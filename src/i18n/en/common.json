@@ -1,7 +1,7 @@
 {
   "app": {
     "title": "Find the Differences: Anomaly Archive",
-    "subtitle": "Northern Route",
+    "subtitle": "White Meridian",
     "pitch": "Restore paired archive photographs from a vanished 1977 expedition."
   },
   "actions": {
@@ -40,18 +40,18 @@
     "cloudUnavailable": "Cloud unavailable, game continues"
   },
   "levels": {
-    "nr01": { "title": "Night Train Carriage" },
-    "nr02": { "title": "Station Waiting Hall" },
-    "nr03": { "title": "Station Chief Office" },
-    "nr04": { "title": "Expedition Storage" },
-    "nr05": { "title": "Radio Room" },
-    "nr06": { "title": "Polar Greenhouse" },
-    "nr07": { "title": "Rover Garage" },
-    "nr08": { "title": "Research Laboratory" },
-    "nr09": { "title": "Living Quarters" },
-    "nr10": { "title": "Observatory Dome" },
-    "nr11": { "title": "Signal Beacon" },
-    "nr12": { "title": "Expedition Camp" }
+    "nr01": { "title": "Boreas Pier" },
+    "nr02": { "title": "Coastal Warehouse" },
+    "nr03": { "title": "White Gull Lighthouse" },
+    "nr04": { "title": "Ice Railway Platform" },
+    "nr05": { "title": "Weather Station" },
+    "nr06": { "title": "Glacier Camp" },
+    "nr07": { "title": "Old Mountain Tunnel" },
+    "nr08": { "title": "Observatory Dome" },
+    "nr09": { "title": "Polar Greenhouse" },
+    "nr10": { "title": "Radio Relay Tower" },
+    "nr11": { "title": "Living Module" },
+    "nr12": { "title": "Hidden Valley Archive" }
   },
   "artifacts": {
     "brass-compass": "Brass compass",

@@ -1,0 +1,203 @@
+{
+  "schemaVersion": "1.0.0",
+  "chapterId": "white-meridian",
+  "titleRu": "Белый меридиан",
+  "premiseRu": "Игрок сравнивает исходные полевые снимки и намеренно изменённые архивные копии экспедиции «Полярная-7».",
+  "truthRu": "Экспедиция скрыла геотермальную долину и редкий синий цветок, чтобы защитить место от промышленной разработки.",
+  "tone": [
+    "cozy-mystery",
+    "scientific",
+    "northern-expedition",
+    "non-supernatural"
+  ],
+  "levels": [
+    {
+      "order": 1,
+      "id": "nr-01-boreas-harbor",
+      "titleRu": "Пристань Борея",
+      "differenceCount": 4,
+      "storyClueRu": "Груза было больше, чем указано в манифесте.",
+      "differences": [
+        "brass-compass-removed",
+        "fuel-canister-count",
+        "life-ring-stripe-color",
+        "seagull-removed"
+      ]
+    },
+    {
+      "order": 2,
+      "id": "nr-02-coastal-warehouse",
+      "titleRu": "Береговой склад",
+      "differenceCount": 5,
+      "storyClueRu": "Запасов хватало минимум на две недели.",
+      "differences": [
+        "sleeping-bag-count",
+        "blue-rope-removed",
+        "lantern-shade-color",
+        "snowshoe-count",
+        "door-crate-removed"
+      ]
+    },
+    {
+      "order": 3,
+      "id": "nr-03-white-gull-lighthouse",
+      "titleRu": "Маяк Белой Чайки",
+      "differenceCount": 5,
+      "artifactId": "brass-compass",
+      "storyClueRu": "На маяке отмечен другой маршрут.",
+      "differences": [
+        "lens-direction",
+        "compass-removed",
+        "signal-lamp-count",
+        "red-route-mark-removed",
+        "window-open-state"
+      ]
+    },
+    {
+      "order": 4,
+      "id": "nr-04-ice-rail-platform",
+      "titleRu": "Ледовая железнодорожная платформа",
+      "differenceCount": 6,
+      "storyClueRu": "Закрытая ветка использовалась после эвакуации.",
+      "differences": [
+        "track-switch-direction",
+        "barrel-count",
+        "railcar-door-state",
+        "mittens-removed",
+        "signal-glass-color",
+        "trolley-position"
+      ]
+    },
+    {
+      "order": 5,
+      "id": "nr-05-weather-station",
+      "titleRu": "Метеорологическая станция",
+      "differenceCount": 6,
+      "storyClueRu": "Температурные данные намеренно занизили.",
+      "differences": [
+        "thermometer-pointer",
+        "wind-vane-direction",
+        "mug-count",
+        "blue-weather-mark-removed",
+        "snow-gauge-sections",
+        "barometer-cover-state"
+      ]
+    },
+    {
+      "order": 6,
+      "id": "nr-06-glacier-camp",
+      "titleRu": "Лагерь у ледника",
+      "differenceCount": 6,
+      "artifactId": "field-radio",
+      "storyClueRu": "Радиопередачи продолжались.",
+      "differences": [
+        "field-radio-removed",
+        "ski-pair-count",
+        "ice-core-removed",
+        "survey-flag-color",
+        "sled-position",
+        "bootprints-removed"
+      ]
+    },
+    {
+      "order": 7,
+      "id": "nr-07-mountain-tunnel",
+      "titleRu": "Старый горный тоннель",
+      "differenceCount": 7,
+      "storyClueRu": "Тоннель был открыт и снабжался электричеством.",
+      "differences": [
+        "deep-lamp-state",
+        "cable-connection",
+        "crate-removed",
+        "vent-state",
+        "sled-tracks-removed",
+        "red-lantern-side",
+        "door-symbol-removed"
+      ]
+    },
+    {
+      "order": 8,
+      "id": "nr-08-observatory-dome",
+      "titleRu": "Купол обсерватории",
+      "differenceCount": 7,
+      "storyClueRu": "Обсерватория следила за долиной.",
+      "differences": [
+        "telescope-direction",
+        "red-notebook-removed",
+        "hatch-state",
+        "golden-diagram-point-removed",
+        "chair-position",
+        "lens-cap-removed",
+        "clock-hands"
+      ]
+    },
+    {
+      "order": 9,
+      "id": "nr-09-polar-greenhouse",
+      "titleRu": "Полярная теплица",
+      "differenceCount": 7,
+      "artifactId": "blue-flower",
+      "storyClueRu": "Синий цветок существовал.",
+      "differences": [
+        "blue-flower-replaced",
+        "pot-count",
+        "grow-light-color",
+        "watering-can-position",
+        "condensation-clear-patch",
+        "thermometer-pointer",
+        "specimen-tray-state"
+      ]
+    },
+    {
+      "order": 10,
+      "id": "nr-10-radio-relay",
+      "titleRu": "Радиорелейная башня",
+      "differenceCount": 7,
+      "storyClueRu": "Сигналы шли между внутренними станциями.",
+      "differences": [
+        "dish-direction",
+        "indicator-color",
+        "field-radio-removed",
+        "cable-socket",
+        "wire-spool-removed",
+        "signal-lamp-state",
+        "route-line-removed"
+      ]
+    },
+    {
+      "order": 11,
+      "id": "nr-11-living-module",
+      "titleRu": "Жилой модуль",
+      "differenceCount": 8,
+      "storyClueRu": "Экспедиция ушла организованно.",
+      "differences": [
+        "bed-state",
+        "mug-count",
+        "jacket-removed",
+        "chess-piece-position",
+        "locker-state",
+        "firewood-removed",
+        "plant-removed",
+        "boot-pair-count"
+      ]
+    },
+    {
+      "order": 12,
+      "id": "nr-12-hidden-archive",
+      "titleRu": "Скрытый архив долины",
+      "differenceCount": 8,
+      "artifactId": "torn-map",
+      "storyClueRu": "Исчезновение было способом защитить долину.",
+      "differences": [
+        "map-fragment-removed",
+        "compass-direction",
+        "pressed-flower-removed",
+        "radio-power-state",
+        "extra-lamp-state",
+        "rock-sample-count",
+        "sled-removed",
+        "steam-plume-removed"
+      ]
+    }
+  ]
+}
