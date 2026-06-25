@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="true" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #E7DDC8; font-family: Inter, system-ui, sans-serif; overflow: hidden; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes drawLine { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }
+    @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(73,107,104,0.4); } 50% { box-shadow: 0 0 0 8px rgba(73,107,104,0); } }
+    @keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
+    @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</helmet>
+
+<!-- ROOT: Full-screen Game Hub -->
+<div style="width:100vw; height:100vh; min-height:600px; background:#E7DDC8; display:flex; flex-direction:column; overflow:hidden; position:relative;">
+
+  <!-- TOP BAR -->
+  <div style="flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:12px 24px; background:#F4EEDD; border-bottom:1px solid #C8BFAD; box-shadow:0 1px 4px rgba(47,50,49,0.08);">
+    <!-- Left: Title -->
+    <div style="display:flex; align-items:baseline; gap:10px;">
+      <span style="font-family:'Playfair Display',Georgia,serif; font-size:18px; font-weight:700; color:#2F3231; letter-spacing:0.01em;">Архив аномалий</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#7A7268; letter-spacing:0.05em;">СЕВЕРНЫЙ МАРШРУТ</span>
+    </div>
+    <!-- Right: Status + Actions -->
+    <div style="display:flex; align-items:center; gap:8px;">
+      <!-- Save status indicator -->
+      <div id="save-status" style="display:flex; align-items:center; gap:5px; padding:4px 10px; border-radius:4px; background:#D6E5E4; animation:fadeUp 0.3s ease;">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#344E4C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="font-size:11px; color:#344E4C; font-weight:500;">Сохранено</span>
+      </div>
+      <!-- Magnifiers balance -->
+      <div style="display:flex; align-items:center; gap:5px; padding:6px 12px; border-radius:4px; border:1px solid #C8BFAD; background:#F4EEDD; cursor:default;">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="5.5" cy="5.5" r="3.5" stroke="#B68A45" stroke-width="1.5"/><path d="M8.5 8.5L12 12" stroke="#B68A45" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:500; color:#2F3231;">{{ magnifiers }}</span>
+        <span style="font-size:11px; color:#7A7268;">луп</span>
+      </div>
+      <!-- Settings -->
+      <button onClick="{{ openSettings }}" style="width:36px; height:36px; border-radius:4px; border:1px solid #C8BFAD; background:#F4EEDD; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#2F3231;" aria-label="Настройки" style-hover="background:#E7DDC8">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="#2F3231" stroke-width="1.4"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.1 3.1l1.4 1.4M11.5 11.5l1.4 1.4M3.1 12.9l1.4-1.4M11.5 4.5l1.4-1.4" stroke="#2F3231" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </button>
+      <!-- Shop -->
+      <button onClick="{{ openShop }}" style="display:flex; align-items:center; gap:6px; padding:6px 14px; border-radius:4px; border:1px solid #B68A45; background:#F4EEDD; cursor:pointer; color:#8C6A34; font-size:13px; font-weight:500;" style-hover="background:#F0E4C8">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="12" height="9" rx="1" stroke="#8C6A34" stroke-width="1.4"/><path d="M4.5 4V3a2.5 2.5 0 015 0v1" stroke="#8C6A34" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Магазин
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div style="flex:1; display:flex; overflow:hidden;">
+
+    <!-- LEFT SIDEBAR: Player status + Daily + Collection -->
+    <div style="width:280px; flex-shrink:0; background:#F4EEDD; border-right:1px solid #C8BFAD; display:flex; flex-direction:column; overflow-y:auto; padding:20px 16px; gap:16px;">
+
+      <!-- Continue / Start CTA -->
+      <div style="animation:fadeUp 0.4s ease 0.1s both;">
+        <sc-if value="{{ isReturning }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ continueLevel }}" style="width:100%; padding:14px 16px; background:#496B68; border:none; border-radius:8px; cursor:pointer; display:flex; flex-direction:column; align-items:flex-start; gap:3px; animation:pulse 2s ease infinite;" style-hover="background:#344E4C" style-active="background:#2A3E3C">
+            <span style="font-size:11px; color:rgba(255,255,255,0.7); text-transform:uppercase; letter-spacing:0.08em;">Продолжить</span>
+            <span style="font-size:15px; font-weight:600; color:#FFFFFF;">{{ currentLevelTitle }}</span>
+            <div style="display:flex; align-items:center; gap:6px; margin-top:2px;">
+              <div style="height:3px; width:60px; background:rgba(255,255,255,0.2); border-radius:2px; overflow:hidden;">
+                <div style="height:100%; width:{{ levelProgressPct }}%; background:rgba(255,255,255,0.7); border-radius:2px;"></div>
+              </div>
+              <span style="font-size:11px; color:rgba(255,255,255,0.7);">{{ foundCount }}/{{ totalCount }} найдено</span>
+            </div>
+          </button>
+        </sc-if>
+        <sc-if value="{{ isNewPlayer }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ startExpedition }}" style="width:100%; padding:14px 16px; background:#496B68; border:none; border-radius:8px; cursor:pointer; display:flex; flex-direction:column; align-items:flex-start; gap:4px;" style-hover="background:#344E4C">
+            <span style="font-size:11px; color:rgba(255,255,255,0.7); text-transform:uppercase; letter-spacing:0.08em;">Новая экспедиция</span>
+            <span style="font-size:15px; font-weight:600; color:#FFFFFF;">Начать экспедицию</span>
+          </button>
+        </sc-if>
+      </div>
+
+      <!-- Progress bar: chapter -->
+      <div style="animation:fadeUp 0.4s ease 0.15s both;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-size:12px; font-weight:500; color:#2F3231;">Маршрут</span>
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#7A7268;">{{ completedCount }}/12</span>
+        </div>
+        <div style="height:4px; background:#C8BFAD; border-radius:2px; overflow:hidden;">
+          <div style="height:100%; width:{{ chapterProgressPct }}%; background:#496B68; border-radius:2px; transition:width 0.5s ease;"></div>
+        </div>
+      </div>
+
+      <!-- Daily Challenge card -->
+      <div style="border:1px solid #C8BFAD; border-radius:8px; overflow:hidden; animation:fadeUp 0.4s ease 0.2s both;">
+        <div style="background:#5F7684; padding:10px 14px; display:flex; align-items:center; justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="white" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <span style="font-size:13px; font-weight:600; color:white;">Ежедневное задание</span>
+          </div>
+          <!-- Streak badge -->
+          <sc-if value="{{ hasStreak }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex; align-items:center; gap:4px; background:rgba(255,255,255,0.15); padding:3px 8px; border-radius:12px;">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1C6 1 9 4 9 7a3 3 0 01-6 0C3 5.5 4.5 3.5 6 1z" fill="rgba(255,255,255,0.9)"/></svg>
+              <span style="font-size:11px; color:white; font-weight:500;">{{ streakDays }} дн.</span>
+            </div>
+          </sc-if>
+        </div>
+        <div style="padding:12px 14px; background:#F4EEDD;">
+          <sc-if value="{{ dailyClaimed }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:8px; opacity:0.6;">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-6" stroke="#3B6E52" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span style="font-size:13px; color:#2F3231;">Задание выполнено сегодня</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ dailyAvailable }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div>
+                <div style="font-size:13px; font-weight:500; color:#2F3231;">{{ dailySceneTitle }}</div>
+                <div style="font-size:11px; color:#7A7268; margin-top:2px; font-family:'IBM Plex Mono',monospace;">{{ dailyDate }}</div>
+              </div>
+              <button onClick="{{ openDaily }}" style="width:100%; padding:9px 12px; background:#496B68; border:none; border-radius:6px; cursor:pointer; font-size:13px; font-weight:500; color:white;" style-hover="background:#344E4C">
+                Играть
+              </button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <!-- Artifact collection progress -->
+      <div style="animation:fadeUp 0.4s ease 0.25s both;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="font-size:12px; font-weight:500; color:#2F3231;">Архивная коллекция</span>
+          <button onClick="{{ openCollection }}" style="font-size:11px; color:#496B68; background:none; border:none; cursor:pointer; font-weight:500; padding:2px 4px;" style-hover="color:#344E4C">Открыть →</button>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <!-- Compass — unlocked at lvl 3 -->
+          <div style="border:1px solid #B68A45; border-radius:6px; padding:10px; background:#F0E4C8; display:flex; flex-direction:column; align-items:center; gap:4px;">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" stroke="#B68A45" stroke-width="1.5"/><path d="M14 7v2M14 19v2M7 14h2M19 14h2" stroke="#B68A45" stroke-width="1.2" stroke-linecap="round"/><path d="M14 11l2 3-2 3-2-3z" fill="#B68A45"/></svg>
+            <span style="font-size:10px; font-weight:500; color:#8C6A34; text-align:center;">Латунный компас</span>
+          </div>
+          <!-- Field radio — unlocked at lvl 6 -->
+          <sc-if value="{{ artifact2Unlocked }}" hint-placeholder-val="{{ true }}">
+            <div style="border:1px solid #B68A45; border-radius:6px; padding:10px; background:#F0E4C8; display:flex; flex-direction:column; align-items:center; gap:4px;">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="5" y="9" width="18" height="12" rx="2" stroke="#B68A45" stroke-width="1.5"/><circle cx="18" cy="15" r="2.5" stroke="#B68A45" stroke-width="1.2"/><path d="M8 15h6M8 12h4" stroke="#B68A45" stroke-width="1.2" stroke-linecap="round"/><path d="M10 9V7M14 9V6" stroke="#B68A45" stroke-width="1.2" stroke-linecap="round"/></svg>
+              <span style="font-size:10px; font-weight:500; color:#8C6A34; text-align:center;">Радиостанция</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ artifact2Locked }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px solid #C8BFAD; border-radius:6px; padding:10px; background:#E7DDC8; display:flex; flex-direction:column; align-items:center; gap:4px; opacity:0.5;">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="9" y="13" width="10" height="8" rx="1.5" stroke="#7A7268" stroke-width="1.5"/><path d="M11 13v-2a3 3 0 016 0v2" stroke="#7A7268" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <span style="font-size:10px; color:#7A7268; text-align:center;">Уровень 6</span>
+            </div>
+          </sc-if>
+          <!-- Blue flower — unlocked at lvl 9 -->
+          <div style="border:1px solid #C8BFAD; border-radius:6px; padding:10px; background:#E7DDC8; display:flex; flex-direction:column; align-items:center; gap:4px; opacity:0.5;">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="9" y="13" width="10" height="8" rx="1.5" stroke="#7A7268" stroke-width="1.5"/><path d="M11 13v-2a3 3 0 016 0v2" stroke="#7A7268" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span style="font-size:10px; color:#7A7268; text-align:center;">Уровень 9</span>
+          </div>
+          <!-- Torn map — unlocked at lvl 12 -->
+          <div style="border:1px solid #C8BFAD; border-radius:6px; padding:10px; background:#E7DDC8; display:flex; flex-direction:column; align-items:center; gap:4px; opacity:0.5;">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="9" y="13" width="10" height="8" rx="1.5" stroke="#7A7268" stroke-width="1.5"/><path d="M11 13v-2a3 3 0 016 0v2" stroke="#7A7268" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span style="font-size:10px; color:#7A7268; text-align:center;">Уровень 12</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CENTER: Expedition Route Map -->
+    <div style="flex:1; overflow-y:auto; padding:24px 28px; display:flex; flex-direction:column; gap:0;">
+
+      <!-- Map header -->
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; animation:fadeUp 0.4s ease 0.1s both;">
+        <div>
+          <div style="font-family:'Playfair Display',Georgia,serif; font-size:22px; font-weight:700; color:#2F3231;">Северный маршрут</div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#7A7268; margin-top:2px; letter-spacing:0.06em;">ЭКСПЕДИЦИЯ 1977 · СТАНЦИЯ ПОЛЯРНАЯ-7</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; padding:6px 12px; background:#F4EEDD; border:1px solid #C8BFAD; border-radius:4px;">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1l1.5 3h3l-2.5 2 1 3L6 7.5 3 9l1-3L1.5 4h3z" fill="#B68A45"/></svg>
+          <span style="font-size:12px; color:#2F3231; font-weight:500;">{{ totalSeals }} печатей</span>
+        </div>
+      </div>
+
+      <!-- Route map: 12 nodes in a winding expedition path -->
+      <div style="position:relative; flex:1; min-height:520px; animation:fadeUp 0.4s ease 0.2s both;">
+
+        <!-- SVG route line background -->
+        <svg style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid meet">
+          <!-- Completed route segments -->
+          <path d="M 80 460 C 160 440, 180 380, 200 340" stroke="#496B68" stroke-width="2.5" fill="none" stroke-dasharray="6 3" opacity="0.6"/>
+          <path d="M 200 340 C 220 300, 300 280, 340 260" stroke="#496B68" stroke-width="2.5" fill="none" stroke-dasharray="6 3" opacity="0.6"/>
+          <path d="M 340 260 C 380 240, 430 240, 460 230" stroke="#496B68" stroke-width="2.5" fill="none" stroke-dasharray="6 3" opacity="0.6"/>
+          <!-- Active/upcoming route -->
+          <path d="M 460 230 C 490 220, 540 230, 560 200" stroke="#C8BFAD" stroke-width="2" fill="none" stroke-dasharray="4 4" opacity="0.7"/>
+          <path d="M 560 200 C 580 170, 600 160, 620 140" stroke="#C8BFAD" stroke-width="2" fill="none" stroke-dasharray="4 4" opacity="0.7"/>
+          <path d="M 620 140 C 640 120, 660 100, 680 80" stroke="#C8BFAD" stroke-width="2" fill="none" stroke-dasharray="4 4" opacity="0.7"/>
+          <path d="M 680 80 C 700 60, 720 50, 740 40" stroke="#C8BFAD" stroke-width="2" fill="none" stroke-dasharray="4 4" opacity="0.7"/>
+          <!-- Decorative compass rose in background -->
+          <g opacity="0.06" transform="translate(680,420)">
+            <circle cx="0" cy="0" r="50" stroke="#2F3231" stroke-width="1" fill="none"/>
+            <path d="M0-50 L6-10 L0 0 L-6-10Z" fill="#2F3231"/>
+            <path d="M0 50 L6 10 L0 0 L-6 10Z" fill="#2F3231" opacity="0.5"/>
+            <path d="M-50 0 L-10 6 L0 0 L-10-6Z" fill="#2F3231" opacity="0.5"/>
+            <path d="M50 0 L10 6 L0 0 L10-6Z" fill="#2F3231" opacity="0.5"/>
+          </g>
+        </svg>
+
+        <!-- Level nodes positioned absolutely -->
+
+        <!-- Node 1 — Tutorial (completed) -->
+        <div onClick="{{ selectLevel1 }}" style="position:absolute; left:50px; top:430px; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; width:80px;">
+          <div style="width:44px; height:44px; border-radius:6px; background:#496B68; border:2px solid #344E4C; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(47,50,49,0.2);">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div style="display:flex; gap:2px;">
+            <div style="width:8px; height:8px; border-radius:1px; background:#B68A45;"></div>
+            <div style="width:8px; height:8px; border-radius:1px; background:#B68A45;"></div>
+            <div style="width:8px; height:8px; border-radius:1px; background:#B68A45;"></div>
+          </div>
+          <span style="font-size:10px; color:#2F3231; font-weight:500; text-align:center; line-height:1.2;">Вагон поезда</span>
+        </div>
+
+        <!-- Node 2 — Completed -->
+        <div onClick="{{ selectLevel2 }}" style="position:absolute; left:170px; top:310px; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; width:80px;">
+          <div style="width:44px; height:44px; border-radius:6px; background:#496B68; border:2px solid #344E4C; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(47,50,49,0.2);">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div style="display:flex; gap:2px;">
+            <div style="width:8px; height:8px; border-radius:1px; background:#B68A45;"></div>
+            <div style="width:8px; height:8px; border-radius:1px; background:#B68A45;"></div>
+            <div style="width:8px; height:8px; border-radius:1px; background:#C8BFAD;"></div>
+          </div>
+          <span style="font-size:10px; color:#2F3231; font-weight:500; text-align:center; line-height:1.2;">Зал ожидания</span>
+        </div>
+
+        <!-- Node 3 — Completed + Artifact milestone -->
+        <div onClick="{{ selectLevel3 }}" style="position:absolute; left:310px; top:228px; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; width:80px;">
+          <div style="position:relative;">
+            <div style="width:44px; height:44px; border-radius:6px; background:#496B68; border:2px solid #344E4C; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(47,50,49,0.2);">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <!-- Artifact badge -->
+            <div style="position:absolute; top:-6px; right:-6px; width:16px; height:16px; border-radius:3px; background:#B68A45; border:1.5px solid #F4EEDD; display:flex; align-items:center; justify-content:center;">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1l1 2.5h2.5L6.5 5l1 2.5L5 6l-2.5 1.5 1-2.5-2-1.5H4z" fill="white"/></svg>
+            </div>
+          </div>
+          <div style="display:flex; gap:2px;">
+            <div style="width:8px; height:8px; border-radius:1px; background:#B68A45;"></div>
+            <div style="width:8px; height:8px; border-radius:1px; background:#B68A45;"></div>
+            <div style="width:8px; height:8px; border-radius:1px; background:#B68A45;"></div>
+          </div>
+          <span style="font-size:10px; color:#2F3231; font-weight:500; text-align:center; line-height:1.2;">Кабинет нач.</span>
+        </div>
+
+        <!-- Node 4 — Active / Current -->
+        <div onClick="{{ selectLevel4 }}" style="position:absolute; left:426px; top:196px; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; width:90px; z-index:2;">
+          <div style="width:50px; height:50px; border-radius:8px; background:#496B68; border:2.5px solid #B68A45; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 4px rgba(73,107,104,0.2), 0 4px 12px rgba(47,50,49,0.25); animation:pulse 2.5s ease infinite;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 5v5l3 3" stroke="white" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="10" r="8" stroke="white" stroke-width="1.5"/></svg>
+          </div>
+          <div style="padding:2px 8px; background:#496B68; border-radius:10px;">
+            <span style="font-size:10px; color:white; font-weight:600;">Текущий</span>
+          </div>
+          <span style="font-size:10px; color:#2F3231; font-weight:600; text-align:center; line-height:1.2;">Склад экспедиции</span>
+        </div>
+
+        <!-- Nodes 5–12: locked/available (simplified) -->
+        <!-- Node 5 -->
+        <div onClick="{{ selectLevel5 }}" style="position:absolute; left:528px; top:168px; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; width:80px; opacity:0.65;">
+          <div style="width:40px; height:40px; border-radius:6px; background:#E7DDC8; border:1.5px solid #C8BFAD; display:flex; align-items:center; justify-content:center;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="5" y="8" width="6" height="5" rx="1" stroke="#7A7268" stroke-width="1.3"/><path d="M6 8V6.5a2 2 0 014 0V8" stroke="#7A7268" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <span style="font-size:10px; color:#7A7268; text-align:center; line-height:1.2;">Радиорубка</span>
+        </div>
+
+        <!-- Node 6 — Artifact milestone (locked) -->
+        <div onClick="{{ selectLevel6 }}" style="position:absolute; left:588px; top:136px; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; width:80px; opacity:0.5;">
+          <div style="position:relative; width:40px; height:40px; border-radius:6px; background:#E7DDC8; border:1.5px solid #C8BFAD; display:flex; align-items:center; justify-content:center;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="5" y="8" width="6" height="5" rx="1" stroke="#7A7268" stroke-width="1.3"/><path d="M6 8V6.5a2 2 0 014 0V8" stroke="#7A7268" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <div style="position:absolute; top:-5px; right:-5px; width:12px; height:12px; border-radius:2px; background:#C8BFAD; display:flex; align-items:center; justify-content:center;">
+              <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 1l.7 2h2L5 4.3l.8 2L4 5.3l-1.8 1L3 4.3 1.3 3h2z" fill="white"/></svg>
+            </div>
+          </div>
+          <span style="font-size:10px; color:#7A7268; text-align:center; line-height:1.2;">Теплица</span>
+        </div>
+
+        <!-- Nodes 7–9 (compressed) -->
+        <div style="position:absolute; left:648px; top:108px; display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; width:70px; opacity:0.45;">
+          <div style="width:36px; height:36px; border-radius:5px; background:#E7DDC8; border:1.5px solid #C8BFAD; display:flex; align-items:center; justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="5" y="8" width="6" height="5" rx="1" stroke="#7A7268" stroke-width="1.3"/><path d="M6 8V6.5a2 2 0 014 0V8" stroke="#7A7268" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <span style="font-size:10px; color:#7A7268; text-align:center; line-height:1.2;">Гараж</span>
+        </div>
+
+        <div style="position:absolute; left:700px; top:72px; display:flex; flex-direction:column; align-items:center; gap:4px; width:70px; opacity:0.35;">
+          <div style="width:36px; height:36px; border-radius:5px; background:#E7DDC8; border:1.5px solid #C8BFAD; display:flex; align-items:center; justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="5" y="8" width="6" height="5" rx="1" stroke="#7A7268" stroke-width="1.3"/><path d="M6 8V6.5a2 2 0 014 0V8" stroke="#7A7268" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <span style="font-size:10px; color:#7A7268; text-align:center; line-height:1.2;">Лаборатория</span>
+        </div>
+
+        <!-- Final node hint at top -->
+        <div style="position:absolute; left:740px; top:30px; display:flex; flex-direction:column; align-items:center; gap:2px; width:80px; opacity:0.25;">
+          <div style="width:36px; height:36px; border-radius:5px; background:#E7DDC8; border:1.5px dashed #C8BFAD; display:flex; align-items:center; justify-content:center;">
+            <span style="font-size:14px;">?</span>
+          </div>
+          <span style="font-size:9px; color:#7A7268; text-align:center;">Цель</span>
+        </div>
+
+        <!-- Archive stamp in corner -->
+        <div style="position:absolute; right:16px; bottom:16px; opacity:0.12; transform:rotate(-8deg);">
+          <div style="border:2.5px solid #9A4E3F; border-radius:4px; padding:6px 12px; display:flex; flex-direction:column; align-items:center; gap:1px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:#9A4E3F; letter-spacing:0.12em; font-weight:500;">АРХИВ</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:8px; color:#9A4E3F; letter-spacing:0.08em;">АНОМАЛИЙ</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM: Mobile layout (hidden on desktop, shown via media query via responsive classes) -->
+  <!-- Note: responsive switching handled by JS via this.state.isMobile -->
+
+  <!-- MODAL LAYER (conditionally rendered) -->
+  <sc-if value="{{ showModal }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; background:rgba(47,50,49,0.55); z-index:50; display:flex; align-items:center; justify-content:center; animation:fadeUp 0.2s ease;" onClick="{{ closeModal }}">
+      <div style="background:#F4EEDD; border-radius:12px; box-shadow:0 16px 40px rgba(47,50,49,0.28); max-width:480px; width:90%; max-height:85vh; overflow-y:auto; animation:slideUp 0.25s ease;" onClick="{{ stopProp }}">
+        <!-- Modal content injected by active modal state -->
+        <div style="padding:24px;">
+          <div style="font-family:'Playfair Display',Georgia,serif; font-size:20px; font-weight:700; color:#2F3231; margin-bottom:6px;">{{ modalTitle }}</div>
+          <div style="font-size:14px; color:#7A7268; margin-bottom:20px; font-family:'IBM Plex Mono',monospace; letter-spacing:0.04em;">{{ modalSubtitle }}</div>
+          <div style="font-size:15px; color:#2F3231; line-height:1.5; margin-bottom:24px;">{{ modalBody }}</div>
+          <div style="display:flex; gap:10px; justify-content:flex-end;">
+            <button onClick="{{ closeModal }}" style="padding:10px 20px; border-radius:6px; border:1px solid #C8BFAD; background:#E7DDC8; font-size:14px; font-weight:500; color:#2F3231; cursor:pointer;" style-hover="background:#D4C9B3">Закрыть</button>
+            <button onClick="{{ modalAction }}" style="padding:10px 20px; border-radius:6px; border:none; background:#496B68; font-size:14px; font-weight:600; color:white; cursor:pointer;" style-hover="background:#344E4C">{{ modalActionLabel }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- Toast notification -->
+  <sc-if value="{{ showToast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#2F3231; color:white; padding:10px 20px; border-radius:6px; font-size:14px; font-weight:500; z-index:60; animation:slideUp 0.2s ease; box-shadow:0 4px 12px rgba(47,50,49,0.3);">
+      {{ toastMessage }}
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1440, &quot;height&quot;: 900 },
+  &quot;playerState&quot;: {
+    &quot;editor&quot;: &quot;enum&quot;,
+    &quot;options&quot;: [&quot;new&quot;, &quot;returning&quot;],
+    &quot;default&quot;: &quot;returning&quot;,
+    &quot;tsType&quot;: &quot;'new' | 'returning'&quot;
+  },
+  &quot;magnifiers&quot;: {
+    &quot;editor&quot;: &quot;int&quot;,
+    &quot;default&quot;: 3,
+    &quot;min&quot;: 0,
+    &quot;max&quot;: 99,
+    &quot;tsType&quot;: &quot;number&quot;
+  },
+  &quot;completedLevels&quot;: {
+    &quot;editor&quot;: &quot;int&quot;,
+    &quot;default&quot;: 3,
+    &quot;min&quot;: 0,
+    &quot;max&quot;: 12,
+    &quot;tsType&quot;: &quot;number&quot;
+  },
+  &quot;hasStreak&quot;: {
+    &quot;editor&quot;: &quot;boolean&quot;,
+    &quot;default&quot;: true,
+    &quot;tsType&quot;: &quot;boolean&quot;
+  },
+  &quot;streakDays&quot;: {
+    &quot;editor&quot;: &quot;int&quot;,
+    &quot;default&quot;: 3,
+    &quot;min&quot;: 1,
+    &quot;max&quot;: 30,
+    &quot;tsType&quot;: &quot;number&quot;
+  },
+  &quot;dailyClaimed&quot;: {
+    &quot;editor&quot;: &quot;boolean&quot;,
+    &quot;default&quot;: false,
+    &quot;tsType&quot;: &quot;boolean&quot;
+  }
+}">
+class Component extends DCLogic {
+  state = {
+    // Player state
+    isReturning: true,
+    isNewPlayer: false,
+    magnifiers: 3,
+    completedCount: 3,
+    totalSeals: 7,
+    chapterProgressPct: 25,
+
+    // Current in-progress level
+    currentLevelTitle: 'Склад экспедиции',
+    foundCount: 2,
+    totalCount: 6,
+    levelProgressPct: 33,
+
+    // Artifacts
+    artifact2Unlocked: false,
+    artifact2Locked: true,
+
+    // Daily
+    dailyClaimed: false,
+    dailyAvailable: true,
+    dailySceneTitle: 'Каюта ледокола',
+    dailyDate: '25 июня 2026',
+    hasStreak: true,
+    streakDays: 3,
+
+    // Modals/toasts
+    showModal: false,
+    modalTitle: '',
+    modalSubtitle: '',
+    modalBody: '',
+    modalActionLabel: 'Продолжить',
+    showToast: false,
+    toastMessage: '',
+    toastTimer: null,
+  };
+
+  renderVals() {
+    const s = this.state;
+    return {
+      ...s,
+      startExpedition: () => this.showToastMsg('Начинаем экспедицию…'),
+      continueLevel: () => this.showToastMsg('Возвращаемся к: ' + s.currentLevelTitle),
+      openSettings: () => this.openModalWith('Настройки', 'УПРАВЛЕНИЕ И СИСТЕМА', 'Язык, звук, вибрация, данные диагностики и поддержка.', 'К настройкам'),
+      openShop: () => this.openModalWith('Магазин', 'АРХИВНЫЙ КАТАЛОГ', 'Архивный набор — отключение принудительной рекламы, 10 луп, эксклюзивная рамка.', 'Открыть магазин'),
+      openCollection: () => this.openModalWith('Коллекция', 'АРХИВНЫЕ ЭКСПОНАТЫ', 'Латунный компас обнаружен после уровня 3. Остальные экспонаты будут раскрыты по мере прохождения маршрута.', 'Смотреть'),
+      openDaily: () => this.showToastMsg('Загружаем ежедневное задание…'),
+      selectLevel1: () => this.openModalWith('Вагон ночного поезда', 'УРОВЕНЬ 01 · ОБУЧЕНИЕ', 'Пройден. Все 4 расхождения найдены. Три печати получены.', 'Повторить'),
+      selectLevel2: () => this.openModalWith('Зал ожидания станции', 'УРОВЕНЬ 02', 'Пройден. 5 расхождений. 2 из 3 печатей.', 'Повторить'),
+      selectLevel3: () => this.openModalWith('Кабинет начальника станции', 'УРОВЕНЬ 03 · ЭКСПОНАТ', 'Пройден. Получен латунный компас.', 'Повторить'),
+      selectLevel4: () => this.openModalWith('Склад экспедиции', 'УРОВЕНЬ 04 · ТЕКУЩИЙ', 'Найдено 2 из 6 расхождений. Продолжить поиск?', 'Продолжить'),
+      selectLevel5: () => this.openModalWith('Радиорубка', 'УРОВЕНЬ 05 · ЗАБЛОКИРОВАН', 'Завершите уровень 4, чтобы открыть этот маршрутный узел.', 'Понятно'),
+      selectLevel6: () => this.openModalWith('Полярная теплица', 'УРОВЕНЬ 06 · ЗАБЛОКИРОВАН', 'Завершите уровень 5, чтобы открыть. Здесь хранится второй экспонат.', 'Понятно'),
+      closeModal: () => this.setState({ showModal: false }),
+      stopProp: (e) => e.stopPropagation(),
+      modalAction: () => this.setState({ showModal: false }),
+    };
+  }
+
+  openModalWith(title, subtitle, body, actionLabel) {
+    this.setState({
+      showModal: true,
+      modalTitle: title,
+      modalSubtitle: subtitle,
+      modalBody: body,
+      modalActionLabel: actionLabel,
+    });
+  }
+
+  showToastMsg(msg) {
+    if (this.state.toastTimer) clearTimeout(this.state.toastTimer);
+    const timer = setTimeout(() => this.setState({ showToast: false, toastTimer: null }), 2500);
+    this.setState({ showToast: true, toastMessage: msg, toastTimer: timer });
+  }
+}
+</script>
+</body>
+</html>

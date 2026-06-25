@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "assets": [
+    {
+      "id": "nr-01-a",
+      "kind": "scene-a",
+      "path": "/assets/scenes/northern-route/nr-01/a.webp",
+      "width": 1600,
+      "height": 1000,
+      "status": "placeholder",
+      "source": "local",
+      "notes": "Replace with validated master image A."
+    },
+    {
+      "id": "nr-01-b",
+      "kind": "scene-b",
+      "path": "/assets/scenes/northern-route/nr-01/b.webp",
+      "width": 1600,
+      "height": 1000,
+      "status": "placeholder",
+      "source": "local",
+      "notes": "Must be edited from A and validated with diff overlay."
+    },
+    {
+      "id": "artifact-brass-compass",
+      "kind": "artifact",
+      "path": "/assets/artifacts/brass-compass.webp",
+      "width": 1200,
+      "height": 1200,
+      "status": "placeholder",
+      "source": "local",
+      "notes": "Museum catalog object illustration."
+    }
+  ]
+}

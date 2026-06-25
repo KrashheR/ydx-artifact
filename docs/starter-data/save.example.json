@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "updatedAt": 0,
+  "deviceId": "generated-per-install",
+  "campaign": {
+    "completedLevelIds": [],
+    "unlockedLevelIds": [
+      "nr-01-night-train"
+    ],
+    "bestResults": {}
+  },
+  "inProgressLevel": null,
+  "inventory": {
+    "magnifiers": 3
+  },
+  "collection": {
+    "unlockedArtifactIds": [],
+    "viewedArtifactIds": []
+  },
+  "daily": {
+    "lastClaimServerDate": null,
+    "streak": 0,
+    "records": {}
+  },
+  "purchases": {
+    "entitlements": [],
+    "processedPurchaseTokens": [],
+    "grantedOneTimeProductIds": []
+  },
+  "settings": {
+    "locale": "ru",
+    "localeWasSelectedManually": false,
+    "musicVolume": 0.7,
+    "sfxVolume": 0.8,
+    "vibration": true,
+    "reducedMotion": false,
+    "mobilePhotoMode": "toggle"
+  },
+  "sync": {
+    "lastCloudSyncAt": null,
+    "pendingCloudSync": false,
+    "source": "local"
+  }
+}

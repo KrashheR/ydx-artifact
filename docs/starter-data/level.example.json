@@ -1,0 +1,150 @@
+{
+  "id": "nr-01-night-train",
+  "chapterId": "northern-route",
+  "order": 1,
+  "titleKey": "levels.nr01.title",
+  "descriptionKey": "levels.nr01.description",
+  "imageA": "/assets/scenes/northern-route/nr-01/a.webp",
+  "imageB": "/assets/scenes/northern-route/nr-01/b.webp",
+  "thumbnail": "/assets/scenes/northern-route/nr-01/thumb.webp",
+  "differences": [
+    {
+      "id": "missing-tea-glass",
+      "hitAreaA": {
+        "kind": "circle",
+        "cx": 0.21,
+        "cy": 0.69,
+        "radius": 0.035
+      },
+      "hitAreaB": {
+        "kind": "circle",
+        "cx": 0.21,
+        "cy": 0.69,
+        "radius": 0.035
+      },
+      "hintArea": {
+        "kind": "circle",
+        "cx": 0.21,
+        "cy": 0.69,
+        "radius": 0.11
+      },
+      "difficulty": 1
+    },
+    {
+      "id": "blue-luggage-strap",
+      "hitAreaA": {
+        "kind": "polygon",
+        "points": [
+          {
+            "x": 0.71,
+            "y": 0.61
+          },
+          {
+            "x": 0.79,
+            "y": 0.61
+          },
+          {
+            "x": 0.8,
+            "y": 0.71
+          },
+          {
+            "x": 0.7,
+            "y": 0.71
+          }
+        ]
+      },
+      "hitAreaB": {
+        "kind": "polygon",
+        "points": [
+          {
+            "x": 0.71,
+            "y": 0.61
+          },
+          {
+            "x": 0.79,
+            "y": 0.61
+          },
+          {
+            "x": 0.8,
+            "y": 0.71
+          },
+          {
+            "x": 0.7,
+            "y": 0.71
+          }
+        ]
+      },
+      "hintArea": {
+        "kind": "circle",
+        "cx": 0.75,
+        "cy": 0.66,
+        "radius": 0.12
+      },
+      "difficulty": 1
+    },
+    {
+      "id": "clock-hand",
+      "hitAreaA": {
+        "kind": "circle",
+        "cx": 0.52,
+        "cy": 0.22,
+        "radius": 0.04
+      },
+      "hitAreaB": {
+        "kind": "circle",
+        "cx": 0.52,
+        "cy": 0.22,
+        "radius": 0.04
+      },
+      "hintArea": {
+        "kind": "circle",
+        "cx": 0.52,
+        "cy": 0.22,
+        "radius": 0.1
+      },
+      "difficulty": 1
+    },
+    {
+      "id": "moved-map-tube",
+      "hitAreaA": {
+        "kind": "circle",
+        "cx": 0.37,
+        "cy": 0.79,
+        "radius": 0.045
+      },
+      "hitAreaB": {
+        "kind": "circle",
+        "cx": 0.45,
+        "cy": 0.79,
+        "radius": 0.045
+      },
+      "hintArea": {
+        "kind": "polygon",
+        "points": [
+          {
+            "x": 0.29,
+            "y": 0.68
+          },
+          {
+            "x": 0.53,
+            "y": 0.68
+          },
+          {
+            "x": 0.53,
+            "y": 0.9
+          },
+          {
+            "x": 0.29,
+            "y": 0.9
+          }
+        ]
+      },
+      "difficulty": 1
+    }
+  ],
+  "requiredDifferences": 4,
+  "reward": {
+    "archivePoints": 100,
+    "magnifiers": 1
+  }
+}

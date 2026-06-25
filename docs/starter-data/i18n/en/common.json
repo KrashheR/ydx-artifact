@@ -1,0 +1,23 @@
+{
+  "app": {
+    "title": "Find the Differences: Anomaly Archive"
+  },
+  "actions": {
+    "start": "Start the expedition",
+    "continue": "Continue",
+    "compare": "Compare",
+    "back": "Back",
+    "retry": "Try again"
+  },
+  "save": {
+    "saved": "Saved",
+    "saving": "Saving…",
+    "localOnly": "Progress is temporarily saved on this device",
+    "cloudUnavailable": "Cloud saves are temporarily unavailable",
+    "cloudRecovered": "Cloud sync restored"
+  },
+  "language": {
+    "russian": "Русский",
+    "english": "English"
+  }
+}

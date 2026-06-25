@@ -1,0 +1,66 @@
+{
+  "app": {
+    "title": "Find the Differences: Anomaly Archive",
+    "subtitle": "Northern Route",
+    "pitch": "Restore paired archive photographs from a vanished 1977 expedition."
+  },
+  "actions": {
+    "start": "Start expedition",
+    "continue": "Continue",
+    "map": "Map",
+    "collection": "Collection",
+    "daily": "Daily",
+    "settings": "Settings",
+    "back": "Back",
+    "compare": "Compare A/B",
+    "hintArea": "Area hint",
+    "hintExact": "Exact reveal",
+    "pause": "Pause",
+    "resume": "Resume",
+    "resetSave": "Reset save",
+    "copyDiagnostics": "Copy diagnostics"
+  },
+  "home": {
+    "new": "New archive",
+    "returning": "Progress found",
+    "mock": "Local Yandex mock mode enabled"
+  },
+  "game": {
+    "found": "Found {{count}} / {{total}}",
+    "mistakes": "Mistakes: {{count}}",
+    "magnifiers": "Magnifiers: {{count}}",
+    "completed": "Photo restored",
+    "accuracy": "Accuracy {{value}}%",
+    "useWheel": "Mouse wheel: zoom. Drag: pan. On mobile, use A/B."
+  },
+  "save": {
+    "saved": "Saved",
+    "saving": "Saving...",
+    "localOnly": "Progress saved locally",
+    "cloudUnavailable": "Cloud unavailable, game continues"
+  },
+  "levels": {
+    "nr01": { "title": "Night Train Carriage" },
+    "nr02": { "title": "Station Waiting Hall" },
+    "nr03": { "title": "Station Chief Office" },
+    "nr04": { "title": "Expedition Storage" },
+    "nr05": { "title": "Radio Room" },
+    "nr06": { "title": "Polar Greenhouse" },
+    "nr07": { "title": "Rover Garage" },
+    "nr08": { "title": "Research Laboratory" },
+    "nr09": { "title": "Living Quarters" },
+    "nr10": { "title": "Observatory Dome" },
+    "nr11": { "title": "Signal Beacon" },
+    "nr12": { "title": "Expedition Camp" }
+  },
+  "artifacts": {
+    "brass-compass": "Brass compass",
+    "field-radio": "Field radio",
+    "blue-flower": "Pressed blue flower",
+    "torn-map": "Torn route map"
+  },
+  "language": {
+    "ru": "Русский",
+    "en": "English"
+  }
+}

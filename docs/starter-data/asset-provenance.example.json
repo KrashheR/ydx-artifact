@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "assets": [
+    {
+      "assetId": "nr-01-master-a",
+      "kind": "scene-master",
+      "toolOrModel": "document-generator-name",
+      "generationDate": "2026-06-25",
+      "sourcePromptPath": "art/prompts/nr-01.md",
+      "sourceMasterPath": "art/source/nr-01-a.png",
+      "humanEdits": [],
+      "licenseOrTermsSnapshot": "legal/tool-terms-snapshot.pdf",
+      "sha256": "replace-after-final-export",
+      "approvalStatus": "draft"
+    }
+  ]
+}

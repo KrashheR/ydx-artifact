@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Inter, system-ui, sans-serif; background: #2F3231; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes stampIn { 0% { transform:scale(1.4) rotate(-8deg); opacity:0; } 60% { transform:scale(0.95) rotate(2deg); opacity:1; } 100% { transform:scale(1) rotate(0deg); opacity:1; } }
+    @keyframes sealStamp { 0% { transform:scale(1.8); opacity:0; } 50% { transform:scale(0.9); opacity:1; } 100% { transform:scale(1); opacity:1; } }
+    @keyframes shimmer { 0%,100% { opacity:0.6; } 50% { opacity:1; } }
+    @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+    @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation:none!important; transition:none!important; } }
+  </style>
+</helmet>
+
+<!-- MODAL SHOWCASE: All overlay states on dark background -->
+<div style="min-height:100vh; background:#1A1F1E; padding:32px; display:flex; flex-direction:column; gap:48px;">
+
+  <!-- Section label -->
+  <div style="display:flex; align-items:center; gap:12px;">
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#496B68; letter-spacing:0.1em;">DESIGN-REFERENCE</div>
+    <div style="flex:1; height:1px; background:rgba(200,191,173,0.1);"></div>
+    <div style="font-family:'Playfair Display',serif; font-size:20px; color:#F4EEDD;">Модальные состояния</div>
+  </div>
+
+  <!-- Modal selector tabs -->
+  <div style="display:flex; gap:6px; flex-wrap:wrap;">
+    <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="9">
+      <button onClick="{{ tab.select }}" style="padding:6px 14px; border-radius:4px; border:1px solid {{ tab.active ? '#496B68' : 'rgba(200,191,173,0.2)' }}; background:{{ tab.active ? '#496B68' : 'transparent' }}; color:{{ tab.active ? 'white' : '#C8BFAD' }}; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.15s;">{{ tab.label }}</button>
+    </sc-for>
+  </div>
+
+  <!-- MODAL DISPLAY AREA -->
+  <div style="display:flex; justify-content:center; align-items:flex-start; min-height:520px;">
+
+    <!-- 1. STORY INTRO -->
+    <sc-if value="{{ activeTab === 'intro' }}" hint-placeholder-val="{{ true }}">
+      <div style="max-width:520px; width:100%; background:#F4EEDD; border-radius:12px; overflow:hidden; box-shadow:0 16px 48px rgba(0,0,0,0.5); animation:fadeUp 0.3s ease;">
+        <!-- Header image area (archival photo contact sheet aesthetic) -->
+        <div style="height:180px; background:linear-gradient(160deg, #243028 0%, #1C2820 60%, #2A3530 100%); position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+          <!-- Contact sheet grid suggestion -->
+          <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:3px; padding:16px; width:100%; height:100%; opacity:0.4;">
+            <sc-for list="{{ contactFrames }}" as="f" hint-placeholder-count="8">
+              <div style="background:#2A3530; border:1px solid #3D4E48; border-radius:2px;"></div>
+            </sc-for>
+          </div>
+          <!-- Center highlight frame -->
+          <div style="position:absolute; border:2px solid #B68A45; border-radius:2px; width:100px; height:70px; box-shadow:0 0 0 4px rgba(182,138,69,0.12);"></div>
+          <div style="position:absolute; bottom:10px; right:12px; font-family:'IBM Plex Mono',monospace; font-size:9px; color:rgba(200,191,173,0.4); letter-spacing:0.08em;">АРХИВ ЭКСПЕДИЦИИ 1977</div>
+        </div>
+        <div style="padding:24px 28px 28px;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#7A7268; letter-spacing:0.08em; margin-bottom:8px;">ДЕЛО № AA-1977-12 · ВХОДЯЩИЕ МАТЕРИАЛЫ</div>
+          <div style="font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:#2F3231; margin-bottom:12px; line-height:1.2;">В архив поступила коробка</div>
+          <div style="font-size:15px; color:#2F3231; line-height:1.6; margin-bottom:20px;">Материалы экспедиции 1977 года, исследовавшей заброшенную станцию «Полярная-7». В каждом конверте — два снимка одной сцены. Детали на них не совпадают.</div>
+          <div style="font-size:13px; color:#7A7268; line-height:1.5; margin-bottom:24px; padding:12px 14px; background:#E7DDC8; border-left:3px solid #9A4E3F; border-radius:0 4px 4px 0;">Ваша задача — найти расхождения и восстановить архивную запись.</div>
+          <button onClick="{{ startTutorial }}" style="width:100%; padding:14px; border-radius:8px; border:none; background:#496B68; font-size:15px; font-weight:600; color:white; cursor:pointer;" style-hover="background:#344E4C">Начать экспедицию</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- 2. PRE-LEVEL CARD -->
+    <sc-if value="{{ activeTab === 'prelevel' }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:440px; width:100%; background:#F4EEDD; border-radius:12px; overflow:hidden; box-shadow:0 16px 48px rgba(0,0,0,0.5); animation:fadeUp 0.3s ease;">
+        <!-- Scene thumbnail -->
+        <div style="height:160px; background:linear-gradient(135deg, #2A3530 0%, #1E2925 50%, #2A3530 100%); position:relative; display:flex; align-items:center; justify-content:center;">
+          <div style="font-size:32px; opacity:0.3;">📸</div>
+          <div style="position:absolute; inset:0; display:grid; grid-template-columns:1fr 1fr; gap:2px; padding:0;">
+            <div style="background:linear-gradient(135deg,#2A3530,#1A2320); opacity:0.8;"></div>
+            <div style="background:linear-gradient(135deg,#243028,#1C2820); opacity:0.8;"></div>
+          </div>
+          <div style="position:absolute; bottom:0; left:0; right:0; height:60px; background:linear-gradient(transparent,rgba(26,31,30,0.8));"></div>
+          <div style="position:absolute; bottom:10px; left:14px;">
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:rgba(200,191,173,0.7); letter-spacing:0.06em;">УРОВЕНЬ 04</div>
+          </div>
+          <!-- Difficulty dots -->
+          <div style="position:absolute; bottom:10px; right:14px; display:flex; gap:3px;">
+            <div style="width:6px; height:6px; border-radius:1px; background:#B68A45;"></div>
+            <div style="width:6px; height:6px; border-radius:1px; background:#B68A45;"></div>
+            <div style="width:6px; height:6px; border-radius:1px; background:rgba(200,191,173,0.3);"></div>
+          </div>
+        </div>
+        <div style="padding:20px 24px 24px;">
+          <div style="font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:#2F3231; margin-bottom:4px;">Склад экспедиции</div>
+          <div style="font-size:13px; color:#7A7268; margin-bottom:16px; font-family:'IBM Plex Mono',monospace;">СЕВЕРНЫЙ МАРШРУТ · ЭКС. 1977</div>
+          <div style="display:flex; gap:16px; margin-bottom:20px;">
+            <div style="flex:1; padding:10px 12px; background:#E7DDC8; border-radius:6px; display:flex; flex-direction:column; gap:2px;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:500; color:#2F3231;">6</div>
+              <div style="font-size:11px; color:#7A7268;">расхождений</div>
+            </div>
+            <div style="flex:1; padding:10px 12px; background:#E7DDC8; border-radius:6px; display:flex; flex-direction:column; gap:2px;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:500; color:#2F3231;">~3 мин</div>
+              <div style="font-size:11px; color:#7A7268;">примерно</div>
+            </div>
+          </div>
+          <!-- Seals from previous attempt -->
+          <div style="display:flex; gap:6px; margin-bottom:20px; padding:10px 12px; background:#E7DDC8; border-radius:6px;">
+            <div style="font-size:12px; color:#7A7268; flex:1;">Лучший результат:</div>
+            <div style="display:flex; gap:4px;">
+              <div style="width:18px; height:18px; border-radius:2px; background:#B68A45; display:flex; align-items:center; justify-content:center;"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+              <div style="width:18px; height:18px; border-radius:2px; background:#B68A45; display:flex; align-items:center; justify-content:center;"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+              <div style="width:18px; height:18px; border-radius:2px; background:#C8BFAD; display:flex; align-items:center; justify-content:center;"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 3l4 4M7 3l-4 4" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+            </div>
+          </div>
+          <button onClick="{{ startLevel }}" style="width:100%; padding:13px; border-radius:8px; border:none; background:#496B68; font-size:15px; font-weight:600; color:white; cursor:pointer; margin-bottom:8px;" style-hover="background:#344E4C">Найдите 6 расхождений</button>
+          <button onClick="{{ cancelLevel }}" style="width:100%; padding:11px; border-radius:8px; border:1px solid #C8BFAD; background:transparent; font-size:13px; color:#7A7268; cursor:pointer;" style-hover="color:#2F3231">Назад к карте</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- 3. RESULT — 1 SEAL -->
+    <sc-if value="{{ activeTab === 'result1' }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:440px; width:100%; background:#F4EEDD; border-radius:12px; overflow:hidden; box-shadow:0 16px 48px rgba(0,0,0,0.5); animation:fadeUp 0.3s ease;">
+        <div style="padding:28px 28px 0; text-align:center;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#7A7268; letter-spacing:0.1em; margin-bottom:8px;">РЕЗУЛЬТАТ · УРОВЕНЬ 04</div>
+          <div style="font-family:'Playfair Display',serif; font-size:24px; font-weight:700; color:#2F3231; margin-bottom:4px;">Снимок восстановлен</div>
+          <div style="font-size:14px; color:#7A7268; margin-bottom:24px;">Склад экспедиции · 6 из 6</div>
+          <!-- Seals row -->
+          <div style="display:flex; justify-content:center; gap:16px; margin-bottom:8px;">
+            <!-- Seal 1: Восстановлено (earned) -->
+            <div style="display:flex; flex-direction:column; align-items:center; gap:6px; animation:sealStamp 0.5s ease 0.1s both;">
+              <div style="width:64px; height:64px; border-radius:8px; border:2.5px solid #496B68; background:#D6E5E4; display:flex; align-items:center; justify-content:center;">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 14l5 5 11-11" stroke="#496B68" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div style="font-size:10px; font-weight:600; color:#344E4C; text-align:center; line-height:1.2; max-width:64px;">Восстановлено</div>
+            </div>
+            <!-- Seal 2: Точный глаз (not earned) -->
+            <div style="display:flex; flex-direction:column; align-items:center; gap:6px; opacity:0.35;">
+              <div style="width:64px; height:64px; border-radius:8px; border:2px solid #C8BFAD; background:#E7DDC8; display:flex; align-items:center; justify-content:center;">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="6" stroke="#C8BFAD" stroke-width="2"/><circle cx="14" cy="14" r="2" fill="#C8BFAD"/></svg>
+              </div>
+              <div style="font-size:10px; color:#7A7268; text-align:center; line-height:1.2; max-width:64px;">Точный глаз</div>
+            </div>
+            <!-- Seal 3: Без вмешательства (not earned) -->
+            <div style="display:flex; flex-direction:column; align-items:center; gap:6px; opacity:0.35;">
+              <div style="width:64px; height:64px; border-radius:8px; border:2px solid #C8BFAD; background:#E7DDC8; display:flex; align-items:center; justify-content:center;">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M9 14h10M14 9v10" stroke="#C8BFAD" stroke-width="2" stroke-linecap="round"/><circle cx="14" cy="14" r="9" stroke="#C8BFAD" stroke-width="1.5" stroke-dasharray="3 2"/></svg>
+              </div>
+              <div style="font-size:10px; color:#7A7268; text-align:center; line-height:1.2; max-width:64px;">Без вмешательства</div>
+            </div>
+          </div>
+          <!-- Accuracy note -->
+          <div style="padding:10px 16px; background:#F2DDD9; border-radius:6px; margin-bottom:20px; font-size:12px; color:#7A3B2F;">Точность 64% — используйте меньше ошибочных нажатий для «Точного глаза»</div>
+          <!-- Rewarded: bonus magnifiers -->
+          <div style="border:1px solid #C8BFAD; border-radius:8px; padding:12px 16px; margin-bottom:20px; display:flex; align-items:center; gap:12px; background:#E7DDC8;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2L12.5 8H19l-5.5 4 2 6L10 14.5 4.5 18l2-6L1 8h6.5z" fill="#B68A45" opacity="0.8"/></svg>
+            <div style="flex:1; text-align:left;">
+              <div style="font-size:13px; font-weight:600; color:#2F3231;">+2 лупы за рекламу</div>
+              <div style="font-size:11px; color:#7A7268;">Посмотреть один раз, только за это прохождение</div>
+            </div>
+            <button onClick="{{ watchAd }}" style="padding:7px 14px; border-radius:6px; border:none; background:#B68A45; font-size:13px; font-weight:600; color:white; cursor:pointer; white-space:nowrap;" style-hover="background:#8C6A34">Смотреть</button>
+          </div>
+        </div>
+        <div style="padding:0 28px 24px; display:flex; flex-direction:column; gap:8px;">
+          <button onClick="{{ nextLevel }}" style="width:100%; padding:13px; border-radius:8px; border:none; background:#496B68; font-size:15px; font-weight:600; color:white; cursor:pointer;" style-hover="background:#344E4C">Следующий уровень</button>
+          <button onClick="{{ backToMap }}" style="width:100%; padding:11px; border-radius:8px; border:1px solid #C8BFAD; background:transparent; font-size:13px; color:#7A7268; cursor:pointer;" style-hover="color:#2F3231">К карте маршрута</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- 4. RESULT — 3 SEALS -->
+    <sc-if value="{{ activeTab === 'result3' }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:440px; width:100%; background:#F4EEDD; border-radius:12px; overflow:hidden; box-shadow:0 16px 48px rgba(0,0,0,0.5); animation:fadeUp 0.3s ease;">
+        <div style="padding:28px 28px 0; text-align:center;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#7A7268; letter-spacing:0.1em; margin-bottom:8px;">РЕЗУЛЬТАТ · УРОВЕНЬ 01</div>
+          <div style="font-family:'Playfair Display',serif; font-size:24px; font-weight:700; color:#2F3231; margin-bottom:4px;">Снимок восстановлен</div>
+          <div style="font-size:14px; color:#7A7268; margin-bottom:24px;">Вагон ночного поезда · 4 из 4</div>
+          <div style="display:flex; justify-content:center; gap:16px; margin-bottom:20px;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:6px; animation:sealStamp 0.5s ease 0.1s both;">
+              <div style="width:64px; height:64px; border-radius:8px; border:2.5px solid #496B68; background:#D6E5E4; display:flex; align-items:center; justify-content:center;"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 14l5 5 11-11" stroke="#496B68" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div style="font-size:10px; font-weight:600; color:#344E4C; text-align:center; line-height:1.2; max-width:64px;">Восстановлено</div>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:6px; animation:sealStamp 0.5s ease 0.25s both;">
+              <div style="width:64px; height:64px; border-radius:8px; border:2.5px solid #B68A45; background:#F0E4C8; display:flex; align-items:center; justify-content:center;"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="6" stroke="#B68A45" stroke-width="2"/><circle cx="14" cy="14" r="2" fill="#B68A45"/></svg></div>
+              <div style="font-size:10px; font-weight:600; color:#8C6A34; text-align:center; line-height:1.2; max-width:64px;">Точный глаз</div>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:6px; animation:sealStamp 0.5s ease 0.4s both;">
+              <div style="width:64px; height:64px; border-radius:8px; border:2.5px solid #496B68; background:#D6E5E4; display:flex; align-items:center; justify-content:center;"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M9 14h10M14 9v10" stroke="#496B68" stroke-width="2" stroke-linecap="round"/><circle cx="14" cy="14" r="9" stroke="#496B68" stroke-width="1.5" stroke-dasharray="3 2"/></svg></div>
+              <div style="font-size:10px; font-weight:600; color:#344E4C; text-align:center; line-height:1.2; max-width:64px;">Без вмешательства</div>
+            </div>
+          </div>
+          <!-- Accuracy -->
+          <div style="padding:10px 16px; background:#D4EAD9; border-radius:6px; margin-bottom:20px; font-size:13px; color:#2C5240; font-weight:500;">Точность 100% · Все три печати получены</div>
+        </div>
+        <div style="padding:0 28px 24px; display:flex; flex-direction:column; gap:8px;">
+          <button onClick="{{ nextLevel }}" style="width:100%; padding:13px; border-radius:8px; border:none; background:#496B68; font-size:15px; font-weight:600; color:white; cursor:pointer;" style-hover="background:#344E4C">Следующий уровень</button>
+          <button onClick="{{ backToMap }}" style="width:100%; padding:11px; border-radius:8px; border:1px solid #C8BFAD; background:transparent; font-size:13px; color:#7A7268; cursor:pointer;" style-hover="color:#2F3231">К карте маршрута</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- 5. ARTIFACT REVEAL -->
+    <sc-if value="{{ activeTab === 'artifact' }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:440px; width:100%; background:#F4EEDD; border-radius:12px; overflow:hidden; box-shadow:0 16px 48px rgba(0,0,0,0.5); animation:fadeUp 0.3s ease;">
+        <div style="background:#2F3231; padding:20px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; height:200px;">
+          <!-- Artifact illustration area -->
+          <div style="position:absolute; inset:0; background:radial-gradient(ellipse at center, rgba(182,138,69,0.15) 0%, transparent 70%);"></div>
+          <div style="width:120px; height:120px; border-radius:12px; background:#1A1F1E; border:2px solid #B68A45; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 8px rgba(182,138,69,0.08); animation:stampIn 0.6s ease;">
+            <!-- Brass compass SVG illustration -->
+            <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+              <circle cx="36" cy="36" r="30" stroke="#B68A45" stroke-width="2"/>
+              <circle cx="36" cy="36" r="24" stroke="#8C6A34" stroke-width="1" stroke-dasharray="4 3"/>
+              <circle cx="36" cy="36" r="4" fill="#B68A45"/>
+              <path d="M36 14l4 18-4 4-4-4z" fill="#B68A45"/>
+              <path d="M36 58l-4-18 4-4 4 4z" fill="#8C6A34" opacity="0.5"/>
+              <path d="M14 36l18-4 4 4-4 4z" fill="#8C6A34" opacity="0.5"/>
+              <path d="M58 36l-18 4-4-4 4-4z" fill="#B68A45" opacity="0.7"/>
+              <path d="M26 14h2M44 14h2M26 58h2M44 58h2" stroke="#B68A45" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M14 26v2M14 44v2M58 26v2M58 44v2" stroke="#B68A45" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="position:absolute; top:12px; left:14px; font-family:'IBM Plex Mono',monospace; font-size:9px; color:rgba(182,138,69,0.6); letter-spacing:0.1em;">ЭКСПОНАТ ОБНАРУЖЕН</div>
+        </div>
+        <div style="padding:24px 28px 28px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+            <div style="font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:#2F3231;">Латунный компас</div>
+            <div style="padding:3px 8px; border-radius:3px; background:#F0E4C8; border:1px solid #D4AE78;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#8C6A34; letter-spacing:0.06em;">АА-0001</span>
+            </div>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#7A7268; margin-bottom:14px; letter-spacing:0.04em;">Обнаружен: Кабинет начальника станции</div>
+          <div style="font-size:14px; color:#2F3231; line-height:1.6; margin-bottom:8px;">Навигационный компас производства 1960-х годов. Использовался для прокладки маршрутов по безориентирной тундре. Стрелка смещена — компас намагничен посторонним источником.</div>
+          <div style="font-size:12px; color:#7A7268; font-family:'IBM Plex Mono',monospace; margin-bottom:24px;">25 июня 1977 · Ед. хр. 1 из 4</div>
+          <div style="padding:8px 12px; background:#F0E4C8; border-radius:6px; margin-bottom:20px; font-size:12px; color:#8C6A34;">
+            Экспонат добавлен в архив
+          </div>
+          <button onClick="{{ closeArtifact }}" style="width:100%; padding:13px; border-radius:8px; border:none; background:#496B68; font-size:15px; font-weight:600; color:white; cursor:pointer;" style-hover="background:#344E4C">Продолжить маршрут</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- 6. CHAPTER COMPLETE -->
+    <sc-if value="{{ activeTab === 'chapter' }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:480px; width:100%; background:#F4EEDD; border-radius:12px; overflow:hidden; box-shadow:0 16px 48px rgba(0,0,0,0.5); animation:fadeUp 0.3s ease;">
+        <!-- Header with archive stamp -->
+        <div style="background:#2F3231; padding:28px; text-align:center; position:relative; overflow:hidden;">
+          <div style="position:absolute; inset:0; background:radial-gradient(ellipse at center, rgba(73,107,104,0.2), transparent 70%);"></div>
+          <div style="display:inline-block; border:3px solid #496B68; border-radius:6px; padding:12px 24px; position:relative; animation:stampIn 0.6s ease;">
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#6B9390; letter-spacing:0.12em; font-weight:500;">СЕВЕРНЫЙ МАРШРУТ</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#496B68; letter-spacing:0.08em; margin-top:3px;">ВОССТАНОВЛЕН</div>
+          </div>
+          <div style="font-family:'Playfair Display',serif; font-size:28px; font-weight:700; color:#F4EEDD; margin-top:16px;">Глава завершена</div>
+          <div style="font-size:14px; color:#7A7268; margin-top:4px;">12 маршрутных узлов · 4 экспоната</div>
+        </div>
+        <div style="padding:24px 28px;">
+          <!-- Total seals -->
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:#E7DDC8; border-radius:8px; margin-bottom:16px;">
+            <div style="font-size:14px; font-weight:500; color:#2F3231;">Всего печатей</div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1l2 5h5L11 9l2 5L8 11l-5 3 2-5-4-3h5z" fill="#B68A45"/></svg>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:20px; font-weight:500; color:#2F3231;">28 / 36</span>
+            </div>
+          </div>
+          <!-- Artifacts collected -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px;">
+            <sc-for list="{{ artifacts }}" as="artifact" hint-placeholder-count="4">
+              <div style="padding:10px 12px; background:#F0E4C8; border:1px solid #D4AE78; border-radius:6px; display:flex; align-items:center; gap:8px;">
+                <div style="width:24px; height:24px; border-radius:4px; background:#B68A45; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1l1.2 3.5h3.5L8 6.8l1.2 3.5L6 8.4 2.8 10.3 4 6.8 1.3 4.5h3.5z" fill="white"/></svg>
+                </div>
+                <span style="font-size:11px; font-weight:500; color:#8C6A34; line-height:1.2;">{{ artifact.name }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <!-- Tease next chapter -->
+          <div style="padding:14px 16px; background:#E7DDC8; border-left:3px solid #9A4E3F; border-radius:0 6px 6px 0; margin-bottom:20px;">
+            <div style="font-size:12px; color:#7A7268; margin-bottom:4px; font-family:'IBM Plex Mono',monospace; letter-spacing:0.04em;">СЛЕДУЮЩАЯ ГЛАВА</div>
+            <div style="font-size:14px; font-weight:500; color:#2F3231;">Внутренние помещения станции</div>
+            <div style="font-size:12px; color:#7A7268; margin-top:2px;">12 новых маршрутных узлов · скоро</div>
+          </div>
+          <button onClick="{{ closeChapter }}" style="width:100%; padding:13px; border-radius:8px; border:none; background:#496B68; font-size:15px; font-weight:600; color:white; cursor:pointer;" style-hover="background:#344E4C">Вернуться в архив</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- 7. REWARDED AD STATES -->
+    <sc-if value="{{ activeTab === 'rewarded' }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:16px; width:100%; max-width:440px;">
+        <!-- Loading state -->
+        <div style="background:#F4EEDD; border-radius:12px; padding:24px; box-shadow:0 8px 24px rgba(0,0,0,0.4);">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#7A7268; letter-spacing:0.1em; margin-bottom:14px;">СОСТОЯНИЕ 1 / ЗАГРУЗКА</div>
+          <div style="display:flex; align-items:center; gap:16px;">
+            <div style="width:44px; height:44px; border-radius:50%; border:2px solid #C8BFAD; border-top-color:#496B68; animation:spin 1s linear infinite; flex-shrink:0;"></div>
+            <div>
+              <div style="font-size:15px; font-weight:600; color:#2F3231; margin-bottom:2px;">Загружаем рекламу…</div>
+              <div style="font-size:12px; color:#7A7268;">После просмотра — точное расположение одного расхождения</div>
+            </div>
+          </div>
+          <button style="width:100%; margin-top:16px; padding:10px; border-radius:6px; border:1px solid #C8BFAD; background:#E7DDC8; font-size:13px; color:#7A7268; cursor:pointer; opacity:0.6;" disabled="true">Посмотреть рекламу и проявить отличие</button>
+        </div>
+        <!-- Unavailable state -->
+        <div style="background:#F4EEDD; border-radius:12px; padding:24px; box-shadow:0 8px 24px rgba(0,0,0,0.4);">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#7A7268; letter-spacing:0.1em; margin-bottom:14px;">СОСТОЯНИЕ 2 / НЕДОСТУПНА</div>
+          <div style="padding:12px 14px; background:#F2DDD9; border-radius:6px; margin-bottom:14px; display:flex; align-items:center; gap:10px;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#9A4E3F" stroke-width="1.4"/><path d="M8 5v4M8 10.5v.5" stroke="#9A4E3F" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <span style="font-size:13px; color:#7A3B2F;">Реклама сейчас недоступна</span>
+          </div>
+          <div style="font-size:13px; color:#7A7268; margin-bottom:14px; line-height:1.5;">Потратьте 2 лупы, чтобы показать расхождение, или продолжайте поиск самостоятельно.</div>
+          <div style="display:flex; gap:8px;">
+            <button style="flex:1; padding:10px; border-radius:6px; border:none; background:#B68A45; font-size:13px; font-weight:600; color:white; cursor:pointer;" style-hover="background:#8C6A34">2 лупы</button>
+            <button style="flex:1; padding:10px; border-radius:6px; border:1px solid #C8BFAD; background:#E7DDC8; font-size:13px; color:#2F3231; cursor:pointer;" style-hover="background:#D4C9B3">Вернуться к поиску</button>
+          </div>
+        </div>
+        <!-- Success state -->
+        <div style="background:#F4EEDD; border-radius:12px; padding:24px; box-shadow:0 8px 24px rgba(0,0,0,0.4);">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#7A7268; letter-spacing:0.1em; margin-bottom:14px;">СОСТОЯНИЕ 3 / УСПЕХ</div>
+          <div style="padding:12px 14px; background:#D4EAD9; border-radius:6px; margin-bottom:14px; display:flex; align-items:center; gap:10px;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-6" stroke="#3B6E52" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span style="font-size:13px; color:#2C5240; font-weight:500;">Проявитель активирован</span>
+          </div>
+          <div style="font-size:13px; color:#7A7268; margin-bottom:14px;">Расхождение отмечено на обоих снимках. Продолжайте поиск.</div>
+          <button style="width:100%; padding:10px; border-radius:6px; border:none; background:#496B68; font-size:14px; font-weight:600; color:white; cursor:pointer;" style-hover="background:#344E4C">Вернуться к поиску</button>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1200, &quot;height&quot;: 900 },
+  &quot;activeTab&quot;: {
+    &quot;editor&quot;: &quot;enum&quot;,
+    &quot;options&quot;: [&quot;intro&quot;, &quot;prelevel&quot;, &quot;result1&quot;, &quot;result3&quot;, &quot;artifact&quot;, &quot;chapter&quot;, &quot;rewarded&quot;],
+    &quot;default&quot;: &quot;intro&quot;,
+    &quot;tsType&quot;: &quot;string&quot;
+  }
+}">
+class Component extends DCLogic {
+  state = {
+    activeTab: 'intro',
+  };
+
+  renderVals() {
+    const s = this.state;
+    const tabDefs = [
+      { id: 'intro',    label: 'Вступление' },
+      { id: 'prelevel', label: 'Карточка уровня' },
+      { id: 'result1',  label: 'Результат · 1 печать' },
+      { id: 'result3',  label: 'Результат · 3 печати' },
+      { id: 'artifact', label: 'Экспонат' },
+      { id: 'chapter',  label: 'Конец главы' },
+      { id: 'rewarded', label: 'Rewarded реклама' },
+    ];
+    const tabs = tabDefs.map(t => ({
+      label: t.label,
+      active: s.activeTab === t.id,
+      select: () => this.setState({ activeTab: t.id }),
+    }));
+    const contactFrames = Array.from({ length: 8 }, (_, i) => ({ i }));
+    const artifacts = [
+      { name: 'Латунный компас' },
+      { name: 'Полевая радиостанция' },
+      { name: 'Засушенный синий цветок' },
+      { name: 'Разорванная карта маршрута' },
+    ];
+    return {
+      activeTab: s.activeTab,
+      tabs,
+      contactFrames,
+      artifacts,
+      startTutorial: () => alert('→ Переход к обучению'),
+      startLevel: () => alert('→ Начало уровня'),
+      cancelLevel: () => alert('← Возврат на карту'),
+      nextLevel: () => alert('→ Следующий уровень'),
+      backToMap: () => alert('← Возврат на карту'),
+      closeArtifact: () => alert('→ Продолжение'),
+      closeChapter: () => alert('← Возврат в архив'),
+      watchAd: () => alert('Загружаем рекламу...'),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #1A1F1E; font-family: Inter, system-ui, sans-serif; overflow: hidden; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes ringPop { 0% { transform:scale(0.5); opacity:0; } 60% { transform:scale(1.15); opacity:1; } 100% { transform:scale(1); opacity:1; } }
+    @keyframes wrongShake { 0%,100% { transform:translateX(0); } 25% { transform:translateX(-4px); } 75% { transform:translateX(4px); } }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  </style>
+</helmet>
+
+<!-- ROOT: Full-screen Gameplay -->
+<div style="width:100vw; height:100vh; background:#1A1F1E; display:flex; flex-direction:column; overflow:hidden; position:relative; user-select:none;">
+
+  <!-- TOP HUD -->
+  <div style="flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:rgba(26,31,30,0.95); border-bottom:1px solid rgba(200,191,173,0.15); z-index:20; gap:12px;">
+
+    <!-- Left: Back + Level info -->
+    <div style="display:flex; align-items:center; gap:12px; min-width:0;">
+      <button onClick="{{ goBack }}" style="width:36px; height:36px; border-radius:6px; border:1px solid rgba(200,191,173,0.25); background:rgba(244,238,221,0.06); cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;" aria-label="Назад" style-hover="background:rgba(244,238,221,0.12)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="#C8BFAD" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div style="min-width:0;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#7A7268; letter-spacing:0.06em; text-transform:uppercase;">Уровень 04</div>
+        <div style="font-size:14px; font-weight:600; color:#F4EEDD; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ levelTitle }}</div>
+      </div>
+    </div>
+
+    <!-- Center: Difference counter -->
+    <div style="display:flex; align-items:center; gap:6px; padding:6px 14px; background:rgba(244,238,221,0.06); border:1px solid rgba(200,191,173,0.2); border-radius:6px; flex-shrink:0;">
+      <span style="font-size:13px; color:#C8BFAD;">Найдите</span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:500; color:#F4EEDD; line-height:1;">{{ remainingCount }}</span>
+      <span style="font-size:13px; color:#C8BFAD;">расхождений</span>
+      <!-- Dots indicator -->
+      <div style="display:flex; gap:4px; margin-left:4px;">
+        <sc-for list="{{ diffDots }}" as="dot" hint-placeholder-count="6">
+          <div style="width:8px; height:8px; border-radius:2px; background:{{ dot.color }}; transition:background 0.2s ease;"></div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- Right: Hints + Pause -->
+    <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+      <!-- Magnifiers balance -->
+      <div style="display:flex; align-items:center; gap:5px; padding:5px 10px; border-radius:5px; border:1px solid rgba(182,138,69,0.3); background:rgba(182,138,69,0.08);">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="5.5" cy="5.5" r="3.5" stroke="#B68A45" stroke-width="1.4"/><path d="M8.5 8.5L12 12" stroke="#B68A45" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span style="font-family:'IBM Plex Mono',monospace; font-size:13px; color:#B68A45; font-weight:500;">{{ magnifiers }}</span>
+      </div>
+      <!-- Hint: Ориентир (1 лупа) -->
+      <button onClick="{{ openHints }}" style="display:flex; align-items:center; gap:6px; padding:7px 12px; border-radius:6px; border:1px solid rgba(200,191,173,0.25); background:rgba(244,238,221,0.06); cursor:pointer; color:#C8BFAD; font-size:13px; font-weight:500;" style-hover="background:rgba(244,238,221,0.12)" aria-label="Подсказки">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#C8BFAD" stroke-width="1.3"/><path d="M7 6v4M7 4.5v.5" stroke="#C8BFAD" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <span style="display:none;">Подсказки</span>
+      </button>
+      <!-- Pause -->
+      <button onClick="{{ openPause }}" style="width:36px; height:36px; border-radius:6px; border:1px solid rgba(200,191,173,0.25); background:rgba(244,238,221,0.06); cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:rgba(244,238,221,0.12)" aria-label="Пауза">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="3" y="2" width="3" height="10" rx="1" fill="#C8BFAD"/><rect x="8" y="2" width="3" height="10" rx="1" fill="#C8BFAD"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- COMPARATOR AREA -->
+  <div style="flex:1; display:flex; overflow:hidden; position:relative;">
+
+    <!-- DESKTOP: Side-by-side (shown when layout=desktop) -->
+    <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1; display:flex; gap:0; overflow:hidden;">
+
+        <!-- Photo A -->
+        <div style="flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative; border-right:1px solid rgba(200,191,173,0.12);">
+          <div style="flex-shrink:0; padding:6px 12px; background:rgba(26,31,30,0.8); display:flex; align-items:center; gap:6px;">
+            <div style="width:20px; height:20px; border-radius:3px; background:#496B68; display:flex; align-items:center; justify-content:center;">
+              <span style="font-size:11px; font-weight:700; color:white;">A</span>
+            </div>
+            <span style="font-size:11px; color:#7A7268; font-family:'IBM Plex Mono',monospace;">СНИМОК ОРИГИНАЛ · 1977</span>
+          </div>
+          <div onClick="{{ handleClickA }}" style="flex:1; background:#2A2F2E; cursor:crosshair; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+            <!-- Scene placeholder — actual game photo goes here -->
+            <div style="width:100%; height:100%; background:linear-gradient(135deg, #2A3530 0%, #1E2925 40%, #252E2C 70%, #1A2320 100%); position:relative; display:flex; align-items:center; justify-content:center;">
+              <!-- Atmospheric scene suggestion (placeholder for real 16:10 illustration) -->
+              <svg style="position:absolute; inset:0; width:100%; height:100%;" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" opacity="0.55">
+                <!-- Floor -->
+                <rect x="0" y="360" width="800" height="140" fill="#1C2420"/>
+                <!-- Back wall -->
+                <rect x="0" y="0" width="800" height="370" fill="#243028"/>
+                <!-- Shelves -->
+                <rect x="40" y="80" width="180" height="12" fill="#3D4E48" rx="2"/>
+                <rect x="40" y="160" width="180" height="12" fill="#3D4E48" rx="2"/>
+                <rect x="40" y="240" width="180" height="12" fill="#3D4E48" rx="2"/>
+                <!-- Crates on shelves -->
+                <rect x="50" y="52" width="40" height="28" fill="#4A5C52" rx="2"/>
+                <rect x="100" y="58" width="30" height="22" fill="#3E5048" rx="2"/>
+                <rect x="140" y="48" width="50" height="32" fill="#536158" rx="2"/>
+                <rect x="50" y="132" width="35" height="28" fill="#4F6057" rx="2"/>
+                <rect x="100" y="138" width="55" height="22" fill="#445850" rx="2"/>
+                <!-- Large crate center -->
+                <rect x="320" y="280" width="160" height="80" fill="#3A4D43" rx="3"/>
+                <rect x="330" y="290" width="140" height="4" fill="#2E3F37"/>
+                <rect x="330" y="340" width="140" height="4" fill="#2E3F37"/>
+                <line x1="400" y1="280" x2="400" y2="360" stroke="#2E3F37" stroke-width="2"/>
+                <!-- Window with cold light -->
+                <rect x="560" y="60" width="180" height="200" fill="#4A6B7A" rx="4"/>
+                <rect x="570" y="70" width="160" height="180" fill="#5F8090" opacity="0.6"/>
+                <line x1="650" y1="70" x2="650" y2="250" stroke="#3A5060" stroke-width="3"/>
+                <line x1="570" y1="160" x2="730" y2="160" stroke="#3A5060" stroke-width="3"/>
+                <!-- Warm lamp -->
+                <circle cx="200" cy="30" r="15" fill="#8C6A34" opacity="0.5"/>
+                <path d="M200 45 L190 120 L210 120 Z" fill="#7A5A28" opacity="0.3"/>
+                <ellipse cx="200" cy="120" rx="40" ry="8" fill="#B68A45" opacity="0.12"/>
+                <!-- Text labels (decorative, not readable) -->
+                <rect x="52" y="296" width="60" height="8" fill="#2E3F37" rx="1" opacity="0.5"/>
+                <rect x="52" y="308" width="40" height="6" fill="#2E3F37" rx="1" opacity="0.4"/>
+              </svg>
+              <div style="position:absolute; bottom:12px; left:12px; font-family:'IBM Plex Mono',monospace; font-size:10px; color:rgba(200,191,173,0.4); letter-spacing:0.06em;">ВЕРСИЯ A</div>
+              <!-- Found difference markers (example) -->
+              <div style="position:absolute; top:30%; left:20%; width:32px; height:32px; animation:ringPop 0.3s ease;">
+                <div style="width:32px; height:32px; border-radius:50%; border:2.5px solid #496B68; background:rgba(73,107,104,0.25); display:flex; align-items:center; justify-content:center;">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-5" stroke="#6B9390" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div style="position:absolute; top:55%; left:65%; width:32px; height:32px; animation:ringPop 0.3s ease 0.1s both;">
+                <div style="width:32px; height:32px; border-radius:50%; border:2.5px solid #496B68; background:rgba(73,107,104,0.25); display:flex; align-items:center; justify-content:center;">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-5" stroke="#6B9390" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Photo B -->
+        <div style="flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative;">
+          <div style="flex-shrink:0; padding:6px 12px; background:rgba(26,31,30,0.8); display:flex; align-items:center; gap:6px;">
+            <div style="width:20px; height:20px; border-radius:3px; background:#5F7684; display:flex; align-items:center; justify-content:center;">
+              <span style="font-size:11px; font-weight:700; color:white;">B</span>
+            </div>
+            <span style="font-size:11px; color:#7A7268; font-family:'IBM Plex Mono',monospace;">ДУБЛИКАТ · АНОМАЛИИ</span>
+          </div>
+          <div onClick="{{ handleClickB }}" style="flex:1; background:#2A2F2E; cursor:crosshair; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+            <div style="width:100%; height:100%; background:linear-gradient(135deg, #2A3530 0%, #1E2925 40%, #252E2C 70%, #1A2320 100%); position:relative; display:flex; align-items:center; justify-content:center;">
+              <svg style="position:absolute; inset:0; width:100%; height:100%;" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" opacity="0.55">
+                <rect x="0" y="360" width="800" height="140" fill="#1C2420"/>
+                <rect x="0" y="0" width="800" height="370" fill="#243028"/>
+                <rect x="40" y="80" width="180" height="12" fill="#3D4E48" rx="2"/>
+                <rect x="40" y="160" width="180" height="12" fill="#3D4E48" rx="2"/>
+                <rect x="40" y="240" width="180" height="12" fill="#3D4E48" rx="2"/>
+                <rect x="50" y="52" width="40" height="28" fill="#4A5C52" rx="2"/>
+                <rect x="100" y="58" width="30" height="22" fill="#3E5048" rx="2"/>
+                <!-- DIFFERENCE: crate removed from shelf -->
+                <rect x="50" y="132" width="35" height="28" fill="#4F6057" rx="2"/>
+                <!-- DIFFERENCE: window color slightly different (more blue) -->
+                <rect x="560" y="60" width="180" height="200" fill="#3A5B7A" rx="4"/>
+                <rect x="570" y="70" width="160" height="180" fill="#4A7090" opacity="0.6"/>
+                <line x1="650" y1="70" x2="650" y2="250" stroke="#2A4050" stroke-width="3"/>
+                <line x1="570" y1="160" x2="730" y2="160" stroke="#2A4050" stroke-width="3"/>
+                <rect x="320" y="280" width="160" height="80" fill="#3A4D43" rx="3"/>
+                <rect x="330" y="290" width="140" height="4" fill="#2E3F37"/>
+                <rect x="330" y="340" width="140" height="4" fill="#2E3F37"/>
+                <line x1="400" y1="280" x2="400" y2="360" stroke="#2E3F37" stroke-width="2"/>
+                <circle cx="200" cy="30" r="15" fill="#8C6A34" opacity="0.5"/>
+                <path d="M200 45 L190 120 L210 120 Z" fill="#7A5A28" opacity="0.3"/>
+                <ellipse cx="200" cy="120" rx="40" ry="8" fill="#B68A45" opacity="0.12"/>
+                <rect x="52" y="296" width="60" height="8" fill="#2E3F37" rx="1" opacity="0.5"/>
+                <rect x="52" y="308" width="40" height="6" fill="#2E3F37" rx="1" opacity="0.4"/>
+              </svg>
+              <div style="position:absolute; bottom:12px; left:12px; font-family:'IBM Plex Mono',monospace; font-size:10px; color:rgba(200,191,173,0.4); letter-spacing:0.06em;">ВЕРСИЯ B</div>
+              <!-- Mirrored found markers -->
+              <div style="position:absolute; top:30%; left:20%; width:32px; height:32px;">
+                <div style="width:32px; height:32px; border-radius:50%; border:2.5px solid #496B68; background:rgba(73,107,104,0.25); display:flex; align-items:center; justify-content:center;">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-5" stroke="#6B9390" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div style="position:absolute; top:55%; left:65%; width:32px; height:32px;">
+                <div style="width:32px; height:32px; border-radius:50%; border:2.5px solid #496B68; background:rgba(73,107,104,0.25); display:flex; align-items:center; justify-content:center;">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-5" stroke="#6B9390" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <!-- Wrong tap feedback (shown briefly after misclick) -->
+              <sc-if value="{{ showWrongTap }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute; top:{{ wrongTapY }}%; left:{{ wrongTapX }}%; transform:translate(-50%,-50%); animation:wrongShake 0.3s ease;">
+                  <div style="width:28px; height:28px; border-radius:50%; border:2px solid #9A4E3F; background:rgba(154,78,63,0.2); display:flex; align-items:center; justify-content:center;">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="#9A4E3F" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </sc-if>
+
+    <!-- MOBILE PORTRAIT: Single photo A/B toggle -->
+    <sc-if value="{{ isMobilePortrait }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1; display:flex; flex-direction:column; overflow:hidden; position:relative;">
+
+        <!-- A/B indicator bar -->
+        <div style="flex-shrink:0; display:flex; background:rgba(26,31,30,0.9); border-bottom:1px solid rgba(200,191,173,0.1);">
+          <div style="flex:1; padding:6px 12px; display:flex; align-items:center; gap:6px; border-right:1px solid rgba(200,191,173,0.1);">
+            <div style="width:18px; height:18px; border-radius:3px; background:{{ abMode === 'A' ? '#496B68' : 'rgba(73,107,104,0.2)' }}; display:flex; align-items:center; justify-content:center; transition:background 0.15s;">
+              <span style="font-size:10px; font-weight:700; color:white;">A</span>
+            </div>
+            <span style="font-size:11px; color:{{ abMode === 'A' ? '#F4EEDD' : '#7A7268' }}; font-weight:{{ abMode === 'A' ? '600' : '400' }}; transition:color 0.15s;">Оригинал</span>
+          </div>
+          <div style="flex:1; padding:6px 12px; display:flex; align-items:center; gap:6px;">
+            <div style="width:18px; height:18px; border-radius:3px; background:{{ abMode === 'B' ? '#5F7684' : 'rgba(95,118,132,0.2)' }}; display:flex; align-items:center; justify-content:center; transition:background 0.15s;">
+              <span style="font-size:10px; font-weight:700; color:white;">B</span>
+            </div>
+            <span style="font-size:11px; color:{{ abMode === 'B' ? '#F4EEDD' : '#7A7268' }}; font-weight:{{ abMode === 'B' ? '600' : '400' }}; transition:color 0.15s;">Дубликат</span>
+          </div>
+        </div>
+
+        <!-- Single photo area (fills all remaining space) -->
+        <div style="flex:1; background:#1A1F1E; position:relative; overflow:hidden;" onClick="{{ handleMobileTap }}">
+          <div style="width:100%; height:100%; background:linear-gradient(135deg, #2A3530 0%, #1E2925 40%, #252E2C 70%, #1A2320 100%); display:flex; align-items:center; justify-content:center; position:relative;">
+            <svg style="position:absolute; inset:0; width:100%; height:100%;" viewBox="0 0 390 640" preserveAspectRatio="xMidYMid slice" opacity="0.6">
+              <rect x="0" y="0" width="390" height="640" fill="#243028"/>
+              <rect x="20" y="40" width="120" height="8" fill="#3D4E48" rx="2"/>
+              <rect x="20" y="80" width="120" height="8" fill="#3D4E48" rx="2"/>
+              <rect x="20" y="120" width="120" height="8" fill="#3D4E48" rx="2"/>
+              <rect x="30" y="24" width="30" height="16" fill="#4A5C52" rx="2"/>
+              <rect x="70" y="28" width="25" height="12" fill="#3E5048" rx="2"/>
+              <rect x="100" y="20" width="35" height="20" fill="#536158" rx="2"/>
+              <rect x="150" y="200" width="100" height="60" fill="#3A4D43" rx="2"/>
+              <rect x="240" y="40" width="130" height="150" fill="#4A6B7A" rx="4"/>
+              <rect x="248" y="50" width="114" height="130" fill="#5F8090" opacity="0.6"/>
+              <line x1="305" y1="50" x2="305" y2="180" stroke="#3A5060" stroke-width="2"/>
+              <line x1="248" y1="115" x2="362" y2="115" stroke="#3A5060" stroke-width="2"/>
+              <circle cx="100" cy="20" r="10" fill="#8C6A34" opacity="0.4"/>
+            </svg>
+            <div style="position:absolute; top:12px; left:12px; padding:3px 8px; border-radius:3px; background:{{ abMode === 'A' ? 'rgba(73,107,104,0.8)' : 'rgba(95,118,132,0.8)' }};">
+              <span style="font-size:11px; font-weight:700; color:white; font-family:'IBM Plex Mono',monospace;">{{ abMode }}</span>
+            </div>
+            <!-- Found markers on mobile -->
+            <div style="position:absolute; top:35%; left:25%; width:36px; height:36px;">
+              <div style="width:36px; height:36px; border-radius:50%; border:2.5px solid #496B68; background:rgba(73,107,104,0.25); display:flex; align-items:center; justify-content:center;">
+                <svg width="16" height="16" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-5" stroke="#6B9390" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM thumb zone: Compare button + hints -->
+        <div style="flex-shrink:0; padding:10px 16px 20px; background:rgba(26,31,30,0.95); border-top:1px solid rgba(200,191,173,0.12); display:flex; align-items:center; gap:10px;">
+          <!-- Hint -->
+          <button onClick="{{ openHints }}" style="flex-shrink:0; width:44px; height:44px; border-radius:6px; border:1px solid rgba(200,191,173,0.25); background:rgba(244,238,221,0.06); cursor:pointer; display:flex; align-items:center; justify-content:center;" aria-label="Подсказки">
+            <svg width="18" height="18" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#C8BFAD" stroke-width="1.3"/><path d="M7 6v4M7 4.5v.5" stroke="#C8BFAD" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </button>
+          <!-- Compare: tap toggles, hold peeks -->
+          <button onMouseDown="{{ startHold }}" onTouchStart="{{ startHold }}" onMouseUp="{{ endHold }}" onTouchEnd="{{ endHold }}" onClick="{{ toggleAB }}" style="flex:1; height:52px; border-radius:8px; border:1.5px solid rgba(200,191,173,0.3); background:rgba(244,238,221,0.08); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;" style-active="background:rgba(244,238,221,0.16)">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="6" height="10" rx="1.5" stroke="#C8BFAD" stroke-width="1.4"/><rect x="10" y="4" width="6" height="10" rx="1.5" stroke="#C8BFAD" stroke-width="1.4"/><path d="M8 9h2" stroke="#C8BFAD" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <span style="font-size:15px; font-weight:600; color:#F4EEDD;">Сравнить</span>
+            <span style="font-size:11px; color:#7A7268; margin-left:2px;">(удерживай)</span>
+          </button>
+          <!-- Pause -->
+          <button onClick="{{ openPause }}" style="flex-shrink:0; width:44px; height:44px; border-radius:6px; border:1px solid rgba(200,191,173,0.25); background:rgba(244,238,221,0.06); cursor:pointer; display:flex; align-items:center; justify-content:center;" aria-label="Пауза">
+            <svg width="16" height="16" viewBox="0 0 14 14" fill="none"><rect x="3" y="2" width="3" height="10" rx="1" fill="#C8BFAD"/><rect x="8" y="2" width="3" height="10" rx="1" fill="#C8BFAD"/></svg>
+          </button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- MOBILE LANDSCAPE: Side-by-side compact -->
+    <sc-if value="{{ isMobileLandscape }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1; display:flex; overflow:hidden;">
+        <!-- Photo A compact -->
+        <div style="flex:1; position:relative; overflow:hidden; border-right:1px solid rgba(200,191,173,0.12);">
+          <div style="width:100%; height:100%; background:linear-gradient(135deg, #2A3530, #1A2320); display:flex; align-items:center; justify-content:center; position:relative; cursor:crosshair;">
+            <div style="position:absolute; top:6px; left:8px; width:18px; height:18px; border-radius:3px; background:#496B68; display:flex; align-items:center; justify-content:center;"><span style="font-size:10px; font-weight:700; color:white;">A</span></div>
+            <div style="position:absolute; top:30%; left:20%; width:28px; height:28px; border-radius:50%; border:2px solid #496B68; background:rgba(73,107,104,0.25); display:flex; align-items:center; justify-content:center;"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-5" stroke="#6B9390" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+        </div>
+        <!-- Photo B compact -->
+        <div style="flex:1; position:relative; overflow:hidden;">
+          <div style="width:100%; height:100%; background:linear-gradient(135deg, #2A3530, #1A2320); display:flex; align-items:center; justify-content:center; position:relative; cursor:crosshair;">
+            <div style="position:absolute; top:6px; left:8px; width:18px; height:18px; border-radius:3px; background:#5F7684; display:flex; align-items:center; justify-content:center;"><span style="font-size:10px; font-weight:700; color:white;">B</span></div>
+            <div style="position:absolute; top:30%; left:20%; width:28px; height:28px; border-radius:50%; border:2px solid #496B68; background:rgba(73,107,104,0.25); display:flex; align-items:center; justify-content:center;"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-5" stroke="#6B9390" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+        </div>
+        <!-- Compact right HUD for landscape -->
+        <div style="width:60px; flex-shrink:0; background:rgba(26,31,30,0.95); border-left:1px solid rgba(200,191,173,0.12); display:flex; flex-direction:column; align-items:center; padding:10px 0; gap:10px; justify-content:space-between;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:500; color:#F4EEDD;">{{ remainingCount }}</span>
+            <span style="font-size:9px; color:#7A7268; text-align:center; line-height:1.2;">осталось</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px; align-items:center;">
+            <button onClick="{{ openHints }}" style="width:40px; height:40px; border-radius:6px; border:1px solid rgba(200,191,173,0.2); background:rgba(244,238,221,0.06); cursor:pointer; display:flex; align-items:center; justify-content:center;" aria-label="Подсказки">
+              <svg width="16" height="16" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#C8BFAD" stroke-width="1.3"/><path d="M7 6v4M7 4.5v.5" stroke="#C8BFAD" stroke-width="1.3" stroke-linecap="round"/></svg>
+            </button>
+            <button onClick="{{ openPause }}" style="width:40px; height:40px; border-radius:6px; border:1px solid rgba(200,191,173,0.2); background:rgba(244,238,221,0.06); cursor:pointer; display:flex; align-items:center; justify-content:center;" aria-label="Пауза">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="3" y="2" width="3" height="10" rx="1" fill="#C8BFAD"/><rect x="8" y="2" width="3" height="10" rx="1" fill="#C8BFAD"/></svg>
+            </button>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="5.5" cy="5.5" r="3.5" stroke="#B68A45" stroke-width="1.4"/><path d="M8.5 8.5L12 12" stroke="#B68A45" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#B68A45;">{{ magnifiers }}</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+
+  <!-- HINT AREA overlay (Ориентир hint active) -->
+  <sc-if value="{{ hintAreaActive }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; top:{{ hintAreaTop }}%; left:{{ hintAreaLeft }}%; width:{{ hintAreaW }}%; height:{{ hintAreaH }}%; border:2px dashed #B68A45; border-radius:4px; pointer-events:none; animation:pulse 1.5s ease infinite; z-index:15;">
+      <div style="position:absolute; top:-20px; left:0; padding:2px 8px; background:#B68A45; border-radius:3px; white-space:nowrap;">
+        <span style="font-size:11px; color:white; font-weight:500;">Ищите здесь</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- OVERLAY PANELS -->
+
+  <!-- Hint selection panel -->
+  <sc-if value="{{ showHintPanel }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; inset:0; background:rgba(26,31,30,0.7); z-index:40; display:flex; align-items:flex-end; justify-content:center; animation:fadeUp 0.2s ease;">
+      <div style="width:100%; max-width:480px; background:#F4EEDD; border-radius:16px 16px 0 0; padding:24px 20px 32px; box-shadow:0 -8px 32px rgba(47,50,49,0.3);" onClick="{{ stopHintPropagation }}">
+        <div style="width:36px; height:4px; background:#C8BFAD; border-radius:2px; margin:0 auto 20px;"></div>
+        <div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:#2F3231; margin-bottom:4px;">Подсказки</div>
+        <div style="font-size:13px; color:#7A7268; margin-bottom:20px;">Используйте лупы чтобы найти расхождение</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <!-- Ориентир -->
+          <div style="border:1px solid #C8BFAD; border-radius:8px; padding:14px 16px; display:flex; align-items:center; gap:14px; background:#F4EEDD; cursor:pointer;" style-hover="background:#EDE5D4" onClick="{{ useAreaHint }}">
+            <div style="width:40px; height:40px; border-radius:8px; background:#E7DDC8; border:1px solid #C8BFAD; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#B68A45" stroke-width="1.5" stroke-dasharray="3 2"/><circle cx="10" cy="10" r="2" fill="#B68A45"/></svg>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:15px; font-weight:600; color:#2F3231;">Ориентир</div>
+              <div style="font-size:12px; color:#7A7268; margin-top:2px;">Подсвечивает область с расхождением</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="5.5" cy="5.5" r="3.5" stroke="#B68A45" stroke-width="1.3"/><path d="M8.5 8.5L12 12" stroke="#B68A45" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:14px; color:#B68A45; font-weight:500;">1</span>
+            </div>
+          </div>
+          <!-- Проявитель -->
+          <div style="border:1px solid #C8BFAD; border-radius:8px; padding:14px 16px; display:flex; align-items:center; gap:14px; cursor:pointer;" style-hover="background:#EDE5D4" onClick="{{ useExactHint }}">
+            <div style="width:40px; height:40px; border-radius:8px; background:#E7DDC8; border:1px solid #C8BFAD; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#496B68" stroke-width="1.5"/><path d="M7 10l2 2 4-4" stroke="#496B68" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:15px; font-weight:600; color:#2F3231;">Проявитель</div>
+              <div style="font-size:12px; color:#7A7268; margin-top:2px;">Точно показывает одно расхождение</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="5.5" cy="5.5" r="3.5" stroke="#B68A45" stroke-width="1.3"/><path d="M8.5 8.5L12 12" stroke="#B68A45" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:14px; color:#B68A45; font-weight:500;">2</span>
+              <span style="font-size:11px; color:#7A7268; margin-left:2px;">или реклама</span>
+            </div>
+          </div>
+        </div>
+        <button onClick="{{ closeHintPanel }}" style="width:100%; margin-top:16px; padding:12px; border-radius:8px; border:1px solid #C8BFAD; background:#E7DDC8; font-size:15px; font-weight:500; color:#2F3231; cursor:pointer;" style-hover="background:#D4C9B3">Вернуться к поиску</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- Pause overlay -->
+  <sc-if value="{{ showPause }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; inset:0; background:rgba(26,31,30,0.85); z-index:50; display:flex; align-items:center; justify-content:center; animation:fadeUp 0.2s ease;">
+      <div style="background:#F4EEDD; border-radius:12px; padding:28px 32px; width:320px; box-shadow:0 16px 40px rgba(47,50,49,0.4); display:flex; flex-direction:column; align-items:center; gap:16px;">
+        <div style="font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:#2F3231;">Пауза</div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#7A7268; letter-spacing:0.06em;">СКЛАД ЭКСПЕДИЦИИ · УРОВЕНЬ 04</div>
+        <div style="display:flex; gap:6px; margin:4px 0;">
+          <sc-for list="{{ diffDots }}" as="dot" hint-placeholder-count="6">
+            <div style="width:10px; height:10px; border-radius:2px; background:{{ dot.color }};"></div>
+          </sc-for>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px; width:100%;">
+          <button onClick="{{ closePause }}" style="width:100%; padding:13px; border-radius:8px; border:none; background:#496B68; font-size:15px; font-weight:600; color:white; cursor:pointer;" style-hover="background:#344E4C">Продолжить</button>
+          <button onClick="{{ restartLevel }}" style="width:100%; padding:11px; border-radius:8px; border:1px solid #C8BFAD; background:#E7DDC8; font-size:14px; font-weight:500; color:#2F3231; cursor:pointer;" style-hover="background:#D4C9B3">Начать заново</button>
+          <button onClick="{{ goBack }}" style="width:100%; padding:11px; border-radius:8px; border:1px solid #C8BFAD; background:transparent; font-size:14px; font-weight:500; color:#7A7268; cursor:pointer;" style-hover="color:#2F3231">К карте маршрута</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- Correct find feedback -->
+  <sc-if value="{{ showCorrectFeedback }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; top:60px; left:50%; transform:translateX(-50%); z-index:30; pointer-events:none; animation:slideUp 0.2s ease;">
+      <div style="background:#3B6E52; color:white; padding:8px 20px; border-radius:6px; font-size:14px; font-weight:600; white-space:nowrap; box-shadow:0 4px 12px rgba(47,50,49,0.3);">
+        Аномалия подтверждена
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1440, &quot;height&quot;: 900 },
+  &quot;layoutMode&quot;: {
+    &quot;editor&quot;: &quot;enum&quot;,
+    &quot;options&quot;: [&quot;desktop&quot;, &quot;mobile-portrait&quot;, &quot;mobile-landscape&quot;],
+    &quot;default&quot;: &quot;desktop&quot;,
+    &quot;tsType&quot;: &quot;'desktop' | 'mobile-portrait' | 'mobile-landscape'&quot;
+  },
+  &quot;foundCount&quot;: {
+    &quot;editor&quot;: &quot;int&quot;,
+    &quot;default&quot;: 2,
+    &quot;min&quot;: 0,
+    &quot;max&quot;: 8,
+    &quot;tsType&quot;: &quot;number&quot;
+  },
+  &quot;totalDiffs&quot;: {
+    &quot;editor&quot;: &quot;int&quot;,
+    &quot;default&quot;: 6,
+    &quot;min&quot;: 4,
+    &quot;max&quot;: 8,
+    &quot;tsType&quot;: &quot;number&quot;
+  },
+  &quot;magnifiers&quot;: {
+    &quot;editor&quot;: &quot;int&quot;,
+    &quot;default&quot;: 3,
+    &quot;min&quot;: 0,
+    &quot;max&quot;: 99,
+    &quot;tsType&quot;: &quot;number&quot;
+  }
+}">
+class Component extends DCLogic {
+  state = {
+    levelTitle: 'Склад экспедиции',
+    magnifiers: 3,
+    foundCount: 2,
+    totalDiffs: 6,
+    abMode: 'A',
+    showHintPanel: false,
+    showPause: false,
+    showCorrectFeedback: false,
+    showWrongTap: false,
+    wrongTapX: 50,
+    wrongTapY: 50,
+    hintAreaActive: false,
+    hintAreaTop: 30,
+    hintAreaLeft: 55,
+    hintAreaW: 25,
+    hintAreaH: 30,
+    // Layout mode: auto-detected, tweak-overridable
+    layoutMode: 'desktop', // 'desktop' | 'mobile-portrait' | 'mobile-landscape'
+    _timers: {},
+  };
+
+  componentDidMount() {
+    this._detectLayout();
+    this._resizeHandler = () => this._detectLayout();
+    window.addEventListener('resize', this._resizeHandler);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._resizeHandler);
+    Object.values(this.state._timers).forEach(clearTimeout);
+  }
+
+  _detectLayout() {
+    const w = window.innerWidth, h = window.innerHeight;
+    let layoutMode = 'desktop';
+    if (w < 768) {
+      layoutMode = (w > h) ? 'mobile-landscape' : 'mobile-portrait';
+    } else if (w < 1024 && h > w) {
+      layoutMode = 'mobile-portrait'; // tablet portrait → A/B toggle
+    }
+    // Allow prop override
+    if (this.props.layoutMode) layoutMode = this.props.layoutMode;
+    this.setState({ layoutMode });
+  }
+
+  _flashFeedback(key, duration = 1200) {
+    const timer = setTimeout(() => this.setState({ [key]: false }), duration);
+    this.setState({ [key]: true, _timers: { ...this.state._timers, [key]: timer } });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const remaining = s.totalDiffs - s.foundCount;
+    const dots = Array.from({ length: s.totalDiffs }, (_, i) => ({
+      color: i < s.foundCount ? '#496B68' : 'rgba(200,191,173,0.2)',
+    }));
+
+    return {
+      levelTitle: s.levelTitle,
+      magnifiers: s.magnifiers,
+      remainingCount: remaining,
+      diffDots: dots,
+      foundCount: s.foundCount,
+      totalCount: s.totalDiffs,
+
+      isDesktop: s.layoutMode === 'desktop',
+      isMobilePortrait: s.layoutMode === 'mobile-portrait',
+      isMobileLandscape: s.layoutMode === 'mobile-landscape',
+
+      abMode: s.abMode,
+      showHintPanel: s.showHintPanel,
+      showPause: s.showPause,
+      showCorrectFeedback: s.showCorrectFeedback,
+      showWrongTap: s.showWrongTap,
+      wrongTapX: s.wrongTapX,
+      wrongTapY: s.wrongTapY,
+      hintAreaActive: s.hintAreaActive,
+      hintAreaTop: s.hintAreaTop,
+      hintAreaLeft: s.hintAreaLeft,
+      hintAreaW: s.hintAreaW,
+      hintAreaH: s.hintAreaH,
+
+      handleClickA: (e) => this._handleClick(e, 'A'),
+      handleClickB: (e) => this._handleClick(e, 'B'),
+      handleMobileTap: (e) => this._handleClick(e, s.abMode),
+      toggleAB: () => this.setState({ abMode: s.abMode === 'A' ? 'B' : 'A' }),
+      startHold: () => { this._holdTimer = setTimeout(() => this.setState({ abMode: s.abMode === 'A' ? 'B' : 'A' }), 120); },
+      endHold: () => { clearTimeout(this._holdTimer); },
+
+      openHints: () => this.setState({ showHintPanel: true }),
+      closeHintPanel: () => this.setState({ showHintPanel: false }),
+      stopHintPropagation: (e) => e.stopPropagation(),
+      useAreaHint: () => {
+        if (s.magnifiers < 1) return;
+        this.setState({ showHintPanel: false, magnifiers: s.magnifiers - 1, hintAreaActive: true });
+        setTimeout(() => this.setState({ hintAreaActive: false }), 3000);
+      },
+      useExactHint: () => {
+        if (s.magnifiers < 2) return;
+        this.setState({ showHintPanel: false, magnifiers: s.magnifiers - 2 });
+        this._flashFeedback('showCorrectFeedback', 1500);
+        const newFound = Math.min(s.foundCount + 1, s.totalDiffs);
+        this.setState({ foundCount: newFound });
+      },
+
+      openPause: () => this.setState({ showPause: true }),
+      closePause: () => this.setState({ showPause: false }),
+      restartLevel: () => this.setState({ showPause: false, foundCount: 0 }),
+      goBack: () => alert('← Возврат на карту маршрута'),
+    };
+  }
+
+  _handleClick(e, side) {
+    // Simulate hit: 30% chance correct, 70% misclick (demo)
+    const rect = e.currentTarget?.getBoundingClientRect?.() || { left:0, top:0, width:400, height:400 };
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    const isCorrect = Math.random() < 0.3 && this.state.foundCount < this.state.totalDiffs;
+    if (isCorrect) {
+      const newFound = this.state.foundCount + 1;
+      this.setState({ foundCount: newFound });
+      this._flashFeedback('showCorrectFeedback', 1200);
+    } else {
+      this.setState({ showWrongTap: true, wrongTapX: x, wrongTapY: y });
+      setTimeout(() => this.setState({ showWrongTap: false }), 600);
+    }
+  }
+}
+</script>
+</body>
+</html>

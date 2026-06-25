@@ -1,0 +1,25 @@
+{
+  "assets": [
+    {
+      "id": "placeholder-a",
+      "path": "public/assets/scenes/northern-route/placeholder/a.svg",
+      "status": "placeholder",
+      "source": "local SVG scaffold",
+      "approval": "not-for-production"
+    },
+    {
+      "id": "placeholder-b",
+      "path": "public/assets/scenes/northern-route/placeholder/b.svg",
+      "status": "placeholder",
+      "source": "local SVG scaffold",
+      "approval": "not-for-production"
+    },
+    {
+      "id": "placeholder-thumb",
+      "path": "public/assets/scenes/northern-route/placeholder/thumb.svg",
+      "status": "placeholder",
+      "source": "local SVG scaffold",
+      "approval": "not-for-production"
+    }
+  ]
+}

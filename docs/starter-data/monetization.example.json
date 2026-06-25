@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.0.0",
+  "currency": {
+    "id": "magnifiers",
+    "startingBalance": 3
+  },
+  "products": [
+    {
+      "id": "archive_supporter_pack",
+      "type": "non_consumable",
+      "fallbackTitleKey": "monetization.products.archiveSupporter.title",
+      "fallbackDescriptionKey": "monetization.products.archiveSupporter.description",
+      "entitlements": [
+        "no_forced_ads",
+        "exclusive_archive_frame"
+      ],
+      "grantOnce": {
+        "magnifiers": 10
+      }
+    },
+    {
+      "id": "magnifiers_10",
+      "type": "consumable",
+      "fallbackTitleKey": "monetization.products.magnifiers10.title",
+      "fallbackDescriptionKey": "monetization.products.magnifiers10.description",
+      "grant": {
+        "magnifiers": 10
+      }
+    }
+  ],
+  "rewardedPlacements": {
+    "exact_hint": {
+      "reward": "reveal_one_difference"
+    },
+    "post_level_bonus": {
+      "reward": {
+        "magnifiers": 2
+      }
+    },
+    "daily_bonus": {
+      "reward": "double_daily_magnifier_reward"
+    }
+  },
+  "interstitial": {
+    "minimumCompletedLevels": 4,
+    "minimumSessionSeconds": 480,
+    "minimumSecondsSinceLast": 300,
+    "minimumLevelCompletionsSinceLast": 2,
+    "allowedScreen": "chapter-map"
+  },
+  "stickyBannerEnabled": false
+}

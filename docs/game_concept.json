@@ -1,0 +1,748 @@
+{
+  "schemaVersion": "1.3.0",
+  "documentType": "canonical_game_concept",
+  "lastUpdated": "2026-06-25",
+  "sourceOfTruth": true,
+  "project": {
+    "internalName": "ExpeditionOfDifferences",
+    "productNameRu": "Найди отличия: Архив аномалий",
+    "productNameEn": "Find the Differences: Anomaly Archive",
+    "subtitleRu": "Северный маршрут",
+    "genre": [
+      "find-the-difference",
+      "visual-puzzle",
+      "light-collection-meta"
+    ],
+    "platform": "Yandex Games",
+    "targetDevices": [
+      "desktop-browser",
+      "mobile-browser",
+      "tablet-browser"
+    ],
+    "releaseGoal": "publishable_vertical_slice",
+    "businessModel": "hybrid_ads_and_single_iap"
+  },
+  "productIdentity": {
+    "oneSentencePitchRu": "Игрок восстанавливает парные снимки исчезнувшей северной экспедиции, находит аномальные расхождения и собирает музейный архив найденных предметов.",
+    "oneSentencePitchEn": "The player restores paired photographs from a vanished northern expedition, finds anomalous differences, and builds a small museum archive of recovered artifacts.",
+    "playerFantasy": "Я внимательный архивист и исследователь, который замечает скрытые несоответствия, восстанавливает ход экспедиции и раскрывает спокойную тайну.",
+    "marketHook": "Понятная за несколько секунд механика «найди отличия» объединена с картой маршрута, коллекционными экспонатами, daily-ритмом и аккуратным сюжетным контекстом.",
+    "emotionalTone": [
+      "уютная тайна",
+      "исследование",
+      "северная экспедиция",
+      "архивная достоверность",
+      "спокойная сосредоточенность"
+    ],
+    "notTone": [
+      "хоррор",
+      "детская мультяшность",
+      "казино",
+      "неоновый sci-fi",
+      "грязный постапокалипсис",
+      "агрессивный free-to-play"
+    ]
+  },
+  "audience": {
+    "primaryAge": "25-60",
+    "coreMotivations": [
+      "расслабиться и сосредоточиться",
+      "получать короткие завершённые победы",
+      "собирать коллекцию",
+      "открывать новые сцены",
+      "возвращаться к ежедневному испытанию"
+    ],
+    "accessibilityPriority": "high",
+    "readingPriority": "high",
+    "mobileOneHandPriority": "high"
+  },
+  "designPillars": [
+    {
+      "id": "instant_comprehension",
+      "name": "Механика понятна за 3 секунды",
+      "rules": [
+        "На ключевых промо- и игровых экранах сразу видны две версии одной сцены или понятный режим A/B.",
+        "Первое реальное игровое действие происходит не позднее 20 секунд после запуска.",
+        "Обязательная регистрация до начала игры запрещена."
+      ]
+    },
+    {
+      "id": "comfort_over_punishment",
+      "name": "Комфорт важнее наказания",
+      "rules": [
+        "В кампании нет энергии, жизней и окончательного проигрыша.",
+        "Основная кампания не использует жёсткий таймер.",
+        "Ошибка снижает точность, но не отнимает валюту и не сбрасывает уровень."
+      ]
+    },
+    {
+      "id": "tactile_discovery",
+      "name": "Каждое найденное отличие приятно ощущается",
+      "rules": [
+        "Правильное нажатие подтверждается формой, анимацией, звуком и необязательной вибрацией.",
+        "Найденное отличие синхронно отмечается на обеих версиях изображения.",
+        "Маркеры не перекрывают важные детали сцены."
+      ]
+    },
+    {
+      "id": "mobile_native",
+      "name": "Mobile — самостоятельный UX",
+      "rules": [
+        "На portrait mobile используется полноэкранное переключение A/B, а не две микроскопические картинки.",
+        "Камера и масштаб синхронизированы между версиями.",
+        "Все важные действия доступны одним пальцем."
+      ]
+    },
+    {
+      "id": "light_meta",
+      "name": "Мета остаётся лёгкой",
+      "rules": [
+        "Мета состоит из карты, четырёх экспонатов, daily и streak.",
+        "Нет строительства, merge, нескольких валют, energy-system и battle pass.",
+        "Мета усиливает желание пройти следующую сцену, но не заменяет основную игру."
+      ]
+    },
+    {
+      "id": "trustworthy_progress",
+      "name": "Прогресс вызывает доверие",
+      "rules": [
+        "Состояние сохраняется после каждого найденного отличия.",
+        "SDK, реклама или облако не должны создавать тупиковые состояния.",
+        "При конфликте сохранений не теряются завершённые уровни, экспонаты и покупки."
+      ]
+    }
+  ],
+  "verticalSliceScope": {
+    "chapterCount": 1,
+    "campaignLevelCount": 12,
+    "dailySceneCount": 3,
+    "artifactCount": 4,
+    "languages": [
+      "ru",
+      "en"
+    ],
+    "hints": [
+      "area_hint",
+      "exact_reveal"
+    ],
+    "monetization": {
+      "rewarded": true,
+      "interstitial": true,
+      "iapProductCount": 1
+    },
+    "requiredSystems": [
+      "onboarding",
+      "chapter-map",
+      "photo-comparator",
+      "level-results",
+      "collection-album",
+      "daily-challenge",
+      "streak",
+      "local-save",
+      "cloud-save-adapter",
+      "yandex-sdk-adapter",
+      "analytics-adapter",
+      "local-mock-platform",
+      "dev-level-editor",
+      "content-validation",
+      "responsive-ui"
+    ],
+    "explicitlyOutOfScope": [
+      "server-backend",
+      "pvp",
+      "social-features",
+      "procedural-scene-generation",
+      "restoration-room",
+      "energy",
+      "lives",
+      "multiple-soft-currencies",
+      "battle-pass",
+      "season-pass",
+      "multiple-chapters",
+      "remote-cms",
+      "voice-over",
+      "complex-cutscenes",
+      "rtl",
+      "tr",
+      "ar",
+      "kk"
+    ]
+  },
+  "chapter": {
+    "id": "northern-route",
+    "titleKey": "chapter.northernRoute.title",
+    "titleRu": "Северный маршрут",
+    "premiseRu": "В архив поступает коробка материалов экспедиции 1977 года, исследовавшей заброшенную станцию «Полярная-7». В коробке находятся две версии каждого снимка, но детали на них не совпадают.",
+    "structure": "linear",
+    "levels": [
+      {
+        "order": 1,
+        "id": "nr-01-night-train",
+        "titleRu": "Вагон ночного поезда",
+        "role": "tutorial",
+        "differenceCount": 4,
+        "difficulty": 1,
+        "artifactMilestone": null
+      },
+      {
+        "order": 2,
+        "id": "nr-02-station-hall",
+        "titleRu": "Зал ожидания станции",
+        "role": "introduce-map-and-daily",
+        "differenceCount": 5,
+        "difficulty": 1,
+        "artifactMilestone": null
+      },
+      {
+        "order": 3,
+        "id": "nr-03-station-office",
+        "titleRu": "Кабинет начальника станции",
+        "role": "first-standard-level",
+        "differenceCount": 5,
+        "difficulty": 1,
+        "artifactMilestone": "brass-compass"
+      },
+      {
+        "order": 4,
+        "id": "nr-04-expedition-storage",
+        "titleRu": "Склад экспедиции",
+        "role": "shape-and-count-differences",
+        "differenceCount": 6,
+        "difficulty": 1,
+        "artifactMilestone": null
+      },
+      {
+        "order": 5,
+        "id": "nr-05-radio-room",
+        "titleRu": "Радиорубка",
+        "role": "instrument-detail-differences",
+        "differenceCount": 6,
+        "difficulty": 2,
+        "artifactMilestone": null
+      },
+      {
+        "order": 6,
+        "id": "nr-06-polar-greenhouse",
+        "titleRu": "Полярная теплица",
+        "role": "color-form-and-count",
+        "differenceCount": 6,
+        "difficulty": 2,
+        "artifactMilestone": "field-radio"
+      },
+      {
+        "order": 7,
+        "id": "nr-07-rover-garage",
+        "titleRu": "Гараж вездеходов",
+        "role": "moved-and-missing-objects",
+        "differenceCount": 7,
+        "difficulty": 2,
+        "artifactMilestone": null
+      },
+      {
+        "order": 8,
+        "id": "nr-08-laboratory",
+        "titleRu": "Исследовательская лаборатория",
+        "role": "dense-composition",
+        "differenceCount": 7,
+        "difficulty": 2,
+        "artifactMilestone": null
+      },
+      {
+        "order": 9,
+        "id": "nr-09-living-quarters",
+        "titleRu": "Жилой блок",
+        "role": "advanced-standard-level",
+        "differenceCount": 7,
+        "difficulty": 2,
+        "artifactMilestone": "blue-flower"
+      },
+      {
+        "order": 10,
+        "id": "nr-10-observatory-dome",
+        "titleRu": "Купол обсерватории",
+        "role": "reflection-and-light-differences",
+        "differenceCount": 7,
+        "difficulty": 3,
+        "artifactMilestone": null
+      },
+      {
+        "order": 11,
+        "id": "nr-11-signal-beacon",
+        "titleRu": "Сигнальный маяк",
+        "role": "pre-final",
+        "differenceCount": 8,
+        "difficulty": 3,
+        "artifactMilestone": null
+      },
+      {
+        "order": 12,
+        "id": "nr-12-expedition-camp",
+        "titleRu": "Лагерь экспедиции",
+        "role": "chapter-finale",
+        "differenceCount": 8,
+        "difficulty": 3,
+        "artifactMilestone": "torn-map"
+      }
+    ],
+    "dailyScenes": [
+      {
+        "id": "daily-icebreaker-cabin",
+        "titleRu": "Каюта ледокола"
+      },
+      {
+        "id": "daily-cartographer-room",
+        "titleRu": "Комната картографа"
+      },
+      {
+        "id": "daily-weather-platform",
+        "titleRu": "Метеорологическая площадка"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "id": "brass-compass",
+      "titleRu": "Латунный компас",
+      "unlockAfterLevel": 3
+    },
+    {
+      "id": "field-radio",
+      "titleRu": "Полевая радиостанция",
+      "unlockAfterLevel": 6
+    },
+    {
+      "id": "blue-flower",
+      "titleRu": "Засушенный синий цветок",
+      "unlockAfterLevel": 9
+    },
+    {
+      "id": "torn-map",
+      "titleRu": "Разорванная карта маршрута",
+      "unlockAfterLevel": 12
+    }
+  ],
+  "coreLoop": {
+    "sessionLoop": [
+      "open-game",
+      "see-daily-and-active-progress",
+      "enter-level",
+      "find-differences",
+      "receive-seals-and-reward",
+      "advance-map",
+      "occasionally-unlock-artifact",
+      "return-next-day"
+    ],
+    "levelLoop": [
+      "show-short-level-card",
+      "load-paired-scene",
+      "search-and-mark-differences",
+      "optionally-use-hint",
+      "complete-scene",
+      "calculate-seals",
+      "show-reward",
+      "return-to-map"
+    ],
+    "targetDurationsSeconds": {
+      "tutorialLevel": "60-90",
+      "standardLevel": "120-180",
+      "hardLevel": "180-300",
+      "returningSession": "180-480",
+      "firstSession": "1200-2100"
+    }
+  },
+  "gameplayRules": {
+    "campaignTimer": false,
+    "energy": false,
+    "lives": false,
+    "permanentFailState": false,
+    "differenceTypes": [
+      "missing-object",
+      "color-change",
+      "shape-change",
+      "quantity-change",
+      "moved-object",
+      "symbol-or-instrument-change",
+      "reflection-or-shadow-change",
+      "subtle-surreal-anomaly"
+    ],
+    "forbiddenDifferenceTypes": [
+      "single-pixel-change",
+      "compression-artifact",
+      "ambiguous-texture-noise",
+      "unmarked-random-ai-difference",
+      "difference-requiring-color-only-identification"
+    ],
+    "misclick": {
+      "reducesAccuracy": true,
+      "removesCurrency": false,
+      "resetsLevel": false,
+      "rapidMisclickThreshold": 3,
+      "temporaryInputLockMs": 700,
+      "panGestureMustNotCount": true
+    },
+    "seals": [
+      {
+        "id": "completed",
+        "titleRu": "Восстановлено",
+        "condition": "level_completed"
+      },
+      {
+        "id": "accurate-eye",
+        "titleRu": "Точный глаз",
+        "condition": "accuracy_gte_0_85"
+      },
+      {
+        "id": "no-intervention",
+        "titleRu": "Без вмешательства",
+        "condition": "exact_hint_not_used"
+      }
+    ]
+  },
+  "hints": {
+    "areaHint": {
+      "id": "area_hint",
+      "titleRu": "Ориентир",
+      "effect": "temporarily_highlight_hint_area",
+      "costMagnifiers": 1
+    },
+    "exactReveal": {
+      "id": "exact_reveal",
+      "titleRu": "Проявитель",
+      "effect": "reveal_one_exact_difference",
+      "costMagnifiers": 2,
+      "rewardedAlternative": true
+    },
+    "noDeadEndRule": "Если реклама или SDK недоступны, игрок возвращается в уровень без потери прогресса и может продолжать поиск."
+  },
+  "controls": {
+    "desktop": {
+      "layout": "two-images-side-by-side",
+      "zoom": [
+        "mouse-wheel",
+        "keyboard-buttons"
+      ],
+      "pan": [
+        "mouse-drag",
+        "touchpad"
+      ],
+      "hitTarget": "either-image",
+      "cameraSync": true
+    },
+    "mobilePortrait": {
+      "defaultLayout": "single-image-a-b-toggle",
+      "tapCompare": "toggle_a_b",
+      "holdCompare": "temporarily_show_other_version",
+      "releaseCompare": "return_to_previous_version",
+      "cameraSync": true,
+      "optionalLayout": "vertical-split",
+      "minimumTouchTargetPx": 44
+    }
+  },
+  "progression": {
+    "mapType": "linear-12-node-expedition-route",
+    "unlockRule": "complete_previous_level",
+    "dailyUnlockAfterLevel": 2,
+    "artifactUnlockLevels": [
+      3,
+      6,
+      9,
+      12
+    ],
+    "metaCurrencies": {
+      "magnifiers": "single_consumable_hint_currency"
+    },
+    "forbiddenCurrencies": [
+      "coins",
+      "gems",
+      "energy"
+    ]
+  },
+  "daily": {
+    "sceneRotation": "deterministic-by-local-calendar-date",
+    "softTimer": true,
+    "rewardOncePerDay": true,
+    "replayAllowed": true,
+    "streakRewards": [
+      {
+        "day": 1,
+        "reward": "1_magnifier"
+      },
+      {
+        "day": 2,
+        "reward": "2_magnifiers"
+      },
+      {
+        "day": 3,
+        "reward": "cosmetic_comparator_frame"
+      }
+    ],
+    "requiredEdgeCases": [
+      "first-daily",
+      "consecutive-day",
+      "missed-day",
+      "replay-after-reward",
+      "date-change-with-open-tab",
+      "rewarded-unavailable"
+    ]
+  },
+  "monetization": {
+    "rewardedPlacements": [
+      "exact_hint",
+      "post_level_bonus_magnifiers",
+      "recover_missed_daily_reward"
+    ],
+    "interstitialPolicy": {
+      "minimumCompletedLevels": 4,
+      "minimumSessionSeconds": 480,
+      "minimumSecondsSinceLastInterstitial": 300,
+      "allowedScreen": "chapter-map",
+      "forbiddenMoments": [
+        "tutorial",
+        "during-level",
+        "artifact-reveal",
+        "daily-result",
+        "chapter-finale"
+      ]
+    },
+    "iap": {
+      "productId": "archive_starter_pack",
+      "titleRu": "Архивный набор",
+      "contents": [
+        "disable_forced_interstitials",
+        "5_magnifiers",
+        "exclusive_comparator_frame"
+      ],
+      "priceSource": "yandex_purchase_catalog",
+      "hardcodedPriceForbidden": true
+    }
+  },
+  "saveSystem": {
+    "localGuestSave": true,
+    "cloudSaveAdapter": true,
+    "saveMoments": [
+      "difference-found",
+      "level-completed",
+      "artifact-unlocked",
+      "purchase-completed",
+      "visibilitychange",
+      "pagehide"
+    ],
+    "storedState": [
+      "completed-levels",
+      "unlocked-levels",
+      "best-results",
+      "in-progress-level",
+      "found-difference-ids",
+      "camera-state",
+      "magnifiers",
+      "artifacts",
+      "daily",
+      "streak",
+      "purchases",
+      "settings"
+    ],
+    "conflictMergeRules": [
+      "union-completed-levels",
+      "union-unlocked-artifacts",
+      "never-lose-purchases",
+      "select-better-level-results",
+      "document-consumable-resolution-rule"
+    ],
+    "versionedSchema": true,
+    "migrationsRequired": true
+  },
+  "visualDirection": {
+    "metaphor": "museum-photo-archive-plus-expedition-cartography",
+    "uiMaterials": [
+      "warm-paper",
+      "mat-board",
+      "contact-sheets",
+      "negatives",
+      "metal-clips",
+      "route-lines",
+      "archive-seals",
+      "subtle-brass-details"
+    ],
+    "palette": {
+      "paper": "#E7DDC8",
+      "ivory": "#F4EEDD",
+      "mutedTeal": "#496B68",
+      "ochre": "#B68A45",
+      "rustAccent": "#9A4E3F",
+      "graphite": "#2F3231",
+      "coldSceneBlue": "#5F7684"
+    },
+    "sceneStyle": {
+      "name": "premium semi-realistic illustrated archival photography",
+      "description": "Стилизованная полуреалистичная 2D-иллюстрация уровня premium hidden-object art: документальная композиция, ясные силуэты, контролируемая детализация, аккуратная живописная фактура, ощущение северной экспедиции конца 1970-х.",
+      "camera": "fixed-eye-level-or-slight-high-angle",
+      "aspectRatio": "16:10",
+      "masterResolution": "1600x1000",
+      "lighting": "soft-directional-overcast-or-warm-practical-light",
+      "detailPolicy": "medium-high-detail-with-clear-object-separation",
+      "characters": "no-close-up-faces; empty-scenes-preferred",
+      "textPolicy": "no-readable-text-inside-scenes",
+      "logoPolicy": "no-brand-logos",
+      "pairRule": "image_b_must_be_edited_from_image_a_not_generated_independently"
+    },
+    "forbiddenVisuals": [
+      "neon",
+      "casino-effects",
+      "candy-mobile-ui",
+      "generic-glossy-chests",
+      "dirty-unreadable-grunge",
+      "dark-horror",
+      "tiny-decorative-text",
+      "overloaded-hud",
+      "restoration-room"
+    ]
+  },
+  "audioDirection": {
+    "music": "quiet-minimal-ambient-with-soft-analog-and-wind-textures",
+    "sfx": [
+      "paper",
+      "camera-shutter",
+      "soft-pencil-mark",
+      "archive-stamp",
+      "subtle-metal-click"
+    ],
+    "avoid": [
+      "casino-jingles",
+      "cartoon-boings",
+      "loud-horror-stingers",
+      "constant-high-energy-loop"
+    ],
+    "settings": [
+      "music-volume",
+      "sfx-volume",
+      "mute",
+      "vibration"
+    ]
+  },
+  "localization": {
+    "languages": [
+      "ru",
+      "en"
+    ],
+    "default": "ru",
+    "allUserStringsExternalized": true,
+    "noTextInsideSceneImages": true,
+    "futureLanguages": [
+      "tr",
+      "ar",
+      "kk"
+    ]
+  },
+  "analytics": {
+    "requiredEvents": [
+      "app_open",
+      "sdk_ready",
+      "first_interaction",
+      "tutorial_start",
+      "tutorial_complete",
+      "map_open",
+      "level_start",
+      "difference_found",
+      "misclick",
+      "zoom_used",
+      "compare_toggle_used",
+      "hint_open",
+      "hint_used",
+      "rewarded_requested",
+      "rewarded_completed",
+      "rewarded_failed",
+      "level_complete",
+      "level_abandon",
+      "artifact_unlock",
+      "collection_open",
+      "daily_start",
+      "daily_complete",
+      "streak_claim",
+      "purchase_open",
+      "purchase_success",
+      "purchase_failed",
+      "save_local_success",
+      "save_cloud_success",
+      "save_cloud_failed"
+    ],
+    "levelCompletePayload": [
+      "levelId",
+      "duration",
+      "accuracy",
+      "mistakes",
+      "hintsUsed",
+      "rewardedUsed",
+      "deviceCategory",
+      "inputMode",
+      "photoMode",
+      "sessionDuration"
+    ]
+  },
+  "technicalConstraints": {
+    "frontend": "React + TypeScript strict + Vite",
+    "styling": "Tailwind CSS",
+    "state": "Zustand",
+    "validation": "Zod",
+    "uiAnimation": "Framer Motion",
+    "photoRendering": "PixiJS or isolated Canvas2D module",
+    "unitTests": "Vitest",
+    "e2eTests": "Playwright",
+    "packageManager": "pnpm",
+    "backend": "none",
+    "platformCalls": "adapter-only",
+    "localMockPlatform": true,
+    "contentDriven": true,
+    "devLevelEditor": true,
+    "contentValidationCommand": "pnpm validate:content"
+  },
+  "performanceTargets": {
+    "preloadPolicy": "current-and-next-scene-only",
+    "firstLevelMustNotWaitForEntireChapter": true,
+    "largeAssetsAsBase64Forbidden": true,
+    "externalImageHotlinksForbidden": true,
+    "freeTextureResourcesAfterLevel": true,
+    "targetExperience": "stable-input-and-layout-on-mid-range-mobile-browser"
+  },
+  "acceptanceCriteria": [
+    "Новый игрок запускает игру без обязательной авторизации.",
+    "Обучение начинается не позднее 20 секунд после запуска при нормальной загрузке.",
+    "Все 12 уровней кампании доступны и проходимы.",
+    "Три daily-сцены выбираются детерминированно по дате.",
+    "Четыре экспоната открываются после уровней 3, 6, 9 и 12.",
+    "Прогресс уровня восстанавливается после reload.",
+    "Desktop и mobile используют разные подходящие layouts.",
+    "Rewarded failure не создаёт тупик.",
+    "SDK failure не создаёт бесконечный spinner.",
+    "Контент валидируется до production build.",
+    "Production build, lint, typecheck, unit tests и e2e tests проходят.",
+    "Интерфейс работает на 360x640 и 1280x720.",
+    "Финальные сцены не содержат случайных незаявленных отличий."
+  ],
+  "developmentProcess": {
+    "canonicalRoadmap": "09_DEVELOPMENT_ROADMAP.md",
+    "machineReadableRoadmap": "starter-data/development-roadmap.json",
+    "phaseGatesAreMandatory": true,
+    "massContentBeforeComparatorForbidden": true,
+    "monetizationBeforeStableCloudSaveForbidden": true,
+    "moderationBeforeReleaseChecklistForbidden": true,
+    "estimatedTotalPersonHours": {
+      "min": 297,
+      "max": 491
+    },
+    "estimatedCalendar": {
+      "fullTimeWeeks": "8-12",
+      "partTimeWeeks": "14-22"
+    },
+    "criticalPath": [
+      "design-gameplay-ux",
+      "three-validated-scene-pairs",
+      "photo-comparator",
+      "yandex-cloud-save",
+      "progression",
+      "purchases",
+      "fifteen-validated-scenes",
+      "full-qa",
+      "moderation"
+    ]
+  }
+}

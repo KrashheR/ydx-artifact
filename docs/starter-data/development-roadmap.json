@@ -1,0 +1,381 @@
+{
+  "schemaVersion": "1.0.0",
+  "project": "find-differences-anomaly-archive",
+  "rule": "A phase cannot be marked complete until every exit criterion passes.",
+  "phases": [
+    {
+      "id": "phase-0",
+      "name": "Product freeze and workspace",
+      "dependsOn": [],
+      "owner": [
+        "human"
+      ],
+      "estimatedHours": {
+        "min": 4,
+        "max": 8
+      },
+      "deliverables": [
+        "git-repository",
+        "frozen-scope",
+        "task-board"
+      ],
+      "exitCriteria": [
+        "game_concept accepted",
+        "out-of-scope accepted",
+        "no product-blocking questions"
+      ]
+    },
+    {
+      "id": "phase-1",
+      "name": "UX and design handoff",
+      "dependsOn": [
+        "phase-0"
+      ],
+      "owner": [
+        "claude-design",
+        "human-review"
+      ],
+      "estimatedHours": {
+        "min": 18,
+        "max": 30
+      },
+      "deliverables": [
+        "clickable-flow",
+        "design-tokens",
+        "desktop-layouts",
+        "mobile-portrait-layouts",
+        "mobile-landscape-layouts",
+        "component-inventory",
+        "catalog-creative-concepts"
+      ],
+      "exitCriteria": [
+        "first-session-flow complete",
+        "returning-session-flow complete",
+        "all error states have exits",
+        "ru and representative en layouts exist"
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Art pipeline and three reference pairs",
+      "dependsOn": [
+        "phase-0"
+      ],
+      "owner": [
+        "human",
+        "image-tools"
+      ],
+      "estimatedHours": {
+        "min": 20,
+        "max": 35
+      },
+      "deliverables": [
+        "tutorial-pair",
+        "standard-pair",
+        "hard-pair",
+        "diff-validation-process",
+        "asset-provenance"
+      ],
+      "exitCriteria": [
+        "no accidental differences",
+        "mobile readability accepted",
+        "runtime assets exported",
+        "pipeline repeatable"
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "Engineering foundation",
+      "dependsOn": [
+        "phase-1"
+      ],
+      "owner": [
+        "codex"
+      ],
+      "estimatedHours": {
+        "min": 14,
+        "max": 22
+      },
+      "deliverables": [
+        "react-vite-app",
+        "architecture",
+        "mock-platform",
+        "i18n-bootstrap",
+        "content-validation",
+        "ci-commands"
+      ],
+      "exitCriteria": [
+        "lint passes",
+        "typecheck passes",
+        "unit tests pass",
+        "content validation passes",
+        "production build passes"
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Core PhotoComparator gameplay",
+      "dependsOn": [
+        "phase-2",
+        "phase-3"
+      ],
+      "owner": [
+        "codex",
+        "human-qa"
+      ],
+      "estimatedHours": {
+        "min": 30,
+        "max": 45
+      },
+      "deliverables": [
+        "renderer",
+        "camera",
+        "hit-testing",
+        "desktop-mode",
+        "portrait-mode",
+        "landscape-mode",
+        "hints",
+        "level-editor"
+      ],
+      "exitCriteria": [
+        "three reference levels playable",
+        "pan is not misclick",
+        "rotation preserves state",
+        "mobile e2e passes",
+        "textures release correctly"
+      ]
+    },
+    {
+      "id": "phase-5",
+      "name": "Yandex lifecycle and saves",
+      "dependsOn": [
+        "phase-4"
+      ],
+      "owner": [
+        "codex"
+      ],
+      "estimatedHours": {
+        "min": 26,
+        "max": 40
+      },
+      "deliverables": [
+        "platform-lifecycle-service",
+        "local-mirror",
+        "yandex-cloud-save",
+        "merge-rules",
+        "migrations",
+        "account-selection-flow"
+      ],
+      "exitCriteria": [
+        "reload after every difference works",
+        "cloud/local conflicts merge",
+        "sdk timeout falls back",
+        "old save migrates",
+        "no reproducible progress loss"
+      ]
+    },
+    {
+      "id": "phase-6",
+      "name": "Progression and light meta",
+      "dependsOn": [
+        "phase-5"
+      ],
+      "owner": [
+        "codex"
+      ],
+      "estimatedHours": {
+        "min": 24,
+        "max": 36
+      },
+      "deliverables": [
+        "chapter-map",
+        "results",
+        "artifacts",
+        "collection",
+        "daily",
+        "streak",
+        "chapter-finale"
+      ],
+      "exitCriteria": [
+        "full first-session flow works",
+        "rewards cannot duplicate",
+        "daily date rollover works",
+        "artifact reveal is idempotent"
+      ]
+    },
+    {
+      "id": "phase-7",
+      "name": "Monetization and Remote Config",
+      "dependsOn": [
+        "phase-5",
+        "phase-6"
+      ],
+      "owner": [
+        "codex",
+        "human-platform-test"
+      ],
+      "estimatedHours": {
+        "min": 20,
+        "max": 32
+      },
+      "deliverables": [
+        "remote-config",
+        "rewarded",
+        "interstitial",
+        "catalog",
+        "supporter-pack",
+        "consumable-pack",
+        "purchase-recovery"
+      ],
+      "exitCriteria": [
+        "purchase mismatch is zero",
+        "grant saved before consume",
+        "no-ads entitlement works",
+        "remote kill switches work"
+      ]
+    },
+    {
+      "id": "phase-8",
+      "name": "Full content production",
+      "dependsOn": [
+        "phase-4",
+        "phase-5"
+      ],
+      "owner": [
+        "human",
+        "image-tools",
+        "codex-integration"
+      ],
+      "estimatedHours": {
+        "min": 70,
+        "max": 120
+      },
+      "deliverables": [
+        "12-campaign-scenes",
+        "3-daily-scenes",
+        "4-artifacts",
+        "all-level-json",
+        "validated-provenance"
+      ],
+      "exitCriteria": [
+        "all content validates",
+        "all levels playable on mobile and desktop",
+        "no accidental differences",
+        "asset budget accepted"
+      ]
+    },
+    {
+      "id": "phase-9",
+      "name": "I18n and catalog",
+      "dependsOn": [
+        "phase-6",
+        "phase-8"
+      ],
+      "owner": [
+        "human",
+        "claude-design",
+        "codex"
+      ],
+      "estimatedHours": {
+        "min": 16,
+        "max": 28
+      },
+      "deliverables": [
+        "complete-ru",
+        "complete-en",
+        "catalog-copy",
+        "icon",
+        "cover",
+        "localized-screenshots"
+      ],
+      "exitCriteria": [
+        "only ru and en declared",
+        "key parity passes",
+        "no clipped english",
+        "catalog materials match real gameplay"
+      ]
+    },
+    {
+      "id": "phase-10",
+      "name": "QA and release hardening",
+      "dependsOn": [
+        "phase-7",
+        "phase-8",
+        "phase-9"
+      ],
+      "owner": [
+        "codex",
+        "human-qa"
+      ],
+      "estimatedHours": {
+        "min": 35,
+        "max": 55
+      },
+      "deliverables": [
+        "automation-green",
+        "browser-matrix-report",
+        "performance-report",
+        "moderation-rehearsal",
+        "release-candidate"
+      ],
+      "exitCriteria": [
+        "no sev0 or sev1",
+        "no console errors",
+        "release checklist complete",
+        "last-known-good archive exists"
+      ]
+    },
+    {
+      "id": "phase-11",
+      "name": "Moderation and publication",
+      "dependsOn": [
+        "phase-10"
+      ],
+      "owner": [
+        "human",
+        "codex-release-tooling"
+      ],
+      "estimatedHours": {
+        "min": 8,
+        "max": 16
+      },
+      "deliverables": [
+        "release-archive",
+        "checksum",
+        "moderation-submission",
+        "published-build"
+      ],
+      "exitCriteria": [
+        "approved build smoke-tested",
+        "manual publication completed",
+        "support and monitoring active"
+      ]
+    },
+    {
+      "id": "phase-12",
+      "name": "First 14 days validation",
+      "dependsOn": [
+        "phase-11"
+      ],
+      "owner": [
+        "human",
+        "codex-fixes"
+      ],
+      "estimatedHours": {
+        "min": 12,
+        "max": 24
+      },
+      "deliverables": [
+        "launch-monitoring",
+        "funnel-review",
+        "review-analysis",
+        "scale-iterate-stop-decision"
+      ],
+      "exitCriteria": [
+        "day-14 decision documented",
+        "critical incidents resolved",
+        "next scope approved or project stopped"
+      ]
+    }
+  ]
+}

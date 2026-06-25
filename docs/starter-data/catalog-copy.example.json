@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0.0",
+  "ru": {
+    "title": "Найди отличия: Архив аномалий",
+    "shortDescription": "Восстановите снимки экспедиции и раскройте тайну архива",
+    "description": "Сравнивайте две версии архивных фотографий, находите аномальные расхождения и восстанавливайте маршрут пропавшей северной экспедиции. Проходите спокойные визуальные головоломки, собирайте музейные экспонаты и возвращайтесь к ежедневным заданиям.",
+    "howToPlay": "На компьютере нажимайте на отличия на любой из двух фотографий. Используйте колесо мыши для масштаба и перетаскивайте снимки для перемещения. На телефоне нажимайте или удерживайте кнопку «Сравнить», чтобы переключаться между версиями. Подсказка «Ориентир» показывает область поиска, а «Проявитель» раскрывает одно отличие."
+  },
+  "en": {
+    "title": "Find the Differences: Anomaly Archive",
+    "shortDescription": "Restore expedition photos and uncover the archive mystery",
+    "description": "Compare two versions of archival photographs, find anomalous differences, and restore the route of a missing northern expedition. Complete relaxing visual puzzles, collect museum artifacts, and return for a new daily challenge.",
+    "howToPlay": "On desktop, click a difference in either photograph. Use the mouse wheel to zoom and drag to move both images together. On mobile, tap or hold the Compare button to switch between versions. The Area Hint highlights where to search, while Exact Reveal uncovers one difference."
+  }
+}

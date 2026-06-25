@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Inter, system-ui, sans-serif; background: #1A1F1E; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+    @keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation:none!important; transition:none!important; } }
+  </style>
+</helmet>
+
+<div style="min-height:100vh; background:#1A1F1E; padding:28px; display:flex; flex-direction:column; gap:40px;">
+
+  <!-- Header -->
+  <div style="display:flex; align-items:center; gap:12px;">
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#496B68; letter-spacing:0.1em;">DESIGN-REFERENCE</div>
+    <div style="flex:1; height:1px; background:rgba(200,191,173,0.1);"></div>
+    <div style="font-family:'Playfair Display',serif; font-size:20px; color:#F4EEDD;">Панели и состояния системы</div>
+  </div>
+
+  <!-- Tab selector -->
+  <div style="display:flex; gap:6px; flex-wrap:wrap;">
+    <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="10">
+      <button onClick="{{ tab.select }}" style="padding:6px 14px; border-radius:4px; border:1px solid {{ tab.active ? '#496B68' : 'rgba(200,191,173,0.2)' }}; background:{{ tab.active ? '#496B68' : 'transparent' }}; color:{{ tab.active ? 'white' : '#C8BFAD' }}; font-size:12px; font-weight:500; cursor:pointer; transition:all 0.15s;">{{ tab.label }}</button>
+    </sc-for>
+  </div>
+
+  <!-- PANEL CONTENT -->
+  <div style="display:flex; justify-content:center; align-items:flex-start; gap:24px; flex-wrap:wrap;">
+
+    <!-- ═══ COLLECTION ═══ -->
+    <sc-if value="{{ activeTab === 'collection' }}" hint-placeholder-val="{{ true }}">
+      <div style="width:480px; background:#F4EEDD; border-radius:12px; overflow:hidden; box-shadow:0 12px 32px rgba(0,0,0,0.4); animation:fadeUp 0.3s ease;">
+        <div style="padding:20px 24px 0;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+            <div style="font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:#2F3231;">Архивная коллекция</div>
+            <button onClick="{{ closePanel }}" style="width:32px; height:32px; border-radius:6px; border:1px solid #C8BFAD; background:#E7DDC8; cursor:pointer; display:flex; align-items:center; justify-content:center;" aria-label="Закрыть">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 3l8 8M11 3l-8 8" stroke="#7A7268" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#7A7268; letter-spacing:0.06em; margin-bottom:20px;">СЕВЕРНЫЙ МАРШРУТ · 1 ИЗ 4 ЭКСПОНАТОВ</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+
+            <!-- Found: Brass Compass -->
+            <div style="border:1.5px solid #B68A45; border-radius:10px; overflow:hidden; background:#FDF8F0; cursor:pointer;" onClick="{{ openArtifact }}" style-hover="border-color:#8C6A34">
+              <div style="height:110px; background:linear-gradient(135deg,#2A2A20,#1A1A14); display:flex; align-items:center; justify-content:center; position:relative;">
+                <svg width="56" height="56" viewBox="0 0 72 72" fill="none"><circle cx="36" cy="36" r="28" stroke="#B68A45" stroke-width="2"/><circle cx="36" cy="36" r="22" stroke="#8C6A34" stroke-width="1" stroke-dasharray="3 2.5"/><circle cx="36" cy="36" r="4" fill="#B68A45"/><path d="M36 16l3.5 16-3.5 4-3.5-4z" fill="#B68A45"/><path d="M36 56l-3.5-16 3.5-4 3.5 4z" fill="#8C6A34" opacity="0.5"/></svg>
+                <div style="position:absolute; top:8px; right:8px; padding:2px 6px; background:rgba(182,138,69,0.9); border-radius:2px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:white; letter-spacing:0.06em;">АА-0001</span></div>
+              </div>
+              <div style="padding:10px 12px;">
+                <div style="font-size:13px; font-weight:600; color:#2F3231; margin-bottom:2px;">Латунный компас</div>
+                <div style="font-size:11px; color:#7A7268; font-family:'IBM Plex Mono',monospace;">Обнаружен · Ур. 03</div>
+              </div>
+            </div>
+
+            <!-- Found: Field Radio -->
+            <div style="border:1.5px solid #B68A45; border-radius:10px; overflow:hidden; background:#FDF8F0; cursor:pointer;" onClick="{{ openArtifact }}" style-hover="border-color:#8C6A34">
+              <div style="height:110px; background:linear-gradient(135deg,#1A2420,#101A18); display:flex; align-items:center; justify-content:center; position:relative;">
+                <svg width="52" height="52" viewBox="0 0 60 60" fill="none"><rect x="6" y="18" width="48" height="30" rx="4" stroke="#B68A45" stroke-width="2"/><circle cx="44" cy="33" r="8" stroke="#B68A45" stroke-width="1.5"/><path d="M12 33h20M12 26h14" stroke="#B68A45" stroke-width="1.5" stroke-linecap="round"/><path d="M18 18V12M28 18V10" stroke="#B68A45" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <div style="position:absolute; top:8px; right:8px; padding:2px 6px; background:rgba(182,138,69,0.9); border-radius:2px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:9px; color:white; letter-spacing:0.06em;">АА-0002</span></div>
+              </div>
+              <div style="padding:10px 12px;">
+                <div style="font-size:13px; font-weight:600; color:#2F3231; margin-bottom:2px;">Полевая радиостанция</div>
+                <div style="font-size:11px; color:#7A7268; font-family:'IBM Plex Mono',monospace;">Обнаружен · Ур. 06</div>
+              </div>
+            </div>
+
+            <!-- Locked: Blue Flower -->
+            <div style="border:1px solid #C8BFAD; border-radius:10px; overflow:hidden; background:#F0EBE0; opacity:0.6;">
+              <div style="height:110px; background:#2A2820; display:flex; align-items:center; justify-content:center; position:relative;">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="12" y="18" width="16" height="14" rx="3" stroke="#7A7268" stroke-width="1.5"/><path d="M14 18v-3a6 6 0 0112 0v3" stroke="#7A7268" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <div style="position:absolute; bottom:8px; left:0; right:0; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:9px; color:rgba(200,191,173,0.5);">УРОВЕНЬ 9</div>
+              </div>
+              <div style="padding:10px 12px;">
+                <div style="font-size:13px; font-weight:500; color:#7A7268; margin-bottom:2px;">Засушенный цветок</div>
+                <div style="font-size:11px; color:#A89E8E; font-family:'IBM Plex Mono',monospace;">Не обнаружен</div>
+              </div>
+            </div>
+
+            <!-- Locked: Torn Map -->
+            <div style="border:1px solid #C8BFAD; border-radius:10px; overflow:hidden; background:#F0EBE0; opacity:0.5;">
+              <div style="height:110px; background:#2A2820; display:flex; align-items:center; justify-content:center; position:relative;">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="12" y="18" width="16" height="14" rx="3" stroke="#7A7268" stroke-width="1.5"/><path d="M14 18v-3a6 6 0 0112 0v3" stroke="#7A7268" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <div style="position:absolute; bottom:8px; left:0; right:0; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:9px; color:rgba(200,191,173,0.5);">УРОВЕНЬ 12</div>
+              </div>
+              <div style="padding:10px 12px;">
+                <div style="font-size:13px; font-weight:500; color:#7A7268; margin-bottom:2px;">Разорванная карта</div>
+                <div style="font-size:11px; color:#A89E8E; font-family:'IBM Plex Mono',monospace;">Не обнаружен</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div style="padding:0 24px 24px;">
+          <button onClick="{{ closePanel }}" style="width:100%; padding:12px; border-radius:8px; border:1px solid #C8BFAD; background:#E7DDC8; font-size:14px; font-weight:500; color:#2F3231; cursor:pointer;" style-hover="background:#D4C9B3">Закрыть коллекцию</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ═══ SHOP ═══ -->
+    <sc-if value="{{ activeTab === 'shop' }}" hint-placeholder-val="{{ false }}">
+      <div style="width:480px; background:#F4EEDD; border-radius:12px; overflow:hidden; box-shadow:0 12px 32px rgba(0,0,0,0.4); animation:fadeUp 0.3s ease;">
+        <div style="padding:20px 24px 0;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+            <div style="font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:#2F3231;">Магазин</div>
+            <button onClick="{{ closePanel }}" style="width:32px; height:32px; border-radius:6px; border:1px solid #C8BFAD; background:#E7DDC8; cursor:pointer; display:flex; align-items:center; justify-content:center;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 3l8 8M11 3l-8 8" stroke="#7A7268" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:#7A7268; letter-spacing:0.06em; margin-bottom:20px;">АРХИВНЫЙ КАТАЛОГ</div>
+
+          <!-- Archive Supporter Pack (non-consumable) -->
+          <div style="border:1.5px solid #B68A45; border-radius:10px; overflow:hidden; margin-bottom:12px; background:#FDF8F0;">
+            <div style="background:linear-gradient(135deg,#2F3231,#1A1F1E); padding:16px 20px; display:flex; align-items:center; gap:14px;">
+              <div style="width:52px; height:52px; border-radius:8px; background:rgba(182,138,69,0.15); border:1.5px solid #B68A45; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M4 10h20v14a2 2 0 01-2 2H6a2 2 0 01-2-2V10z" stroke="#B68A45" stroke-width="1.5"/><path d="M2 6h24v4H2z" rx="1" stroke="#B68A45" stroke-width="1.5"/><path d="M14 6V2M14 6c-2 0-3.5-1-3.5-2.5S11.5 1 14 1s3.5 1 3.5 2.5S16 6 14 6z" stroke="#B68A45" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </div>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:16px; font-weight:700; color:#F4EEDD; margin-bottom:2px;">Архивный набор</div>
+                <div style="font-size:11px; color:#D4AE78; font-family:'IBM Plex Mono',monospace; letter-spacing:0.04em;">РАЗОВАЯ ПОКУПКА</div>
+              </div>
+              <div style="text-align:right; flex-shrink:0;">
+                <div style="font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:500; color:#F4EEDD;">{{ archivePrice }}</div>
+                <div style="font-size:10px; color:#7A7268; margin-top:1px;">{{ priceCurrency }}</div>
+              </div>
+            </div>
+            <div style="padding:14px 20px;">
+              <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:14px;">
+                <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#2F3231;">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l4 4 6-6" stroke="#3B6E52" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Отключение принудительной рекламы
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#2F3231;">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l4 4 6-6" stroke="#3B6E52" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  10 луп однократно
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#2F3231;">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l4 4 6-6" stroke="#3B6E52" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Эксклюзивная архивная рамка
+                </div>
+              </div>
+              <div style="font-size:11px; color:#7A7268; margin-bottom:14px;">Добровольная реклама за подсказки остаётся доступна</div>
+              <button onClick="{{ buyArchivePack }}" style="width:100%; padding:12px; border-radius:8px; border:none; background:#B68A45; font-size:14px; font-weight:600; color:white; cursor:pointer;" style-hover="background:#8C6A34">Получить архивный набор</button>
+            </div>
+          </div>
+
+          <!-- Magnifiers 10 (consumable) -->
+          <div style="border:1px solid #C8BFAD; border-radius:10px; overflow:hidden; margin-bottom:20px; background:#F4EEDD;">
+            <div style="padding:14px 20px; display:flex; align-items:center; gap:14px;">
+              <div style="width:44px; height:44px; border-radius:8px; background:#E7DDC8; border:1px solid #C8BFAD; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="9" cy="9" r="5.5" stroke="#B68A45" stroke-width="1.5"/><path d="M13 13L18 18" stroke="#B68A45" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:14px; font-weight:600; color:#2F3231;">Набор из 10 луп</div>
+                <div style="font-size:12px; color:#7A7268; margin-top:1px;">Расходуемый · используйте на подсказки</div>
+              </div>
+              <div style="text-align:right; flex-shrink:0;">
+                <div style="font-family:'IBM Plex Mono',monospace; font-size:16px; font-weight:500; color:#2F3231;">{{ magnifiersPrice }}</div>
+                <div style="font-size:10px; color:#7A7268;">{{ priceCurrency }}</div>
+              </div>
+            </div>
+            <div style="padding:0 20px 14px;">
+              <button onClick="{{ buyMagnifiers }}" style="width:100%; padding:10px; border-radius:6px; border:1px solid #B68A45; background:transparent; font-size:13px; font-weight:600; color:#8C6A34; cursor:pointer;" style-hover="background:#F0E4C8">Купить 10 луп</button>
+            </div>
+          </div>
+
+          <!-- Catalog unavailable fallback -->
+          <sc-if value="{{ catalogUnavailable }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:12px 14px; background:#F2DDD9; border-radius:6px; display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#9A4E3F" stroke-width="1.4"/><path d="M8 5v4M8 10.5v.5" stroke="#9A4E3F" stroke-width="1.4" stroke-linecap="round"/></svg>
+              <div style="flex:1;">
+                <div style="font-size:13px; color:#7A3B2F; font-weight:500;">Каталог временно недоступен</div>
+                <div style="font-size:11px; color:#7A3B2F; opacity:0.8; margin-top:1px;">Цены загружаются при наличии соединения</div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+        <div style="padding:0 24px 24px;">
+          <button onClick="{{ closePanel }}" style="width:100%; padding:11px; border-radius:8px; border:1px solid #C8BFAD; background:transparent; font-size:13px; color:#7A7268; cursor:pointer;" style-hover="color:#2F3231">Закрыть</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ═══ DAILY ═══ -->
+    <sc-if value="{{ activeTab === 'daily' }}" hint-placeholder-val="{{ false }}">
+      <div style="width:440px; background:#F4EEDD; border-radius:12px; overflow:hidden; box-shadow:0 12px 32px rgba(0,0,0,0.4); animation:fadeUp 0.3s ease;">
+        <div style="background:#5F7684; padding:20px 24px; display:flex; align-items:center; justify-content:space-between;">
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:rgba(255,255,255,0.6); letter-spacing:0.1em; margin-bottom:4px;">ЕЖЕДНЕВНОЕ ЗАДАНИЕ</div>
+            <div style="font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:white;">Каюта ледокола</div>
+            <div style="font-size:12px; color:rgba(255,255,255,0.7); margin-top:3px;">25 июня 2026</div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2C10 2 14 7 14 11a4 4 0 01-8 0C6 8 10 2 10 2z" fill="rgba(255,255,255,0.8)"/></svg>
+            <div style="display:flex; align-items:center; gap:3px; background:rgba(255,255,255,0.15); padding:4px 10px; border-radius:12px;">
+              <span style="font-size:13px; font-weight:600; color:white;">Серия: 3 дня</span>
+            </div>
+          </div>
+        </div>
+        <div style="padding:20px 24px;">
+          <!-- Streak rewards -->
+          <div style="display:flex; gap:8px; margin-bottom:20px;">
+            <div style="flex:1; padding:10px 8px; background:#D6E5E4; border:1.5px solid #496B68; border-radius:8px; display:flex; flex-direction:column; align-items:center; gap:4px;">
+              <div style="font-size:11px; font-weight:600; color:#344E4C;">День 1</div>
+              <div style="display:flex; align-items:center; gap:3px;"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="5.5" cy="5.5" r="3.5" stroke="#496B68" stroke-width="1.3"/><path d="M8.5 8.5L11 11" stroke="#496B68" stroke-width="1.3" stroke-linecap="round"/></svg><span style="font-size:12px; color:#344E4C; font-weight:600;">+1</span></div>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l4 4 4-4" stroke="#496B68" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </div>
+            <div style="flex:1; padding:10px 8px; background:#D6E5E4; border:1.5px solid #496B68; border-radius:8px; display:flex; flex-direction:column; align-items:center; gap:4px;">
+              <div style="font-size:11px; font-weight:600; color:#344E4C;">День 2</div>
+              <div style="display:flex; align-items:center; gap:3px;"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><circle cx="5.5" cy="5.5" r="3.5" stroke="#496B68" stroke-width="1.3"/><path d="M8.5 8.5L11 11" stroke="#496B68" stroke-width="1.3" stroke-linecap="round"/></svg><span style="font-size:12px; color:#344E4C; font-weight:600;">+2</span></div>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l4 4 4-4" stroke="#496B68" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </div>
+            <div style="flex:1; padding:10px 8px; background:#F0E4C8; border:1.5px solid #B68A45; border-radius:8px; display:flex; flex-direction:column; align-items:center; gap:4px;">
+              <div style="font-size:11px; font-weight:600; color:#8C6A34;">День 3</div>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1.5" stroke="#B68A45" stroke-width="1.4"/><path d="M6 6h4M6 9h3" stroke="#B68A45" stroke-width="1.2" stroke-linecap="round"/></svg>
+              <div style="font-size:10px; color:#8C6A34; font-weight:500; text-align:center; line-height:1.2;">Рамка</div>
+            </div>
+          </div>
+
+          <!-- Already claimed state -->
+          <sc-if value="{{ dailyClaimed }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:16px; background:#D4EAD9; border-radius:8px; display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="#3B6E52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div>
+                <div style="font-size:14px; font-weight:600; color:#2C5240;">Задание выполнено сегодня</div>
+                <div style="font-size:12px; color:#3B6E52; margin-top:1px;">Возвращайтесь завтра для продолжения серии</div>
+              </div>
+            </div>
+            <button onClick="{{ replayDaily }}" style="width:100%; padding:11px; border-radius:8px; border:1px solid #C8BFAD; background:#E7DDC8; font-size:13px; color:#2F3231; cursor:pointer; margin-bottom:8px;" style-hover="background:#D4C9B3">Сыграть снова (без награды)</button>
+          </sc-if>
+          <sc-if value="{{ dailyAvailable }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex; align-items:center; gap:8px; padding:10px 14px; background:#E7DDC8; border-radius:6px; margin-bottom:16px;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#7A7268" stroke-width="1.2"/><path d="M7 4v3l2 2" stroke="#7A7268" stroke-width="1.2" stroke-linecap="round"/></svg>
+              <span style="font-size:12px; color:#7A7268;">Мягкий таймер — нет жёстких ограничений</span>
+            </div>
+            <button onClick="{{ startDaily }}" style="width:100%; padding:13px; border-radius:8px; border:none; background:#5F7684; font-size:15px; font-weight:600; color:white; cursor:pointer; margin-bottom:8px;" style-hover="background:#475A66">Начать задание</button>
+          </sc-if>
+          <button onClick="{{ closePanel }}" style="width:100%; padding:10px; border-radius:8px; border:1px solid #C8BFAD; background:transparent; font-size:13px; color:#7A7268; cursor:pointer;" style-hover="color:#2F3231">Закрыть</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ═══ SETTINGS ═══ -->
+    <sc-if value="{{ activeTab === 'settings' }}" hint-placeholder-val="{{ false }}">
+      <div style="width:400px; background:#F4EEDD; border-radius:12px; overflow:hidden; box-shadow:0 12px 32px rgba(0,0,0,0.4); animation:fadeUp 0.3s ease;">
+        <div style="padding:20px 24px 0;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+            <div style="font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:#2F3231;">Настройки</div>
+            <button onClick="{{ closePanel }}" style="width:32px; height:32px; border-radius:6px; border:1px solid #C8BFAD; background:#E7DDC8; cursor:pointer; display:flex; align-items:center; justify-content:center;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 3l8 8M11 3l-8 8" stroke="#7A7268" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+          </div>
+
+          <!-- Language -->
+          <div style="margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:500; color:#7A7268; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Язык</div>
+            <div style="display:flex; border:1px solid #C8BFAD; border-radius:6px; overflow:hidden;">
+              <button onClick="{{ setRu }}" style="flex:1; padding:10px; border:none; background:{{ lang === 'ru' ? '#496B68' : '#E7DDC8' }}; color:{{ lang === 'ru' ? 'white' : '#2F3231' }}; font-size:14px; font-weight:{{ lang === 'ru' ? '600' : '400' }}; cursor:pointer; border-right:1px solid #C8BFAD; transition:all 0.15s;">Русский</button>
+              <button onClick="{{ setEn }}" style="flex:1; padding:10px; border:none; background:{{ lang === 'en' ? '#496B68' : '#E7DDC8' }}; color:{{ lang === 'en' ? 'white' : '#2F3231' }}; font-size:14px; font-weight:{{ lang === 'en' ? '600' : '400' }}; cursor:pointer; transition:all 0.15s;">English</button>
+            </div>
+          </div>
+
+          <!-- Sound / Vibration toggles -->
+          <div style="margin-bottom:16px; border:1px solid #C8BFAD; border-radius:8px; overflow:hidden;">
+            <div style="padding:12px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #C8BFAD; background:#F4EEDD;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6h2l3-3v10L5 10H3V6z" stroke="#2F3231" stroke-width="1.3" stroke-linejoin="round"/><path d="M10 5c1.5.8 2 2 2 3s-.5 2.2-2 3" stroke="#2F3231" stroke-width="1.3" stroke-linecap="round"/></svg>
+                <span style="font-size:14px; color:#2F3231;">Музыка</span>
+              </div>
+              <div onClick="{{ toggleMusic }}" style="width:40px; height:22px; border-radius:11px; background:{{ musicOn ? '#496B68' : '#C8BFAD' }}; position:relative; cursor:pointer; transition:background 0.2s;">
+                <div style="position:absolute; top:3px; left:{{ musicOn ? '21px' : '3px' }}; width:16px; height:16px; border-radius:50%; background:white; transition:left 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
+              </div>
+            </div>
+            <div style="padding:12px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #C8BFAD; background:#F4EEDD;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 6h2l3-3v10L5 10H3V6zM10 5c1.5.8 2 2 2 3s-.5 2.2-2 3M12 3c2 1.3 3 3 3 5s-1 3.7-3 5" stroke="#2F3231" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span style="font-size:14px; color:#2F3231;">Звук</span>
+              </div>
+              <div onClick="{{ toggleSound }}" style="width:40px; height:22px; border-radius:11px; background:{{ soundOn ? '#496B68' : '#C8BFAD' }}; position:relative; cursor:pointer; transition:background 0.2s;">
+                <div style="position:absolute; top:3px; left:{{ soundOn ? '21px' : '3px' }}; width:16px; height:16px; border-radius:50%; background:white; transition:left 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
+              </div>
+            </div>
+            <div style="padding:12px 16px; display:flex; align-items:center; justify-content:space-between; background:#F4EEDD;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v3M8 11v3M2 8h3M11 8h3M4.1 4.1l2.1 2.1M9.8 9.8l2.1 2.1M4.1 11.9l2.1-2.1M9.8 6.2l2.1-2.1" stroke="#2F3231" stroke-width="1.3" stroke-linecap="round"/></svg>
+                <span style="font-size:14px; color:#2F3231;">Вибрация</span>
+              </div>
+              <div onClick="{{ toggleVibration }}" style="width:40px; height:22px; border-radius:11px; background:{{ vibrationOn ? '#496B68' : '#C8BFAD' }}; position:relative; cursor:pointer; transition:background 0.2s;">
+                <div style="position:absolute; top:3px; left:{{ vibrationOn ? '21px' : '3px' }}; width:16px; height:16px; border-radius:50%; background:white; transition:left 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Diagnostics + Support -->
+          <div style="margin-bottom:16px; border:1px solid #C8BFAD; border-radius:8px; overflow:hidden;">
+            <button onClick="{{ copyDiagnostics }}" style="width:100%; padding:12px 16px; background:#F4EEDD; border:none; cursor:pointer; text-align:left; border-bottom:1px solid #C8BFAD; display:flex; align-items:center; gap:10px;" style-hover="background:#EDE5D4">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="5" y="3" width="8" height="10" rx="1.5" stroke="#2F3231" stroke-width="1.3"/><path d="M3 5h2M3 8h2M3 11h2" stroke="#2F3231" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span style="font-size:14px; color:#2F3231;">Скопировать данные диагностики</span>
+            </button>
+            <button onClick="{{ openSupport }}" style="width:100%; padding:12px 16px; background:#F4EEDD; border:none; cursor:pointer; text-align:left; display:flex; align-items:center; gap:10px;" style-hover="background:#EDE5D4">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12v8a1 1 0 01-1 1H3a1 1 0 01-1-1V4z" stroke="#2F3231" stroke-width="1.3"/><path d="M2 4l6 5 6-5" stroke="#2F3231" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span style="font-size:14px; color:#2F3231;">Написать в поддержку</span>
+            </button>
+          </div>
+
+          <!-- Version info -->
+          <div style="padding:8px 0 20px;">
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#A89E8E; letter-spacing:0.04em; line-height:1.8;">
+              <div>Версия игры: 1.0.0+20260625.1</div>
+              <div>Контент: 2026.06.1</div>
+              <div>Сохранение: {{ saveStatus }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ═══ SAVE STATES ═══ -->
+    <sc-if value="{{ activeTab === 'save' }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:10px; width:100%; max-width:420px; animation:fadeUp 0.3s ease;">
+        <div style="font-family:'Playfair Display',serif; font-size:18px; color:#F4EEDD; margin-bottom:4px;">Состояния сохранения</div>
+
+        <!-- Cloud saved -->
+        <div style="background:#F4EEDD; border-radius:8px; padding:12px 16px; display:flex; align-items:center; gap:10px;">
+          <div style="width:8px; height:8px; border-radius:50%; background:#3B6E52; flex-shrink:0;"></div>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 10a3 3 0 01-.5-5.95A4 4 0 0112 6.5a2.5 2.5 0 010 5H4z" stroke="#3B6E52" stroke-width="1.3"/><path d="M6 10l2 2 2-2" stroke="#3B6E52" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div style="flex:1;"><div style="font-size:13px; font-weight:500; color:#2F3231;">Сохранено</div><div style="font-size:11px; color:#7A7268;">Прогресс синхронизирован с облаком</div></div>
+        </div>
+
+        <!-- Saving in progress -->
+        <div style="background:#F4EEDD; border-radius:8px; padding:12px 16px; display:flex; align-items:center; gap:10px;">
+          <div style="width:14px; height:14px; border-radius:50%; border:2px solid #C8BFAD; border-top-color:#496B68; animation:spin 1s linear infinite; flex-shrink:0;"></div>
+          <div style="flex:1;"><div style="font-size:13px; font-weight:500; color:#2F3231;">Сохранение…</div><div style="font-size:11px; color:#7A7268;">Передача данных в облако</div></div>
+        </div>
+
+        <!-- Local only -->
+        <div style="background:#F4EEDD; border-radius:8px; padding:12px 16px; display:flex; align-items:center; gap:10px;">
+          <div style="width:8px; height:8px; border-radius:50%; background:#B68A45; flex-shrink:0;"></div>
+          <div style="flex:1;"><div style="font-size:13px; font-weight:500; color:#2F3231;">Прогресс сохранён локально</div><div style="font-size:11px; color:#7A7268;">Облако временно недоступно — игра продолжается</div></div>
+        </div>
+
+        <!-- Cloud unavailable, game continues -->
+        <div style="background:#F4EEDD; border-radius:8px; padding:12px 16px; border-left:3px solid #B68A45;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 4v4M7 9.5v.5" stroke="#B68A45" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="7" r="5.5" stroke="#B68A45" stroke-width="1.2"/></svg>
+            <div style="font-size:13px; font-weight:500; color:#2F3231;">Облако недоступно</div>
+          </div>
+          <div style="font-size:12px; color:#7A7268; line-height:1.5; margin-bottom:10px;">Прогресс сохраняется на устройстве. Синхронизация восстановится автоматически.</div>
+          <button style="padding:7px 14px; border-radius:6px; border:1px solid #C8BFAD; background:#E7DDC8; font-size:12px; color:#2F3231; cursor:pointer;">Продолжить игру</button>
+        </div>
+
+        <!-- Resync restored -->
+        <div style="background:#D4EAD9; border-radius:8px; padding:12px 16px; display:flex; align-items:center; gap:10px;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-6" stroke="#3B6E52" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div><div style="font-size:13px; font-weight:500; color:#2C5240;">Синхронизация восстановлена</div><div style="font-size:11px; color:#3B6E52;">Ваш прогресс обновлён в облаке</div></div>
+        </div>
+
+        <!-- Conflict dialog -->
+        <div style="background:#F4EEDD; border-radius:8px; padding:16px 16px; border:1.5px solid #9A4E3F;">
+          <div style="font-size:14px; font-weight:600; color:#2F3231; margin-bottom:6px;">Обнаружен конфликт сохранений</div>
+          <div style="font-size:12px; color:#7A7268; line-height:1.5; margin-bottom:14px;">Найдены два разных прогресса. Выберите, какой использовать — пройденные уровни и экспонаты будут объединены.</div>
+          <div style="display:flex; gap:8px;">
+            <button style="flex:1; padding:9px; border-radius:6px; border:none; background:#496B68; font-size:12px; font-weight:600; color:white; cursor:pointer;">Облако (новее)</button>
+            <button style="flex:1; padding:9px; border-radius:6px; border:1px solid #C8BFAD; background:#E7DDC8; font-size:12px; color:#2F3231; cursor:pointer;">Это устройство</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ═══ ERRORS & LIFECYCLE ═══ -->
+    <sc-if value="{{ activeTab === 'errors' }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:10px; width:100%; max-width:420px; animation:fadeUp 0.3s ease;">
+        <div style="font-family:'Playfair Display',serif; font-size:18px; color:#F4EEDD; margin-bottom:4px;">Ошибки и состояния платформы</div>
+
+        <!-- Scene load error -->
+        <div style="background:#F4EEDD; border-radius:8px; padding:20px; text-align:center;">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" style="margin:0 auto 12px; display:block;"><circle cx="20" cy="20" r="16" stroke="#9A4E3F" stroke-width="1.5"/><path d="M20 12v10M20 25v2" stroke="#9A4E3F" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <div style="font-size:15px; font-weight:600; color:#2F3231; margin-bottom:6px;">Не удалось загрузить сцену</div>
+          <div style="font-size:13px; color:#7A7268; margin-bottom:16px; line-height:1.5;">Проверьте соединение и попробуйте снова. Прогресс сохранён.</div>
+          <div style="display:flex; gap:8px;">
+            <button style="flex:1; padding:10px; border-radius:6px; border:none; background:#496B68; font-size:13px; font-weight:600; color:white; cursor:pointer;">Повторить</button>
+            <button style="flex:1; padding:10px; border-radius:6px; border:1px solid #C8BFAD; background:#E7DDC8; font-size:13px; color:#2F3231; cursor:pointer;">К карте</button>
+          </div>
+        </div>
+
+        <!-- Maintenance message -->
+        <div style="background:#F4EEDD; border-radius:8px; padding:20px; text-align:center;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#7A7268; letter-spacing:0.08em; margin-bottom:12px;">ТЕХНИЧЕСКОЕ ОБСЛУЖИВАНИЕ</div>
+          <div style="font-size:15px; font-weight:600; color:#2F3231; margin-bottom:8px;">Архив временно закрыт</div>
+          <div style="font-size:13px; color:#7A7268; line-height:1.5; margin-bottom:16px;">Проводятся плановые работы. Игра скоро будет доступна снова.</div>
+          <div style="padding:8px 12px; background:#E7DDC8; border-radius:6px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:#7A7268;">Статус обновляется автоматически</div>
+        </div>
+
+        <!-- Startup ad pause -->
+        <div style="background:#1A1F1E; border-radius:8px; padding:20px; border:1px solid rgba(200,191,173,0.15);">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#496B68; letter-spacing:0.08em; margin-bottom:10px;">СОСТОЯНИЕ ПЛАТФОРМЫ</div>
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+            <div style="width:32px; height:32px; border-radius:50%; border:2px solid rgba(200,191,173,0.2); border-top-color:#496B68; animation:spin 1.2s linear infinite; flex-shrink:0;"></div>
+            <div>
+              <div style="font-size:14px; font-weight:500; color:#F4EEDD;">Инициализация архива…</div>
+              <div style="font-size:11px; color:#7A7268; margin-top:2px;">Восстанавливаем прогресс экспедиции</div>
+            </div>
+          </div>
+          <div style="font-size:11px; color:#7A7268; padding:8px 10px; background:rgba(200,191,173,0.05); border-radius:4px; font-family:'IBM Plex Mono',monospace;">Первое игровое действие не позднее 20 секунд</div>
+        </div>
+
+        <!-- Rating prompt -->
+        <div style="background:#F4EEDD; border-radius:8px; padding:20px;">
+          <div style="font-size:14px; font-weight:600; color:#2F3231; margin-bottom:6px;">Как вам «Архив аномалий»?</div>
+          <div style="font-size:13px; color:#7A7268; margin-bottom:14px; line-height:1.5;">Ваш отзыв поможет нам улучшить экспедицию для всех архивистов.</div>
+          <div style="display:flex; gap:8px;">
+            <button style="flex:1; padding:10px; border-radius:6px; border:none; background:#496B68; font-size:13px; font-weight:600; color:white; cursor:pointer;">Оценить игру</button>
+            <button style="flex:1; padding:10px; border-radius:6px; border:1px solid #C8BFAD; background:transparent; font-size:13px; color:#7A7268; cursor:pointer;">Позже</button>
+          </div>
+          <div style="font-size:11px; color:#A89E8E; margin-top:8px; text-align:center;">Без принуждения — только если хочется</div>
+        </div>
+
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1200, &quot;height&quot;: 900 },
+  &quot;activeTab&quot;: {
+    &quot;editor&quot;: &quot;enum&quot;,
+    &quot;options&quot;: [&quot;collection&quot;, &quot;shop&quot;, &quot;daily&quot;, &quot;settings&quot;, &quot;save&quot;, &quot;errors&quot;],
+    &quot;default&quot;: &quot;collection&quot;,
+    &quot;tsType&quot;: &quot;string&quot;
+  },
+  &quot;dailyClaimed&quot;: {
+    &quot;editor&quot;: &quot;boolean&quot;,
+    &quot;default&quot;: false,
+    &quot;tsType&quot;: &quot;boolean&quot;
+  },
+  &quot;catalogUnavailable&quot;: {
+    &quot;editor&quot;: &quot;boolean&quot;,
+    &quot;default&quot;: false,
+    &quot;tsType&quot;: &quot;boolean&quot;
+  }
+}">
+class Component extends DCLogic {
+  state = {
+    activeTab: 'collection',
+    lang: 'ru',
+    musicOn: true,
+    soundOn: true,
+    vibrationOn: false,
+    dailyClaimed: false,
+    dailyAvailable: true,
+    catalogUnavailable: false,
+    archivePrice: '99 ЯМ',
+    magnifiersPrice: '29 ЯМ',
+    priceCurrency: 'Яндекс Монеты',
+    saveStatus: 'Облако синхронизировано',
+  };
+
+  renderVals() {
+    const s = this.state;
+    const tabDefs = [
+      { id: 'collection', label: 'Коллекция' },
+      { id: 'shop',       label: 'Магазин' },
+      { id: 'daily',      label: 'Daily' },
+      { id: 'settings',   label: 'Настройки' },
+      { id: 'save',       label: 'Сохранение' },
+      { id: 'errors',     label: 'Ошибки' },
+    ];
+    const tabs = tabDefs.map(t => ({
+      label: t.label,
+      active: s.activeTab === t.id,
+      select: () => this.setState({ activeTab: t.id }),
+    }));
+    return {
+      ...s,
+      tabs,
+      closePanel: () => alert('← Закрыть'),
+      openArtifact: () => alert('→ Открыть экспонат'),
+      buyArchivePack: () => alert('Запуск покупки: archive_supporter_pack'),
+      buyMagnifiers: () => alert('Запуск покупки: magnifiers_10'),
+      startDaily: () => alert('→ Ежедневное задание'),
+      replayDaily: () => alert('→ Повторное прохождение'),
+      setRu: () => this.setState({ lang: 'ru' }),
+      setEn: () => this.setState({ lang: 'en' }),
+      toggleMusic: () => this.setState({ musicOn: !s.musicOn }),
+      toggleSound: () => this.setState({ soundOn: !s.soundOn }),
+      toggleVibration: () => this.setState({ vibrationOn: !s.vibrationOn }),
+      copyDiagnostics: () => {
+        const data = JSON.stringify({ gameVersion:'1.0.0+20260625.1', contentVersion:'2026.06.1', locale: s.lang, saveMode:'cloud-synced' }, null, 2);
+        navigator.clipboard?.writeText(data).catch(()=>{});
+        alert('Данные скопированы в буфер обмена');
+      },
+      openSupport: () => { window.location.href = 'mailto:support@example.com?subject=Архив%20аномалий'; },
+    };
+  }
+}
+</script>
+</body>
+</html>

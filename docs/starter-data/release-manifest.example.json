@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0.0",
+  "gameVersion": "1.0.0+20260625.1",
+  "contentVersion": "2026.06.1",
+  "saveSchemaVersion": 1,
+  "builtAt": "2026-06-25T00:00:00Z",
+  "gitCommit": "replace-at-build",
+  "platform": "yandex-games",
+  "supportedPlatforms": [
+    "desktop",
+    "mobile-ios",
+    "mobile-android"
+  ],
+  "orientation": "any",
+  "locales": [
+    "ru",
+    "en"
+  ],
+  "features": {
+    "cloudSave": true,
+    "rewarded": true,
+    "interstitial": true,
+    "purchases": true,
+    "daily": true
+  },
+  "checksums": {
+    "archiveSha256": "replace-at-release"
+  }
+}

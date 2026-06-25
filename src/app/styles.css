@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color: #2f3231;
+  background: #d8ccb4;
+  font-family: "Trebuchet MS", Verdana, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-width: 320px;
+  background:
+    radial-gradient(circle at 18% 12%, rgb(244 238 221 / 0.95), transparent 34rem),
+    linear-gradient(135deg, #e7ddc8 0%, #b7aa90 52%, #496b68 100%);
+  overscroll-behavior: none;
+}
+
+button,
+select {
+  font: inherit;
+}
+
+.game-area {
+  user-select: none;
+  -webkit-user-drag: none;
+  touch-action: none;
+}

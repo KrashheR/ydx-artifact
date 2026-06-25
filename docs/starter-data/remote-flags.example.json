@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0.0",
+  "flags": {
+    "rewarded_enabled": "true",
+    "interstitial_enabled": "true",
+    "purchases_enabled": "true",
+    "rating_prompt_enabled": "true",
+    "shortcut_prompt_enabled": "false",
+    "daily_enabled": "true",
+    "max_interstitials_per_session": "2",
+    "min_session_seconds_before_interstitial": "480",
+    "disabled_level_ids": "",
+    "disabled_daily_level_ids": "",
+    "maintenance_message_key": "",
+    "catalog_offer_enabled": "true"
+  },
+  "notes": [
+    "All Yandex remote flags are strings.",
+    "Embed these as local defaults.",
+    "Validate and parse before use."
+  ]
+}
