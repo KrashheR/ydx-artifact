@@ -1,0 +1,290 @@
+{
+  "schemaVersion": "1.0.0",
+  "chapterId": "sand-meridian",
+  "titleRu": "Песчаный меридиан",
+  "titleEn": "Sand Meridian",
+  "canvas": {
+    "aspectRatio": "16:10",
+    "referenceWidth": 1600,
+    "referenceHeight": 1000,
+    "coordinateSystem": "normalized-top-left",
+    "safeArea": {
+      "left": 0.06,
+      "right": 0.94,
+      "top": 0.08,
+      "bottom": 0.9
+    }
+  },
+  "route": {
+    "type": "continuous-polyline",
+    "connectBy": "order",
+    "mustNotBreak": true,
+    "mustNotCrossItself": true,
+    "visualStyle": "тонкая экспедиционная линия цвета тёмной охры с небольшими узлами",
+    "pointDiameterPxAt1600": 34,
+    "activePointDiameterPxAt1600": 42,
+    "lockedPointOpacity": 0.48,
+    "completedPointMark": "small-check-or-stamp",
+    "recommendedCurve": "catmull-rom",
+    "routePaddingPxAt1600": 12
+  },
+  "placementRules": [
+    "Точки позиционируются по normalized x/y относительно фоновой карты.",
+    "Позиции не должны вычисляться из DOM-размеров отдельных landmark-объектов.",
+    "При изменении размеров контейнера сохранять aspect-ratio 16:10 и использовать contain, а не cover.",
+    "Подписи уровней не встраивать в фон карты; показывать в UI-карточке/tooltip.",
+    "Кликабельная зона должна быть минимум 44x44 CSS px.",
+    "Маршрут рисуется строго по order от 1 до 13 одним непрерывным path.",
+    "Финальная точка 13 должна выглядеть более значимой, но не перекрывать landmark.",
+    "На мобильных не переносить точки в другую схему; масштабировать карту и разрешать pan/zoom или горизонтальный viewport."
+  ],
+  "levels": [
+    {
+      "order": 1,
+      "id": "sm-01-desert-edge-camp",
+      "titleRu": "Край барханов",
+      "titleEn": "Desert Edge Camp",
+      "promptFile": "01_desert-edge-camp.md",
+      "x": 0.1,
+      "y": 0.82,
+      "anchor": "center",
+      "landmark": "Стартовый лагерь на границе каменистой равнины и первых барханов",
+      "visualCues": [
+        "две палатки",
+        "ящики",
+        "радиостанция",
+        "следы транспорта"
+      ],
+      "storyRole": "Первый признак подмены маршрута",
+      "mapPlacement": "нижний левый сектор, на границе пустыни"
+    },
+    {
+      "order": 2,
+      "id": "sm-02-caravan-trail",
+      "titleRu": "След каравана",
+      "titleEn": "Caravan Trail",
+      "promptFile": "02_caravan-trail.md",
+      "x": 0.2,
+      "y": 0.72,
+      "anchor": "center",
+      "landmark": "Караванная тропа и временная точка перегрузки",
+      "visualCues": [
+        "грузовая телега",
+        "мешки",
+        "следы волочения",
+        "столб привязи"
+      ],
+      "storyRole": "Груз тайно увели с официального пути",
+      "mapPlacement": "левый нижний сектор, выше стартового лагеря"
+    },
+    {
+      "order": 3,
+      "id": "sm-03-dune-basin",
+      "titleRu": "Чаша дюн",
+      "titleEn": "Dune Basin",
+      "promptFile": "03_dune-basin.md",
+      "x": 0.32,
+      "y": 0.8,
+      "anchor": "center",
+      "landmark": "Окружённая барханами впадина с частично раскрытым каменным ориентиром",
+      "visualCues": [
+        "кольцо дюн",
+        "раскоп",
+        "геодезические флажки",
+        "каменная плита"
+      ],
+      "storyRole": "Первый знак солнца и линии меридиана",
+      "mapPlacement": "нижний центрально-левый сектор внутри кольца дюн"
+    },
+    {
+      "order": 4,
+      "id": "sm-04-dry-well",
+      "titleRu": "Сухой колодец",
+      "titleEn": "Dry Well",
+      "promptFile": "04_dry-well.md",
+      "x": 0.41,
+      "y": 0.67,
+      "anchor": "center",
+      "landmark": "Старый каменный колодец с треногой и скрытой шахтой",
+      "visualCues": [
+        "круглый колодец",
+        "тренога",
+        "ведро",
+        "каменные стенки"
+      ],
+      "storyRole": "Намёк на подземную гидросистему",
+      "mapPlacement": "центр карты, чуть ниже середины"
+    },
+    {
+      "order": 5,
+      "id": "sm-05-rock-arch",
+      "titleRu": "Каменная арка",
+      "titleEn": "Rock Arch",
+      "promptFile": "05_rock-arch.md",
+      "x": 0.34,
+      "y": 0.54,
+      "anchor": "center",
+      "landmark": "Массивная природная арка, используемая как геодезический ориентир",
+      "visualCues": [
+        "каменная арка",
+        "штатив",
+        "сигнальное зеркало",
+        "узкая тень"
+      ],
+      "storyRole": "Маршрутные метки выстраиваются по полуденной оси",
+      "mapPlacement": "центр слева, на переходе от дюн к скалам"
+    },
+    {
+      "order": 6,
+      "id": "sm-06-canyon-pass",
+      "titleRu": "Каньонный проход",
+      "titleEn": "Canyon Pass",
+      "promptFile": "06_canyon-pass.md",
+      "x": 0.46,
+      "y": 0.44,
+      "anchor": "center",
+      "landmark": "Узкий красный каньон с грузовой переправой",
+      "visualCues": [
+        "ущелье",
+        "канатная линия",
+        "подвесной груз",
+        "теневой навес"
+      ],
+      "storyRole": "Скрытая перевозка оборудования",
+      "mapPlacement": "самый центр карты, в узком проходе между плато"
+    },
+    {
+      "order": 7,
+      "id": "sm-07-abandoned-dig-site",
+      "titleRu": "Заброшенный раскоп",
+      "titleEn": "Abandoned Dig Site",
+      "promptFile": "07_abandoned-dig-site.md",
+      "x": 0.58,
+      "y": 0.55,
+      "anchor": "center",
+      "landmark": "Полузасыпанный археологический раскоп с брошенными тентами",
+      "visualCues": [
+        "траншеи",
+        "рваные тенты",
+        "сито",
+        "резной фрагмент"
+      ],
+      "storyRole": "Доказательство намеренного сворачивания работ",
+      "mapPlacement": "правее центра, в открытой каменистой зоне"
+    },
+    {
+      "order": 8,
+      "id": "sm-08-oasis-iram",
+      "titleRu": "Оазис Ирам",
+      "titleEn": "Oasis Iram",
+      "promptFile": "08_oasis-iram.md",
+      "x": 0.69,
+      "y": 0.41,
+      "anchor": "center",
+      "landmark": "Небольшой зелёный оазис с полевой водной станцией",
+      "visualCues": [
+        "пальмы",
+        "зелёная вода",
+        "насос",
+        "тень навеса"
+      ],
+      "storyRole": "Подтверждение живой подпитки древней системы",
+      "mapPlacement": "правый центральный сектор, единственная ярко-зелёная область"
+    },
+    {
+      "order": 9,
+      "id": "sm-09-salt-flat",
+      "titleRu": "Соляное зеркало",
+      "titleEn": "Salt Flat",
+      "promptFile": "09_salt-flat.md",
+      "x": 0.81,
+      "y": 0.49,
+      "anchor": "center",
+      "landmark": "Белая соляная равнина с геодезическими штативами",
+      "visualCues": [
+        "светлая соль",
+        "трещины",
+        "отражающие пятна",
+        "тонкие вехи"
+      ],
+      "storyRole": "Все точки складываются в идеальную меридианную линию",
+      "mapPlacement": "крайний правый средний сектор, светлая пустая плоскость"
+    },
+    {
+      "order": 10,
+      "id": "sm-10-ruined-observatory",
+      "titleRu": "Разрушенная обсерватория",
+      "titleEn": "Ruined Observatory",
+      "promptFile": "10_ruined-observatory.md",
+      "x": 0.87,
+      "y": 0.32,
+      "anchor": "center",
+      "landmark": "Круглая разрушенная каменная обсерватория на плато",
+      "visualCues": [
+        "круглая платформа",
+        "звёздные диски",
+        "сломанные колонны",
+        "штатив"
+      ],
+      "storyRole": "Звёздная привязка раскрывает направление входа",
+      "mapPlacement": "верхний правый сектор на высоком плато"
+    },
+    {
+      "order": 11,
+      "id": "sm-11-buried-temple-courtyard",
+      "titleRu": "Двор засыпанного храма",
+      "titleEn": "Buried Temple Courtyard",
+      "promptFile": "11_buried-temple-courtyard.md",
+      "x": 0.76,
+      "y": 0.21,
+      "anchor": "center",
+      "landmark": "Частично раскопанный храмовый двор у скальной стены",
+      "visualCues": [
+        "каменный двор",
+        "вход в храм",
+        "колонны",
+        "тенты раскопа"
+      ],
+      "storyRole": "Архитектура подтверждает линию меридиана",
+      "mapPlacement": "верхний правый сектор, ниже гряды"
+    },
+    {
+      "order": 12,
+      "id": "sm-12-storm-ridge",
+      "titleRu": "Гряда бури",
+      "titleEn": "Storm Ridge",
+      "promptFile": "12_storm-ridge.md",
+      "x": 0.61,
+      "y": 0.15,
+      "anchor": "center",
+      "landmark": "Высокая ветреная гряда с последним скрытым лагерем",
+      "visualCues": [
+        "низкие ветрозащитные стенки",
+        "натянутые тенты",
+        "песчаный шлейф",
+        "сигнальный флаг"
+      ],
+      "storyRole": "Раскрывается намеренная защита маршрута",
+      "mapPlacement": "верхняя центрально-правая область, на гребне"
+    },
+    {
+      "order": 13,
+      "id": "sm-13-buried-meridian",
+      "titleRu": "Погребённый меридиан",
+      "titleEn": "Buried Meridian",
+      "promptFile": "13_buried-meridian.md",
+      "x": 0.47,
+      "y": 0.25,
+      "anchor": "center",
+      "landmark": "Скрытая кратерообразная впадина с входом в подземный комплекс",
+      "visualCues": [
+        "кольцевая впадина",
+        "каменная дверь",
+        "обрушенные ступени",
+        "центр меридианной системы"
+      ],
+      "storyRole": "Финальная истина о древней гидросистеме",
+      "mapPlacement": "верхняя центральная область, внутри скрытой впадины; визуально самый важный финальный узел"
+    }
+  ]
+}

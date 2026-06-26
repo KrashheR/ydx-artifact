@@ -14,7 +14,7 @@ export function CollectionScreen() {
     <Panel>
       <div className="mb-6 flex items-center justify-between gap-3">
         <h1 className="font-archive text-4xl">{t("actions.collection")}</h1>
-        <Button variant="ghost" onClick={() => navigate({ kind: "map" })}>{t("actions.back")}</Button>
+        <Button variant="ghost" onClick={() => navigate({ kind: "home" })}>{t("actions.back")}</Button>
       </div>
       <div className="grid gap-4 md:grid-cols-4">
         {artifactIds.map((id) => (

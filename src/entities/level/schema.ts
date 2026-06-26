@@ -28,8 +28,8 @@ export const differenceSchema = z.object({
 
 export const levelSchema = z.object({
   id: z.string().min(1),
-  chapterId: z.literal("northern-route"),
-  order: z.number().int().min(1).max(12),
+  chapterId: z.enum(["northern-route", "sand-meridian"]),
+  order: z.number().int().min(1).max(13),
   titleKey: z.string().min(1),
   imageA: z.string().min(1),
   imageB: z.string().min(1),

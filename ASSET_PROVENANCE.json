@@ -22,6 +22,20 @@
       "approval": "not-for-production"
     },
     {
+      "id": "sand-meridian-background",
+      "path": "public/assets/scenes/sand-meredian/background.png",
+      "status": "production-intake",
+      "source": "content owner chapter map background provided in workspace",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "sand-meridian-package",
+      "path": "public/assets/scenes/sand-meredian",
+      "status": "production-intake",
+      "source": "content owner sand-meridian scene package provided in workspace; includes level folders 1-12 with 1.png/2.png runtime pairs and 3.png markup references, while level 13 currently reuses folder 12 as a temporary runtime fallback",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
       "id": "nr-01-scene-a",
       "path": "public/assets/scenes/northern-route/1/1.webp",
       "status": "production-intake",
@@ -40,6 +54,258 @@
       "path": "public/assets/scenes/northern-route/1/3.webp",
       "status": "authoring-only",
       "source": "content owner markup reference provided in workspace, converted from public/assets/scenes/northern-route/1/3.png",
+      "approval": "internal-reference-only"
+    },
+    {
+      "id": "nr-02-scene-a",
+      "path": "public/assets/scenes/northern-route/2/1.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/2/1.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-02-scene-b",
+      "path": "public/assets/scenes/northern-route/2/2.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/2/2.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-02-markup",
+      "path": "public/assets/scenes/northern-route/2/3.webp",
+      "status": "authoring-only",
+      "source": "content owner markup reference provided in workspace, converted from public/assets/scenes/northern-route/2/3.png",
+      "approval": "internal-reference-only"
+    },
+    {
+      "id": "nr-03-scene-a",
+      "path": "public/assets/scenes/northern-route/3/1.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/3/1.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-03-scene-b",
+      "path": "public/assets/scenes/northern-route/3/2.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/3/2.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-03-markup",
+      "path": "public/assets/scenes/northern-route/3/3.webp",
+      "status": "authoring-only",
+      "source": "content owner markup reference provided in workspace, converted from public/assets/scenes/northern-route/3/3.png",
+      "approval": "internal-reference-only"
+    },
+    {
+      "id": "nr-04-scene-a",
+      "path": "public/assets/scenes/northern-route/4/1.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/4/1.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-04-scene-b",
+      "path": "public/assets/scenes/northern-route/4/2.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/4/2.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-04-markup",
+      "path": "public/assets/scenes/northern-route/4/3.webp",
+      "status": "authoring-only",
+      "source": "content owner markup reference provided in workspace, converted from public/assets/scenes/northern-route/4/3.png",
+      "approval": "internal-reference-only"
+    },
+    {
+      "id": "nr-05-scene-a",
+      "path": "public/assets/scenes/northern-route/5/1.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/5/1.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-05-scene-b",
+      "path": "public/assets/scenes/northern-route/5/2.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/5/2.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-05-markup",
+      "path": "public/assets/scenes/northern-route/5/3.webp",
+      "status": "authoring-only",
+      "source": "content owner markup reference provided in workspace, converted from public/assets/scenes/northern-route/5/3.png",
+      "approval": "internal-reference-only"
+    },
+    {
+      "id": "nr-06-scene-a",
+      "path": "public/assets/scenes/northern-route/6/1.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/6/1.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-06-scene-b",
+      "path": "public/assets/scenes/northern-route/6/2.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/6/2.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-06-markup",
+      "path": "public/assets/scenes/northern-route/6/3.webp",
+      "status": "authoring-only",
+      "source": "content owner markup reference provided in workspace, converted from public/assets/scenes/northern-route/6/3.png",
+      "approval": "internal-reference-only"
+    },
+    {
+      "id": "nr-07-scene-a",
+      "path": "public/assets/scenes/northern-route/7/1.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/7/1.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-07-scene-b",
+      "path": "public/assets/scenes/northern-route/7/2.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/7/2.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-07-markup",
+      "path": "public/assets/scenes/northern-route/7/3.webp",
+      "status": "authoring-only",
+      "source": "content owner markup reference provided in workspace, converted from public/assets/scenes/northern-route/7/3.png",
+      "approval": "internal-reference-only"
+    },
+    {
+      "id": "nr-08-scene-a",
+      "path": "public/assets/scenes/northern-route/8/1.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/8/1.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-08-scene-b",
+      "path": "public/assets/scenes/northern-route/8/2.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/8/2.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-08-markup",
+      "path": "public/assets/scenes/northern-route/8/3.webp",
+      "status": "authoring-only",
+      "source": "content owner markup reference provided in workspace, converted from public/assets/scenes/northern-route/8/3.png",
+      "approval": "internal-reference-only"
+    },
+    {
+      "id": "nr-09-scene-a",
+      "path": "public/assets/scenes/northern-route/9/1.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/9/1.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-09-scene-b",
+      "path": "public/assets/scenes/northern-route/9/2.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/9/2.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-09-markup",
+      "path": "public/assets/scenes/northern-route/9/3.webp",
+      "status": "authoring-only",
+      "source": "content owner markup reference provided in workspace, converted from public/assets/scenes/northern-route/9/3.png",
+      "approval": "internal-reference-only"
+    },
+    {
+      "id": "nr-10-scene-a",
+      "path": "public/assets/scenes/northern-route/10/1.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/10/1.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-10-scene-b",
+      "path": "public/assets/scenes/northern-route/10/2.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/10/2.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-10-markup",
+      "path": "public/assets/scenes/northern-route/10/3.webp",
+      "status": "authoring-only",
+      "source": "content owner markup reference provided in workspace, converted from public/assets/scenes/northern-route/10/3.png",
+      "approval": "internal-reference-only"
+    },
+    {
+      "id": "nr-11-scene-a",
+      "path": "public/assets/scenes/northern-route/11/1.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/11/1.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-11-scene-b",
+      "path": "public/assets/scenes/northern-route/11/2.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/11/2.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-11-markup",
+      "path": "public/assets/scenes/northern-route/11/3.webp",
+      "status": "authoring-only",
+      "source": "content owner markup reference provided in workspace, converted from public/assets/scenes/northern-route/11/3.png",
+      "approval": "internal-reference-only"
+    },
+    {
+      "id": "nr-12-scene-a",
+      "path": "public/assets/scenes/northern-route/12/1.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/12/1.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-12-scene-b",
+      "path": "public/assets/scenes/northern-route/12/2.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/12/2.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-12-markup",
+      "path": "public/assets/scenes/northern-route/12/3.webp",
+      "status": "authoring-only",
+      "source": "content owner markup reference provided in workspace, converted from public/assets/scenes/northern-route/12/3.png",
+      "approval": "internal-reference-only"
+    },
+    {
+      "id": "nr-13-scene-a",
+      "path": "public/assets/scenes/northern-route/13/1.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/13/1.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-13-scene-b",
+      "path": "public/assets/scenes/northern-route/13/2.webp",
+      "status": "production-intake",
+      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/13/2.png",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "nr-13-markup",
+      "path": "public/assets/scenes/northern-route/13/3.webp",
+      "status": "authoring-only",
+      "source": "content owner markup reference provided in workspace, converted from public/assets/scenes/northern-route/13/3.png",
       "approval": "internal-reference-only"
     }
   ]

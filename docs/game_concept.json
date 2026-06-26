@@ -114,7 +114,7 @@
   ],
   "verticalSliceScope": {
     "chapterCount": 1,
-    "campaignLevelCount": 12,
+    "campaignLevelCount": 13,
     "dailySceneCount": 3,
     "artifactCount": 4,
     "languages": [
@@ -282,6 +282,15 @@
         "differenceCount": 8,
         "difficulty": 3,
         "artifactMilestone": "torn-map"
+      },
+      {
+        "order": 13,
+        "id": "nr-13-ice-cliff-camp",
+        "titleRu": "?????? ? ???????? ??????",
+        "role": "post-finale-epilogue",
+        "differenceCount": 8,
+        "difficulty": 3,
+        "artifactMilestone": null
       }
     ],
     "dailyScenes": [
@@ -439,7 +448,7 @@
     }
   },
   "progression": {
-    "mapType": "linear-12-node-expedition-route",
+    "mapType": "linear-13-node-expedition-route",
     "unlockRule": "complete_previous_level",
     "dailyUnlockAfterLevel": 2,
     "artifactUnlockLevels": [

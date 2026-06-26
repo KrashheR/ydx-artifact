@@ -23,10 +23,11 @@ const titles = [
   "nr09",
   "nr10",
   "nr11",
-  "nr12"
+  "nr12",
+  "nr13"
 ] as const;
 
-const counts = [4, 5, 5, 6, 6, 6, 7, 7, 7, 7, 8, 8];
+const counts = [4, 5, 5, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8];
 const artifactByOrder: Record<number, string> = {
   3: "brass-compass",
   6: "field-radio",
@@ -79,8 +80,254 @@ const firstLevel = levelSchema.parse({
   }
 });
 
+const secondLevel = levelSchema.parse({
+  id: "nr-02-scene02",
+  chapterId: "northern-route",
+  order: 2,
+  titleKey: "levels.nr02.title",
+  imageA: "/assets/scenes/northern-route/2/1.webp",
+  imageB: "/assets/scenes/northern-route/2/2.webp",
+  thumbnail: "/assets/scenes/northern-route/2/1.webp",
+  differences: [
+    {
+      id: "rolled-bedding-count-2",
+      hitAreaA: { kind: "circle", cx: 0.158, cy: 0.171, radius: 0.06 },
+      hitAreaB: { kind: "circle", cx: 0.158, cy: 0.171, radius: 0.06 },
+      hintArea: { kind: "circle", cx: 0.158, cy: 0.171, radius: 0.085 },
+      difficulty: 1
+    },
+    {
+      id: "lamp-color-2",
+      hitAreaA: { kind: "circle", cx: 0.238, cy: 0.381, radius: 0.038 },
+      hitAreaB: { kind: "circle", cx: 0.238, cy: 0.381, radius: 0.038 },
+      hintArea: { kind: "circle", cx: 0.238, cy: 0.381, radius: 0.055 },
+      difficulty: 1
+    },
+    {
+      id: "snowshoes-count-2",
+      hitAreaA: { kind: "circle", cx: 0.629, cy: 0.336, radius: 0.065 },
+      hitAreaB: { kind: "circle", cx: 0.629, cy: 0.336, radius: 0.065 },
+      hintArea: { kind: "circle", cx: 0.629, cy: 0.336, radius: 0.105 },
+      difficulty: 1
+    },
+    {
+      id: "rope-added-2",
+      hitAreaA: { kind: "circle", cx: 0.388, cy: 0.583, radius: 0.09 },
+      hitAreaB: { kind: "circle", cx: 0.388, cy: 0.583, radius: 0.09 },
+      hintArea: { kind: "circle", cx: 0.388, cy: 0.583, radius: 0.125 },
+      difficulty: 1
+    },
+    {
+      id: "crate-added-2",
+      hitAreaA: { kind: "circle", cx: 0.855, cy: 0.635, radius: 0.045 },
+      hitAreaB: { kind: "circle", cx: 0.855, cy: 0.635, radius: 0.045 },
+      hintArea: { kind: "circle", cx: 0.855, cy: 0.635, radius: 0.065 },
+      difficulty: 1
+    }
+  ],
+  requiredDifferences: 5,
+  reward: {
+    archivePoints: 120,
+    magnifiers: 0
+  }
+});
+
+const thirdLevel = levelSchema.parse({
+  id: "nr-03-scene03",
+  chapterId: "northern-route",
+  order: 3,
+  titleKey: "levels.nr03.title",
+  imageA: "/assets/scenes/northern-route/3/1.webp",
+  imageB: "/assets/scenes/northern-route/3/2.webp",
+  thumbnail: "/assets/scenes/northern-route/3/1.webp",
+  differences: [
+    {
+      id: "lens-rotation-3",
+      hitAreaA: { kind: "circle", cx: 0.357, cy: 0.323, radius: 0.135 },
+      hitAreaB: { kind: "circle", cx: 0.357, cy: 0.323, radius: 0.135 },
+      hintArea: { kind: "circle", cx: 0.357, cy: 0.323, radius: 0.18 },
+      difficulty: 1
+    },
+    {
+      id: "open-window-3",
+      hitAreaA: { kind: "circle", cx: 0.677, cy: 0.258, radius: 0.078 },
+      hitAreaB: { kind: "circle", cx: 0.677, cy: 0.258, radius: 0.078 },
+      hintArea: { kind: "circle", cx: 0.677, cy: 0.258, radius: 0.11 },
+      difficulty: 1
+    },
+    {
+      id: "lantern-count-3",
+      hitAreaA: { kind: "circle", cx: 0.877, cy: 0.376, radius: 0.07 },
+      hitAreaB: { kind: "circle", cx: 0.877, cy: 0.376, radius: 0.07 },
+      hintArea: { kind: "circle", cx: 0.877, cy: 0.376, radius: 0.1 },
+      difficulty: 1
+    },
+    {
+      id: "map-route-3",
+      hitAreaA: { kind: "circle", cx: 0.668, cy: 0.795, radius: 0.052 },
+      hitAreaB: { kind: "circle", cx: 0.668, cy: 0.795, radius: 0.052 },
+      hintArea: { kind: "circle", cx: 0.668, cy: 0.795, radius: 0.078 },
+      difficulty: 1
+    },
+    {
+      id: "compass-removed-3",
+      hitAreaA: { kind: "circle", cx: 0.881, cy: 0.771, radius: 0.072 },
+      hitAreaB: { kind: "circle", cx: 0.881, cy: 0.771, radius: 0.072 },
+      hintArea: { kind: "circle", cx: 0.881, cy: 0.771, radius: 0.1 },
+      difficulty: 1
+    }
+  ],
+  requiredDifferences: 5,
+  reward: {
+    archivePoints: 130,
+    magnifiers: 1,
+    artifactId: "brass-compass"
+  }
+});
+
+const fourthLevel = levelSchema.parse({
+  id: "nr-04-scene04",
+  chapterId: "northern-route",
+  order: 4,
+  titleKey: "levels.nr04.title",
+  imageA: "/assets/scenes/northern-route/4/1.webp",
+  imageB: "/assets/scenes/northern-route/4/2.webp",
+  thumbnail: "/assets/scenes/northern-route/4/1.webp",
+  differences: [
+    {
+      id: "switch-position-4",
+      hitAreaA: { kind: "circle", cx: 0.322, cy: 0.809, radius: 0.13 },
+      hitAreaB: { kind: "circle", cx: 0.322, cy: 0.809, radius: 0.13 },
+      hintArea: { kind: "circle", cx: 0.322, cy: 0.809, radius: 0.18 },
+      difficulty: 1
+    },
+    {
+      id: "train-door-4",
+      hitAreaA: { kind: "circle", cx: 0.346, cy: 0.358, radius: 0.065 },
+      hitAreaB: { kind: "circle", cx: 0.346, cy: 0.358, radius: 0.065 },
+      hintArea: { kind: "circle", cx: 0.346, cy: 0.358, radius: 0.09 },
+      difficulty: 1
+    },
+    {
+      id: "barrel-count-4",
+      hitAreaA: { kind: "circle", cx: 0.516, cy: 0.524, radius: 0.08 },
+      hitAreaB: { kind: "circle", cx: 0.516, cy: 0.524, radius: 0.08 },
+      hintArea: { kind: "circle", cx: 0.516, cy: 0.524, radius: 0.11 },
+      difficulty: 1
+    },
+    {
+      id: "cart-moved-4",
+      hitAreaA: { kind: "circle", cx: 0.701, cy: 0.567, radius: 0.065 },
+      hitAreaB: { kind: "circle", cx: 0.613, cy: 0.585, radius: 0.065 },
+      hintArea: { kind: "circle", cx: 0.657, cy: 0.576, radius: 0.12 },
+      difficulty: 1
+    },
+    {
+      id: "lantern-color-4",
+      hitAreaA: { kind: "circle", cx: 0.934, cy: 0.354, radius: 0.04 },
+      hitAreaB: { kind: "circle", cx: 0.934, cy: 0.354, radius: 0.04 },
+      hintArea: { kind: "circle", cx: 0.934, cy: 0.354, radius: 0.06 },
+      difficulty: 1
+    },
+    {
+      id: "fur-gloves-4",
+      hitAreaA: { kind: "circle", cx: 0.901, cy: 0.645, radius: 0.05 },
+      hitAreaB: { kind: "circle", cx: 0.901, cy: 0.645, radius: 0.05 },
+      hintArea: { kind: "circle", cx: 0.901, cy: 0.645, radius: 0.075 },
+      difficulty: 1
+    }
+  ],
+  requiredDifferences: 6,
+  reward: {
+    archivePoints: 140,
+    magnifiers: 0
+  }
+});
+
+const thirteenthLevel = levelSchema.parse({
+  id: "nr-13-scene13",
+  chapterId: "northern-route",
+  order: 13,
+  titleKey: "levels.nr13.title",
+  imageA: "/assets/scenes/northern-route/13/1.webp",
+  imageB: "/assets/scenes/northern-route/13/2.webp",
+  thumbnail: "/assets/scenes/northern-route/13/1.webp",
+  differences: [
+    {
+      id: "tent-opening-13",
+      hitAreaA: { kind: "circle", cx: 0.226, cy: 0.39, radius: 0.065 },
+      hitAreaB: { kind: "circle", cx: 0.226, cy: 0.39, radius: 0.065 },
+      hintArea: { kind: "circle", cx: 0.226, cy: 0.39, radius: 0.095 },
+      difficulty: 3
+    },
+    {
+      id: "survey-device-13",
+      hitAreaA: { kind: "circle", cx: 0.333, cy: 0.307, radius: 0.045 },
+      hitAreaB: { kind: "circle", cx: 0.333, cy: 0.307, radius: 0.045 },
+      hintArea: { kind: "circle", cx: 0.333, cy: 0.307, radius: 0.07 },
+      difficulty: 3
+    },
+    {
+      id: "mug-13",
+      hitAreaA: { kind: "circle", cx: 0.141, cy: 0.56, radius: 0.038 },
+      hitAreaB: { kind: "circle", cx: 0.141, cy: 0.56, radius: 0.038 },
+      hintArea: { kind: "circle", cx: 0.141, cy: 0.56, radius: 0.06 },
+      difficulty: 3
+    },
+    {
+      id: "rope-coil-13",
+      hitAreaA: { kind: "circle", cx: 0.286, cy: 0.708, radius: 0.08 },
+      hitAreaB: { kind: "circle", cx: 0.286, cy: 0.708, radius: 0.08 },
+      hintArea: { kind: "circle", cx: 0.286, cy: 0.708, radius: 0.115 },
+      difficulty: 3
+    },
+    {
+      id: "red-tarp-13",
+      hitAreaA: { kind: "circle", cx: 0.31, cy: 0.875, radius: 0.12 },
+      hitAreaB: { kind: "circle", cx: 0.31, cy: 0.875, radius: 0.12 },
+      hintArea: { kind: "circle", cx: 0.31, cy: 0.875, radius: 0.16 },
+      difficulty: 3
+    },
+    {
+      id: "rope-marker-13",
+      hitAreaA: { kind: "circle", cx: 0.475, cy: 0.62, radius: 0.06 },
+      hitAreaB: { kind: "circle", cx: 0.475, cy: 0.62, radius: 0.06 },
+      hintArea: { kind: "circle", cx: 0.475, cy: 0.62, radius: 0.09 },
+      difficulty: 3
+    },
+    {
+      id: "striped-post-13",
+      hitAreaA: { kind: "circle", cx: 0.595, cy: 0.669, radius: 0.07 },
+      hitAreaB: { kind: "circle", cx: 0.595, cy: 0.669, radius: 0.07 },
+      hintArea: { kind: "circle", cx: 0.595, cy: 0.669, radius: 0.1 },
+      difficulty: 3
+    },
+    {
+      id: "bridge-planks-13",
+      hitAreaA: { kind: "circle", cx: 0.783, cy: 0.521, radius: 0.125 },
+      hitAreaB: { kind: "circle", cx: 0.783, cy: 0.521, radius: 0.125 },
+      hintArea: { kind: "circle", cx: 0.783, cy: 0.521, radius: 0.17 },
+      difficulty: 3
+    }
+  ],
+  requiredDifferences: 8,
+  reward: {
+    archivePoints: 230,
+    magnifiers: 0
+  }
+});
+
+const authoredLevels: Partial<Record<number, LevelDefinition>> = {
+  1: firstLevel,
+  2: secondLevel,
+  3: thirdLevel,
+  4: fourthLevel,
+  13: thirteenthLevel
+};
+
 function makeLevel(order: number): LevelDefinition {
-  if (order === 1) return firstLevel;
+  const authoredLevel = authoredLevels[order];
+  if (authoredLevel) return authoredLevel;
 
   const slug = titles[order - 1];
   const id = `nr-${String(order).padStart(2, "0")}-${slug.replace("nr", "scene")}`;
@@ -102,9 +349,9 @@ function makeLevel(order: number): LevelDefinition {
     chapterId: "northern-route",
     order,
     titleKey: `levels.${slug}.title`,
-    imageA: "/assets/scenes/northern-route/placeholder/a.svg",
-    imageB: "/assets/scenes/northern-route/placeholder/b.svg",
-    thumbnail: "/assets/scenes/northern-route/placeholder/thumb.svg",
+    imageA: `/assets/scenes/northern-route/${order}/1.webp`,
+    imageB: `/assets/scenes/northern-route/${order}/2.webp`,
+    thumbnail: `/assets/scenes/northern-route/${order}/1.webp`,
     differences,
     requiredDifferences: counts[order - 1],
     reward: {
@@ -115,7 +362,7 @@ function makeLevel(order: number): LevelDefinition {
   });
 }
 
-export const levels = Array.from({ length: 12 }, (_, index) => makeLevel(index + 1));
+export const levels = Array.from({ length: 13 }, (_, index) => makeLevel(index + 1));
 
 export const dailyLevels = [
   { id: "daily-icebreaker-cabin", titleKey: "Daily: icebreaker cabin", levelId: levels[2].id },

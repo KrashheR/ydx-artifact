@@ -1,0 +1,29 @@
+{
+  "archive": "sand_meridian_codex_map_handoff",
+  "files": [
+    {
+      "name": "README_CODEX.md",
+      "purpose": "инструкции по интеграции"
+    },
+    {
+      "name": "CODEX_TASK_PROMPT.md",
+      "purpose": "готовая задача для Codex"
+    },
+    {
+      "name": "sand-meridian-map-layout.json",
+      "purpose": "главный data-source"
+    },
+    {
+      "name": "sand-meridian-map.config.ts",
+      "purpose": "готовый TypeScript-конфиг"
+    },
+    {
+      "name": "map-art-direction.md",
+      "purpose": "сопоставление координат и landmarks"
+    },
+    {
+      "name": "route-preview.svg",
+      "purpose": "технический превью-маршрут без финального арта"
+    }
+  ]
+}

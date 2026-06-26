@@ -1,0 +1,10 @@
+{
+  "packageId": "sand-meridian-complete-codex-package",
+  "chapterId": "sand-meridian",
+  "levelCount": 13,
+  "entrypoint": "README_FIRST.md",
+  "dataSource": "map-handoff/sand-meridian-map-layout.json",
+  "typescriptConfig": "map-handoff/sand-meridian-map.config.ts",
+  "story": "prompts/00_campaign_story.md",
+  "mapPrompt": "prompts/00_map_prompt.md"
+}

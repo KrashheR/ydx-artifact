@@ -270,9 +270,9 @@ Consumables:
 
 ```text
 src/content/levels/northern-route/nr-01-night-train.json
-public/assets/scenes/northern-route/nr-01/a.webp
-public/assets/scenes/northern-route/nr-01/b.webp
-public/assets/scenes/northern-route/nr-01/thumb.webp
+public/assets/scenes/northern-route/nr-01/a.png
+public/assets/scenes/northern-route/nr-01/b.png
+public/assets/scenes/northern-route/nr-01/thumb.png
 ```
 
 ## Почему один файл на уровень
@@ -607,9 +607,9 @@ Do not add text, logos, new clutter or lighting changes.
 ## Имена
 
 ```text
-nr-01-night-train-a.webp
-nr-01-night-train-b.webp
-nr-01-night-train-thumb.webp
+nr-01-night-train-a.png
+nr-01-night-train-b.png
+nr-01-night-train-thumb.png
 ```
 
 Не использовать пробелы, кириллицу и `final_final_2`.
@@ -765,7 +765,7 @@ Runtime:
 
 ## Milestone 5 — content
 
-- 12 campaign levels;
+- 13 campaign levels;
 - three daily scenes;
 - artifact art;
 - UI assets;

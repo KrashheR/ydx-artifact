@@ -1017,7 +1017,7 @@ Codex automation + ручное тестирование.
 - first scene;
 - scene switch;
 - p10 FPS;
-- memory over 12 levels;
+- memory over 13 levels;
 - input latency;
 - decode failure;
 - canvas loss.

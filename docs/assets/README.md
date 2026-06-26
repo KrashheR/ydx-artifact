@@ -7,9 +7,9 @@ assets/
   scenes/
     northern-route/
       nr-01/
-        a.webp
-        b.webp
-        thumb.webp
+        a.png
+        b.png
+        thumb.png
   artifacts/
     brass-compass.webp
     field-radio.webp
@@ -20,4 +20,4 @@ assets/
 
 Codex может скопировать эту структуру в `public/assets/`.
 
-Не размещай master PNG в runtime build. Source masters лучше хранить отдельно.
+Не размещай в runtime build многослойные master-файлы или лишние промежуточные экспорты. Рабочие source-файлы лучше хранить отдельно.

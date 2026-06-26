@@ -4,9 +4,9 @@
   "order": 1,
   "titleKey": "levels.nr01.title",
   "descriptionKey": "levels.nr01.description",
-  "imageA": "/assets/scenes/northern-route/nr-01/a.webp",
-  "imageB": "/assets/scenes/northern-route/nr-01/b.webp",
-  "thumbnail": "/assets/scenes/northern-route/nr-01/thumb.webp",
+  "imageA": "/assets/scenes/northern-route/nr-01/a.png",
+  "imageB": "/assets/scenes/northern-route/nr-01/b.png",
+  "thumbnail": "/assets/scenes/northern-route/nr-01/thumb.png",
   "differences": [
     {
       "id": "missing-tea-glass",

@@ -1,12 +1,13 @@
 import { create } from "zustand";
 import { createDefaultSave, type SaveData } from "@/entities/save/schema";
-import { levels } from "@/content/levels";
+import { allLevels, getLevelById, type ChapterId } from "@/content/chapters";
 import { clearLocalSave, loadLocalSave, saveLocalSave } from "@/services/storage/localSaveService";
 import { unlockedArtifactsForCompleted } from "@/shared/lib/progression";
+import { buildUnlockedDevSave, DEV_ALL_CAMPAIGNS_PRODUCT_ID } from "@/shared/lib/devCheats";
 
 type Screen =
   | { kind: "home" }
-  | { kind: "map" }
+  | { kind: "map"; chapterId: ChapterId }
   | { kind: "game"; levelId: string; mode: "campaign" | "daily" }
   | { kind: "daily" }
   | { kind: "collection" }
@@ -30,6 +31,7 @@ type GameStore = {
   setLocale: (locale: "ru" | "en") => void;
   claimDailyReward: (date: string) => void;
   resetSave: () => Promise<void>;
+  unlockAllDevContent: () => Promise<void>;
 };
 
 function ensureInProgress(saveData: SaveData, levelId: string): SaveData {
@@ -78,7 +80,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ screen });
   },
   startLevel(levelId, mode = "campaign") {
-    const level = levels.find((candidate) => candidate.id === levelId);
+    const level = getLevelById(levelId);
     if (!level) return;
     set((state) => ({
       screen: { kind: "game", levelId, mode },
@@ -121,7 +123,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   completeLevel(levelId, durationSeconds, exactHintUsed) {
     set((state) => {
-      const level = levels.find((candidate) => candidate.id === levelId);
+      const level = getLevelById(levelId);
       if (!level) return state;
       const foundCount = state.saveData.inProgress?.foundDifferenceIds.length ?? level.requiredDifferences;
       const mistakes = state.saveData.inProgress?.mistakes ?? 0;
@@ -181,5 +183,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
   async resetSave() {
     await clearLocalSave();
     set({ saveData: createDefaultSave(), screen: { kind: "home" }, saveStatus: "idle" });
+  },
+  async unlockAllDevContent() {
+    const currentSave = get().saveData;
+    const allLevelsAlreadyCompleted = allLevels.every((level) => currentSave.completedLevels.includes(level.id));
+    const purchasesAlreadyUnlocked =
+      currentSave.purchases.noForcedInterstitials
+      && currentSave.purchases.productIds.includes(DEV_ALL_CAMPAIGNS_PRODUCT_ID);
+
+    const saveData = allLevelsAlreadyCompleted && purchasesAlreadyUnlocked
+      ? currentSave
+      : buildUnlockedDevSave(currentSave);
+
+    set({ saveData });
+    await get().save();
   }
 }));

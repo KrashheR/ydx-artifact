@@ -1,17 +1,20 @@
 import type { SaveData } from "@/entities/save/schema";
-import { levels } from "@/content/levels";
+import { getChapterLevels, getLevelById } from "@/content/chapters";
 
 export function isLevelUnlocked(levelId: string, save: SaveData): boolean {
-  const level = levels.find((candidate) => candidate.id === levelId);
+  const level = getLevelById(levelId);
   if (!level) return false;
+  const chapterLevels = getChapterLevels(level.chapterId);
   if (level.order === 1) return true;
-  const previous = levels.find((candidate) => candidate.order === level.order - 1);
+  const previous = chapterLevels.find((candidate) => candidate.order === level.order - 1);
   return previous ? save.completedLevels.includes(previous.id) : false;
 }
 
 export function unlockedArtifactsForCompleted(completedLevelIds: string[]) {
   const completedOrders = new Set(
-    levels.filter((level) => completedLevelIds.includes(level.id)).map((level) => level.order)
+    getChapterLevels("northern-route")
+      .filter((level) => completedLevelIds.includes(level.id))
+      .map((level) => level.order)
   );
   return [
     { level: 3, id: "brass-compass" },

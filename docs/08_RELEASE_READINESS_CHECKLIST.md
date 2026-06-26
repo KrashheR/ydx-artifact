@@ -8,7 +8,7 @@
 
 - [ ] Tutorial понятен без внешних инструкций.
 - [ ] Первое действие доступно не позднее 20 секунд при нормальной сети.
-- [ ] Все 12 campaign levels проходимы.
+- [ ] Все 13 campaign levels проходимы.
 - [ ] Все 3 daily scenes проходимы.
 - [ ] Difficulty растёт постепенно.
 - [ ] Нет pixel-hunt и случайных AI differences.
@@ -108,7 +108,7 @@
 - [ ] Canvas context loss fallback.
 - [ ] No unhandled promise rejection.
 - [ ] No console errors in normal flow.
-- [ ] Memory does not grow across 12 levels.
+- [ ] Memory does not grow across 13 levels.
 - [ ] Textures released.
 - [ ] Midrange mobile p10 FPS accepted.
 - [ ] Input latency accepted.

@@ -23,7 +23,10 @@
   "home": {
     "new": "New archive",
     "returning": "Progress found",
-    "mock": "Local Yandex mock mode enabled"
+    "mock": "Local Yandex mock mode enabled",
+    "levelCount": "{{count}} levels",
+    "dailyCount": "{{count}} daily",
+    "artifactCount": "{{count}} artifacts"
   },
   "game": {
     "found": "Found {{count}} / {{total}}",
@@ -40,18 +43,84 @@
     "cloudUnavailable": "Cloud unavailable, game continues"
   },
   "levels": {
-    "nr01": { "title": "Boreas Pier" },
-    "nr02": { "title": "Coastal Warehouse" },
-    "nr03": { "title": "White Gull Lighthouse" },
-    "nr04": { "title": "Ice Railway Platform" },
-    "nr05": { "title": "Weather Station" },
-    "nr06": { "title": "Glacier Camp" },
-    "nr07": { "title": "Old Mountain Tunnel" },
-    "nr08": { "title": "Observatory Dome" },
-    "nr09": { "title": "Polar Greenhouse" },
-    "nr10": { "title": "Radio Relay Tower" },
-    "nr11": { "title": "Living Module" },
-    "nr12": { "title": "Hidden Valley Archive" }
+    "nr01": {
+      "title": "Boreas Pier"
+    },
+    "nr02": {
+      "title": "Coastal Warehouse"
+    },
+    "nr03": {
+      "title": "White Gull Lighthouse"
+    },
+    "nr04": {
+      "title": "Ice Railway Platform"
+    },
+    "nr05": {
+      "title": "Weather Station"
+    },
+    "nr06": {
+      "title": "Glacier Camp"
+    },
+    "nr07": {
+      "title": "Old Mountain Tunnel"
+    },
+    "nr08": {
+      "title": "Observatory Dome"
+    },
+    "nr09": {
+      "title": "Polar Greenhouse"
+    },
+    "nr10": {
+      "title": "Radio Relay Tower"
+    },
+    "nr11": {
+      "title": "Living Module"
+    },
+    "nr12": {
+      "title": "Hidden Valley Archive"
+    },
+    "nr13": {
+      "title": "Ice Cliff Camp"
+    },
+    "sm01": {
+      "title": "Desert Edge Camp"
+    },
+    "sm02": {
+      "title": "Caravan Trail"
+    },
+    "sm03": {
+      "title": "Dune Basin"
+    },
+    "sm04": {
+      "title": "Dry Well"
+    },
+    "sm05": {
+      "title": "Rock Arch"
+    },
+    "sm06": {
+      "title": "Canyon Pass"
+    },
+    "sm07": {
+      "title": "Abandoned Dig Site"
+    },
+    "sm08": {
+      "title": "Oasis Iram"
+    },
+    "sm09": {
+      "title": "Salt Flat"
+    },
+    "sm10": {
+      "title": "Ruined Observatory"
+    },
+    "sm11": {
+      "title": "Buried Temple Courtyard"
+    },
+    "sm12": {
+      "title": "Storm Ridge"
+    },
+    "sm13": {
+      "title": "Buried Meridian"
+    }
   },
   "artifacts": {
     "brass-compass": "Brass compass",
@@ -62,5 +131,55 @@
   "language": {
     "ru": "Русский",
     "en": "English"
+  },
+  "campaigns": {
+    "supra": "ANOMALY ARCHIVE",
+    "heading": "Choose Your Expedition",
+    "subheading": "Three routes. One archive. Follow the clues.",
+    "openAll": "Unlock all campaigns",
+    "allUnlocked": "All expeditions unlocked",
+    "autoSave": "Progress is saved automatically",
+    "totalProgress": "{{done}} / {{total}}",
+    "levelCount": "{{count}} LEVELS",
+    "lastLevel": "Last level: {{name}}",
+    "white": {
+      "title": "White Meridian",
+      "description": "A lost northern expedition and the mystery of a valley that isn't on any map.",
+      "lockReason": "Complete «White Meridian»",
+      "levelsLeft": "This is the first available campaign"
+    },
+    "sand": {
+      "title": "Sand Meridian",
+      "description": "An archaeological expedition discovers a temple complex built along an unknown meridian.",
+      "lockReason": "Complete «White Meridian»",
+      "levelsLeft": "{{count}} levels left to unlock"
+    },
+    "emerald": {
+      "title": "Emerald Meridian",
+      "description": "A tropical jungle expedition finds traces of a system linking ancient complexes across the globe.",
+      "lockReason": "Complete «Sand Meridian»",
+      "finalLabel": "Final archive expedition"
+    },
+    "status": {
+      "in_progress": "EXPEDITION IN PROGRESS",
+      "available": "NEW EXPEDITION",
+      "completed": "EXPEDITION COMPLETE",
+      "locked": "LOCKED"
+    },
+    "paywall": {
+      "supra": "FULL ARCHIVE ACCESS",
+      "heading": "Unlock All Expeditions",
+      "subheading": "Get instant access to all three expeditions — including future campaigns.",
+      "cta": "Unlock All Campaigns — {{price}}",
+      "skip": "Continue for Free",
+      "restore": "Restore Purchases",
+      "benefits": {
+        "b0": "All current campaigns unlock immediately",
+        "b1": "No need to complete the previous campaign first",
+        "b2": "Access to all 13 levels in each campaign",
+        "b3": "Future campaigns will also be available",
+        "b4": "Purchase is saved to your player profile"
+      }
+    }
   }
 }

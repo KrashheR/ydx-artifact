@@ -1,39 +1,32 @@
 import { useTranslation } from "react-i18next";
-import { levels } from "@/content/levels";
+import { getChapter } from "@/content/chapters";
 import { isLevelUnlocked } from "@/shared/lib/progression";
 import { useGameStore } from "@/shared/store/gameStore";
 import { Button } from "@/shared/ui/Button";
 import { Panel } from "@/shared/ui/Panel";
 
-const mapNodePositions = [
-  { x: 27.2, y: 83.6 },
-  { x: 31.5, y: 66.1 },
-  { x: 43.1, y: 56.7 },
-  { x: 31.4, y: 45.8 },
-  { x: 35.2, y: 30.9 },
-  { x: 57.3, y: 29.3 },
-  { x: 66.0, y: 16.7 },
-  { x: 79.5, y: 24.1 },
-  { x: 88.6, y: 17.2 },
-  { x: 84.7, y: 41.8 },
-  { x: 76.8, y: 58.7 },
-  { x: 59.8, y: 73.4 }
-] as const;
-
 const artifactMilestones = new Set([3, 6, 9, 12]);
 
 export function MapScreen() {
   const { t } = useTranslation();
+  const screen = useGameStore((state) => state.screen);
   const saveData = useGameStore((state) => state.saveData);
   const startLevel = useGameStore((state) => state.startLevel);
   const navigate = useGameStore((state) => state.navigate);
+  const chapterId = screen.kind === "map" ? screen.chapterId : "northern-route";
+  const chapter = getChapter(chapterId);
+  const routePoints = chapter.mapPoints
+    .slice()
+    .sort((left, right) => left.order - right.order)
+    .map((point) => `${point.x * 100},${point.y * 100}`)
+    .join(" ");
 
   return (
     <Panel>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-teal">{t("app.subtitle")}</p>
-          <h1 className="font-archive text-4xl">{t("actions.map")}</h1>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-teal">{t("campaigns.supra")}</p>
+          <h1 className="font-archive text-4xl">{t(chapter.titleKey)}</h1>
         </div>
         <div className="flex gap-2">
           <Button variant="ghost" onClick={() => navigate({ kind: "collection" })}>{t("actions.collection")}</Button>
@@ -42,19 +35,30 @@ export function MapScreen() {
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-graphite/15 bg-graphite/10 p-2 shadow-inner">
-        <div className="relative min-w-[980px] overflow-hidden rounded-xl">
+        <div className="relative min-w-[980px] overflow-hidden rounded-xl" style={{ aspectRatio: chapter.aspectRatio }}>
           <img
-            src="/assets/scenes/northern-route/background.png"
+            src={chapter.backgroundAsset}
             alt=""
-            className="block w-full select-none"
+            className="block h-full w-full select-none object-contain"
             draggable={false}
           />
           <div className="absolute inset-0">
-            {levels.map((level) => {
+            <svg viewBox="0 0 100 100" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
+              <polyline
+                points={routePoints}
+                fill="none"
+                stroke="rgba(184,138,69,0.78)"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeDasharray="1.4 2.2"
+              />
+            </svg>
+            {chapter.levels.map((level) => {
               const unlocked = isLevelUnlocked(level.id, saveData);
               const completed = saveData.completedLevels.includes(level.id);
               const active = unlocked && !completed;
-              const position = mapNodePositions[level.order - 1];
+              const position = chapter.mapPoints.find((point) => point.id === level.id) ?? chapter.mapPoints[level.order - 1];
               const statusLabel = completed ? "completed" : unlocked ? "active" : "locked";
 
               return (
@@ -64,7 +68,7 @@ export function MapScreen() {
                   onClick={() => startLevel(level.id)}
                   aria-label={`${level.order}. ${t(level.titleKey)} (${statusLabel})`}
                   title={`${level.order}. ${t(level.titleKey)}`}
-                  style={{ left: `${position.x}%`, top: `${position.y}%` }}
+                  style={{ left: `${position.x * 100}%`, top: `${position.y * 100}%` }}
                   className={`group absolute flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 font-archive text-lg font-bold shadow-lg transition focus:outline-none focus:ring-4 focus:ring-ochre/50 ${
                     completed
                       ? "border-teal bg-teal text-ivory shadow-teal/25"

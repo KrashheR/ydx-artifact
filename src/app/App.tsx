@@ -51,16 +51,18 @@ export function App() {
     }
   }, [screen]);
 
+  const isHome = screen.kind === "home";
+
   return (
-    <main className="min-h-screen px-4 py-5 text-graphite md:px-8">
+    <main className={`min-h-screen text-graphite ${isHome ? "" : "px-4 py-5 md:px-8"}`}>
       <AnimatePresence mode="wait">
         <motion.div
-          key={`${screen.kind}-${"levelId" in screen ? screen.levelId : ""}`}
+          key={`${screen.kind}-${"chapterId" in screen ? screen.chapterId : ""}-${"levelId" in screen ? screen.levelId : ""}`}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.22 }}
-          className="mx-auto max-w-7xl"
+          className={isHome ? "" : "mx-auto max-w-7xl"}
         >
           {current}
         </motion.div>

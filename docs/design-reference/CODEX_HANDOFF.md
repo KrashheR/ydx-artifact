@@ -359,5 +359,5 @@ Rule: never stack more than 2; dismiss on tap
 6. Daily + streak
 7. Rewarded ads + interstitial policy
 8. IAP: archive pack + magnifiers
-9. All 12 campaign levels (validated)
+9. All 13 campaign levels (validated)
 10. QA: save, ads, purchases, rotation, offline, platform lifecycle
