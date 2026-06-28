@@ -4,7 +4,17 @@ import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist", "node_modules", "coverage"] },
+  {
+    ignores: [
+      "dist",
+      "node_modules",
+      "coverage",
+      "docs/**/*.dc.html",
+      "docs/**/support.js",
+      "docs/menu-design/**/*.html",
+      "docs/rate-modal-design/**/*.html"
+    ]
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

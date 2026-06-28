@@ -333,6 +333,7 @@ Rule: never stack more than 2; dismiss on tap
 
 - All interactive elements: 44×44px minimum touch target
 - Focus states required on all interactive elements (visible outline)
+- Suppress default mobile browser tap highlight on interactive elements; use project-defined pressed/focus feedback instead of a system white flash
 - States must differ by more than color alone (shape, icon, label)
 - `prefers-reduced-motion`: all animations disabled, opacity-only fallback
 - `aria-label` on all icon-only buttons

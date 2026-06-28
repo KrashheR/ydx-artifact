@@ -12,6 +12,8 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "validate:content": "tsx scripts/validate-content.ts",
+    "agent:check": "pnpm lint && pnpm typecheck && pnpm validate:content",
+    "agent:release-check": "pnpm validate:content && pnpm build && pnpm test:e2e",
     "release:validate": "pnpm validate:content && pnpm build",
     "release:manifest": "tsx scripts/release-manifest.ts",
     "release:zip": "tsx scripts/release-zip.ts",

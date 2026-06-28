@@ -6,6 +6,7 @@
   },
   "actions": {
     "start": "Start expedition",
+    "play": "Play",
     "continue": "Continue",
     "map": "Map",
     "collection": "Collection",
@@ -34,13 +35,47 @@
     "magnifiers": "Magnifiers: {{count}}",
     "completed": "Photo restored",
     "accuracy": "Accuracy {{value}}%",
-    "useWheel": "Mouse wheel: zoom. Drag: pan. On mobile, use A/B."
+    "useWheel": "Mouse wheel: zoom. Drag: pan. On mobile, use A/B.",
+    "levelBadge": "{{campaign}} · LEVEL {{current}} / {{total}}",
+    "labelOriginal": "ARCHIVE PHOTO · ORIGINAL",
+    "labelCopy": "COPY · SPOT DIFFERENCES",
+    "diffCount": "FOUND",
+    "foundLabel": "FOUND",
+    "accuracyLabel": "ACCURACY",
+    "hintLabel": "Hint",
+    "completedBadge": "LEVEL {{order}} COMPLETE",
+    "completedTitle": "All differences found",
+    "completedDesc": "Archive photo restored. The route continues to the next expedition point.",
+    "statTime": "TIME",
+    "statFound": "FOUND",
+    "statRating": "RATING",
+    "nextLevelCta": "Level {{order}} · {{title}}",
+    "retry": "Retry",
+    "toMap": "Level Select",
+    "timeoutBadge": "TIME'S UP",
+    "timeoutTitle": "Not all differences found",
+    "timeoutDesc": "The trail went cold. Return to the photos and try again.",
+    "statTimer": "TIMER",
+    "statRemaining": "REMAINING",
+    "diffsOnLevel": "DIFFERENCES IN LEVEL",
+    "retryAgain": "Try Again",
+    "extendTime": "+30 sec"
   },
   "save": {
     "saved": "Saved",
     "saving": "Saving...",
     "localOnly": "Progress saved locally",
     "cloudUnavailable": "Cloud unavailable, game continues"
+  },
+  "reviewPrompt": {
+    "eyebrow": "EXPEDITION LOG",
+    "title": "How was the expedition?",
+    "description": "You've already explored several locations. Your rating helps us improve the game and build new journeys.",
+    "mobileDescription": "Your rating helps us improve the game and build new journeys.",
+    "reviewAction": "Rate the game",
+    "laterAction": "Later",
+    "loadingAction": "Opening…",
+    "closeLabel": "Close"
   },
   "levels": {
     "nr01": {
@@ -120,6 +155,45 @@
     },
     "sm13": {
       "title": "Buried Meridian"
+    },
+    "em01": {
+      "title": "River Landing"
+    },
+    "em02": {
+      "title": "Abandoned Radio Station"
+    },
+    "em03": {
+      "title": "Botanical Camp"
+    },
+    "em04": {
+      "title": "Flooded Bridge"
+    },
+    "em05": {
+      "title": "Stone Terraces"
+    },
+    "em06": {
+      "title": "Stilt Village"
+    },
+    "em07": {
+      "title": "Three-Stream Waterfall"
+    },
+    "em08": {
+      "title": "Temple of Roots"
+    },
+    "em09": {
+      "title": "Underground Reservoir"
+    },
+    "em10": {
+      "title": "Canopy Observatory"
+    },
+    "em11": {
+      "title": "Heart of the Green Valley"
+    },
+    "em12": {
+      "title": "Ruined Geological Station"
+    },
+    "em13": {
+      "title": "Evacuation Airstrip"
     }
   },
   "artifacts": {
@@ -134,6 +208,7 @@
   },
   "campaigns": {
     "supra": "ANOMALY ARCHIVE",
+    "campaignLabel": "EXPEDITION",
     "heading": "Choose Your Expedition",
     "subheading": "Three routes. One archive. Follow the clues.",
     "openAll": "Unlock all campaigns",
@@ -141,6 +216,16 @@
     "autoSave": "Progress is saved automatically",
     "totalProgress": "{{done}} / {{total}}",
     "levelCount": "{{count}} LEVELS",
+    "journalLabel": "JOURNAL · {{count}} LEVELS",
+    "routeLevels": "Route Levels",
+    "currentLevel": "CURRENT LEVEL",
+    "currentLevelSummary": "CURRENT LEVEL · {{progress}}",
+    "completed": "COMPLETED",
+    "locked": "LOCKED",
+    "replay": "Replay",
+    "finishLevel": "Finish lvl. {{level}}",
+    "levelCode": "Level {{order}}",
+    "levelsDone": "{{done}} levels completed",
     "lastLevel": "Last level: {{name}}",
     "white": {
       "title": "White Meridian",
@@ -158,7 +243,8 @@
       "title": "Emerald Meridian",
       "description": "A tropical jungle expedition finds traces of a system linking ancient complexes across the globe.",
       "lockReason": "Complete «Sand Meridian»",
-      "finalLabel": "Final archive expedition"
+      "finalLabel": "Final archive expedition",
+      "levelsLeft": "{{count}} levels left to unlock"
     },
     "status": {
       "in_progress": "EXPEDITION IN PROGRESS",

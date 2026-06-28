@@ -1,5 +1,9 @@
 import { create } from "zustand";
-import { createDefaultSave, type SaveData } from "@/entities/save/schema";
+import {
+  createDefaultSave,
+  type ReviewUnavailableReason,
+  type SaveData
+} from "@/entities/save/schema";
 import { allLevels, getLevelById, type ChapterId } from "@/content/chapters";
 import { clearLocalSave, loadLocalSave, saveLocalSave } from "@/services/storage/localSaveService";
 import { unlockedArtifactsForCompleted } from "@/shared/lib/progression";
@@ -15,10 +19,17 @@ type Screen =
 
 type SaveStatus = "idle" | "saving" | "saved" | "local-only";
 
+type ReviewPromptRuntimeState = {
+  pendingMapCheckToken: number;
+  pendingMapCheckCompletedLevels: number | null;
+  nativeRequestInFlight: boolean;
+};
+
 type GameStore = {
   screen: Screen;
   saveData: SaveData;
   saveStatus: SaveStatus;
+  reviewPromptRuntime: ReviewPromptRuntimeState;
   startedAt: number;
   hydrate: () => Promise<void>;
   save: () => Promise<void>;
@@ -26,10 +37,22 @@ type GameStore = {
   startLevel: (levelId: string, mode?: "campaign" | "daily") => void;
   recordDifference: (levelId: string, differenceId: string) => void;
   recordMisclick: (levelId: string) => void;
-  completeLevel: (levelId: string, durationSeconds: number, exactHintUsed: boolean) => void;
+  completeLevel: (
+    levelId: string,
+    durationSeconds: number,
+    exactHintUsed: boolean,
+    mode?: "campaign" | "daily"
+  ) => void;
   spendMagnifiers: (amount: number) => boolean;
   setLocale: (locale: "ru" | "en") => void;
   claimDailyReward: (date: string) => void;
+  clearPendingReviewPromptCheck: () => void;
+  markReviewPromptShown: () => void;
+  dismissReviewPrompt: () => void;
+  setReviewNativeRequestInFlight: (value: boolean) => void;
+  setReviewNativeResolved: (value: boolean) => void;
+  setReviewUnavailableReason: (reason?: ReviewUnavailableReason) => void;
+  resetLevelProgress: (levelId: string) => void;
   resetSave: () => Promise<void>;
   unlockAllDevContent: () => Promise<void>;
 };
@@ -61,6 +84,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
   screen: { kind: "home" },
   saveData: createDefaultSave(),
   saveStatus: "idle",
+  reviewPromptRuntime: {
+    pendingMapCheckToken: 0,
+    pendingMapCheckCompletedLevels: null,
+    nativeRequestInFlight: false
+  },
   startedAt: Date.now(),
   async hydrate() {
     const saveData = await loadLocalSave();
@@ -121,7 +149,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
     void get().save();
   },
-  completeLevel(levelId, durationSeconds, exactHintUsed) {
+  completeLevel(levelId, durationSeconds, exactHintUsed, mode = "campaign") {
     set((state) => {
       const level = getLevelById(levelId);
       if (!level) return state;
@@ -131,7 +159,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const seals = ["completed"];
       if (accuracy >= 0.85) seals.push("accurate-eye");
       if (!exactHintUsed) seals.push("no-intervention");
-      const completedLevels = state.saveData.completedLevels.includes(levelId)
+      const wasAlreadyCompleted = state.saveData.completedLevels.includes(levelId);
+      const completedLevels = wasAlreadyCompleted
         ? state.saveData.completedLevels
         : [...state.saveData.completedLevels, levelId];
       const nextSave = applyArtifactUnlocks({
@@ -150,7 +179,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         }
       });
-      return { saveData: nextSave };
+      const shouldQueueReviewCheck = mode === "campaign" && !wasAlreadyCompleted;
+
+      return {
+        saveData: nextSave,
+        reviewPromptRuntime: shouldQueueReviewCheck
+          ? {
+              ...state.reviewPromptRuntime,
+              pendingMapCheckToken: state.reviewPromptRuntime.pendingMapCheckToken + 1,
+              pendingMapCheckCompletedLevels: completedLevels.length
+            }
+          : state.reviewPromptRuntime
+      };
     });
     void get().save();
   },
@@ -180,9 +220,100 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
     void get().save();
   },
+  clearPendingReviewPromptCheck() {
+    set((state) => ({
+      reviewPromptRuntime: {
+        ...state.reviewPromptRuntime,
+        pendingMapCheckCompletedLevels: null
+      }
+    }));
+  },
+  markReviewPromptShown() {
+    set((state) => ({
+      saveData: {
+        ...state.saveData,
+        reviewPrompt: {
+          ...state.saveData.reviewPrompt,
+          prePromptShownCount: Math.min(state.saveData.reviewPrompt.prePromptShownCount + 1, 2)
+        }
+      },
+      reviewPromptRuntime: {
+        ...state.reviewPromptRuntime,
+        pendingMapCheckCompletedLevels: null
+      }
+    }));
+    void get().save();
+  },
+  dismissReviewPrompt() {
+    set((state) => {
+      const reviewPrompt = state.saveData.reviewPrompt;
+
+      return {
+        saveData: {
+          ...state.saveData,
+          reviewPrompt: {
+            ...reviewPrompt,
+            nextEligibleCompletedLevel:
+              reviewPrompt.prePromptShownCount <= 1
+                ? Math.max(state.saveData.completedLevels.length + 5, 8)
+                : reviewPrompt.nextEligibleCompletedLevel
+          }
+        }
+      };
+    });
+    void get().save();
+  },
+  setReviewNativeRequestInFlight(value) {
+    set((state) => ({
+      reviewPromptRuntime: {
+        ...state.reviewPromptRuntime,
+        nativeRequestInFlight: value
+      }
+    }));
+  },
+  setReviewNativeResolved(value) {
+    set((state) => ({
+      saveData: {
+        ...state.saveData,
+        reviewPrompt: {
+          ...state.saveData.reviewPrompt,
+          nativeReviewResolved: value
+        }
+      }
+    }));
+    void get().save();
+  },
+  setReviewUnavailableReason(reason) {
+    set((state) => ({
+      saveData: {
+        ...state.saveData,
+        reviewPrompt: {
+          ...state.saveData.reviewPrompt,
+          lastUnavailableReason: reason
+        }
+      }
+    }));
+    void get().save();
+  },
+  resetLevelProgress(levelId) {
+    set((state) => {
+      if (state.saveData.inProgress?.levelId !== levelId) return state;
+      return { saveData: { ...state.saveData, inProgress: null } };
+    });
+    void get().save();
+  },
   async resetSave() {
     await clearLocalSave();
-    set({ saveData: createDefaultSave(), screen: { kind: "home" }, saveStatus: "idle" });
+    set({
+      saveData: createDefaultSave(),
+      screen: { kind: "home" },
+      saveStatus: "idle",
+      reviewPromptRuntime: {
+        pendingMapCheckToken: 0,
+        pendingMapCheckCompletedLevels: null,
+        nativeRequestInFlight: false
+      }
+    });
   },
   async unlockAllDevContent() {
     const currentSave = get().saveData;

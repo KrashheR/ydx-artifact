@@ -13,6 +13,13 @@ export const hitShapeSchema = z.discriminatedUnion("kind", [
     radius: z.number().min(0.005).max(1)
   }),
   z.object({
+    kind: z.literal("ellipse"),
+    cx: z.number().min(0).max(1),
+    cy: z.number().min(0).max(1),
+    rx: z.number().min(0.005).max(1),
+    ry: z.number().min(0.005).max(1)
+  }),
+  z.object({
     kind: z.literal("polygon"),
     points: z.array(pointSchema).min(3)
   })
@@ -28,7 +35,7 @@ export const differenceSchema = z.object({
 
 export const levelSchema = z.object({
   id: z.string().min(1),
-  chapterId: z.enum(["northern-route", "sand-meridian"]),
+  chapterId: z.enum(["northern-route", "sand-meridian", "emerald-meridian"]),
   order: z.number().int().min(1).max(13),
   titleKey: z.string().min(1),
   imageA: z.string().min(1),

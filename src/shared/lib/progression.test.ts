@@ -18,8 +18,10 @@ describe("progression", () => {
 
   it("tracks unlock progression independently for each chapter", () => {
     const sandLevels = getChapterLevels("sand-meridian");
+    const emeraldLevels = getChapterLevels("emerald-meridian");
     const save = { ...createDefaultSave(), completedLevels: [sandLevels[0].id] };
     expect(isLevelUnlocked(sandLevels[1].id, save)).toBe(true);
     expect(isLevelUnlocked(levels[1].id, save)).toBe(false);
+    expect(isLevelUnlocked(emeraldLevels[1].id, save)).toBe(false);
   });
 });

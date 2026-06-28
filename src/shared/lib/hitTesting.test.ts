@@ -7,6 +7,11 @@ describe("hitTest", () => {
     expect(hitTest({ kind: "circle", cx: 0.5, cy: 0.5, radius: 0.1 }, 0.8, 0.8)).toBe(false);
   });
 
+  it("detects ellipse hits", () => {
+    expect(hitTest({ kind: "ellipse", cx: 0.5, cy: 0.5, rx: 0.2, ry: 0.08 }, 0.68, 0.5)).toBe(true);
+    expect(hitTest({ kind: "ellipse", cx: 0.5, cy: 0.5, rx: 0.2, ry: 0.08 }, 0.5, 0.6)).toBe(false);
+  });
+
   it("detects polygon hits", () => {
     const square = {
       kind: "polygon" as const,

@@ -37,6 +37,12 @@
     "reducedMotion": false,
     "mobilePhotoMode": "toggle"
   },
+  "reviewPrompt": {
+    "schemaVersion": 1,
+    "prePromptShownCount": 0,
+    "nextEligibleCompletedLevel": 3,
+    "nativeReviewResolved": false
+  },
   "sync": {
     "lastCloudSyncAt": null,
     "pendingCloudSync": false,

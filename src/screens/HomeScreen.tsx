@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { chapters, getChapterLevels } from "@/content/chapters";
+import { getChapterPreviewAsset } from "@/content/sceneAssets";
 import { useGameStore } from "@/shared/store/gameStore";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -122,6 +123,12 @@ const PREVIEW_BG: Record<CampaignId, string> = {
   white: "radial-gradient(ellipse at 50% -10%, #9FBAC3 0%, #274659 45%, #152431 100%)",
   sand: "linear-gradient(180deg, #3A2C18 0%, #7A5A2F 50%, #E3C489 100%)",
   emerald: "linear-gradient(180deg, #0E211A 0%, #1C3A2C 50%, #3C6F52 100%)",
+};
+
+const PREVIEW_IMAGE: Record<CampaignId, string> = {
+  white: getChapterPreviewAsset("northern-route"),
+  sand: getChapterPreviewAsset("sand-meridian"),
+  emerald: getChapterPreviewAsset("emerald-meridian"),
 };
 
 const CAMPAIGN_SYMBOL: Record<CampaignId, (props: { size?: number }) => React.ReactElement> = {
@@ -445,6 +452,12 @@ function DesktopCard({
         className="relative h-[216px] overflow-hidden flex-shrink-0"
         style={{ background: PREVIEW_BG[campaign.id] }}
       >
+        <img
+          src={PREVIEW_IMAGE[campaign.id]}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          draggable={false}
+        />
         <div
           className="absolute inset-0"
           style={{
@@ -580,6 +593,12 @@ function MobileFullCard({
         className="relative h-[128px] overflow-hidden"
         style={{ background: PREVIEW_BG[campaign.id] }}
       >
+        <img
+          src={PREVIEW_IMAGE[campaign.id]}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          draggable={false}
+        />
         <div
           className="absolute inset-0"
           style={{
@@ -661,6 +680,12 @@ function MobileCompactCard({
         className="relative h-full w-[108px] flex-shrink-0 overflow-hidden"
         style={{ background: PREVIEW_BG[campaign.id] }}
       >
+        <img
+          src={PREVIEW_IMAGE[campaign.id]}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          draggable={false}
+        />
         <div
           className="absolute inset-0"
           style={{
@@ -716,11 +741,17 @@ function MiniCampaignPreview({
   return (
     <div className="flex flex-1 flex-col gap-1.5">
       <div
-        className="w-full overflow-hidden rounded-[8px]"
+        className="relative w-full overflow-hidden rounded-[8px]"
         style={{ height, background: PREVIEW_BG[id] }}
       >
+        <img
+          src={PREVIEW_IMAGE[id]}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          draggable={false}
+        />
         <div
-          className="h-full w-full"
+          className="absolute inset-0"
           style={{
             background:
               "linear-gradient(180deg,transparent 40%,rgba(13,20,26,.65) 100%)",
@@ -994,6 +1025,7 @@ export function HomeScreen() {
 
   const northernRouteLevels = getChapterLevels("northern-route");
   const sandMeridianLevels = getChapterLevels("sand-meridian");
+  const emeraldMeridianLevels = getChapterLevels("emerald-meridian");
   const nrDone = northernRouteLevels.filter((l) => completedLevels.includes(l.id)).length;
   const nrTotal = northernRouteLevels.length;
   const nrStatus: CampaignStatus =
@@ -1008,6 +1040,16 @@ export function HomeScreen() {
       : sandDone === sandTotal
         ? "completed"
         : "in_progress";
+  const emeraldDone = emeraldMeridianLevels.filter((l) => completedLevels.includes(l.id)).length;
+  const emeraldTotal = emeraldMeridianLevels.length;
+  const emeraldUnlocked = sandDone === sandTotal;
+  const emeraldStatus: CampaignStatus = !emeraldUnlocked
+    ? "locked"
+    : emeraldDone === 0
+      ? "available"
+      : emeraldDone === emeraldTotal
+        ? "completed"
+        : "in_progress";
 
   const lastCompleted = [...northernRouteLevels].reverse().find((l) =>
     completedLevels.includes(l.id)
@@ -1015,8 +1057,11 @@ export function HomeScreen() {
   const sandLastCompleted = [...sandMeridianLevels].reverse().find((l) =>
     completedLevels.includes(l.id)
   );
+  const emeraldLastCompleted = [...emeraldMeridianLevels].reverse().find((l) =>
+    completedLevels.includes(l.id)
+  );
 
-  const TOTAL_ALL = 39; // 3 campaigns × 13 levels
+  const totalAll = nrTotal + sandTotal + emeraldTotal;
 
   const campaigns: Campaign[] = [
     {
@@ -1036,10 +1081,13 @@ export function HomeScreen() {
     },
     {
       id: "emerald",
-      status: "locked",
-      done: 0,
-      total: 13,
-      lockHint: t("campaigns.emerald.finalLabel"),
+      status: emeraldStatus,
+      done: emeraldDone,
+      total: emeraldTotal,
+      lastLevelName: emeraldLastCompleted ? t(emeraldLastCompleted.titleKey) : null,
+      lockHint: emeraldUnlocked
+        ? undefined
+        : t("campaigns.emerald.levelsLeft", { count: sandTotal - sandDone }),
     },
   ];
 
@@ -1054,6 +1102,10 @@ export function HomeScreen() {
     }
     if (campaignId === "sand" && sandUnlocked) {
       navigate({ kind: "map", chapterId: chapters["sand-meridian"].id });
+      return;
+    }
+    if (campaignId === "emerald" && emeraldUnlocked) {
+      navigate({ kind: "map", chapterId: chapters["emerald-meridian"].id });
     }
   };
   const handleOpenAll = () => setPaywallOpen(true);
@@ -1064,7 +1116,7 @@ export function HomeScreen() {
       {/* Top bar */}
       <TopBar
         totalDone={completedLevels.length}
-        totalAll={TOTAL_ALL}
+        totalAll={totalAll}
         onSettings={() => navigate({ kind: "settings" })}
         onOpenAll={handleOpenAll}
       />
@@ -1083,12 +1135,13 @@ export function HomeScreen() {
       </section>
 
       {/* Route sequence (desktop only) */}
-      <div className="hidden md:block">
-        <RouteSequence
-          statuses={campaigns.map((c) => c.status)}
-          labels={campaigns.map((c) => t(`campaigns.${c.id}.title`).toUpperCase())}
-        />
-      </div>
+      <div className="mx-auto w-full max-w-[1460px]">
+        <div className="hidden md:block">
+          <RouteSequence
+            statuses={campaigns.map((c) => c.status)}
+            labels={campaigns.map((c) => t(`campaigns.${c.id}.title`).toUpperCase())}
+          />
+        </div>
 
       {/* ── Desktop card row ── */}
       <div className="hidden gap-[26px] px-10 pb-4 md:flex">
@@ -1103,6 +1156,8 @@ export function HomeScreen() {
       </div>
 
       {/* ── Mobile card stack ── */}
+      </div>
+
       <div className="flex flex-col gap-3 px-4 pb-36 pt-5 md:hidden">
         {campaigns
           .filter((campaign) => campaign.status !== "locked")
@@ -1121,13 +1176,15 @@ export function HomeScreen() {
       </div>
 
       {/* Footer (desktop) */}
-      <footer
-        className="hidden h-10 items-center justify-center gap-2 border-t md:flex"
-        style={{ borderColor: "rgba(213,195,154,0.09)" }}
-      >
-        <CheckIcon size={12} color="#6FC69E" />
-        <p className="text-[10.5px] text-exp-muted">{t("campaigns.autoSave")}</p>
-      </footer>
+      <div className="mx-auto hidden w-full max-w-[1460px] md:block">
+        <footer
+          className="flex h-10 items-center justify-center gap-2 border-t"
+          style={{ borderColor: "rgba(213,195,154,0.09)" }}
+        >
+          <CheckIcon size={12} color="#6FC69E" />
+          <p className="text-[10.5px] text-exp-muted">{t("campaigns.autoSave")}</p>
+        </footer>
+      </div>
 
       {/* Mobile sticky CTA */}
       <div

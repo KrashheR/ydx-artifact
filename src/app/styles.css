@@ -17,6 +17,7 @@ body,
 #root {
   min-height: 100%;
   margin: 0;
+  background-color: #151b18;
 }
 
 body {
@@ -32,8 +33,39 @@ select {
   font: inherit;
 }
 
+:where(a, button, [role="button"], input, select, textarea, summary) {
+  -webkit-tap-highlight-color: transparent;
+}
+
 .game-area {
   user-select: none;
   -webkit-user-drag: none;
   touch-action: none;
+}
+
+@keyframes game-pop {
+  0%   { transform: scale(0.3) translateY(8px); opacity: 0; }
+  60%  { transform: scale(1.08); }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes game-ring {
+  0%  { transform: scale(0.4); opacity: 0; }
+  40% { opacity: 1; }
+  100%{ transform: scale(1); opacity: 1; }
+}
+
+@keyframes game-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1) translate(-50%, -50%); }
+  50%       { opacity: 1;   transform: scale(1.25) translate(-38%, -38%); }
+}
+
+@keyframes game-ripple {
+  0%   { transform: translate(-50%, -50%) scale(0.3); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(2.4); opacity: 0; }
+}
+
+@keyframes wrong-fade {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
 }

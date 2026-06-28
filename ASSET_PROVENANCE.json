@@ -23,16 +23,58 @@
     },
     {
       "id": "sand-meridian-background",
-      "path": "public/assets/scenes/sand-meredian/background.png",
+      "path": "public/assets/scenes/sand-meredian/background.webp",
       "status": "production-intake",
-      "source": "content owner chapter map background provided in workspace",
+      "source": "content owner chapter map background provided in workspace, converted to WebP",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "sand-meridian-preview",
+      "path": "public/assets/scenes/sand-meredian/preview.webp",
+      "status": "production-intake",
+      "source": "content owner campaign menu preview provided in workspace, converted to WebP",
       "approval": "pending-owner-license-confirmation"
     },
     {
       "id": "sand-meridian-package",
       "path": "public/assets/scenes/sand-meredian",
       "status": "production-intake",
-      "source": "content owner sand-meridian scene package provided in workspace; includes level folders 1-12 with 1.png/2.png runtime pairs and 3.png markup references, while level 13 currently reuses folder 12 as a temporary runtime fallback",
+      "source": "content owner sand-meridian scene package provided in workspace; includes level folders 1-13 with 1.webp/2.webp runtime pairs and 3.webp markup references",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "emerald-meridian-background",
+      "path": "public/assets/scenes/emerald-meridian/bg.webp",
+      "status": "production-intake",
+      "source": "content owner chapter map background provided in workspace, converted to WebP",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "emerald-meridian-preview",
+      "path": "public/assets/scenes/emerald-meridian/preview.webp",
+      "status": "production-intake",
+      "source": "content owner campaign menu preview provided in workspace, converted to WebP",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "emerald-meridian-package",
+      "path": "public/assets/scenes/emerald-meridian",
+      "status": "production-intake",
+      "source": "content owner emerald-meridian scene package provided in workspace; includes level folders 1-13 with 1.webp/2.webp runtime pairs and 3.webp markup references",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "northern-route-preview",
+      "path": "public/assets/scenes/northern-route/preview.webp",
+      "status": "production-intake",
+      "source": "content owner campaign menu preview provided in workspace, converted to WebP",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
+      "id": "northern-route-background",
+      "path": "public/assets/scenes/northern-route/background.webp",
+      "status": "production-intake",
+      "source": "content owner chapter map background provided in workspace, converted to WebP",
       "approval": "pending-owner-license-confirmation"
     },
     {

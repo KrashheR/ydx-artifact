@@ -9,7 +9,8 @@ export default {
         ui: ["Trebuchet MS", "Verdana", "sans-serif"],
         // Expedition menu fonts
         cormorant: ['"Cormorant Garamond"', "Georgia", "serif"],
-        manrope: ["Manrope", "system-ui", "sans-serif"]
+        manrope: ["Manrope", "system-ui", "sans-serif"],
+        jetbrains: ['"JetBrains Mono"', '"Courier New"', "monospace"]
       },
       colors: {
         // ── Light "Anomaly Archive" palette (existing screens) ──────────────

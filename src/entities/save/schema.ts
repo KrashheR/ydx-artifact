@@ -1,5 +1,31 @@
 import { z } from "zod";
 
+export const reviewUnavailableReasonSchema = z.enum([
+  "NO_AUTH",
+  "GAME_RATED",
+  "REVIEW_ALREADY_REQUESTED",
+  "REVIEW_WAS_REQUESTED",
+  "UNKNOWN"
+]);
+
+export const reviewPromptStateSchema = z.object({
+  schemaVersion: z.literal(1),
+  prePromptShownCount: z.number().int().min(0).max(2),
+  nextEligibleCompletedLevel: z.number().int().nonnegative(),
+  nativeReviewResolved: z.boolean(),
+  lastUnavailableReason: reviewUnavailableReasonSchema.optional()
+});
+
+export type ReviewUnavailableReason = z.infer<typeof reviewUnavailableReasonSchema>;
+export type ReviewPromptState = z.infer<typeof reviewPromptStateSchema>;
+
+export const initialReviewPromptState: ReviewPromptState = {
+  schemaVersion: 1,
+  prePromptShownCount: 0,
+  nextEligibleCompletedLevel: 3,
+  nativeReviewResolved: false
+};
+
 export const saveSchema = z.object({
   version: z.literal(1),
   updatedAt: z.number(),
@@ -32,6 +58,7 @@ export const saveSchema = z.object({
     vibration: z.boolean(),
     reducedMotion: z.boolean()
   }),
+  reviewPrompt: reviewPromptStateSchema.default(initialReviewPromptState),
   purchases: z.object({
     noForcedInterstitials: z.boolean(),
     productIds: z.array(z.string())
@@ -63,6 +90,7 @@ export function createDefaultSave(): SaveData {
       vibration: true,
       reducedMotion: false
     },
+    reviewPrompt: initialReviewPromptState,
     purchases: {
       noForcedInterstitials: false,
       productIds: []

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@keyframes pulseDot{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pop{0%{transform:translate(-50%,-46%) scale(.94);opacity:0}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
+*{box-sizing:border-box}
+</style>
+</helmet>
+
+<!-- ============================================================= -->
+<!-- FRAME 1 · DESKTOP · DEFAULT (in campaign-map context) -->
+<!-- ============================================================= -->
+<div data-drags-parent="1" style="position:absolute;left:80px;top:34px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">DESKTOP · 1440 × 900 · ОЦЕНКА ПОСЛЕ 3-ГО УРОВНЯ</div>
+
+<div data-screen-label="Desktop · Модалка оценки" style="position:absolute;left:80px;top:78px;width:1440px;height:900px;background:#151B18;border-radius:8px;overflow:hidden;box-shadow:0 36px 90px rgba(0,0,0,.5);font-family:Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+
+  <!-- DIMMED CAMPAIGN-MAP BACKDROP -->
+  <div style="position:absolute;inset:0;filter:blur(3px) brightness(.5) saturate(.92)">
+    <div style="height:78px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;border-bottom:1px solid rgba(213,195,154,.12);background:linear-gradient(180deg,rgba(34,42,37,.9),rgba(21,27,24,.4))">
+      <div style="display:flex;align-items:center;gap:14px"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15.2" stroke="#B88A45" stroke-width="1.4"/><circle cx="17" cy="17" r="10.5" stroke="#B88A45" stroke-width=".7" opacity=".5"/><path d="M17 6.5 L20 17 L17 27.5 L14 17 Z" fill="#B88A45"/><path d="M17 6.5 L14 17 L17 27.5 Z" fill="#8a6730"/></svg><div><div style="font:700 12.5px Manrope;letter-spacing:.26em;color:#B88A45">ИЗУМРУДНЫЙ МЕРИДИАН</div><div style="font:500 10.5px Manrope;letter-spacing:.2em;color:#879087;margin-top:3px">АРХИВ ЭКСПЕДИЦИОННОГО ОБЩЕСТВА</div></div></div>
+      <div style="display:flex;align-items:center;gap:8px"><div style="font:600 9.5px Manrope;letter-spacing:.2em;color:#879087">ПРОГРЕСС</div><div style="width:96px;height:5px;border-radius:3px;background:rgba(213,195,154,.12);overflow:hidden"><div style="width:23%;height:100%;background:linear-gradient(90deg,#d8af63,#a9762f)"></div></div><div style="font:600 12px Manrope;color:#D5C39A">9 / 39</div></div>
+    </div>
+    <div style="text-align:center;padding:34px 0 18px"><div style="font:600 12px Manrope;letter-spacing:.34em;color:#B88A45">ЭКСПЕДИЦИОННЫЙ АРХИВ · ВЫБОР МАРШРУТА</div><h1 style="font:600 50px 'Cormorant Garamond',serif;color:#D5C39A;margin:8px 0 0">Выберите экспедицию</h1></div>
+    <div style="display:flex;gap:26px;padding:0 40px">
+      <div style="flex:1;border-radius:12px;overflow:hidden;border:1px solid rgba(184,138,69,.28);background:#222A25"><div style="position:relative;height:200px;background:radial-gradient(140% 95% at 26% -12%,rgba(96,206,168,.42),transparent 50%),linear-gradient(180deg,#152431,#274659 55%,#9fbac3)"><div style="position:absolute;left:0;right:0;bottom:0;height:44%;background:linear-gradient(180deg,#d2e2e8,#8eb0bc);clip-path:polygon(0 56%,24% 30%,46% 60%,70% 34%,100% 58%,100% 100%,0 100%)"></div></div><div style="padding:16px 18px"><div style="font:600 24px 'Cormorant Garamond',serif;color:#D5C39A">Белый меридиан</div><div style="font:500 12px Manrope;color:#879087;margin-top:6px">07 / 13 · Продолжается</div></div></div>
+      <div style="flex:1;border-radius:12px;overflow:hidden;border:1px solid rgba(213,195,154,.12);background:#222A25"><div style="height:200px;background:radial-gradient(60% 55% at 70% 20%,rgba(255,212,148,.5),transparent 56%),linear-gradient(180deg,#3a2c18,#7a5a2f 42%,#e3c489)"></div><div style="padding:16px 18px"><div style="font:600 24px 'Cormorant Garamond',serif;color:rgba(213,195,154,.78)">Песчаный меридиан</div><div style="font:500 12px Manrope;color:#879087;margin-top:6px">Заблокировано</div></div></div>
+      <div style="flex:1;border-radius:12px;overflow:hidden;border:1px solid rgba(213,195,154,.12);background:#222A25"><div style="height:200px;background:radial-gradient(70% 65% at 50% -12%,rgba(150,210,160,.34),transparent 56%),linear-gradient(180deg,#0e211a,#1c3a2c 45%,#3c6f52)"></div><div style="padding:16px 18px"><div style="font:600 24px 'Cormorant Garamond',serif;color:rgba(213,195,154,.78)">Изумрудный меридиан</div><div style="font:500 12px Manrope;color:#879087;margin-top:6px">Заблокировано</div></div></div>
+    </div>
+  </div>
+  <div style="position:absolute;inset:0;background:radial-gradient(78% 78% at 50% 50%,rgba(13,18,15,.5),rgba(13,18,15,.85))"></div>
+
+  <!-- MODAL (props-driven hero) -->
+  <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:520px;background:linear-gradient(180deg,#27302b,#1d251f);border:1px solid rgba(184,138,69,.35);border-radius:16px;box-shadow:0 50px 120px rgba(0,0,0,.7),inset 0 1px 0 rgba(213,195,154,.08);overflow:hidden;animation:pop .45s cubic-bezier(.2,.8,.3,1.05)">
+    <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#d8af63,transparent)"></div>
+    <button aria-label="Закрыть" style="position:absolute;top:16px;right:16px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.04);color:#879087;display:flex;align-items:center;justify-content:center;cursor:pointer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+
+    <div style="padding:42px 46px 34px;text-align:center;position:relative">
+      <div style="width:66px;height:66px;margin:0 auto 18px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#caa05a,#7e5b2a 72%);border:2px solid rgba(255,236,196,.4);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 30px rgba(0,0,0,.5),inset 0 2px 6px rgba(255,236,196,.4)">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" stroke-linecap="round"><circle cx="12" cy="12" r="9.2" stroke-width="1.2"/><path d="M12 4.4 L14 12 L12 19.6 L10 12 Z" fill="#2a1d0c" stroke="none"/><path d="M4.8 7.6 L19.2 16.4 M4.8 16.4 L19.2 7.6" stroke-width="1" opacity=".45"/><circle cx="12" cy="12" r="1.5" fill="#e3c489" stroke="none"/></svg>
+      </div>
+
+      <sc-if value="{{ showStamp }}" hint-placeholder-val="{{ true }}">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 13px;border:1px solid rgba(184,138,69,.5);border-radius:5px;background:rgba(184,138,69,.06);transform:rotate(-1.4deg)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="1.8" stroke-linecap="round"><path d="M4 5h16M4 12h16M4 19h10"/></svg>
+          <span style="font:700 10.5px Manrope;letter-spacing:.26em;color:#B88A45">ЭКСПЕДИЦИОННАЯ ЗАПИСЬ</span>
+        </div>
+      </sc-if>
+
+      <h2 style="font:600 36px 'Cormorant Garamond',serif;color:#D5C39A;margin:14px 0 0;letter-spacing:.01em">Как вам экспедиция?</h2>
+      <p style="font:400 14.5px Manrope;color:#879087;line-height:1.6;margin:11px auto 0;max-width:400px">Вы уже исследовали несколько локаций. Ваша оценка поможет нам улучшать игру и создавать новые путешествия.</p>
+
+      <div style="display:flex;flex-direction:{{ btnDir }};gap:12px;margin-top:28px">
+        <button style="flex:1.45;height:52px;border:none;border-radius:9px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 15px Manrope;cursor:pointer;box-shadow:0 12px 28px rgba(184,138,69,.32),inset 0 1px 0 rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;gap:9px">
+          <sc-if value="{{ notLoading }}" hint-placeholder-val="{{ true }}">
+            <span>{{ primaryLabel }}</span>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8.5 8.5"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg>
+          </sc-if>
+          <sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="2.4" style="animation:spin .8s linear infinite"><path d="M12 3a9 9 0 1 0 9 9" stroke-linecap="round"/></svg>
+            <span>Открываем…</span>
+          </sc-if>
+        </button>
+        <button style="flex:1;height:52px;border:1px solid rgba(213,195,154,.16);border-radius:9px;background:transparent;color:#D5C39A;font:600 14px Manrope;cursor:pointer">Позже</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="position:absolute;left:50%;bottom:30px;transform:translateX(-50%);display:flex;align-items:center;gap:7px;font:500 11px Manrope;color:rgba(135,144,135,.7)"><span style="width:5px;height:5px;border-radius:50%;background:#6fc69e;box-shadow:0 0 8px #6fc69e;animation:pulseDot 2.6s ease-in-out infinite"></span>Показывается один раз, после спокойной паузы на карте · не блокирует игру</div>
+</div>
+
+
+<!-- ============================================================= -->
+<!-- FRAME 2 · MOBILE · DEFAULT -->
+<!-- ============================================================= -->
+<div data-drags-parent="1" style="position:absolute;left:1600px;top:34px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">MOBILE · 390 × 844</div>
+
+<div data-screen-label="Mobile · Модалка оценки" style="position:absolute;left:1600px;top:78px;width:390px;height:844px;background:#151B18;border-radius:30px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.5);font-family:Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+  <!-- backdrop -->
+  <div style="position:absolute;inset:0;filter:blur(2.5px) brightness(.46)">
+    <div style="height:38px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 22px 4px;font:600 12px Manrope;color:#D5C39A"><span>9:41</span><span style="font-size:11px">▮▮▮ ◷ 􀛨</span></div>
+    <div style="height:52px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid rgba(213,195,154,.12)"><svg width="24" height="24" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15.2" stroke="#B88A45" stroke-width="1.6"/><path d="M17 6.5 L20 17 L17 27.5 L14 17 Z" fill="#B88A45"/></svg><div style="font:700 10px Manrope;letter-spacing:.18em;color:#B88A45">ИЗУМРУДНЫЙ МЕРИДИАН</div></div>
+    <div style="padding:16px 20px"><h1 style="font:600 28px 'Cormorant Garamond',serif;color:#D5C39A">Выберите экспедицию</h1><div style="height:128px;border-radius:14px;margin-top:14px;background:radial-gradient(140% 95% at 26% -12%,rgba(96,206,168,.42),transparent 50%),linear-gradient(180deg,#152431,#274659 55%,#9fbac3)"></div></div>
+  </div>
+  <div style="position:absolute;inset:0;background:rgba(11,15,12,.66)"></div>
+
+  <!-- centered card modal, safe-area margins -->
+  <div style="position:absolute;left:20px;right:20px;top:50%;transform:translateY(-50%);background:linear-gradient(180deg,#27302b,#1d251f);border:1px solid rgba(184,138,69,.4);border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.7),inset 0 1px 0 rgba(213,195,154,.08);overflow:hidden">
+    <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#d8af63,transparent)"></div>
+    <button aria-label="Закрыть" style="position:absolute;top:10px;right:10px;width:44px;height:44px;border-radius:50%;border:none;background:transparent;color:#879087;display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+
+    <div style="padding:30px 24px 26px;text-align:center">
+      <div style="width:58px;height:58px;margin:0 auto 14px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#caa05a,#7e5b2a 72%);border:2px solid rgba(255,236,196,.4);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(0,0,0,.5),inset 0 2px 6px rgba(255,236,196,.4)"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" stroke-linecap="round"><circle cx="12" cy="12" r="9.2" stroke-width="1.2"/><path d="M12 4.4 L14 12 L12 19.6 L10 12 Z" fill="#2a1d0c" stroke="none"/><path d="M4.8 7.6 L19.2 16.4 M4.8 16.4 L19.2 7.6" stroke-width="1" opacity=".45"/><circle cx="12" cy="12" r="1.5" fill="#e3c489" stroke="none"/></svg></div>
+      <div style="display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border:1px solid rgba(184,138,69,.5);border-radius:5px;background:rgba(184,138,69,.06);transform:rotate(-1.4deg)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="1.8" stroke-linecap="round"><path d="M4 5h16M4 12h16M4 19h10"/></svg><span style="font:700 9px Manrope;letter-spacing:.22em;color:#B88A45">ЭКСПЕДИЦИОННАЯ ЗАПИСЬ</span></div>
+      <h2 style="font:600 28px 'Cormorant Garamond',serif;color:#D5C39A;margin:12px 0 0">Как вам экспедиция?</h2>
+      <p style="font:400 13px Manrope;color:#879087;line-height:1.55;margin:9px 6px 0">Ваша оценка поможет нам улучшать игру и создавать новые путешествия.</p>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:22px">
+        <button style="width:100%;height:52px;border:none;border-radius:10px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 15px Manrope;box-shadow:0 10px 24px rgba(184,138,69,.3),inset 0 1px 0 rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;gap:9px">Оценить игру<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8.5 8.5"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg></button>
+        <button style="width:100%;height:50px;border:1px solid rgba(213,195,154,.16);border-radius:10px;background:transparent;color:#D5C39A;font:600 14px Manrope">Позже</button>
+      </div>
+    </div>
+  </div>
+  <!-- home indicator -->
+  <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:rgba(213,195,154,.3)"></div>
+</div>
+
+
+<!-- ============================================================= -->
+<!-- FRAME 3 · MOBILE · RTL (Arabic) -->
+<!-- ============================================================= -->
+<div data-drags-parent="1" style="position:absolute;left:2090px;top:34px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">MOBILE · RTL · العربية</div>
+
+<div data-screen-label="Mobile · RTL" dir="rtl" lang="ar" style="position:absolute;left:2090px;top:78px;width:390px;height:844px;background:#151B18;border-radius:30px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.5);font-family:'Noto Sans Arabic',Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+  <div style="position:absolute;inset:0;filter:blur(2.5px) brightness(.46)">
+    <div style="height:38px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 22px 4px;font:600 12px Manrope;color:#D5C39A;direction:ltr"><span>9:41</span><span style="font-size:11px">▮▮▮ ◷ 􀛨</span></div>
+    <div style="height:52px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid rgba(213,195,154,.12)"><svg width="24" height="24" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15.2" stroke="#B88A45" stroke-width="1.6"/><path d="M17 6.5 L20 17 L17 27.5 L14 17 Z" fill="#B88A45"/></svg><div style="font:700 12px 'Noto Sans Arabic';color:#B88A45">الزمرّد الزوالي</div></div>
+    <div style="padding:16px 20px"><h1 style="font:600 26px 'Noto Sans Arabic';color:#D5C39A">اختر بعثتك</h1><div style="height:128px;border-radius:14px;margin-top:14px;background:radial-gradient(140% 95% at 74% -12%,rgba(96,206,168,.42),transparent 50%),linear-gradient(180deg,#152431,#274659 55%,#9fbac3)"></div></div>
+  </div>
+  <div style="position:absolute;inset:0;background:rgba(11,15,12,.66)"></div>
+
+  <div style="position:absolute;left:20px;right:20px;top:50%;transform:translateY(-50%);background:linear-gradient(180deg,#27302b,#1d251f);border:1px solid rgba(184,138,69,.4);border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.7),inset 0 1px 0 rgba(213,195,154,.08);overflow:hidden">
+    <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#d8af63,transparent)"></div>
+    <!-- close mirrors to top-left -->
+    <button aria-label="إغلاق" style="position:absolute;top:10px;left:10px;width:44px;height:44px;border-radius:50%;border:none;background:transparent;color:#879087;display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+
+    <div style="padding:30px 24px 26px;text-align:center">
+      <div style="width:58px;height:58px;margin:0 auto 14px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#caa05a,#7e5b2a 72%);border:2px solid rgba(255,236,196,.4);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(0,0,0,.5),inset 0 2px 6px rgba(255,236,196,.4)"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" stroke-linecap="round"><circle cx="12" cy="12" r="9.2" stroke-width="1.2"/><path d="M12 4.4 L14 12 L12 19.6 L10 12 Z" fill="#2a1d0c" stroke="none"/><path d="M4.8 7.6 L19.2 16.4 M4.8 16.4 L19.2 7.6" stroke-width="1" opacity=".45"/><circle cx="12" cy="12" r="1.5" fill="#e3c489" stroke="none"/></svg></div>
+      <div style="display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border:1px solid rgba(184,138,69,.5);border-radius:5px;background:rgba(184,138,69,.06);transform:rotate(1.4deg)"><span style="font:700 10px 'Noto Sans Arabic';letter-spacing:.04em;color:#B88A45">سجلّ البعثة</span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="1.8" stroke-linecap="round"><path d="M4 5h16M4 12h16M10 19h10"/></svg></div>
+      <h2 style="font:600 27px 'Noto Sans Arabic';color:#D5C39A;margin:12px 0 0">كيف كانت رحلتك؟</h2>
+      <p style="font:400 13px 'Noto Sans Arabic';color:#879087;line-height:1.7;margin:9px 6px 0">تقييمك يساعدنا على تحسين اللعبة وإنشاء رحلات جديدة.</p>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:22px">
+        <button style="width:100%;height:52px;border:none;border-radius:10px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 15px 'Noto Sans Arabic';box-shadow:0 10px 24px rgba(184,138,69,.3),inset 0 1px 0 rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;gap:9px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" style="transform:scaleX(-1)"><path d="M14 4h6v6M20 4l-8.5 8.5"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg>قيّم اللعبة</button>
+        <button style="width:100%;height:50px;border:1px solid rgba(213,195,154,.16);border-radius:10px;background:transparent;color:#D5C39A;font:600 14px 'Noto Sans Arabic'">لاحقًا</button>
+      </div>
+    </div>
+  </div>
+  <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:rgba(213,195,154,.3)"></div>
+</div>
+
+
+<!-- ============================================================= -->
+<!-- FRAME 4 · DESKTOP · RTL (in context) -->
+<!-- ============================================================= -->
+<div data-drags-parent="1" style="position:absolute;left:80px;top:1096px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">DESKTOP · RTL · 1440 × 900</div>
+
+<div data-screen-label="Desktop · RTL" dir="rtl" lang="ar" style="position:absolute;left:80px;top:1140px;width:1440px;height:900px;background:#151B18;border-radius:8px;overflow:hidden;box-shadow:0 36px 90px rgba(0,0,0,.5);font-family:'Noto Sans Arabic',Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+  <div style="position:absolute;inset:0;filter:blur(3px) brightness(.5) saturate(.92)">
+    <div style="height:78px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;border-bottom:1px solid rgba(213,195,154,.12);background:linear-gradient(180deg,rgba(34,42,37,.9),rgba(21,27,24,.4))">
+      <div style="display:flex;align-items:center;gap:14px"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15.2" stroke="#B88A45" stroke-width="1.4"/><path d="M17 6.5 L20 17 L17 27.5 L14 17 Z" fill="#B88A45"/></svg><div style="text-align:right"><div style="font:700 13px 'Noto Sans Arabic';color:#B88A45">الزمرّد الزوالي</div><div style="font:500 11px 'Noto Sans Arabic';color:#879087;margin-top:3px">أرشيف جمعية البعثات</div></div></div>
+      <div style="display:flex;align-items:center;gap:8px;direction:ltr"><div style="font:600 12px Manrope;color:#D5C39A">9 / 39</div><div style="width:96px;height:5px;border-radius:3px;background:rgba(213,195,154,.12);overflow:hidden"><div style="width:23%;height:100%;background:linear-gradient(90deg,#d8af63,#a9762f)"></div></div></div>
+    </div>
+    <div style="text-align:center;padding:34px 0 18px"><h1 style="font:600 46px 'Noto Sans Arabic';color:#D5C39A;margin:0">اختر بعثتك</h1></div>
+    <div style="display:flex;gap:26px;padding:0 40px">
+      <div style="flex:1;border-radius:12px;overflow:hidden;border:1px solid rgba(184,138,69,.28);background:#222A25"><div style="position:relative;height:200px;background:radial-gradient(140% 95% at 74% -12%,rgba(96,206,168,.42),transparent 50%),linear-gradient(180deg,#152431,#274659 55%,#9fbac3)"><div style="position:absolute;left:0;right:0;bottom:0;height:44%;background:linear-gradient(180deg,#d2e2e8,#8eb0bc);clip-path:polygon(0 58%,30% 34%,54% 60%,76% 30%,100% 56%,100% 100%,0 100%)"></div></div><div style="padding:16px 18px;text-align:right"><div style="font:600 22px 'Noto Sans Arabic';color:#D5C39A">المريديان الأبيض</div></div></div>
+      <div style="flex:1;border-radius:12px;overflow:hidden;border:1px solid rgba(213,195,154,.12);background:#222A25"><div style="height:200px;background:radial-gradient(60% 55% at 30% 20%,rgba(255,212,148,.5),transparent 56%),linear-gradient(180deg,#3a2c18,#7a5a2f 42%,#e3c489)"></div><div style="padding:16px 18px;text-align:right"><div style="font:600 22px 'Noto Sans Arabic';color:rgba(213,195,154,.78)">المريديان الرملي</div></div></div>
+      <div style="flex:1;border-radius:12px;overflow:hidden;border:1px solid rgba(213,195,154,.12);background:#222A25"><div style="height:200px;background:radial-gradient(70% 65% at 50% -12%,rgba(150,210,160,.34),transparent 56%),linear-gradient(180deg,#0e211a,#1c3a2c 45%,#3c6f52)"></div><div style="padding:16px 18px;text-align:right"><div style="font:600 22px 'Noto Sans Arabic';color:rgba(213,195,154,.78)">المريديان الزمرّدي</div></div></div>
+    </div>
+  </div>
+  <div style="position:absolute;inset:0;background:radial-gradient(78% 78% at 50% 50%,rgba(13,18,15,.5),rgba(13,18,15,.85))"></div>
+
+  <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:520px;background:linear-gradient(180deg,#27302b,#1d251f);border:1px solid rgba(184,138,69,.35);border-radius:16px;box-shadow:0 50px 120px rgba(0,0,0,.7),inset 0 1px 0 rgba(213,195,154,.08);overflow:hidden">
+    <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#d8af63,transparent)"></div>
+    <button aria-label="إغلاق" style="position:absolute;top:16px;left:16px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.04);color:#879087;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div style="padding:42px 46px 34px;text-align:center">
+      <div style="width:66px;height:66px;margin:0 auto 18px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#caa05a,#7e5b2a 72%);border:2px solid rgba(255,236,196,.4);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 30px rgba(0,0,0,.5),inset 0 2px 6px rgba(255,236,196,.4)"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" stroke-linecap="round"><circle cx="12" cy="12" r="9.2" stroke-width="1.2"/><path d="M12 4.4 L14 12 L12 19.6 L10 12 Z" fill="#2a1d0c" stroke="none"/><path d="M4.8 7.6 L19.2 16.4 M4.8 16.4 L19.2 7.6" stroke-width="1" opacity=".45"/><circle cx="12" cy="12" r="1.5" fill="#e3c489" stroke="none"/></svg></div>
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 13px;border:1px solid rgba(184,138,69,.5);border-radius:5px;background:rgba(184,138,69,.06);transform:rotate(1.4deg)"><span style="font:700 11px 'Noto Sans Arabic';color:#B88A45">سجلّ البعثة</span></div>
+      <h2 style="font:600 34px 'Noto Sans Arabic';color:#D5C39A;margin:14px 0 0">كيف كانت رحلتك؟</h2>
+      <p style="font:400 14.5px 'Noto Sans Arabic';color:#879087;line-height:1.8;margin:11px auto 0;max-width:400px">لقد استكشفت عدة مواقع بالفعل. تقييمك يساعدنا على تحسين اللعبة وإنشاء رحلات جديدة.</p>
+      <div style="display:flex;flex-direction:row;gap:12px;margin-top:28px">
+        <button style="flex:1.45;height:52px;border:none;border-radius:9px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 15px 'Noto Sans Arabic';cursor:pointer;box-shadow:0 12px 28px rgba(184,138,69,.32),inset 0 1px 0 rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;gap:9px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" style="transform:scaleX(-1)"><path d="M14 4h6v6M20 4l-8.5 8.5"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg>قيّم اللعبة</button>
+        <button style="flex:1;height:52px;border:1px solid rgba(213,195,154,.16);border-radius:9px;background:transparent;color:#D5C39A;font:600 14px 'Noto Sans Arabic';cursor:pointer">لاحقًا</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================= -->
+<!-- FRAME 5 · COMPONENT SHEET -->
+<!-- ============================================================= -->
+<div data-drags-parent="1" style="position:absolute;left:1600px;top:1096px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">COMPONENT SHEET · СОСТОЯНИЯ</div>
+
+<div data-screen-label="Component sheet" style="position:absolute;left:1600px;top:1140px;width:1280px;background:#151B18;border-radius:8px;box-shadow:0 36px 90px rgba(0,0,0,.5);font-family:Manrope,sans-serif;color:#D5C39A;padding:40px 44px 46px;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+
+  <div style="border-bottom:1px solid rgba(213,195,154,.12);padding-bottom:22px;margin-bottom:30px">
+    <div style="font:600 12px Manrope;letter-spacing:.32em;color:#B88A45">МОДАЛКА ОЦЕНКИ · ПЕРЕД ВЫЗОВОМ SDK ЯНДЕКС ИГР</div>
+    <h1 style="font:600 38px 'Cormorant Garamond',serif;color:#D5C39A;margin:6px 0 0">Состояния компонента</h1>
+  </div>
+
+  <!-- PRIMARY BUTTON STATES -->
+  <div style="font:700 11px Manrope;letter-spacing:.2em;color:#879087;margin-bottom:16px">ОСНОВНАЯ КНОПКА · «ОЦЕНИТЬ ИГРУ»</div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:40px">
+    <div><div style="font:600 9.5px Manrope;color:#879087;margin-bottom:7px">1 · DEFAULT</div><button style="width:100%;height:52px;border:none;border-radius:9px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 14px Manrope;box-shadow:0 12px 28px rgba(184,138,69,.32),inset 0 1px 0 rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;gap:8px">Оценить игру<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8.5 8.5"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg></button></div>
+    <div><div style="font:600 9.5px Manrope;color:#d8af63;margin-bottom:7px">2 · HOVER</div><button style="width:100%;height:52px;border:none;border-radius:9px;background:linear-gradient(180deg,#e7bd6f,#c08c33);color:#1a130a;font:700 14px Manrope;box-shadow:0 16px 34px rgba(184,138,69,.46),inset 0 1px 0 rgba(255,255,255,.4);transform:translateY(-1px);display:flex;align-items:center;justify-content:center;gap:8px">Оценить игру<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8.5 8.5"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg></button></div>
+    <div><div style="font:600 9.5px Manrope;color:#879087;margin-bottom:7px">3 · FOCUS (keyboard)</div><button style="width:100%;height:52px;border:none;border-radius:9px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 14px Manrope;outline:none;box-shadow:0 0 0 3px #151B18,0 0 0 6px #d8af63,0 12px 28px rgba(184,138,69,.32);display:flex;align-items:center;justify-content:center;gap:8px">Оценить игру<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8.5 8.5"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg></button></div>
+    <div><div style="font:600 9.5px Manrope;color:#879087;margin-bottom:7px">4 · PRESSED</div><button style="width:100%;height:52px;border:none;border-radius:9px;background:linear-gradient(180deg,#b3812f,#9a6d26);color:#1a130a;font:700 14px Manrope;box-shadow:inset 0 3px 9px rgba(0,0,0,.4);transform:translateY(1px);display:flex;align-items:center;justify-content:center;gap:8px">Оценить игру<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8.5 8.5"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg></button></div>
+    <div><div style="font:600 9.5px Manrope;color:#879087;margin-bottom:7px">5 · LOADING (SDK)</div><button disabled style="width:100%;height:52px;border:none;border-radius:9px;background:linear-gradient(180deg,#b89a5e,#8f7330);color:rgba(26,19,10,.7);font:700 14px Manrope;cursor:not-allowed;display:flex;align-items:center;justify-content:center;gap:9px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="2.4" style="animation:spin .8s linear infinite"><path d="M12 3a9 9 0 1 0 9 9" stroke-linecap="round"/></svg>Открываем…</button></div>
+  </div>
+
+  <!-- SECONDARY + CLOSE -->
+  <div style="display:flex;gap:60px;flex-wrap:wrap;margin-bottom:40px">
+    <div>
+      <div style="font:700 11px Manrope;letter-spacing:.2em;color:#879087;margin-bottom:16px">ВТОРИЧНАЯ КНОПКА · «ПОЗЖЕ»</div>
+      <div style="display:flex;gap:16px">
+        <div style="width:170px"><div style="font:600 9.5px Manrope;color:#879087;margin-bottom:7px">DEFAULT</div><button style="width:100%;height:52px;border:1px solid rgba(213,195,154,.16);border-radius:9px;background:transparent;color:#D5C39A;font:600 14px Manrope">Позже</button></div>
+        <div style="width:170px"><div style="font:600 9.5px Manrope;color:#d8af63;margin-bottom:7px">HOVER</div><button style="width:100%;height:52px;border:1px solid rgba(213,195,154,.32);border-radius:9px;background:rgba(213,195,154,.06);color:#D5C39A;font:600 14px Manrope">Позже</button></div>
+        <div style="width:170px"><div style="font:600 9.5px Manrope;color:#879087;margin-bottom:7px">FOCUS</div><button style="width:100%;height:52px;border:1px solid rgba(213,195,154,.16);border-radius:9px;background:transparent;color:#D5C39A;font:600 14px Manrope;box-shadow:0 0 0 3px #151B18,0 0 0 6px #d8af63">Позже</button></div>
+      </div>
+    </div>
+    <div>
+      <div style="font:700 11px Manrope;letter-spacing:.2em;color:#879087;margin-bottom:16px">КНОПКА ЗАКРЫТИЯ · 44×44 HIT</div>
+      <div style="display:flex;gap:16px">
+        <div style="text-align:center"><div style="font:600 9.5px Manrope;color:#879087;margin-bottom:7px">DEFAULT</div><button aria-label="Закрыть" style="width:44px;height:44px;border-radius:50%;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.04);color:#879087;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+        <div style="text-align:center"><div style="font:600 9.5px Manrope;color:#d8af63;margin-bottom:7px">HOVER</div><button aria-label="Закрыть" style="width:44px;height:44px;border-radius:50%;border:1px solid rgba(213,195,154,.28);background:rgba(213,195,154,.1);color:#D5C39A;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+        <div style="text-align:center"><div style="font:600 9.5px Manrope;color:#879087;margin-bottom:7px">FOCUS</div><button aria-label="Закрыть" style="width:44px;height:44px;border-radius:50%;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.04);color:#D5C39A;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #151B18,0 0 0 6px #d8af63"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL STATES: default + loading -->
+  <div style="font:700 11px Manrope;letter-spacing:.2em;color:#879087;margin-bottom:16px">МОДАЛКА · DEFAULT / LOADING</div>
+  <div style="display:flex;gap:26px">
+    <!-- default mini -->
+    <div style="width:440px;background:linear-gradient(180deg,#27302b,#1d251f);border:1px solid rgba(184,138,69,.35);border-radius:16px;box-shadow:0 30px 70px rgba(0,0,0,.5);overflow:hidden;position:relative">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#d8af63,transparent)"></div>
+      <button aria-label="Закрыть" style="position:absolute;top:14px;right:14px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.04);color:#879087;display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <div style="padding:34px 36px 30px;text-align:center">
+        <div style="width:58px;height:58px;margin:0 auto 14px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#caa05a,#7e5b2a 72%);border:2px solid rgba(255,236,196,.4);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(0,0,0,.5)"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" stroke-linecap="round"><circle cx="12" cy="12" r="9.2" stroke-width="1.2"/><path d="M12 4.4 L14 12 L12 19.6 L10 12 Z" fill="#2a1d0c" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="#e3c489" stroke="none"/></svg></div>
+        <div style="display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border:1px solid rgba(184,138,69,.5);border-radius:5px;background:rgba(184,138,69,.06);transform:rotate(-1.4deg)"><span style="font:700 9px Manrope;letter-spacing:.22em;color:#B88A45">ЭКСПЕДИЦИОННАЯ ЗАПИСЬ</span></div>
+        <h2 style="font:600 28px 'Cormorant Garamond',serif;color:#D5C39A;margin:11px 0 0">Как вам экспедиция?</h2>
+        <p style="font:400 12.5px Manrope;color:#879087;line-height:1.55;margin:8px 8px 0">Вы уже исследовали несколько локаций. Ваша оценка поможет улучшать игру.</p>
+        <div style="display:flex;gap:10px;margin-top:20px"><button style="flex:1.45;height:50px;border:none;border-radius:9px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 14px Manrope;box-shadow:0 10px 24px rgba(184,138,69,.3),inset 0 1px 0 rgba(255,255,255,.3)">Оценить игру</button><button style="flex:1;height:50px;border:1px solid rgba(213,195,154,.16);border-radius:9px;background:transparent;color:#D5C39A;font:600 13.5px Manrope">Позже</button></div>
+      </div>
+      <div style="position:absolute;left:14px;bottom:12px;font:600 8.5px Manrope;letter-spacing:.18em;color:rgba(135,144,135,.6)">DEFAULT</div>
+    </div>
+
+    <!-- loading mini -->
+    <div style="width:440px;background:linear-gradient(180deg,#27302b,#1d251f);border:1px solid rgba(184,138,69,.35);border-radius:16px;box-shadow:0 30px 70px rgba(0,0,0,.5);overflow:hidden;position:relative">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#d8af63,transparent)"></div>
+      <button aria-label="Закрыть" disabled style="position:absolute;top:14px;right:14px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(213,195,154,.1);background:rgba(213,195,154,.02);color:rgba(135,144,135,.4);display:flex;align-items:center;justify-content:center;cursor:not-allowed"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <div style="padding:34px 36px 30px;text-align:center">
+        <div style="width:58px;height:58px;margin:0 auto 14px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#caa05a,#7e5b2a 72%);border:2px solid rgba(255,236,196,.4);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(0,0,0,.5)"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" stroke-linecap="round"><circle cx="12" cy="12" r="9.2" stroke-width="1.2"/><path d="M12 4.4 L14 12 L12 19.6 L10 12 Z" fill="#2a1d0c" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="#e3c489" stroke="none"/></svg></div>
+        <div style="display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border:1px solid rgba(184,138,69,.5);border-radius:5px;background:rgba(184,138,69,.06);transform:rotate(-1.4deg)"><span style="font:700 9px Manrope;letter-spacing:.22em;color:#B88A45">ЭКСПЕДИЦИОННАЯ ЗАПИСЬ</span></div>
+        <h2 style="font:600 28px 'Cormorant Garamond',serif;color:#D5C39A;margin:11px 0 0">Как вам экспедиция?</h2>
+        <p style="font:400 12.5px Manrope;color:#879087;line-height:1.55;margin:8px 8px 0">Вы уже исследовали несколько локаций. Ваша оценка поможет улучшать игру.</p>
+        <div style="display:flex;gap:10px;margin-top:20px"><button disabled style="flex:1.45;height:50px;border:none;border-radius:9px;background:linear-gradient(180deg,#b89a5e,#8f7330);color:rgba(26,19,10,.7);font:700 14px Manrope;cursor:not-allowed;display:flex;align-items:center;justify-content:center;gap:9px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="2.4" style="animation:spin .8s linear infinite"><path d="M12 3a9 9 0 1 0 9 9" stroke-linecap="round"/></svg>Открываем…</button><button disabled style="flex:1;height:50px;border:1px solid rgba(213,195,154,.08);border-radius:9px;background:transparent;color:rgba(213,195,154,.35);font:600 13.5px Manrope;cursor:not-allowed">Позже</button></div>
+      </div>
+      <div style="position:absolute;left:14px;bottom:12px;font:600 8.5px Manrope;letter-spacing:.18em;color:rgba(135,144,135,.6)">LOADING · клики заблокированы, открывается окно SDK</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================= -->
+<!-- FRAME 6 · DEVELOPER SPEC + TOKENS -->
+<!-- ============================================================= -->
+<div data-drags-parent="1" style="position:absolute;left:80px;top:2096px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">СПЕЦИФИКАЦИЯ ДЛЯ РАЗРАБОТЧИКА</div>
+
+<div data-screen-label="Спецификация" style="position:absolute;left:80px;top:2140px;width:1280px;background:#151B18;border-radius:8px;box-shadow:0 36px 90px rgba(0,0,0,.5);font-family:Manrope,sans-serif;color:#D5C39A;padding:40px 44px 48px">
+  <div style="border-bottom:1px solid rgba(213,195,154,.12);padding-bottom:22px;margin-bottom:30px">
+    <div style="font:600 12px Manrope;letter-spacing:.32em;color:#B88A45">RATE-PROMPT MODAL · DEV SPEC</div>
+    <h1 style="font:600 38px 'Cormorant Garamond',serif;color:#D5C39A;margin:6px 0 0">Спецификация и токены</h1>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:34px 40px">
+
+    <!-- размеры -->
+    <div>
+      <div style="font:700 11px Manrope;letter-spacing:.2em;color:#879087;margin-bottom:14px">РАЗМЕРЫ И ОТСТУПЫ</div>
+      <div style="font:500 12.5px Manrope;color:#D5C39A;line-height:2.1">
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(213,195,154,.08)"><span style="color:#879087">Ширина (desktop)</span><span style="font-family:'JetBrains Mono'">520 px</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(213,195,154,.08)"><span style="color:#879087">max-width</span><span style="font-family:'JetBrains Mono'">560 px</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(213,195,154,.08)"><span style="color:#879087">Ширина (mobile)</span><span style="font-family:'JetBrains Mono'">100% − 40</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(213,195,154,.08)"><span style="color:#879087">Внутр. отступ ↕</span><span style="font-family:'JetBrains Mono'">42 / 34</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(213,195,154,.08)"><span style="color:#879087">Внутр. отступ ↔</span><span style="font-family:'JetBrains Mono'">46 px</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(213,195,154,.08)"><span style="color:#879087">safe-area (mobile)</span><span style="font-family:'JetBrains Mono'">20 px +env</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#879087">Gap кнопок</span><span style="font-family:'JetBrains Mono'">12 px</span></div>
+      </div>
+    </div>
+
+    <!-- радиусы тени -->
+    <div>
+      <div style="font:700 11px Manrope;letter-spacing:.2em;color:#879087;margin-bottom:14px">РАДИУСЫ И ТЕНИ</div>
+      <div style="font:500 12.5px Manrope;color:#D5C39A;line-height:2.1">
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(213,195,154,.08)"><span style="color:#879087">Радиус окна</span><span style="font-family:'JetBrains Mono'">16 px</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(213,195,154,.08)"><span style="color:#879087">Радиус mobile</span><span style="font-family:'JetBrains Mono'">20 px</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(213,195,154,.08)"><span style="color:#879087">Радиус кнопок</span><span style="font-family:'JetBrains Mono'">9 px</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(213,195,154,.08)"><span style="color:#879087">Медальон / ×</span><span style="font-family:'JetBrains Mono'">50%</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(213,195,154,.08)"><span style="color:#879087">Тень окна</span><span style="font-family:'JetBrains Mono'">y50 b120 .7</span></div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(213,195,154,.08)"><span style="color:#879087">Тень CTA</span><span style="font-family:'JetBrains Mono'">y12 b28 .32</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#879087">Backdrop</span><span style="font-family:'JetBrains Mono'">blur3 · .85</span></div>
+      </div>
+    </div>
+
+    <!-- типографика -->
+    <div>
+      <div style="font:700 11px Manrope;letter-spacing:.2em;color:#879087;margin-bottom:14px">ТИПОГРАФИКА</div>
+      <div style="font:500 12.5px Manrope;color:#D5C39A;line-height:1.7">
+        <div style="border-bottom:1px solid rgba(213,195,154,.08);padding:5px 0"><div style="color:#879087;font-size:11px">Штамп · Manrope 700</div>10–11 / .26em / brass</div>
+        <div style="border-bottom:1px solid rgba(213,195,154,.08);padding:5px 0"><div style="color:#879087;font-size:11px">Заголовок · Cormorant 600</div>desktop 36 · mobile 28</div>
+        <div style="border-bottom:1px solid rgba(213,195,154,.08);padding:5px 0"><div style="color:#879087;font-size:11px">Текст · Manrope 400</div>14.5 / 1.6 · mobile 13</div>
+        <div style="padding:5px 0"><div style="color:#879087;font-size:11px">Кнопки · Manrope 700/600</div>15 (CTA) · 14 (втор.)</div>
+      </div>
+    </div>
+
+    <!-- состояния -->
+    <div>
+      <div style="font:700 11px Manrope;letter-spacing:.2em;color:#879087;margin-bottom:14px">СОСТОЯНИЯ CTA</div>
+      <div style="font:500 12px Manrope;color:#D5C39A;line-height:1.9">
+        <div><span style="color:#879087">hover</span> — светлее +6%, y−1, тень ×1.4</div>
+        <div><span style="color:#879087">focus</span> — ring 3px #d8af63 + 3px offset фоном</div>
+        <div><span style="color:#879087">pressed</span> — темнее, inset-тень, y+1</div>
+        <div><span style="color:#879087">loading</span> — disabled, spinner + «Открываем…», блок повторного клика</div>
+        <div><span style="color:#879087">disabled ×</span> — пока открывается SDK</div>
+      </div>
+    </div>
+
+    <!-- адаптив -->
+    <div>
+      <div style="font:700 11px Manrope;letter-spacing:.2em;color:#879087;margin-bottom:14px">АДАПТИВ И ПЕРЕВОДЫ</div>
+      <div style="font:500 12px Manrope;color:#D5C39A;line-height:1.9">
+        <div>≥ 600 px — кнопки в строке, CTA flex 1.45</div>
+        <div>&lt; 600 px — кнопки вертикально, CTA сверху</div>
+        <div>Текст переносится, окно не скроллится</div>
+        <div>Длинный перевод — высота растёт, кнопки переходят в столбец</div>
+        <div>RTL — dir=rtl, × слева, иконка scaleX(−1), компас/цифры не зеркалятся</div>
+        <div>Работает при увеличенном масштабе текста</div>
+      </div>
+    </div>
+
+    <!-- поведение -->
+    <div>
+      <div style="font:700 11px Manrope;letter-spacing:.2em;color:#879087;margin-bottom:14px">ПОВЕДЕНИЕ И A11Y</div>
+      <div style="font:500 12px Manrope;color:#D5C39A;line-height:1.9">
+        <div>role=dialog · aria-modal · focus-trap</div>
+        <div>Esc / × / «Позже» — закрыть, не оценивая</div>
+        <div>CTA → loading → window.ya SDK rate-окно</div>
+        <div>× и «Позже» всегда видимы, hit ≥ 44×44</div>
+        <div>Контраст текста ≥ 4.5:1, не только цвет</div>
+        <div>Показ 1 раз после 3-го уровня, не поверх рекламы/покупки</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOKENS -->
+  <div style="border-top:1px solid rgba(213,195,154,.12);margin-top:34px;padding-top:28px">
+    <div style="font:700 11px Manrope;letter-spacing:.2em;color:#879087;margin-bottom:6px">ИСПОЛЬЗУЕМЫЕ ТОКЕНЫ ПРОЕКТА</div>
+    <div style="font:400 11.5px Manrope;color:rgba(135,144,135,.85);margin-bottom:18px">Все взяты из существующей системы. Новых не вводится — кроме одного предложенного <span style="color:#d8af63">+ focus-ring</span>.</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
+      <div><div style="height:48px;border-radius:8px;background:#151B18;border:1px solid rgba(213,195,154,.12)"></div><div style="font:600 10.5px Manrope;margin-top:6px">bg / backdrop</div><div style="font:500 9.5px 'JetBrains Mono';color:#879087">#151B18</div></div>
+      <div><div style="height:48px;border-radius:8px;background:linear-gradient(180deg,#27302b,#1d251f);border:1px solid rgba(184,138,69,.35)"></div><div style="font:600 10.5px Manrope;margin-top:6px">surface (окно)</div><div style="font:500 9.5px 'JetBrains Mono';color:#879087">#27302b→1d251f</div></div>
+      <div><div style="height:48px;border-radius:8px;background:linear-gradient(180deg,#d8af63,#b3812f)"></div><div style="font:600 10.5px Manrope;margin-top:6px">brass (CTA)</div><div style="font:500 9.5px 'JetBrains Mono';color:#879087">#d8af63 / #b3812f</div></div>
+      <div><div style="height:48px;border-radius:8px;background:#D5C39A"></div><div style="font:600 10.5px Manrope;margin-top:6px">parch (текст)</div><div style="font:500 9.5px 'JetBrains Mono';color:#879087">#D5C39A</div></div>
+      <div><div style="height:48px;border-radius:8px;background:#B88A45"></div><div style="font:600 10.5px Manrope;margin-top:6px">brass-label</div><div style="font:500 9.5px 'JetBrains Mono';color:#879087">#B88A45</div></div>
+      <div><div style="height:48px;border-radius:8px;background:#879087"></div><div style="font:600 10.5px Manrope;margin-top:6px">muted</div><div style="font:500 9.5px 'JetBrains Mono';color:#879087">#879087</div></div>
+      <div><div style="height:48px;border-radius:8px;background:radial-gradient(circle at 38% 32%,#caa05a,#7e5b2a 72%)"></div><div style="font:600 10.5px Manrope;margin-top:6px">seal (медальон)</div><div style="font:500 9.5px 'JetBrains Mono';color:#879087">#caa05a / #7e5b2a</div></div>
+      <div><div style="height:48px;border-radius:8px;background:#6fc69e"></div><div style="font:600 10.5px Manrope;margin-top:6px">success-dot</div><div style="font:500 9.5px 'JetBrains Mono';color:#879087">#6FC69E</div></div>
+      <div><div style="height:48px;border-radius:8px;border:1px solid rgba(213,195,154,.16);background:rgba(213,195,154,.04)"></div><div style="font:600 10.5px Manrope;margin-top:6px">line / ghost</div><div style="font:500 9.5px 'JetBrains Mono';color:#879087">parch / .12–.16</div></div>
+      <div><div style="height:48px;border-radius:8px;background:#151B18;box-shadow:inset 0 0 0 3px #d8af63"></div><div style="font:600 10.5px Manrope;margin-top:6px;color:#d8af63">+ focus-ring</div><div style="font:500 9.5px 'JetBrains Mono';color:#879087">brass 3px (новый)</div></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1440, &quot;height&quot;: 900 },
+  &quot;primaryLabel&quot;: { &quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;Оценить игру&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Текст&quot; },
+  &quot;buttonLayout&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;row&quot;, &quot;stacked&quot;], &quot;default&quot;: &quot;row&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Макет&quot; },
+  &quot;showStamp&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Макет&quot; },
+  &quot;loading&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Состояние&quot; }
+}">
+class Component extends DCLogic {
+  renderVals() {
+    const loading = this.props.loading ?? false;
+    const stacked = (this.props.buttonLayout ?? 'row') === 'stacked';
+    return {
+      primaryLabel: this.props.primaryLabel ?? 'Оценить игру',
+      showStamp: this.props.showStamp ?? true,
+      loading,
+      notLoading: !loading,
+      btnDir: stacked ? 'column' : 'row',
+    };
+  }
+}
+</script>
+</body>
+</html>
