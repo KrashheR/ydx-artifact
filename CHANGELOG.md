@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Recompressed all WebP scene assets under `public/assets/scenes/` in place again, preserving dimensions and paths while reducing total WebP weight from 43.2 MB to 25.5 MB.
+
+- Disabled production sourcemap emission by default to reduce the release build size; diagnostic builds can still opt in with `BUILD_SOURCEMAP=true pnpm build`.
+
 - Updated the layout-debug hitbox editor so dragging or resizing either A/B marker synchronously updates both side hitboxes and the shared hint area.
 
 - Added `pnpm dev:validate:cheat`, which starts the hitbox validation dev server and automatically applies the existing all-content dev unlock.

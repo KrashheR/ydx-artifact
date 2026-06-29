@@ -2,7 +2,7 @@
 
 All runtime scene assets in this scaffold are local placeholders. They preserve the expected path discipline and allow gameplay, validation and build checks without external hotlinks.
 
-Runtime WebP assets under `public/assets/scenes/` were recompressed in place on 2026-06-29 to reduce download/package size while preserving pixel dimensions and existing paths. Project SVG images were whitespace-minified without geometry changes.
+WebP assets under `public/assets/scenes/` were recompressed in place on 2026-06-29 and again on 2026-06-30 to reduce download/package size while preserving pixel dimensions and existing paths. The latest WebP pass reduced the scene WebP set from 43.2 MB to 25.5 MB. Project SVG images were whitespace-minified without geometry changes.
 
 Production level intake stores converted runtime scene images under `public/assets/scenes/northern-route/<level-order>/`:
 

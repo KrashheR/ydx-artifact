@@ -101,6 +101,6 @@ export default defineConfig({
     }
   },
   build: {
-    sourcemap: true
+    sourcemap: process.env.BUILD_SOURCEMAP === "true"
   }
 });

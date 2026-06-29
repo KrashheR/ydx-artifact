@@ -48,6 +48,7 @@ For broad agent edits, `pnpm agent:check` runs lint, typecheck and content valid
 `pnpm dev:validate` starts the Vite dev server with gameplay scenes swapped to each level's `3.*` markup reference and all difference hitboxes visible for live alignment checks.
 `pnpm dev:validate:cheat` starts the same validation server and automatically unlocks all currently implemented campaigns and levels in the local dev save.
 Production builds exclude scene markup reference files named `3.webp` from `dist/assets/scenes/**`; the source files stay in `public` for `pnpm validate:content`, `pnpm dev:validate`, and local hitbox review.
+Production builds do not emit sourcemaps by default to keep the Yandex upload smaller. Use `BUILD_SOURCEMAP=true pnpm build` when a diagnostic build needs `.map` files.
 
 ## Scope Implemented
 
