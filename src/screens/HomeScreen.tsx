@@ -43,29 +43,6 @@ function LockIcon({ size = 18, color = "#879087" }: { size?: number; color?: str
   );
 }
 
-function SoundIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <path d="M5 7H3a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2l4 3V4L5 7z" fill="#D5C39A" />
-      <path d="M13 5.5A5 5 0 0 1 13 12.5M10.5 7A2.5 2.5 0 0 1 10.5 11"
-        stroke="#D5C39A" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function SettingsIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <line x1="2" y1="5" x2="16" y2="5" stroke="#D5C39A" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="2" y1="9" x2="16" y2="9" stroke="#D5C39A" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="2" y1="13" x2="16" y2="13" stroke="#D5C39A" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="6" cy="5" r="2" fill="#151B18" stroke="#D5C39A" strokeWidth="1.5" />
-      <circle cx="11" cy="9" r="2" fill="#151B18" stroke="#D5C39A" strokeWidth="1.5" />
-      <circle cx="6" cy="13" r="2" fill="#151B18" stroke="#D5C39A" strokeWidth="1.5" />
-    </svg>
-  );
-}
-
 function CheckIcon({ size = 14, color = "#6FC69E" }: { size?: number; color?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 14 14" fill="none" aria-hidden="true">
@@ -258,45 +235,15 @@ function OutlineButton({
 
 // ─── Round icon button ────────────────────────────────────────────────────────
 
-function RoundButton({
-  onClick,
-  label,
-  size = 40,
-  children,
-}: {
-  onClick?: () => void;
-  label?: string;
-  size?: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label={label}
-      className="flex flex-shrink-0 items-center justify-center rounded-full transition hover:bg-white/5 active:bg-white/10"
-      style={{
-        width: size,
-        height: size,
-        background: "rgba(213,195,154,0.06)",
-        border: "1px solid rgba(213,195,154,0.12)",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
 // ─── Top bar ─────────────────────────────────────────────────────────────────
 
 function TopBar({
   totalDone,
   totalAll,
-  onSettings,
   onOpenAll,
 }: {
   totalDone: number;
   totalAll: number;
-  onSettings: () => void;
   onOpenAll: () => void;
 }) {
   const { t } = useTranslation();
@@ -323,7 +270,7 @@ function TopBar({
       </div>
 
       {/* Right cluster */}
-      <div className="flex items-center gap-3 md:gap-4">
+      <div className="flex items-center gap-3 pr-14 md:gap-4">
         {/* Overall progress (desktop only) */}
         <div className="hidden flex-col items-end gap-1 md:flex">
           <p className="text-[11px] text-exp-muted">
@@ -348,13 +295,6 @@ function TopBar({
           className="hidden h-6 w-px md:block"
           style={{ background: "rgba(213,195,154,0.15)" }}
         />
-
-        <RoundButton size={36} label={t("actions.settings")}>
-          <SoundIcon size={16} />
-        </RoundButton>
-        <RoundButton size={36} onClick={onSettings} label={t("actions.settings")}>
-          <SettingsIcon size={16} />
-        </RoundButton>
 
         {/* Open all CTA (desktop) */}
         <button
@@ -1117,7 +1057,6 @@ export function HomeScreen() {
       <TopBar
         totalDone={completedLevels.length}
         totalAll={totalAll}
-        onSettings={() => navigate({ kind: "settings" })}
         onOpenAll={handleOpenAll}
       />
 

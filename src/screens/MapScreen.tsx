@@ -69,7 +69,11 @@ export function MapScreen() {
   const startLevel = useGameStore((state) => state.startLevel);
   const navigate = useGameStore((state) => state.navigate);
   const reviewPromptRuntime = useGameStore((state) => state.reviewPromptRuntime);
+  const interstitialRuntime = useGameStore((state) => state.interstitialRuntime);
   const clearPendingReviewPromptCheck = useGameStore((state) => state.clearPendingReviewPromptCheck);
+  const clearPendingInterstitialCheck = useGameStore((state) => state.clearPendingInterstitialCheck);
+  const setInterstitialNativeRequestInFlight = useGameStore((state) => state.setInterstitialNativeRequestInFlight);
+  const setInterstitialResolved = useGameStore((state) => state.setInterstitialResolved);
   const markReviewPromptShown = useGameStore((state) => state.markReviewPromptShown);
   const dismissReviewPrompt = useGameStore((state) => state.dismissReviewPrompt);
   const setReviewNativeRequestInFlight = useGameStore((state) => state.setReviewNativeRequestInFlight);
@@ -80,11 +84,13 @@ export function MapScreen() {
   const chapter = getChapter(chapterId);
   const [isReviewPromptOpen, setIsReviewPromptOpen] = useState(false);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [isInterstitialActive, setIsInterstitialActive] = useState(false);
   const [isDocumentVisible, setIsDocumentVisible] = useState(
     () => typeof document === "undefined" || document.visibilityState === "visible"
   );
   const checkRunRef = useRef(0);
   const reviewSubmitGuardRef = useRef(false);
+  const interstitialGuardRef = useRef(false);
   const completedLevelsCount = saveData.completedLevels.length;
   const promptOrdinal = Math.min(saveData.reviewPrompt.prePromptShownCount + 1, 2) as 1 | 2;
   const analyticsPayload = useMemo(() => ({
@@ -132,6 +138,112 @@ export function MapScreen() {
 
   useEffect(() => {
     if (screen.kind !== "map") return;
+
+    const completedLevels = interstitialRuntime.pendingMapCheckCompletedLevels;
+    if (completedLevels === null) return;
+
+    if (saveData.purchases.noForcedInterstitials) {
+      clearPendingInterstitialCheck();
+      return;
+    }
+
+    if (
+      completedLevels % 3 !== 0 ||
+      completedLevels <= interstitialRuntime.lastResolvedCompletedLevels
+    ) {
+      clearPendingInterstitialCheck();
+      return;
+    }
+
+    if (
+      !isDocumentVisible ||
+      isReviewPromptOpen ||
+      reviewPromptRuntime.nativeRequestInFlight ||
+      interstitialRuntime.nativeRequestInFlight ||
+      interstitialGuardRef.current
+    ) {
+      return;
+    }
+
+    interstitialGuardRef.current = true;
+    let cancelled = false;
+    let requestStarted = false;
+
+    const timeoutId = window.setTimeout(() => {
+      void (async () => {
+        requestStarted = true;
+        trackAnalyticsEvent("interstitial_eligible", {
+          ...analyticsPayload,
+          completedLevels
+        });
+        trackAnalyticsEvent("interstitial_request", {
+          ...analyticsPayload,
+          completedLevels
+        });
+        setInterstitialNativeRequestInFlight(true);
+
+        const result = await mockPlatform.showInterstitial({
+          onOpen: () => {
+            if (cancelled) return;
+            setIsInterstitialActive(true);
+            trackAnalyticsEvent("interstitial_open", {
+              ...analyticsPayload,
+              completedLevels
+            });
+          },
+          onClose: () => {
+            if (cancelled) return;
+            setIsInterstitialActive(false);
+            trackAnalyticsEvent("interstitial_close", {
+              ...analyticsPayload,
+              completedLevels
+            });
+          },
+          onError: () => {
+            if (cancelled) return;
+            setIsInterstitialActive(false);
+            trackAnalyticsEvent("interstitial_error", {
+              ...analyticsPayload,
+              completedLevels
+            });
+          }
+        });
+
+        if (!cancelled) {
+          if (result === "failed") {
+            setIsInterstitialActive(false);
+          }
+          setInterstitialResolved(completedLevels);
+        }
+
+        interstitialGuardRef.current = false;
+      })();
+    }, 250);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      if (!requestStarted) {
+        cancelled = true;
+        interstitialGuardRef.current = false;
+      }
+    };
+  }, [
+    analyticsPayload,
+    clearPendingInterstitialCheck,
+    interstitialRuntime.lastResolvedCompletedLevels,
+    interstitialRuntime.nativeRequestInFlight,
+    interstitialRuntime.pendingMapCheckCompletedLevels,
+    isDocumentVisible,
+    isReviewPromptOpen,
+    reviewPromptRuntime.nativeRequestInFlight,
+    saveData.purchases.noForcedInterstitials,
+    screen,
+    setInterstitialNativeRequestInFlight,
+    setInterstitialResolved
+  ]);
+
+  useEffect(() => {
+    if (screen.kind !== "map") return;
     if (reviewPromptRuntime.pendingMapCheckCompletedLevels === null) return;
 
     const checkId = checkRunRef.current + 1;
@@ -144,7 +256,7 @@ export function MapScreen() {
           isCampaignMapActive: screen.kind === "map",
           isDocumentVisible: document.visibilityState === "visible",
           hasBlockingOverlay: isReviewPromptOpen,
-          isAdActive: false,
+          isAdActive: isInterstitialActive || interstitialRuntime.nativeRequestInFlight,
           isPurchaseFlowActive: false,
           isTutorialActive: false,
           nativeRequestInFlight: reviewPromptRuntime.nativeRequestInFlight
@@ -181,8 +293,10 @@ export function MapScreen() {
     clearPendingReviewPromptCheck,
     completedLevelsCount,
     isDocumentVisible,
+    isInterstitialActive,
     isReviewPromptOpen,
     markReviewPromptShown,
+    interstitialRuntime.nativeRequestInFlight,
     reviewPromptRuntime.nativeRequestInFlight,
     reviewPromptRuntime.pendingMapCheckCompletedLevels,
     saveData.reviewPrompt,
@@ -254,7 +368,7 @@ export function MapScreen() {
   return (
     <div className="min-h-screen bg-exp-bg font-manrope text-exp-parch">
       <div className="relative z-10 min-h-screen">
-        <div className="flex items-center gap-3 border-b border-[#D5C39A]/10 px-5 pb-4 pt-3 md:px-10">
+        <div className="flex items-center gap-3 border-b border-[#D5C39A]/10 px-5 pb-4 pr-20 pt-3 md:px-10 md:pr-24">
           <button
             onClick={() => navigate({ kind: "home" })}
             aria-label={t("actions.back")}
@@ -284,12 +398,6 @@ export function MapScreen() {
               ))}
             </div>
           </div>
-          <button
-            onClick={() => navigate({ kind: "collection" })}
-            className="hidden h-11 rounded-[10px] border border-[#D5C39A]/15 bg-[#D5C39A]/5 px-4 text-[12px] font-bold uppercase tracking-[.12em] text-[#D5C39A] transition hover:bg-[#D5C39A]/10 md:block"
-          >
-            {t("actions.collection")}
-          </button>
         </div>
 
         <section className="px-5 pb-2 pt-[34px] text-center md:px-10 md:pb-0">

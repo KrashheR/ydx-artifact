@@ -7,55 +7,79 @@ import { LevelFailedOverlay } from "@/features/gameplay/LevelFailedOverlay";
 import { useGameStore } from "@/shared/store/gameStore";
 
 const TIME_LIMIT = 300; // 5 minutes
-const COMPLETE_OVERLAY_DELAY_MS = 1000;
+const COMPLETE_OVERLAY_DELAY_MS = 200;
 const DEBUG_LAYOUT_MODE = import.meta.env.VITE_LAYOUT_DEBUG === "true";
 
 function formatTime(s: number) {
-  return `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
+  return `${Math.floor(s / 60)
+    .toString()
+    .padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
 }
 
-export function GameScreen({ levelId, mode }: { levelId: string; mode: "campaign" | "daily" }) {
+export function GameScreen({
+  levelId,
+  mode,
+}: {
+  levelId: string;
+  mode: "campaign" | "daily";
+}) {
   const { t } = useTranslation();
 
-  const saveData    = useGameStore((s) => s.saveData);
-  const navigate    = useGameStore((s) => s.navigate);
-  const startLevel  = useGameStore((s) => s.startLevel);
-  const recordDiff  = useGameStore((s) => s.recordDifference);
-  const recordMiss  = useGameStore((s) => s.recordMisclick);
+  const saveData = useGameStore((s) => s.saveData);
+  const navigate = useGameStore((s) => s.navigate);
+  const startLevel = useGameStore((s) => s.startLevel);
+  const recordDiff = useGameStore((s) => s.recordDifference);
+  const recordMiss = useGameStore((s) => s.recordMisclick);
   const completeLevel = useGameStore((s) => s.completeLevel);
   const spendMagnifiers = useGameStore((s) => s.spendMagnifiers);
   const claimDailyReward = useGameStore((s) => s.claimDailyReward);
   const resetLevelProgress = useGameStore((s) => s.resetLevelProgress);
 
   const [startedAt] = useState(() => Date.now());
-  const [timeLeft, setTimeLeft]     = useState(TIME_LIMIT);
-  const [timedOut, setTimedOut]     = useState(false);
-  const [paused, setPaused]         = useState(false);
-  const [hintId, setHintId]         = useState<string | undefined>();
+  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
+  const [timedOut, setTimedOut] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [hintId, setHintId] = useState<string | undefined>();
   const [exactHintUsed, setExactHintUsed] = useState(false);
-  const [pendingFinalStats, setPendingFinalStats] = useState<{ found: number; mistakes: number; elapsed: number } | null>(null);
-  const [finalStats, setFinalStats] = useState<{ found: number; mistakes: number; elapsed: number } | null>(null);
+  const [pendingFinalStats, setPendingFinalStats] = useState<{
+    found: number;
+    mistakes: number;
+    elapsed: number;
+  } | null>(null);
+  const [finalStats, setFinalStats] = useState<{
+    found: number;
+    mistakes: number;
+    elapsed: number;
+  } | null>(null);
   const completeOverlayDelayRef = useRef<number | null>(null);
 
-  const level   = getLevelById(levelId);
+  const level = getLevelById(levelId);
   const chapter = level ? getChapter(level.chapterId) : null;
 
-  const liveFoundIds = saveData.inProgress?.levelId === levelId ? saveData.inProgress.foundDifferenceIds : [];
-  const liveMistakes = saveData.inProgress?.levelId === levelId ? saveData.inProgress.mistakes : 0;
+  const liveFoundIds =
+    saveData.inProgress?.levelId === levelId
+      ? saveData.inProgress.foundDifferenceIds
+      : [];
+  const liveMistakes =
+    saveData.inProgress?.levelId === levelId ? saveData.inProgress.mistakes : 0;
   const completionPending = pendingFinalStats !== null;
   const showComplete = finalStats !== null;
-  const showOverlay  = showComplete || timedOut;
+  const showOverlay = showComplete || timedOut;
 
   // Countdown timer
   useEffect(() => {
     if (showComplete || completionPending || timedOut || paused) return;
-    const id = window.setInterval(() => setTimeLeft((p) => Math.max(0, p - 1)), 1000);
+    const id = window.setInterval(
+      () => setTimeLeft((p) => Math.max(0, p - 1)),
+      1000,
+    );
     return () => window.clearInterval(id);
   }, [showComplete, completionPending, timedOut, paused]);
 
   // Detect timeout
   useEffect(() => {
-    if (timeLeft === 0 && !showComplete && !completionPending) setTimedOut(true);
+    if (timeLeft === 0 && !showComplete && !completionPending)
+      setTimedOut(true);
   }, [timeLeft, showComplete, completionPending]);
 
   useEffect(() => {
@@ -68,15 +92,22 @@ export function GameScreen({ levelId, mode }: { levelId: string; mode: "campaign
 
   if (!level || !chapter) return null;
 
-  const nextLevel = chapter.levels.find((l) => l.order === level.order + 1) ?? null;
+  const nextLevel =
+    chapter.levels.find((l) => l.order === level.order + 1) ?? null;
   const magnifiers = saveData.magnifiers;
-  const displayFoundIds = showComplete ? level.differences.map((d) => d.id) : liveFoundIds;
+  const displayFoundIds = showComplete
+    ? level.differences.map((d) => d.id)
+    : liveFoundIds;
   const accuracyPct = Math.round(
-    (liveFoundIds.length / Math.max(liveFoundIds.length + liveMistakes, 1)) * 100
+    (liveFoundIds.length / Math.max(liveFoundIds.length + liveMistakes, 1)) *
+      100,
   );
   const chapterId = level.chapterId;
 
-  function handleDifference(differenceId: string, usedExactHint = exactHintUsed) {
+  function handleDifference(
+    differenceId: string,
+    usedExactHint = exactHintUsed,
+  ) {
     if (completionPending || showComplete || timedOut) return;
     recordDiff(levelId, differenceId);
     const nextFound = liveFoundIds.length + 1;
@@ -85,9 +116,11 @@ export function GameScreen({ levelId, mode }: { levelId: string; mode: "campaign
       const stats = { found: nextFound, mistakes: liveMistakes, elapsed };
       setPendingFinalStats(stats);
       completeOverlayDelayRef.current = window.setTimeout(() => {
+        setPendingFinalStats(null);
         setFinalStats(stats);
         completeLevel(levelId, elapsed, usedExactHint, mode);
-        if (mode === "daily") claimDailyReward(new Date().toISOString().slice(0, 10));
+        if (mode === "daily")
+          claimDailyReward(new Date().toISOString().slice(0, 10));
         completeOverlayDelayRef.current = null;
       }, COMPLETE_OVERLAY_DELAY_MS);
     }
@@ -142,20 +175,23 @@ export function GameScreen({ levelId, mode }: { levelId: string; mode: "campaign
 
   return (
     <div className="fixed inset-0 flex flex-col overflow-hidden bg-exp-bg font-manrope text-exp-parch">
-
       {/* ── Game content (blurred when overlay active) ─────────────────── */}
       <div
         className="flex flex-1 flex-col"
-        style={showOverlay ? { filter: "blur(4px) brightness(0.42)", pointerEvents: "none" } : undefined}
+        style={
+          showOverlay
+            ? { filter: "blur(4px) brightness(0.42)", pointerEvents: "none" }
+            : undefined
+        }
       >
-
         {/* ── TOP HUD ──────────────────────────────────────────────────── */}
         <header
-          className="relative flex shrink-0 items-center justify-between px-[30px]"
+          className="relative flex shrink-0 items-center justify-between pl-[30px] pr-[86px]"
           style={{
             height: "74px",
             borderBottom: "1px solid rgba(213,195,154,.12)",
-            background: "linear-gradient(180deg, rgba(34,42,37,.92), rgba(21,27,24,.4))"
+            background:
+              "linear-gradient(180deg, rgba(34,42,37,.92), rgba(21,27,24,.4))",
           }}
         >
           {/* Left: back + title */}
@@ -163,17 +199,39 @@ export function GameScreen({ levelId, mode }: { levelId: string; mode: "campaign
             <button
               onClick={handleMap}
               className="flex h-[42px] w-[42px] items-center justify-center rounded-[9px] text-exp-parch"
-              style={{ border: "1px solid rgba(213,195,154,.14)", background: "rgba(213,195,154,.05)" }}
+              style={{
+                border: "1px solid rgba(213,195,154,.14)",
+                background: "rgba(213,195,154,.05)",
+              }}
               aria-label={t("actions.back")}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M15 18l-6-6 6-6" />
               </svg>
             </button>
-            <div style={{ width: "1px", height: "32px", background: "rgba(213,195,154,.12)" }} />
+            <div
+              style={{
+                width: "1px",
+                height: "32px",
+                background: "rgba(213,195,154,.12)",
+              }}
+            />
             <div className="hidden sm:block">
               <div className="font-manrope text-[10px] font-bold tracking-[.22em] text-exp-brass">
-                {t("game.levelBadge", { campaign: campaignTitle, current: level.order, total: chapter.levels.length })}
+                {t("game.levelBadge", {
+                  campaign: campaignTitle,
+                  current: level.order,
+                  total: chapter.levels.length,
+                })}
               </div>
               <div className="font-cormorant text-[22px] font-semibold leading-tight tracking-[.01em] text-exp-parch">
                 {t(level.titleKey)}
@@ -186,9 +244,19 @@ export function GameScreen({ levelId, mode }: { levelId: string; mode: "campaign
             {/* Timer */}
             <div
               className="flex h-[48px] items-center gap-[9px] rounded-[11px] px-[18px]"
-              style={{ border: "1px solid rgba(213,195,154,.14)", background: "rgba(21,27,24,.6)" }}
+              style={{
+                border: "1px solid rgba(213,195,154,.14)",
+                background: "rgba(21,27,24,.6)",
+              }}
             >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#879087" strokeWidth="1.8">
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#879087"
+                strokeWidth="1.8"
+              >
                 <circle cx="12" cy="13" r="8" />
                 <path d="M12 9v4l2.5 2" strokeLinecap="round" />
                 <path d="M9 2h6" strokeLinecap="round" />
@@ -204,15 +272,35 @@ export function GameScreen({ levelId, mode }: { levelId: string; mode: "campaign
             {/* Found counter */}
             <div
               className="flex h-[48px] items-center gap-[11px] rounded-[11px] px-5"
-              style={{ border: "1px solid rgba(184,138,69,.4)", background: "linear-gradient(180deg, rgba(184,138,69,.16), rgba(184,138,69,.05))" }}
+              style={{
+                border: "1px solid rgba(184,138,69,.4)",
+                background:
+                  "linear-gradient(180deg, rgba(184,138,69,.16), rgba(184,138,69,.05))",
+              }}
             >
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#d8af63" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="19"
+                height="19"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#d8af63"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <circle cx="11" cy="11" r="7" />
                 <path d="m21 21-4.3-4.3" />
               </svg>
               <div className="flex items-baseline gap-0.5">
-                <span className="font-manrope text-[24px] font-bold text-exp-brass2">{liveFoundIds.length}</span>
-                <span className="font-manrope text-[15px] font-semibold" style={{ color: "rgba(213,195,154,.5)" }}>/ {level.requiredDifferences}</span>
+                <span className="font-manrope text-[24px] font-bold text-exp-brass2">
+                  {liveFoundIds.length}
+                </span>
+                <span
+                  className="font-manrope text-[15px] font-semibold"
+                  style={{ color: "rgba(213,195,154,.5)" }}
+                >
+                  / {level.requiredDifferences}
+                </span>
               </div>
               <span className="hidden font-manrope text-[10.5px] font-semibold tracking-[.12em] text-exp-muted sm:block">
                 {t("game.diffCount")}
@@ -224,11 +312,27 @@ export function GameScreen({ levelId, mode }: { levelId: string; mode: "campaign
           <div className="flex items-center gap-[10px]">
             <button
               onClick={handleAreaHint}
-              disabled={showComplete || completionPending || liveFoundIds.length >= level.requiredDifferences}
+              disabled={
+                showComplete ||
+                completionPending ||
+                liveFoundIds.length >= level.requiredDifferences
+              }
               className="flex h-[44px] items-center gap-2 rounded-[9px] px-4 font-manrope text-[13px] font-bold text-exp-brass2 disabled:opacity-40"
-              style={{ border: "1px solid rgba(184,138,69,.45)", background: "rgba(184,138,69,.08)" }}
+              style={{
+                border: "1px solid rgba(184,138,69,.45)",
+                background: "rgba(184,138,69,.08)",
+              }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M9 18h6M10 21h4" />
                 <path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z" />
               </svg>
@@ -244,15 +348,36 @@ export function GameScreen({ levelId, mode }: { levelId: string; mode: "campaign
             <button
               onClick={() => setPaused((p) => !p)}
               className="flex h-[44px] w-[44px] items-center justify-center rounded-[9px] text-exp-parch"
-              style={{ border: "1px solid rgba(213,195,154,.14)", background: paused ? "rgba(213,195,154,.12)" : "rgba(213,195,154,.05)" }}
+              style={{
+                border: "1px solid rgba(213,195,154,.14)",
+                background: paused
+                  ? "rgba(213,195,154,.12)"
+                  : "rgba(213,195,154,.05)",
+              }}
               aria-label={paused ? t("actions.resume") : t("actions.pause")}
             >
               {paused ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                >
                   <path d="M5 3l14 9-14 9V3z" />
                 </svg>
               ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                >
                   <rect x="6" y="5" width="4" height="14" rx="1" />
                   <rect x="14" y="5" width="4" height="14" rx="1" />
                 </svg>
@@ -261,12 +386,27 @@ export function GameScreen({ levelId, mode }: { levelId: string; mode: "campaign
 
             <button
               onClick={handleExactHint}
-              disabled={showComplete || completionPending || liveFoundIds.length >= level.requiredDifferences || magnifiers < 2}
+              disabled={
+                showComplete ||
+                completionPending ||
+                liveFoundIds.length >= level.requiredDifferences ||
+                magnifiers < 2
+              }
               className="flex h-[44px] w-[44px] items-center justify-center rounded-[9px] text-exp-parch disabled:opacity-40"
-              style={{ border: "1px solid rgba(213,195,154,.14)", background: "rgba(213,195,154,.05)" }}
+              style={{
+                border: "1px solid rgba(213,195,154,.14)",
+                background: "rgba(213,195,154,.05)",
+              }}
               aria-label={t("actions.hintExact")}
             >
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg
+                width="19"
+                height="19"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              >
                 <circle cx="12" cy="12" r="3.2" />
                 <path d="M19.4 13a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
               </svg>
@@ -280,29 +420,53 @@ export function GameScreen({ levelId, mode }: { levelId: string; mode: "campaign
           style={{ borderBottom: "1px solid rgba(213,195,154,.08)" }}
         >
           <div className="min-w-0 flex-1 text-center">
-            <div className="font-manrope text-[8.5px] font-bold tracking-[.16em] text-exp-brass">{t(chapter.titleKey)} · {t("actions.map")} {level.order}</div>
-            <div className="overflow-hidden text-ellipsis whitespace-nowrap font-cormorant text-[16px] font-semibold text-exp-parch">{t(level.titleKey)}</div>
+            <div className="font-manrope text-[8.5px] font-bold tracking-[.16em] text-exp-brass">
+              {t(chapter.titleKey)} · {t("actions.map")} {level.order}
+            </div>
+            <div className="overflow-hidden text-ellipsis whitespace-nowrap font-cormorant text-[16px] font-semibold text-exp-parch">
+              {t(level.titleKey)}
+            </div>
           </div>
         </div>
 
         {/* Mobile found row */}
         <div className="flex shrink-0 items-center justify-between px-4 pb-[10px] sm:hidden">
           <div className="flex items-center gap-2">
-            <span className="font-manrope text-[19px] font-bold text-exp-brass2">{liveFoundIds.length}</span>
-            <span className="font-manrope text-[13px] font-semibold" style={{ color: "rgba(213,195,154,.5)" }}>/ {level.requiredDifferences}</span>
-            <span className="font-manrope text-[9px] font-semibold tracking-[.12em] text-exp-muted">{t("game.diffCount")}</span>
+            <span className="font-manrope text-[19px] font-bold text-exp-brass2">
+              {liveFoundIds.length}
+            </span>
+            <span
+              className="font-manrope text-[13px] font-semibold"
+              style={{ color: "rgba(213,195,154,.5)" }}
+            >
+              / {level.requiredDifferences}
+            </span>
+            <span className="font-manrope text-[9px] font-semibold tracking-[.12em] text-exp-muted">
+              {t("game.diffCount")}
+            </span>
           </div>
           <div className="flex gap-[5px]">
             {Array.from({ length: level.requiredDifferences }).map((_, i) => (
               <span
                 key={i}
                 className="flex h-[18px] w-[18px] items-center justify-center rounded-[5px]"
-                style={i < liveFoundIds.length
-                  ? { background: "#d8af63" }
-                  : { border: "1px dashed rgba(213,195,154,.28)" }}
+                style={
+                  i < liveFoundIds.length
+                    ? { background: "#d8af63" }
+                    : { border: "1px dashed rgba(213,195,154,.28)" }
+                }
               >
                 {i < liveFoundIds.length && (
-                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#1a130a" strokeWidth="3.6" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="9"
+                    height="9"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#1a130a"
+                    strokeWidth="3.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M20 6L9 17l-5-5" />
                   </svg>
                 )}
@@ -334,23 +498,40 @@ export function GameScreen({ levelId, mode }: { levelId: string; mode: "campaign
           style={{
             height: "74px",
             borderTop: "1px solid rgba(213,195,154,.12)",
-            background: "linear-gradient(0deg, rgba(34,42,37,.9), rgba(21,27,24,.3))"
+            background:
+              "linear-gradient(0deg, rgba(34,42,37,.9), rgba(21,27,24,.3))",
           }}
         >
           {/* Found squares */}
           <div className="flex items-center gap-[14px]">
-            <span className="font-manrope text-[10.5px] font-semibold tracking-[.16em] text-exp-muted">{t("game.foundLabel")}</span>
+            <span className="font-manrope text-[10.5px] font-semibold tracking-[.16em] text-exp-muted">
+              {t("game.foundLabel")}
+            </span>
             <div className="flex gap-2">
               {Array.from({ length: level.requiredDifferences }).map((_, i) => (
                 <span
                   key={i}
                   className="flex h-[26px] w-[26px] items-center justify-center rounded-[7px]"
-                  style={i < liveFoundIds.length
-                    ? { background: "#d8af63" }
-                    : { border: "1px dashed rgba(213,195,154,.25)", background: "rgba(213,195,154,.04)" }}
+                  style={
+                    i < liveFoundIds.length
+                      ? { background: "#d8af63" }
+                      : {
+                          border: "1px dashed rgba(213,195,154,.25)",
+                          background: "rgba(213,195,154,.04)",
+                        }
+                  }
                 >
                   {i < liveFoundIds.length && (
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a130a" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#1a130a"
+                      strokeWidth="3.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M20 6L9 17l-5-5" />
                     </svg>
                   )}
@@ -362,26 +543,42 @@ export function GameScreen({ levelId, mode }: { levelId: string; mode: "campaign
           {/* Accuracy + mistakes */}
           <div className="flex items-center gap-[22px]">
             <div className="flex items-center gap-[9px]">
-              <span className="font-manrope text-[10.5px] font-semibold tracking-[.14em] text-exp-muted">{t("game.accuracyLabel")}</span>
-              <div className="h-[6px] w-[120px] overflow-hidden rounded-[3px]" style={{ background: "rgba(213,195,154,.12)" }}>
+              <span className="font-manrope text-[10.5px] font-semibold tracking-[.14em] text-exp-muted">
+                {t("game.accuracyLabel")}
+              </span>
+              <div
+                className="h-[6px] w-[120px] overflow-hidden rounded-[3px]"
+                style={{ background: "rgba(213,195,154,.12)" }}
+              >
                 <div
                   className="h-full"
                   style={{
                     width: `${accuracyPct}%`,
                     background: "linear-gradient(90deg, #6fc69e, #2F6A57)",
-                    transition: "width .3s"
+                    transition: "width .3s",
                   }}
                 />
               </div>
-              <span className="font-manrope text-[12px] font-bold text-exp-success">{accuracyPct}%</span>
+              <span className="font-manrope text-[12px] font-bold text-exp-success">
+                {accuracyPct}%
+              </span>
             </div>
             {liveMistakes > 0 && (
               <div className="flex items-center gap-[7px]">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e08a78" strokeWidth="2" strokeLinecap="round">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#e08a78"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                >
                   <path d="M6 6l12 12M18 6L6 18" />
                 </svg>
                 <span className="font-manrope text-[12px] text-exp-muted">
-                  {liveMistakes} {t("game.mistakes", { count: liveMistakes }).toLowerCase()}
+                  {liveMistakes}{" "}
+                  {t("game.mistakes", { count: liveMistakes }).toLowerCase()}
                 </span>
               </div>
             )}

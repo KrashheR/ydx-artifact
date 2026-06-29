@@ -46,7 +46,7 @@ Hitboxes are authored as normalized coordinates from `0` to `1` relative to the 
 - Level 4 (`nr-04-scene04`) is wired to `public/assets/scenes/northern-route/4/1.webp` and `2.webp`.
 - Level 4 hitboxes were transcribed from `public/assets/scenes/northern-route/4/3.webp` for switch, train door, barrel count, handcart, lantern color and fur glove differences.
 - Levels 5-12 (`nr-05` through `nr-12`) are wired to their runtime WebP scene pairs under `public/assets/scenes/northern-route/<level-order>/1.webp` and `2.webp`.
-- Levels 5-12 hitboxes are transcribed from their `3.webp` markup references in `src/content/levels.ts`, replacing the earlier scaffold coordinates. Levels 5, 6, 8, 9, 10 and 12 were rechecked against the visible markup rings after aspect-aware circle rendering and ellipse hitboxes were added.
+- Levels 5-12 hitboxes are transcribed from their `3.webp` markup references in `src/content/levels.ts`, replacing the earlier scaffold coordinates. Levels 5, 6, 7, 8, 9, 10 and 12 were rechecked against the visible markup rings after aspect-aware circle rendering and ellipse hitboxes were added.
 - Level 13 (`nr-13-scene13`) is wired to `public/assets/scenes/northern-route/13/1.webp` and `2.webp`.
 - Level 13 hitboxes were transcribed from `public/assets/scenes/northern-route/13/3.webp` for the tent opening, survey device, mug, rope coil, tarp, rope marker, striped post and bridge differences.
 - Runtime scene, markup, preview and map background assets in `public/assets/scenes/` are WebP. Keep source masters outside runtime folders if they need to be preserved.
@@ -56,6 +56,7 @@ Hitboxes are authored as normalized coordinates from `0` to `1` relative to the 
 - `sand-meridian` gameplay now uses transcribed hitboxes for levels 1-13 based on each scene's `public/assets/scenes/sand-meredian/<level-order>/3.webp` markup reference. Levels 3, 7, 11, 12 and 13 were rechecked against their markup references and include their marked circles.
 - `emerald-meridian` is connected from `docs/plot/emerald-meredian/emerald_meridian_story_map_placement_guide.md` and runtime assets in `public/assets/scenes/emerald-meridian/`.
 - `emerald-meridian` map placement is stored in `src/content/chapters.ts` as a sequential 13-point route derived from the story placement guide until a dedicated handoff JSON is supplied.
-- `emerald-meridian` gameplay currently uses scaffold hitboxes in `src/content/emeraldMeridianLevels.ts` until marked reference images are transcribed.
+- `emerald-meridian` gameplay hitboxes in `src/content/emeraldMeridianLevels.ts` are transcribed from each level's `3.webp` annotation rings (find-ALL: `requiredDifferences` equals the number of rings per level — 10, 9, 9, 10, 7, 9, 9, 11, 9, 10, 9, 9, 9).
 - Local layout-debug mode is opt-in with `VITE_LAYOUT_DEBUG=true pnpm dev`; it can swap gameplay `1/2` scene assets to the local `3.*` markup reference via `getSceneMarkupAsset()` and draw all authored difference markers immediately for visual alignment work.
+- `pnpm dev:validate` starts the same layout-debug mode through Vite dev/HMR, so reviewers can compare authored hitboxes against every level's `3.*` markup reference while code and content edits update live.
 - `pnpm validate:content` now checks level assets, chapter previews/backgrounds, locale keys, provenance coverage, markup references, known campaign runtime folders and accidental debug-flag usage.

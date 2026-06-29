@@ -127,6 +127,8 @@ Sticky можно тестировать позднее только на кар
 
 # 4. Interstitial-реклама
 
+Implementation note: current build queues forced interstitials after every third newly completed campaign level (`3, 6, 9, ...`). The call still happens only on the campaign map after gameplay, is skipped for replay and daily completions, and is disabled by `purchases.noForcedInterstitials`.
+
 Запрашивать interstitial только на карте после логического завершения действия.
 
 Все условия должны быть истинны:

@@ -23,7 +23,9 @@ export function DailyScreen() {
         <h1 className="font-archive text-4xl">{t("actions.daily")}</h1>
         <Button variant="ghost" onClick={() => navigate({ kind: "home" })}>{t("actions.back")}</Button>
       </div>
-      <p className="mt-4 text-graphite/70">Deterministic scene: {entry.id}. Streak: {daily.streak}</p>
+      <p className="mt-4 text-graphite/70">
+        {t("daily.sceneInfo", { title: t(entry.titleKey), streak: daily.streak })}
+      </p>
       <Button className="mt-6" onClick={() => startLevel(entry.levelId, "daily")}>{t("actions.start")}</Button>
     </Panel>
   );

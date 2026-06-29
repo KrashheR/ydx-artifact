@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+- Renamed the game to its official title everywhere it is shown to players: RU "Найди отличия: Тайны экспедиций", EN "Spot the Differences: Expedition Mysteries". Updated `src/i18n/{ru,en}/common.json` (`app.title` and the header brand tag `campaigns.supra` → "ТАЙНЫ ЭКСПЕДИЦИЙ" / "EXPEDITION MYSTERIES"), the `index.html` `<title>`, the e2e heading assertion in `tests/e2e/app.spec.ts`, and the store listing `title` fields in `docs/starter-data/catalog-copy.example.json` and `docs/starter-data/i18n/{ru,en}/common.json`.
+- Added the missing `ladder-foot` hitbox to `emerald-meridian` level 4 (`em-04-flooded-bridge`) in `src/content/emeraldMeridianLevels.ts`: a 10th annotation ring at the foot of the bridge ladder was drawn in `4/3.webp` but had no hit area. Transcribed it (`circle` at `cx 0.707, cy 0.712, r 0.046`, least-squares fit to the ring, verified via red overlay render), bringing level 4 to 10 rings so `requiredDifferences` now equals 10.
+- Fixed all 13 `emerald-meridian` chapter hitboxes in `src/content/emeraldMeridianLevels.ts` to match the rings drawn on each level's `3.webp` annotation image — both the count and the position/size/shape of every hit area were transcribed and visually verified against red overlay renders. Made the chapter find-ALL: removed the `differenceCounts` table and the "find any subset" comment, and set `requiredDifferences` to `perLevelDiffs[order - 1].length` so the required count always equals the number of drawn rings (per-level ring counts: 10, 9, 9, 9, 7, 9, 9, 11, 9, 10, 9, 9, 9). Fixes the prior `pnpm validate:content` failure where `requiredDifferences` did not match the number of differences.
+
+- Moved the settings entry point into the app shell so the gear button is always clickable in the top-right corner on every screen and opens the shared settings modal.
+
+- Fixed the gameplay result modal's "Level Select" / "К выбору уровней" action so it returns to the current campaign level journal after completion.
+- Removed the collection button from the campaign map header and fixed the home settings control so the gear button opens the settings modal reliably.
+
+- Redesigned settings as a `SettingsModal` overlay (bottom sheet on mobile, centered modal on desktop) matching the Expedition design system; removed "Reset save" and "Copy diagnostics" dev buttons from production UI; removed `{ kind: "settings" }` from the `Screen` union and `App.tsx` routing — settings is now opened via local `useState` in `HomeScreen`.
+- Moved the remaining visible daily and settings strings into `src/i18n/{ru,en}/common.json`, and switched `DailyScreen` / `SettingsScreen` to the new translation keys.
+- Added Yandex fullscreen interstitial handling on the campaign map after every third newly completed campaign level, with no-ads entitlement suppression and focused MapScreen coverage.
+- Added Yandex Player Data cloud saves with `ysdk.getStorage()` / `localStorage` mirroring, newest-`updatedAt` cloud/local hydration, 4-second cloud load timeout and focused storage tests.
+- Corrected `northern-route` level 12 hitboxes for the radio room scene, including the sled, steam plume, pressed flower case and lower drawer markup rings.
+- Corrected `northern-route` level 7 hitboxes so the gameplay markers align with the white `3.webp` markup rings.
+- Reduced the gameplay completion modal delay from 1 second to 0.7 seconds after the final difference is found.
+- Added `npm run dev:validate` / `pnpm dev:validate`, which starts Vite dev/HMR with scene images swapped to `3.*` markup references and all gameplay hitboxes visible for visual alignment review.
 - Added ellipse hitbox support and corrected stretched first-campaign markup rings for `northern-route` levels 2 and 9 so clickable areas match the visible authoring circles more closely.
 - Delayed the gameplay completion modal by 1 second after the final difference so the last found marker appears before the win result opens.
 - Converted all runtime PNG scene, preview and map background assets under `public/assets/scenes/` to compressed WebP, updated content wiring to `.webp`, and removed the old PNG runtime copies.

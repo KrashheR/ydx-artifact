@@ -39,10 +39,12 @@ pnpm test
 pnpm validate:content
 pnpm agent:check
 pnpm build
+pnpm dev:validate
 pnpm test:e2e
 ```
 
 For broad agent edits, `pnpm agent:check` runs lint, typecheck and content validation. For pre-release agent validation, use `pnpm agent:release-check`.
+`pnpm dev:validate` starts the Vite dev server with gameplay scenes swapped to each level's `3.*` markup reference and all difference hitboxes visible for live alignment checks.
 
 ## Scope Implemented
 
@@ -56,9 +58,10 @@ For broad agent edits, `pnpm agent:check` runs lint, typecheck and content valid
 - All 13 `emerald-meridian` levels are wired to compressed local WebP scene pairs under `public/assets/scenes/emerald-meridian/`; route points follow `docs/plot/emerald-meredian/emerald_meridian_story_map_placement_guide.md` and hitboxes still use scaffold data until markup references are transcribed.
 - Campaign metadata such as runtime asset folders, preview filenames, map backgrounds and legacy folder notes is centralized in `src/content/campaignManifest.ts`.
 - `GameScreen` layout-debug mode is opt-in via `VITE_LAYOUT_DEBUG=true pnpm dev`: the comparator draws all authored difference markers immediately and swaps scene `1/2` assets for the local `3.*` markup reference on both sides so button/marker positions can be adjusted visually.
+- `pnpm dev:validate` runs the same hitbox-alignment view through Vite dev/HMR so hitbox edits can be reviewed live.
 - Responsive photo comparator with desktop side-by-side and mobile A/B toggle.
 - Circle/polygon hit testing, found markers, hints, misclicks and completion.
-- Local save fallback with versioned schema.
+- Yandex Player Data cloud saves with a `ysdk.getStorage()` / `localStorage` mirror fallback and versioned schema.
 - Mock platform adapter and diagnostics copy.
 - Campaign journal review pre-prompt wired to the Yandex Games feedback API seam with local dev mocks.
 

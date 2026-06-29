@@ -67,7 +67,7 @@ if (import.meta.env.DEV) {
           nativeRequestInFlight: false
         }
       }));
-      await useGameStore.getState().save();
+      await useGameStore.getState().save({ flush: true });
     }
   };
 }

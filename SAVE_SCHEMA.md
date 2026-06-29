@@ -4,6 +4,14 @@ Version: `1`
 
 Stored fields: completed levels, best results, in-progress level, magnifiers, artifacts, daily streak, settings, review prompt state and purchase flags. Runtime validation is in `src/entities/save/schema.ts`.
 
+Storage flow:
+
+- Yandex Player Data (`player.getData` / `player.setData`) is the canonical cloud save when the Yandex SDK is available.
+- The local mirror uses `ysdk.getStorage()` when available, then `window.localStorage` as the browser fallback.
+- Hydration loads local and cloud saves, validates both, and uses the valid save with the newest `updatedAt`.
+- Cloud load has a 4-second timeout. If cloud is unavailable, gameplay continues from the local mirror or a default save.
+- Frequent gameplay progress can use non-flushing cloud writes; important milestones and lifecycle exits request `flush: true`.
+
 Persisted review prompt fields:
 
 - `reviewPrompt.schemaVersion`

@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Find the Differences: Anomaly Archive",
+    "title": "Spot the Differences: Expedition Mysteries",
     "subtitle": "White Meridian",
     "pitch": "Restore paired archive photographs from a vanished 1977 expedition."
   },
@@ -66,6 +66,26 @@
     "saving": "Saving...",
     "localOnly": "Progress saved locally",
     "cloudUnavailable": "Cloud unavailable, game continues"
+  },
+  "daily": {
+    "sceneInfo": "Daily scene: {{title}}. Streak: {{streak}}",
+    "icebreakerCabin": {
+      "title": "Icebreaker cabin"
+    },
+    "cartographerRoom": {
+      "title": "Cartographer room"
+    },
+    "weatherPlatform": {
+      "title": "Weather platform"
+    }
+  },
+  "settings": {
+    "localeLabel": "Language",
+    "eyebrow": "EXPEDITION GEAR",
+    "languageSection": "INTERFACE LANGUAGE",
+    "savedToProfile": "Selection saved to profile",
+    "done": "Done",
+    "closeLabel": "Close"
   },
   "reviewPrompt": {
     "eyebrow": "EXPEDITION LOG",
@@ -207,7 +227,7 @@
     "en": "English"
   },
   "campaigns": {
-    "supra": "ANOMALY ARCHIVE",
+    "supra": "EXPEDITION MYSTERIES",
     "campaignLabel": "EXPEDITION",
     "heading": "Choose Your Expedition",
     "subheading": "Three routes. One archive. Follow the clues.",
