@@ -38,15 +38,15 @@ const sandMeridianDifferenceOverrides = {
       { id: "deck-winch", x: 0.582, y: 0.889, radius: 0.06 }
     ],
   2: [
-    { id: "signal-flares", x: 0.376, y: 0.368, radius: 0.04 },
-    { id: "generator", x: 0.086, y: 0.424, radius: 0.06 },
-    { id: "blue-barrels", x: 0.79, y: 0.457, radius: 0.055 },
-    { id: "helmet-rack", x: 0.66, y: 0.457, radius: 0.06 },
-    { id: "ventilator", x: 0.532, y: 0.509, radius: 0.06 },
-    { id: "field-phone", x: 0.277, y: 0.579, radius: 0.04 },
-    { id: "jeep-radio", x: 0.772, y: 0.618, radius: 0.04 },
-    { id: "equipment-case", x: 0.46, y: 0.89, radius: 0.07 }
-  ],
+      { id: "signal-flares", x: 0.376, y: 0.368, radius: 0.04 },
+      { id: "generator", x: 0.086, y: 0.424, radius: 0.06 },
+      { id: "blue-barrels", x: 0.79, y: 0.457, radius: 0.0664 },
+      { id: "helmet-rack", x: 0.66, y: 0.457, radius: 0.06 },
+      { id: "ventilator", x: 0.532, y: 0.509, radius: 0.0647 },
+      { id: "field-phone", x: 0.277, y: 0.579, radius: 0.04 },
+      { id: "jeep-radio", x: 0.772, y: 0.618, radius: 0.0477 },
+      { id: "equipment-case", x: 0.46, y: 0.89, radius: 0.07 }
+    ],
   3: [
     { id: "signal-marker", x: 0.653, y: 0.133, radius: 0.04 },
     { id: "lamp", x: 0.74, y: 0.237, radius: 0.04 },
