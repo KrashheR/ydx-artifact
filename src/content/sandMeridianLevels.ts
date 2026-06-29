@@ -110,7 +110,6 @@ const sandMeridianDifferenceOverrides = {
       { id: "bottle-cluster", x: 0.1759, y: 0.8003, radius: 0.07 },
       { id: "pump-rig", x: 0.3363, y: 0.796, radius: 0.09 },
       { id: "measuring-pole", shape: { kind: "ellipse", cx: 0.8424, cy: 0.6485, rx: 0.0572, ry: 0.1586 } },
-      { id: "water-reflection", x: 0.9493, y: 0.5934, radius: 0.04 }
     ],
   9: [
       { id: "ceiling-hole", x: 0.207, y: 0.148, radius: 0.08 },
