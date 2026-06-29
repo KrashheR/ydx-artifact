@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+@keyframes ringpulse{0%{transform:translate(-50%,-50%) scale(.65);opacity:.85}100%{transform:translate(-50%,-50%) scale(1.75);opacity:0}}
+@keyframes pulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+@keyframes drift{0%{transform:translateX(-3%)}100%{transform:translateX(4%)}}
+*{box-sizing:border-box}
+</style>
+</helmet>
+
+<!-- ============================================================ -->
+<!-- DESKTOP · КАРТА КАМПАНИИ -->
+<!-- ============================================================ -->
+<div data-drags-parent="1" style="position:absolute;left:80px;top:34px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">DESKTOP · 1440 × 900 · КАРТА ЭКСПЕДИЦИИ</div>
+
+<div data-screen-label="Desktop · Карта кампании" style="position:absolute;left:80px;top:78px;width:1440px;height:900px;background:#0F1512;border-radius:8px;overflow:hidden;box-shadow:0 36px 90px rgba(0,0,0,.55);font-family:Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+
+  <!-- ===== MAP LAYER ===== -->
+  <div style="position:absolute;inset:0">
+    <!-- atmospheric base: arctic glow + parchment patina -->
+    <div style="position:absolute;inset:0;background:radial-gradient(90% 70% at 50% 118%,rgba(47,106,87,.16),transparent 60%),radial-gradient(80% 60% at 50% -18%,rgba(96,206,168,.12),transparent 55%),radial-gradient(120% 120% at 50% 50%,rgba(110,98,70,.05),transparent 70%)"></div>
+    <!-- aurora drift -->
+    <div style="position:absolute;left:-6%;right:-6%;top:0;height:46%;background:linear-gradient(180deg,rgba(96,206,168,.10),transparent 70%);filter:blur(8px);animation:drift 26s ease-in-out infinite alternate;pointer-events:none"></div>
+    <!-- graticule -->
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 129px,rgba(213,195,154,.045) 129px 130px),repeating-linear-gradient(90deg,transparent 0 159px,rgba(213,195,154,.04) 159px 160px);pointer-events:none"></div>
+    <!-- grain -->
+    <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+
+    <!-- contour isolines -->
+    <sc-if value="{{ showContours }}" hint-placeholder-val="{{ true }}">
+    <svg viewBox="0 0 1440 900" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+      <g fill="none" stroke="rgba(184,138,69,.11)" stroke-width="1">
+        <g transform="rotate(-16 1005 540)">
+          <ellipse cx="1005" cy="540" rx="62" ry="46"/><ellipse cx="1005" cy="540" rx="112" ry="84"/><ellipse cx="1005" cy="540" rx="168" ry="126"/><ellipse cx="1005" cy="540" rx="230" ry="172"/><ellipse cx="1005" cy="540" rx="300" ry="222"/>
+        </g>
+        <g transform="rotate(14 360 330)">
+          <ellipse cx="360" cy="330" rx="54" ry="42"/><ellipse cx="360" cy="330" rx="104" ry="80"/><ellipse cx="360" cy="330" rx="160" ry="122"/><ellipse cx="360" cy="330" rx="222" ry="168"/>
+        </g>
+        <g transform="rotate(26 700 760)" stroke="rgba(184,138,69,.08)">
+          <ellipse cx="700" cy="760" rx="80" ry="48"/><ellipse cx="700" cy="760" rx="150" ry="92"/><ellipse cx="700" cy="760" rx="230" ry="140"/>
+        </g>
+      </g>
+      <g fill="rgba(213,195,154,.34)" font-family="'JetBrains Mono',monospace" font-size="9" letter-spacing="1">
+        <text x="985" y="544">&#9650; 2148 м</text>
+        <text x="338" y="334">&#9650; 1604 м</text>
+        <text x="1150" y="210">&#9650; 2390 м</text>
+      </g>
+      <g fill="rgba(213,195,154,.22)" font-family="'JetBrains Mono',monospace" font-size="10" letter-spacing="1">
+        <text x="22" y="150">68°N</text><text x="22" y="410">67°N</text><text x="22" y="670">66°N</text>
+        <text x="190" y="888">23°E</text><text x="640" y="888">24°E</text><text x="1090" y="888">25°E</text>
+      </g>
+    </svg>
+    </sc-if>
+
+    <!-- ROUTE -->
+    <svg viewBox="0 0 1440 900" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible">
+      <path d="{{ dRouteRest }}" fill="none" stroke="rgba(213,195,154,.26)" stroke-width="2.5" stroke-dasharray="1.5 9" stroke-linecap="round"></path>
+      <path d="{{ dRouteDone }}" fill="none" stroke="#d8af63" stroke-width="3.5" stroke-linecap="round" style="filter:drop-shadow(0 0 6px rgba(216,175,99,.5))"></path>
+    </svg>
+
+    <!-- COMPLETED NODES -->
+    <sc-for list="{{ dDone }}" as="n" hint-placeholder-count="7">
+      <div onMouseEnter="{{ n.onEnter }}" onMouseLeave="{{ n.onLeave }}" style="position:absolute;left:{{ n.left }};top:{{ n.top }};transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;cursor:pointer;background:linear-gradient(180deg,#dcb360,#a9762f);border:1px solid rgba(255,236,196,.5);box-shadow:0 6px 16px rgba(184,138,69,.35),inset 0 1px 0 rgba(255,255,255,.45),inset 0 -3px 8px rgba(120,80,20,.45);display:flex;align-items:center;justify-content:center;z-index:4">
+        <span style="font:700 17px Manrope;color:#1a130a">{{ n.num }}</span>
+        <span style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#1b2620;border:1.5px solid #d8af63;display:flex;align-items:center;justify-content:center"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span>
+        <sc-if value="{{ alwaysNames }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:32px;left:50%;transform:translateX(-50%);white-space:nowrap;font:600 9.5px Manrope;letter-spacing:.02em;color:rgba(213,195,154,.6)">{{ n.name }}</div></sc-if>
+      </div>
+    </sc-for>
+
+    <!-- LOCKED NODES -->
+    <sc-for list="{{ dLocked }}" as="l" hint-placeholder-count="5">
+      <div onMouseEnter="{{ l.onEnter }}" onMouseLeave="{{ l.onLeave }}" style="position:absolute;left:{{ l.left }};top:{{ l.top }};transform:translate(-50%,-50%);width:42px;height:42px;border-radius:50%;cursor:pointer;background:rgba(213,195,154,.045);border:1.5px dashed rgba(213,195,154,.22);display:flex;align-items:center;justify-content:center;z-index:3">
+        <span style="font:700 14px Manrope;color:rgba(213,195,154,.42)">{{ l.num }}</span>
+        <span style="position:absolute;bottom:-5px;right:-5px;width:17px;height:17px;border-radius:50%;background:#161d18;border:1px solid rgba(213,195,154,.22);display:flex;align-items:center;justify-content:center"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="2.2"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></span>
+        <sc-if value="{{ l.isFinal }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:-6px;border-radius:50%;border:1.5px dashed rgba(184,138,69,.5)"></div>
+          <div style="position:absolute;top:-26px;left:50%;transform:translateX(-50%);white-space:nowrap;font:700 8.5px Manrope;letter-spacing:.2em;color:#B88A45">ФИНАЛ</div>
+        </sc-if>
+        <sc-if value="{{ alwaysNames }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:30px;left:50%;transform:translateX(-50%);white-space:nowrap;font:600 9.5px Manrope;color:rgba(213,195,154,.4)">{{ l.name }}</div></sc-if>
+      </div>
+    </sc-for>
+
+    <!-- CURRENT NODE -->
+    <sc-if value="{{ dCurrent }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;left:{{ dCurrent.left }};top:{{ dCurrent.top }};transform:translate(-50%,-50%);z-index:6">
+        <div style="position:absolute;left:50%;top:50%;width:64px;height:64px;border-radius:50%;border:1.5px solid rgba(216,175,99,.55);animation:ringpulse 2.8s ease-out infinite"></div>
+        <div style="position:absolute;left:50%;top:50%;width:64px;height:64px;border-radius:50%;border:1.5px solid rgba(216,175,99,.4);animation:ringpulse 2.8s ease-out infinite 1.4s"></div>
+        <div onMouseEnter="{{ dCurrent.onEnter }}" onMouseLeave="{{ dCurrent.onLeave }}" style="position:relative;width:64px;height:64px;border-radius:50%;cursor:pointer;background:radial-gradient(circle at 38% 32%,#334036,#1a221c);border:2px solid #d8af63;box-shadow:0 0 0 4px rgba(184,138,69,.16),0 12px 28px rgba(0,0,0,.55),0 0 22px rgba(216,175,99,.42);display:flex;align-items:center;justify-content:center">
+          <span style="font:700 25px Manrope;color:#d8af63">{{ dCurrent.num }}</span>
+        </div>
+        <div style="position:absolute;bottom:80px;left:50%;transform:translateX(-50%);white-space:nowrap;background:linear-gradient(180deg,#2c352e,#1c241e);border:1px solid rgba(184,138,69,.45);border-radius:12px;padding:12px 16px 13px;box-shadow:0 18px 38px rgba(0,0,0,.55);text-align:center">
+          <div style="font:700 9px Manrope;letter-spacing:.2em;color:#B88A45">ВЫ ЗДЕСЬ · УРОВЕНЬ {{ dCurrent.num }}</div>
+          <div style="font:600 19px 'Cormorant Garamond',serif;color:#D5C39A;margin:3px 0 10px">{{ dCurrent.name }}</div>
+          <button style="width:100%;height:40px;border:none;border-radius:7px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 13px Manrope;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 7px 18px rgba(184,138,69,.32),inset 0 1px 0 rgba(255,255,255,.3)">Играть<svg width="13" height="13" viewBox="0 0 24 24" fill="#1a130a"><path d="M8 5v14l11-7z"></path></svg></button>
+          <div style="position:absolute;bottom:-6px;left:50%;transform:translateX(-50%) rotate(45deg);width:12px;height:12px;background:#1c241e;border-right:1px solid rgba(184,138,69,.45);border-bottom:1px solid rgba(184,138,69,.45)"></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- HOVER TOOLTIP -->
+    <sc-if value="{{ hoverD }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:{{ hoverDLeft }};top:{{ hoverDTop }};transform:translate(-50%,calc(-100% - 32px));z-index:20;pointer-events:none">
+        <div style="white-space:nowrap;background:#1c241e;border:1px solid rgba(184,138,69,.4);border-radius:8px;padding:8px 12px;box-shadow:0 12px 26px rgba(0,0,0,.5);text-align:center">
+          <div style="font:700 8px Manrope;letter-spacing:.18em;color:#B88A45">ВЕХА {{ hoverD.num }}</div>
+          <div style="font:600 13px 'Cormorant Garamond',serif;color:#D5C39A;margin-top:1px">{{ hoverD.name }}</div>
+          <sc-if value="{{ hoverD.locked }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;justify-content:center;gap:4px;font:600 8.5px Manrope;color:#879087;margin-top:3px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="2.2"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>Закрыто</div></sc-if>
+        </div>
+        <div style="position:absolute;bottom:-5px;left:50%;transform:translateX(-50%) rotate(45deg);width:10px;height:10px;background:#1c241e;border-right:1px solid rgba(184,138,69,.4);border-bottom:1px solid rgba(184,138,69,.4)"></div>
+      </div>
+    </sc-if>
+
+    <!-- LEGEND -->
+    <div style="position:absolute;left:40px;top:96px;display:flex;gap:18px;align-items:center;padding:9px 15px;border-radius:9px;background:rgba(16,21,18,.62);border:1px solid rgba(213,195,154,.1);backdrop-filter:blur(5px);z-index:8">
+      <div style="display:flex;align-items:center;gap:7px"><span style="width:14px;height:14px;border-radius:50%;background:linear-gradient(180deg,#dcb360,#a9762f);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)"></span><span style="font:600 10px Manrope;letter-spacing:.04em;color:#879087">Пройдено</span></div>
+      <div style="display:flex;align-items:center;gap:7px"><span style="width:14px;height:14px;border-radius:50%;background:#1a221c;border:1.5px solid #d8af63"></span><span style="font:600 10px Manrope;letter-spacing:.04em;color:#879087">Текущая</span></div>
+      <div style="display:flex;align-items:center;gap:7px"><span style="width:14px;height:14px;border-radius:50%;background:rgba(213,195,154,.05);border:1.5px dashed rgba(213,195,154,.3)"></span><span style="font:600 10px Manrope;letter-spacing:.04em;color:#879087">Закрыто</span></div>
+    </div>
+
+    <!-- COMPASS -->
+    <div style="position:absolute;left:48px;bottom:118px;width:100px;height:100px;z-index:8">
+      <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="46" fill="rgba(16,21,18,.5)" stroke="rgba(184,138,69,.4)"></circle>
+        <circle cx="50" cy="50" r="36" stroke="rgba(184,138,69,.22)" stroke-width=".8"></circle>
+        <g stroke="rgba(184,138,69,.5)" stroke-width="1.4" stroke-linecap="round"><line x1="50" y1="7" x2="50" y2="16"></line><line x1="50" y1="84" x2="50" y2="93"></line><line x1="7" y1="50" x2="16" y2="50"></line><line x1="84" y1="50" x2="93" y2="50"></line></g>
+        <path d="M50 19 L57 50 L50 50 Z" fill="#d8af63"></path><path d="M50 19 L43 50 L50 50 Z" fill="#a9762f"></path>
+        <path d="M50 81 L57 50 L50 50 Z" fill="#6b5226"></path><path d="M50 81 L43 50 L50 50 Z" fill="#4f3c1b"></path>
+        <circle cx="50" cy="50" r="3" fill="#D5C39A"></circle>
+        <text x="50" y="30" fill="#d8af63" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600" text-anchor="middle">С</text>
+      </svg>
+    </div>
+    <div style="position:absolute;left:38px;bottom:78px;font:600 9px 'JetBrains Mono',monospace;letter-spacing:.12em;color:rgba(213,195,154,.4);z-index:8">ЛИСТ I · СЕВЕРНЫЙ СЕКТОР</div>
+
+    <!-- SCALE BAR -->
+    <div style="position:absolute;right:40px;bottom:40px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;z-index:8">
+      <div style="display:flex"><span style="width:36px;height:5px;background:rgba(213,195,154,.5)"></span><span style="width:36px;height:5px;background:rgba(213,195,154,.16)"></span><span style="width:36px;height:5px;background:rgba(213,195,154,.5)"></span></div>
+      <span style="font:600 9px 'JetBrains Mono',monospace;letter-spacing:.1em;color:rgba(213,195,154,.45)">0 — 25 — 50 КМ</span>
+    </div>
+
+    <!-- inner vignette -->
+    <div style="position:absolute;inset:0;box-shadow:inset 0 0 160px rgba(8,12,10,.7);pointer-events:none"></div>
+  </div>
+
+  <!-- ===== TOP HUD ===== -->
+  <div style="position:absolute;top:0;left:0;right:0;height:78px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;border-bottom:1px solid rgba(213,195,154,.12);background:linear-gradient(180deg,rgba(22,29,24,.94),rgba(16,21,18,.72));backdrop-filter:blur(6px);z-index:10">
+    <div style="display:flex;align-items:center;gap:16px">
+      <button style="width:44px;height:44px;border-radius:10px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>
+      <div style="width:1px;height:34px;background:rgba(213,195,154,.12)"></div>
+      <div>
+        <div style="font:700 10px Manrope;letter-spacing:.22em;color:#B88A45">ЭКСПЕДИЦИЯ · СЕВЕРНЫЙ МАРШРУТ</div>
+        <div style="font:600 24px 'Cormorant Garamond',serif;color:#D5C39A;margin-top:1px;letter-spacing:.01em">Белый меридиан</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:7px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font:600 9.5px Manrope;letter-spacing:.2em;color:#879087">ПРОГРЕСС ЭКСПЕДИЦИИ</span><span style="font:700 13px Manrope;color:#d8af63">{{ progLabel }}</span></div>
+      <div style="display:flex;gap:3px;width:300px">
+        <sc-for list="{{ segs }}" as="s" hint-placeholder-count="13"><span style="flex:1;height:6px;border-radius:2px;background:{{ s.bg }};box-shadow:{{ s.sh }}"></span></sc-for>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px">
+      <button style="width:44px;height:44px;border-radius:10px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"></path><path d="M16 9a3.5 3.5 0 0 1 0 6"></path></svg></button>
+      <button style="width:44px;height:44px;border-radius:10px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3.2"></circle><path d="M19.4 13a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg></button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- MOBILE · КАРТА КАМПАНИИ -->
+<!-- ============================================================ -->
+<div data-drags-parent="1" style="position:absolute;left:1640px;top:34px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">MOBILE · 390 × 844</div>
+
+<div data-screen-label="Mobile · Карта кампании" style="position:absolute;left:1640px;top:78px;width:390px;height:844px;background:#0F1512;border-radius:30px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.55);font-family:Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+
+  <!-- map base -->
+  <div style="position:absolute;inset:0;background:radial-gradient(90% 50% at 50% 0%,rgba(96,206,168,.12),transparent 55%),radial-gradient(90% 40% at 50% 100%,rgba(47,106,87,.16),transparent 60%)"></div>
+  <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 109px,rgba(213,195,154,.04) 109px 110px),repeating-linear-gradient(90deg,transparent 0 89px,rgba(213,195,154,.035) 89px 90px);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+
+  <!-- translated inner map -->
+  <div style="position:absolute;left:0;top:0;width:390px;height:1900px;transform:translateY(-398px)">
+    <!-- contours -->
+    <sc-if value="{{ showContours }}" hint-placeholder-val="{{ true }}">
+    <svg viewBox="0 0 390 1900" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+      <g fill="none" stroke="rgba(184,138,69,.1)" stroke-width="1">
+        <g transform="rotate(-12 150 810)"><ellipse cx="150" cy="810" rx="60" ry="80"/><ellipse cx="150" cy="810" rx="120" ry="150"/><ellipse cx="150" cy="810" rx="190" ry="230"/></g>
+        <g transform="rotate(10 290 360)"><ellipse cx="290" cy="360" rx="50" ry="66"/><ellipse cx="290" cy="360" rx="110" ry="138"/></g>
+        <g transform="rotate(8 110 1390)"><ellipse cx="110" cy="1390" rx="60" ry="84"/><ellipse cx="110" cy="1390" rx="124" ry="158"/></g>
+      </g>
+    </svg>
+    </sc-if>
+
+    <!-- route -->
+    <svg viewBox="0 0 390 1900" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible">
+      <path d="{{ mRouteRest }}" fill="none" stroke="rgba(213,195,154,.26)" stroke-width="2.5" stroke-dasharray="1.5 8" stroke-linecap="round"></path>
+      <path d="{{ mRouteDone }}" fill="none" stroke="#d8af63" stroke-width="3.5" stroke-linecap="round" style="filter:drop-shadow(0 0 5px rgba(216,175,99,.5))"></path>
+    </svg>
+
+    <!-- completed -->
+    <sc-for list="{{ mDone }}" as="n" hint-placeholder-count="7">
+      <div style="position:absolute;left:{{ n.left }};top:{{ n.top }};transform:translate(-50%,-50%);width:42px;height:42px;border-radius:50%;background:linear-gradient(180deg,#dcb360,#a9762f);border:1px solid rgba(255,236,196,.5);box-shadow:0 5px 14px rgba(184,138,69,.35),inset 0 1px 0 rgba(255,255,255,.45);display:flex;align-items:center;justify-content:center;z-index:4">
+        <span style="font:700 15px Manrope;color:#1a130a">{{ n.num }}</span>
+        <span style="position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:#1b2620;border:1.5px solid #d8af63;display:flex;align-items:center;justify-content:center"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span>
+      </div>
+    </sc-for>
+
+    <!-- locked -->
+    <sc-for list="{{ mLocked }}" as="l" hint-placeholder-count="5">
+      <div style="position:absolute;left:{{ l.left }};top:{{ l.top }};transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:rgba(213,195,154,.045);border:1.5px dashed rgba(213,195,154,.22);display:flex;align-items:center;justify-content:center;z-index:3">
+        <span style="font:700 13px Manrope;color:rgba(213,195,154,.42)">{{ l.num }}</span>
+        <span style="position:absolute;bottom:-4px;right:-4px;width:15px;height:15px;border-radius:50%;background:#161d18;border:1px solid rgba(213,195,154,.22);display:flex;align-items:center;justify-content:center"><svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="2.4"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></span>
+        <sc-if value="{{ l.isFinal }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:-5px;border-radius:50%;border:1.5px dashed rgba(184,138,69,.5)"></div></sc-if>
+      </div>
+    </sc-for>
+
+    <!-- current -->
+    <sc-if value="{{ mCurrent }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;left:{{ mCurrent.left }};top:{{ mCurrent.top }};transform:translate(-50%,-50%);z-index:6">
+        <div style="position:absolute;left:50%;top:50%;width:58px;height:58px;border-radius:50%;border:1.5px solid rgba(216,175,99,.55);animation:ringpulse 2.8s ease-out infinite"></div>
+        <div style="position:relative;width:58px;height:58px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#334036,#1a221c);border:2px solid #d8af63;box-shadow:0 0 0 4px rgba(184,138,69,.16),0 10px 24px rgba(0,0,0,.55),0 0 20px rgba(216,175,99,.42);display:flex;align-items:center;justify-content:center"><span style="font:700 22px Manrope;color:#d8af63">{{ mCurrent.num }}</span></div>
+        <div style="position:absolute;top:-30px;left:50%;transform:translateX(-50%);white-space:nowrap;font:700 8.5px Manrope;letter-spacing:.16em;color:#B88A45;text-align:center">ВЫ ЗДЕСЬ</div>
+      </div>
+    </sc-if>
+  </div>
+
+  <!-- top/bottom fades -->
+  <div style="position:absolute;left:0;right:0;top:90px;height:64px;background:linear-gradient(180deg,#0F1512,transparent);pointer-events:none;z-index:4"></div>
+  <div style="position:absolute;left:0;right:0;bottom:96px;height:90px;background:linear-gradient(0deg,#0F1512,transparent);pointer-events:none;z-index:4"></div>
+
+  <!-- status bar -->
+  <div style="position:absolute;top:0;left:0;right:0;height:38px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 22px 4px;font:600 12px Manrope;color:#D5C39A;z-index:7"><span>9:41</span><span style="font-size:11px;letter-spacing:.05em">▮▮▮ ◷ 􀛨</span></div>
+
+  <!-- top bar -->
+  <div style="position:absolute;top:38px;left:0;right:0;height:54px;display:flex;align-items:center;gap:11px;padding:0 14px;border-bottom:1px solid rgba(213,195,154,.12);background:linear-gradient(180deg,rgba(22,29,24,.95),rgba(16,21,18,.6));backdrop-filter:blur(6px);z-index:7">
+    <button style="width:38px;height:38px;border-radius:9px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>
+    <div style="flex:1;min-width:0"><div style="font:700 8.5px Manrope;letter-spacing:.18em;color:#B88A45">ЭКСПЕДИЦИЯ · СЕВЕР</div><div style="font:600 18px 'Cormorant Garamond',serif;color:#D5C39A;line-height:1.1">Белый меридиан</div></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+      <span style="font:700 12px Manrope;color:#d8af63">{{ progLabel }}</span>
+      <div style="display:flex;gap:2px;width:88px"><sc-for list="{{ segs }}" as="s" hint-placeholder-count="13"><span style="flex:1;height:4px;border-radius:1px;background:{{ s.bg }}"></span></sc-for></div>
+    </div>
+  </div>
+
+  <!-- bottom CTA -->
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:14px 16px 22px;display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,transparent,#0F1512 26%);z-index:7">
+    <div style="flex:1;min-width:0"><div style="font:700 8.5px Manrope;letter-spacing:.16em;color:#B88A45">ТЕКУЩАЯ ВЕХА · УР. {{ mCurrent.num }}</div><div style="font:600 17px 'Cormorant Garamond',serif;color:#D5C39A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ curName }}</div></div>
+    <button style="height:50px;padding:0 22px;border:none;border-radius:11px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 14.5px Manrope;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 20px rgba(184,138,69,.32),inset 0 1px 0 rgba(255,255,255,.3);flex-shrink:0">Играть<svg width="15" height="15" viewBox="0 0 24 24" fill="#1a130a"><path d="M8 5v14l11-7z"></path></svg></button>
+  </div>
+
+  <!-- home indicator -->
+  <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:rgba(213,195,154,.3);z-index:8"></div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- MOBILE LANDSCAPE · КАРТА КАМПАНИИ · 896 × 414 -->
+<!-- ============================================================ -->
+<div data-drags-parent="1" style="position:absolute;left:1640px;top:954px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">MOBILE · ГОРИЗОНТ · 896 × 414</div>
+
+<div data-screen-label="Mobile landscape · Карта кампании" style="position:absolute;left:1640px;top:998px;width:896px;height:414px;background:#0F1512;border-radius:34px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.55);font-family:Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+
+  <!-- map base -->
+  <div style="position:absolute;inset:0;background:radial-gradient(90% 70% at 50% 118%,rgba(47,106,87,.16),transparent 60%),radial-gradient(80% 60% at 50% -18%,rgba(96,206,168,.12),transparent 55%)"></div>
+  <div style="position:absolute;left:-6%;right:-6%;top:0;height:55%;background:linear-gradient(180deg,rgba(96,206,168,.10),transparent 70%);filter:blur(8px);animation:drift 26s ease-in-out infinite alternate;pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 79px,rgba(213,195,154,.045) 79px 80px),repeating-linear-gradient(90deg,transparent 0 99px,rgba(213,195,154,.04) 99px 100px);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+
+  <!-- scaled desktop-style horizontal map -->
+  <div style="position:absolute;left:0;top:0;width:1440px;height:900px;transform-origin:top left;transform:translateY(-78px) scale(.622)">
+    <!-- contours -->
+    <sc-if value="{{ showContours }}" hint-placeholder-val="{{ true }}">
+    <svg viewBox="0 0 1440 900" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+      <g fill="none" stroke="rgba(184,138,69,.11)" stroke-width="1.4">
+        <g transform="rotate(-16 1005 540)"><ellipse cx="1005" cy="540" rx="62" ry="46"/><ellipse cx="1005" cy="540" rx="112" ry="84"/><ellipse cx="1005" cy="540" rx="168" ry="126"/><ellipse cx="1005" cy="540" rx="230" ry="172"/></g>
+        <g transform="rotate(14 360 330)"><ellipse cx="360" cy="330" rx="54" ry="42"/><ellipse cx="360" cy="330" rx="104" ry="80"/><ellipse cx="360" cy="330" rx="160" ry="122"/></g>
+      </g>
+    </svg>
+    </sc-if>
+
+    <!-- route -->
+    <svg viewBox="0 0 1440 900" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible">
+      <path d="{{ dRouteRest }}" fill="none" stroke="rgba(213,195,154,.26)" stroke-width="3.2" stroke-dasharray="2 11" stroke-linecap="round"></path>
+      <path d="{{ dRouteDone }}" fill="none" stroke="#d8af63" stroke-width="4.5" stroke-linecap="round" style="filter:drop-shadow(0 0 8px rgba(216,175,99,.5))"></path>
+    </svg>
+
+    <!-- completed nodes -->
+    <sc-for list="{{ dDone }}" as="n" hint-placeholder-count="7">
+      <div style="position:absolute;left:{{ n.left }};top:{{ n.top }};transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:linear-gradient(180deg,#dcb360,#a9762f);border:1px solid rgba(255,236,196,.5);box-shadow:0 6px 16px rgba(184,138,69,.35),inset 0 1px 0 rgba(255,255,255,.45);display:flex;align-items:center;justify-content:center;z-index:4">
+        <span style="font:700 17px Manrope;color:#1a130a">{{ n.num }}</span>
+        <span style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#1b2620;border:1.5px solid #d8af63;display:flex;align-items:center;justify-content:center"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span>
+      </div>
+    </sc-for>
+
+    <!-- locked nodes -->
+    <sc-for list="{{ dLocked }}" as="l" hint-placeholder-count="5">
+      <div style="position:absolute;left:{{ l.left }};top:{{ l.top }};transform:translate(-50%,-50%);width:42px;height:42px;border-radius:50%;background:rgba(213,195,154,.045);border:1.5px dashed rgba(213,195,154,.22);display:flex;align-items:center;justify-content:center;z-index:3">
+        <span style="font:700 14px Manrope;color:rgba(213,195,154,.42)">{{ l.num }}</span>
+        <span style="position:absolute;bottom:-5px;right:-5px;width:17px;height:17px;border-radius:50%;background:#161d18;border:1px solid rgba(213,195,154,.22);display:flex;align-items:center;justify-content:center"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="2.2"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></span>
+        <sc-if value="{{ l.isFinal }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:-6px;border-radius:50%;border:1.5px dashed rgba(184,138,69,.5)"></div></sc-if>
+      </div>
+    </sc-for>
+
+    <!-- current node (no callout) -->
+    <sc-if value="{{ dCurrent }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;left:{{ dCurrent.left }};top:{{ dCurrent.top }};transform:translate(-50%,-50%);z-index:6">
+        <div style="position:absolute;left:50%;top:50%;width:64px;height:64px;border-radius:50%;border:1.5px solid rgba(216,175,99,.55);animation:ringpulse 2.8s ease-out infinite"></div>
+        <div style="position:relative;width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#334036,#1a221c);border:2px solid #d8af63;box-shadow:0 0 0 4px rgba(184,138,69,.16),0 12px 28px rgba(0,0,0,.55),0 0 22px rgba(216,175,99,.42);display:flex;align-items:center;justify-content:center"><span style="font:700 25px Manrope;color:#d8af63">{{ dCurrent.num }}</span></div>
+        <div style="position:absolute;top:-30px;left:50%;transform:translateX(-50%);white-space:nowrap;font:700 11px Manrope;letter-spacing:.2em;color:#B88A45;text-align:center">ВЫ ЗДЕСЬ</div>
+      </div>
+    </sc-if>
+  </div>
+
+  <!-- vignette -->
+  <div style="position:absolute;inset:0;box-shadow:inset 0 0 120px rgba(8,12,10,.7);pointer-events:none;z-index:5"></div>
+  <!-- top/bottom fades -->
+  <div style="position:absolute;left:0;right:0;top:48px;height:46px;background:linear-gradient(180deg,#0F1512,transparent);pointer-events:none;z-index:6"></div>
+  <div style="position:absolute;left:0;right:0;bottom:66px;height:66px;background:linear-gradient(0deg,#0F1512,transparent);pointer-events:none;z-index:6"></div>
+
+  <!-- top bar -->
+  <div style="position:absolute;top:0;left:0;right:0;height:50px;display:flex;align-items:center;gap:13px;padding:0 18px;border-bottom:1px solid rgba(213,195,154,.12);background:linear-gradient(180deg,rgba(22,29,24,.95),rgba(16,21,18,.55));backdrop-filter:blur(6px);z-index:7">
+    <button style="width:36px;height:36px;border-radius:9px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>
+    <div style="min-width:0"><div style="font:700 8.5px Manrope;letter-spacing:.18em;color:#B88A45">ЭКСПЕДИЦИЯ · СЕВЕР</div><div style="font:600 19px 'Cormorant Garamond',serif;color:#D5C39A;line-height:1.1">Белый меридиан</div></div>
+    <div style="flex:1"></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
+      <span style="font:700 12px Manrope;color:#d8af63">{{ progLabel }}</span>
+      <div style="display:flex;gap:2px;width:160px"><sc-for list="{{ segs }}" as="s" hint-placeholder-count="13"><span style="flex:1;height:4px;border-radius:1px;background:{{ s.bg }}"></span></sc-for></div>
+    </div>
+  </div>
+
+  <!-- bottom CTA -->
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 18px 18px;display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,transparent,#0F1512 26%);z-index:7">
+    <div style="flex:1;min-width:0"><div style="font:700 8.5px Manrope;letter-spacing:.16em;color:#B88A45">ТЕКУЩАЯ ВЕХА · УР. {{ dCurrent.num }}</div><div style="font:600 17px 'Cormorant Garamond',serif;color:#D5C39A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ curName }}</div></div>
+    <button style="height:48px;padding:0 24px;border:none;border-radius:11px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 14.5px Manrope;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 20px rgba(184,138,69,.32),inset 0 1px 0 rgba(255,255,255,.3);flex-shrink:0">Играть<svg width="15" height="15" viewBox="0 0 24 24" fill="#1a130a"><path d="M8 5v14l11-7z"></path></svg></button>
+  </div>
+
+  <!-- home indicator -->
+  <div style="position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:rgba(213,195,154,.3);z-index:8"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1440, &quot;height&quot;: 900 },
+  &quot;completed&quot;: { &quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 7, &quot;min&quot;: 0, &quot;max&quot;: 13, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Прогресс&quot; },
+  &quot;alwaysShowNames&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Карта&quot; },
+  &quot;showContours&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Карта&quot; }
+}">
+class Component extends DCLogic {
+  state = { hover: null };
+
+  cr(pts){
+    if(!pts || pts.length < 2) return '';
+    var d = 'M ' + pts[0][0] + ' ' + pts[0][1];
+    for(var i=0;i<pts.length-1;i++){
+      var p0 = pts[i-1] || pts[i], p1 = pts[i], p2 = pts[i+1], p3 = pts[i+2] || p2;
+      var c1x = p1[0] + (p2[0]-p0[0])/6, c1y = p1[1] + (p2[1]-p0[1])/6;
+      var c2x = p2[0] - (p3[0]-p1[0])/6, c2y = p2[1] - (p3[1]-p1[1])/6;
+      d += ' C ' + c1x.toFixed(1) + ' ' + c1y.toFixed(1) + ' ' + c2x.toFixed(1) + ' ' + c2y.toFixed(1) + ' ' + p2[0] + ' ' + p2[1];
+    }
+    return d;
+  }
+
+  names(){
+    return ['Базовый лагерь','Ледяные ворота','Перевал Молчания','Брошенная вышка','Расщелина','Снежный архив','Радиостанция','Станция «Восход»','Ледовый порог','Чёрный гребень','Хребет ветров','Затерянная долина','Сердце меридиана'];
+  }
+
+  build(pts, fid, completed){
+    var nm = this.names(), self = this;
+    var done = [], locked = [], current = null;
+    pts.forEach(function(p, i){
+      var node = {
+        num: i+1, name: nm[i], left: p[0]+'px', top: p[1]+'px',
+        onEnter: function(){ self.setState({ hover: { x:p[0], y:p[1], num:i+1, name:nm[i], locked:i>completed, frame:fid } }); },
+        onLeave: function(){ self.setState({ hover: null }); }
+      };
+      if(i < completed) done.push(node);
+      else if(i === completed){ node.isCurrent = true; current = node; }
+      else { node.isFinal = (i === 12); locked.push(node); }
+    });
+    return { done:done, locked:locked, current:current };
+  }
+
+  renderVals(){
+    var dPts = [[205,675],[440,650],[670,680],[900,645],[1125,672],[1248,475],[1015,452],[780,488],[548,448],[315,486],[255,300],[560,252],[1130,238]];
+    var mPts = [[150,1820],[280,1680],[250,1530],[110,1390],[140,1240],[275,1100],[295,960],[150,810],[100,660],[235,520],[300,360],[180,210],[130,70]];
+    var completed = Math.max(0, Math.min(13, this.props.completed != null ? this.props.completed : 7));
+    var nm = this.names();
+    var d = this.build(dPts, 'd', completed), m = this.build(mPts, 'm', completed);
+
+    var segs = [];
+    for(var i=0;i<13;i++){
+      var bg = i < completed ? 'linear-gradient(180deg,#d8af63,#a9762f)' : (i === completed ? 'linear-gradient(180deg,#e7c074,#b3812f)' : 'rgba(213,195,154,.1)');
+      var sh = i === completed ? '0 0 8px rgba(216,175,99,.65)' : 'none';
+      segs.push({ bg:bg, sh:sh });
+    }
+
+    var h = this.state.hover;
+    var hoverD = (h && h.frame === 'd') ? h : null;
+    var hoverM = (h && h.frame === 'm') ? h : null;
+
+    return {
+      dDone: d.done, dCurrent: d.current, dLocked: d.locked,
+      mDone: m.done, mCurrent: m.current, mLocked: m.locked,
+      dRouteDone: this.cr(dPts.slice(0, Math.min(completed+1, 13))),
+      dRouteRest: this.cr(dPts.slice(Math.min(completed, 12))),
+      mRouteDone: this.cr(mPts.slice(0, Math.min(completed+1, 13))),
+      mRouteRest: this.cr(mPts.slice(Math.min(completed, 12))),
+      segs: segs,
+      hoverD: hoverD, hoverM: hoverM,
+      hoverDLeft: hoverD ? hoverD.x+'px' : '0px',
+      hoverDTop: hoverD ? hoverD.y+'px' : '0px',
+      alwaysNames: this.props.alwaysShowNames != null ? this.props.alwaysShowNames : false,
+      showContours: this.props.showContours != null ? this.props.showContours : true,
+      progLabel: completed + ' / 13',
+      curName: nm[Math.min(completed, 12)]
+    };
+  }
+}
+</script>
+</body>
+</html>

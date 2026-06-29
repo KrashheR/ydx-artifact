@@ -122,7 +122,7 @@ export function SettingsModal({ isOpen, onClose }: Props) {
           {/* Panel */}
           <motion.div
             ref={dialogRef}
-            className="relative flex w-full flex-col overflow-hidden sm:mx-auto sm:max-w-[560px] sm:rounded-2xl"
+            className="settings-dialog relative flex w-full flex-col overflow-hidden sm:mx-auto sm:max-w-[560px] sm:rounded-2xl"
             initial={prefersReducedMotion ? { opacity: 0 } : { y: "100%" }}
             animate={{ y: 0, opacity: 1 }}
             exit={prefersReducedMotion ? { opacity: 0 } : { y: "100%" }}
@@ -155,7 +155,7 @@ export function SettingsModal({ isOpen, onClose }: Props) {
 
             {/* Header */}
             <div
-              className="flex flex-shrink-0 items-center gap-3.5 px-7 pb-5 pt-4 sm:pb-[22px] sm:pt-[26px]"
+              className="settings-header flex flex-shrink-0 items-center gap-3.5 px-7 pb-5 pt-4 sm:pb-[22px] sm:pt-[26px]"
               style={{ borderBottom: "1px solid rgba(213,195,154,.1)" }}
             >
               <div
@@ -200,7 +200,7 @@ export function SettingsModal({ isOpen, onClose }: Props) {
             </div>
 
             {/* Language section label */}
-            <div className="flex flex-shrink-0 items-center gap-2.5 px-7 pb-2 pt-5">
+            <div className="settings-section-label flex flex-shrink-0 items-center gap-2.5 px-7 pb-2 pt-5">
               <GlobeIcon />
               <span className="text-[11px] font-bold uppercase tracking-[.2em] text-exp-muted">
                 {t("settings.languageSection")}
@@ -217,7 +217,7 @@ export function SettingsModal({ isOpen, onClose }: Props) {
 
             {/* Language list */}
             <div
-              className="flex-1 overflow-y-auto px-[22px] pb-1.5 pt-2 sm:max-h-[368px] sm:flex-none"
+              className="settings-language-list flex-1 overflow-y-auto px-[22px] pb-1.5 pt-2 sm:max-h-[368px] sm:flex-none"
               style={{
                 scrollbarWidth: "thin",
                 scrollbarColor: "rgba(184,138,69,.4) rgba(213,195,154,.05)",
@@ -297,7 +297,7 @@ export function SettingsModal({ isOpen, onClose }: Props) {
 
             {/* Footer */}
             <div
-              className="flex flex-shrink-0 items-center justify-between gap-4 px-7 pb-8 pt-4 sm:pb-6"
+              className="settings-footer flex flex-shrink-0 items-center justify-between gap-4 px-7 pb-8 pt-4 sm:pb-6"
               style={{ borderTop: "1px solid rgba(213,195,154,.1)" }}
             >
               <div className="flex items-center gap-2">

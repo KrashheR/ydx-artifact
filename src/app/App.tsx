@@ -85,7 +85,7 @@ export function App() {
         type="button"
         onClick={() => setSettingsOpen(true)}
         aria-label={t("actions.settings")}
-        className="fixed right-4 top-4 z-[90] flex h-11 w-11 items-center justify-center rounded-[9px] text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+        className={`app-settings-button app-settings-button--${screen.kind} fixed right-4 top-4 z-[90] flex h-11 w-11 items-center justify-center rounded-[9px] text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass`}
         style={{
           border: "1px solid rgba(213,195,154,.14)",
           background: "rgba(213,195,154,.05)",

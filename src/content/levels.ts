@@ -161,9 +161,9 @@ const fourthLevel = levelSchema.parse({
   differences: [
     {
       id: "switch-position-4",
-      hitAreaA: { kind: "circle", cx: 0.333, cy: 0.813, radius: 0.212 },
-      hitAreaB: { kind: "circle", cx: 0.333, cy: 0.813, radius: 0.212 },
-      hintArea: { kind: "circle", cx: 0.333, cy: 0.813, radius: 0.245 },
+      hitAreaA: { kind: "ellipse", cx: 0.333, cy: 0.813, rx: 0.212, ry: 0.17 },
+      hitAreaB: { kind: "ellipse", cx: 0.333, cy: 0.813, rx: 0.212, ry: 0.17 },
+      hintArea: { kind: "ellipse", cx: 0.333, cy: 0.813, rx: 0.245, ry: 0.205 },
       difficulty: 1,
     },
     {

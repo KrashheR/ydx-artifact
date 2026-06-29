@@ -1,11 +1,19 @@
 # Yandex Integration
 
-`src/services/platform/mockPlatform.ts` is the current adapter seam. It now wraps the Yandex review API and fullscreen advertising API:
+`src/services/platform/mockPlatform.ts` is the current adapter seam. It now wraps the Yandex review API, rewarded advertising API and fullscreen advertising API:
 
 - `mockPlatform.canReview()` safely returns `{ value: false, reason: "UNKNOWN" }` when Yandex SDK or `ysdk.feedback` is unavailable.
 - `mockPlatform.requestReview()` normalizes the documented `feedbackSent` response and tolerates the older `sentFeedback` example payload.
+- `mockPlatform.showRewarded()` calls `ysdk.adv.showRewardedVideo()` when available, grants only after `onRewarded` followed by close, and falls back to an immediate local mock reward in Vite/local mode.
 - `mockPlatform.showInterstitial()` calls `ysdk.adv.showFullscreenAdv()` when available and falls back to a short local mock open/close cycle in Vite/local mode.
 - SDK initialization is cached via a singleton promise and reuses `window.ysdk` when the host already initialized the SDK.
+
+Rewarded hint behavior:
+
+- the regular area hint button spends one magnifier while the player has a positive balance;
+- when the balance is `0`, the same button shows an ad icon and requests a rewarded Yandex ad;
+- the hint marker is applied only when the rewarded ad returns `rewarded`; closing or failing the ad returns the player to gameplay without a hint or penalty;
+- rewarded hint offers remain available after a rewarded hint while there are still unrevealed differences, so the player can watch another ad for another hint.
 
 Forced interstitial cadence:
 

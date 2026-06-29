@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+@keyframes fog{0%{transform:translateX(-5%)}100%{transform:translateX(6%)}}
+@keyframes pulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.25)}}
+@keyframes ring{0%{transform:scale(.4);opacity:0}40%{opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes ripple{0%{transform:scale(.3);opacity:.9}100%{transform:scale(2.4);opacity:0}}
+@keyframes pop{0%{transform:scale(.3) translateY(8px);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1) translateY(0);opacity:1}}
+@keyframes hintsweep{0%,100%{box-shadow:0 0 0 0 rgba(216,175,99,0)}50%{box-shadow:0 0 22px 2px rgba(216,175,99,.4)}}
+*{box-sizing:border-box}
+</style>
+</helmet>
+
+<!-- ============ DESKTOP GAMEPLAY ============ -->
+<div data-drags-parent="1" style="position:absolute;left:80px;top:34px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">DESKTOP · ИГРА «НАЙДИ ОТЛИЧИЯ»</div>
+
+<div data-screen-label="Desktop · Игровой экран" style="position:absolute;left:80px;top:78px;width:1440px;height:900px;background:#151B18;border-radius:8px;overflow:hidden;box-shadow:0 36px 90px rgba(0,0,0,.5);font-family:Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+
+  <div style="position:absolute;inset:0;background:radial-gradient(120% 70% at 50% -10%,rgba(47,106,87,.14),transparent 55%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+
+  <!-- TOP HUD -->
+  <div style="position:relative;height:74px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;border-bottom:1px solid rgba(213,195,154,.12);background:linear-gradient(180deg,rgba(34,42,37,.92),rgba(21,27,24,.4))">
+    <div style="display:flex;align-items:center;gap:16px">
+      <button style="width:42px;height:42px;border-radius:9px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div style="width:1px;height:32px;background:rgba(213,195,154,.12)"></div>
+      <div>
+        <div style="font:700 10px Manrope;letter-spacing:.22em;color:#B88A45">БЕЛЫЙ МЕРИДИАН · УРОВЕНЬ 8 / 13</div>
+        <div style="font:600 22px 'Cormorant Garamond',serif;color:#D5C39A;margin-top:1px;letter-spacing:.01em">Станция «Восход»</div>
+      </div>
+    </div>
+
+    <!-- center: timer + found -->
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="display:flex;align-items:center;gap:9px;height:48px;padding:0 18px;border-radius:11px;border:1px solid rgba(213,195,154,.14);background:rgba(21,27,24,.6)">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.8"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2" stroke-linecap="round"/><path d="M9 2h6" stroke-linecap="round"/></svg>
+        <span style="font:600 22px 'JetBrains Mono',monospace;color:#D5C39A;letter-spacing:.04em">02:14</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:11px;height:48px;padding:0 20px 0 16px;border-radius:11px;border:1px solid rgba(184,138,69,.4);background:linear-gradient(180deg,rgba(184,138,69,.16),rgba(184,138,69,.05))">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <div style="display:flex;align-items:baseline;gap:2px"><span style="font:700 24px Manrope;color:#d8af63">3</span><span style="font:600 15px Manrope;color:rgba(213,195,154,.5)">/ 7</span></div>
+        <span style="font:600 10.5px Manrope;letter-spacing:.12em;color:#879087;margin-left:2px">ОТЛИЧИЙ</span>
+      </div>
+    </div>
+
+    <!-- right: actions -->
+    <div style="display:flex;align-items:center;gap:10px">
+      <button style="display:flex;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:9px;border:1px solid rgba(184,138,69,.45);background:rgba(184,138,69,.08);color:#d8af63;font:700 13px Manrope;cursor:pointer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z"/></svg>
+        Подсказка
+        <span style="display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;border-radius:6px;background:#d8af63;color:#1a130a;font:700 11px Manrope">2</span>
+      </button>
+      <button style="width:44px;height:44px;border-radius:9px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;cursor:pointer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+      </button>
+      <button style="width:44px;height:44px;border-radius:9px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;cursor:pointer">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- PLAY AREA: two images -->
+  <div style="display:flex;gap:22px;padding:26px 30px 0;height:626px">
+
+    <!-- IMAGE A -->
+    <div style="flex:1;display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:rgba(184,138,69,.16);border:1px solid rgba(184,138,69,.4);font:700 11px Manrope;color:#d8af63">A</span><span style="font:600 11px Manrope;letter-spacing:.18em;color:#879087">АРХИВНЫЙ СНИМОК · ОРИГИНАЛ</span></div>
+        <span style="font:500 10px 'JetBrains Mono',monospace;color:rgba(135,144,135,.7)">REF-0481-N</span>
+      </div>
+      <!-- placeholder image with markers -->
+      <div style="position:relative;flex:1;border-radius:13px;overflow:hidden;border:1px solid rgba(213,195,154,.14);background:#1b211d;box-shadow:inset 0 0 60px rgba(0,0,0,.5)">
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(213,195,154,.045) 0 14px,rgba(213,195,154,.015) 14px 28px)"></div>
+        <div style="position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 38%,rgba(96,206,168,.07),transparent 60%)"></div>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:rgba(135,144,135,.6)">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M3 16l4.5-4 3.5 3 4-4 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span style="font:500 11px 'JetBrains Mono',monospace;letter-spacing:.06em">ИЛЛЮСТРАЦИЯ СЦЕНЫ · 1920×1280</span>
+        </div>
+        <!-- found markers -->
+        <div style="position:absolute;left:22%;top:30%;width:42px;height:42px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.5px solid #d8af63;box-shadow:0 0 14px rgba(216,175,99,.5),inset 0 0 10px rgba(216,175,99,.25);animation:ring .4s ease-out"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+        <div style="position:absolute;left:68%;top:24%;width:42px;height:42px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.5px solid #d8af63;box-shadow:0 0 14px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+        <div style="position:absolute;left:44%;top:72%;width:42px;height:42px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.5px solid #d8af63;box-shadow:0 0 14px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+        <!-- hint pulsing area -->
+        <div style="position:absolute;left:82%;top:60%;width:64px;height:64px;transform:translate(-50%,-50%);border-radius:50%;border:1.5px dashed rgba(216,175,99,.55);background:radial-gradient(circle,rgba(216,175,99,.12),transparent 70%);animation:pulse 2.4s ease-in-out infinite"></div>
+      </div>
+    </div>
+
+    <!-- divider -->
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding-top:30px">
+      <div style="flex:1;width:1px;background:linear-gradient(180deg,transparent,rgba(213,195,154,.2),transparent)"></div>
+      <div style="width:34px;height:34px;border-radius:50%;border:1px solid rgba(184,138,69,.4);background:rgba(21,27,24,.7);display:flex;align-items:center;justify-content:center;color:#B88A45"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 7l-4 5 4 5M16 7l4 5-4 5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div style="flex:1;width:1px;background:linear-gradient(180deg,transparent,rgba(213,195,154,.2),transparent)"></div>
+    </div>
+
+    <!-- IMAGE B -->
+    <div style="flex:1;display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:rgba(184,138,69,.16);border:1px solid rgba(184,138,69,.4);font:700 11px Manrope;color:#d8af63">B</span><span style="font:600 11px Manrope;letter-spacing:.18em;color:#879087">КОПИЯ · НАЙДИТЕ РАСХОЖДЕНИЯ</span></div>
+        <span style="font:500 10px 'JetBrains Mono',monospace;color:rgba(135,144,135,.7)">REF-0481-N·b</span>
+      </div>
+      <div style="position:relative;flex:1;border-radius:13px;overflow:hidden;border:1px solid rgba(213,195,154,.14);background:#1b211d;box-shadow:inset 0 0 60px rgba(0,0,0,.5)">
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(213,195,154,.045) 0 14px,rgba(213,195,154,.015) 14px 28px)"></div>
+        <div style="position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 38%,rgba(96,206,168,.07),transparent 60%)"></div>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:rgba(135,144,135,.6)">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M3 16l4.5-4 3.5 3 4-4 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span style="font:500 11px 'JetBrains Mono',monospace;letter-spacing:.06em">КОПИЯ С ОТЛИЧИЯМИ · 1920×1280</span>
+        </div>
+        <!-- found markers (mirrored) -->
+        <div style="position:absolute;left:22%;top:30%;width:42px;height:42px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.5px solid #d8af63;box-shadow:0 0 14px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+        <div style="position:absolute;left:68%;top:24%;width:42px;height:42px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.5px solid #d8af63;box-shadow:0 0 14px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+        <div style="position:absolute;left:44%;top:72%;width:42px;height:42px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.5px solid #d8af63;box-shadow:0 0 14px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+        <!-- wrong click marker -->
+        <div style="position:absolute;left:33%;top:50%;width:34px;height:34px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2px solid rgba(208,94,74,.85);background:rgba(208,94,74,.14)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#e08a78"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></div></div>
+        <!-- hint pulsing area -->
+        <div style="position:absolute;left:82%;top:60%;width:64px;height:64px;transform:translate(-50%,-50%);border-radius:50%;border:1.5px dashed rgba(216,175,99,.55);background:radial-gradient(circle,rgba(216,175,99,.12),transparent 70%);animation:pulse 2.4s ease-in-out infinite"></div>
+        <!-- click ripple -->
+        <div style="position:absolute;left:82%;top:60%;width:40px;height:40px;transform:translate(-50%,-50%);border-radius:50%;border:2px solid rgba(216,175,99,.6);animation:ripple 1.8s ease-out infinite"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM TRACKER -->
+  <div style="position:absolute;bottom:0;left:0;right:0;height:74px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;border-top:1px solid rgba(213,195,154,.12);background:linear-gradient(0deg,rgba(34,42,37,.9),rgba(21,27,24,.3))">
+    <div style="display:flex;align-items:center;gap:14px">
+      <span style="font:600 10.5px Manrope;letter-spacing:.16em;color:#879087">НАЙДЕНО</span>
+      <div style="display:flex;gap:8px">
+        <span style="width:26px;height:26px;border-radius:7px;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+        <span style="width:26px;height:26px;border-radius:7px;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+        <span style="width:26px;height:26px;border-radius:7px;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+        <span style="width:26px;height:26px;border-radius:7px;border:1px dashed rgba(213,195,154,.25);background:rgba(213,195,154,.04)"></span>
+        <span style="width:26px;height:26px;border-radius:7px;border:1px dashed rgba(213,195,154,.25);background:rgba(213,195,154,.04)"></span>
+        <span style="width:26px;height:26px;border-radius:7px;border:1px dashed rgba(213,195,154,.25);background:rgba(213,195,154,.04)"></span>
+        <span style="width:26px;height:26px;border-radius:7px;border:1px dashed rgba(213,195,154,.25);background:rgba(213,195,154,.04)"></span>
+      </div>
+    </div>
+    <!-- accuracy / penalty -->
+    <div style="display:flex;align-items:center;gap:22px">
+      <div style="display:flex;align-items:center;gap:9px"><span style="font:600 10.5px Manrope;letter-spacing:.14em;color:#879087">ТОЧНОСТЬ</span><div style="width:120px;height:6px;border-radius:3px;background:rgba(213,195,154,.12);overflow:hidden"><div style="width:75%;height:100%;background:linear-gradient(90deg,#6fc69e,#2F6A57)"></div></div><span style="font:700 12px Manrope;color:#9bd9bb">75%</span></div>
+      <div style="display:flex;align-items:center;gap:7px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e08a78" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg><span style="font:600 12px Manrope;color:#879087">1 промах · <span style="color:#e08a78">−5 сек</span></span></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============ MOBILE GAMEPLAY ============ -->
+<div data-drags-parent="1" style="position:absolute;left:1600px;top:34px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">MOBILE · ИГРА</div>
+
+<div data-screen-label="Mobile · Игровой экран" style="position:absolute;left:1600px;top:78px;width:390px;height:844px;background:#151B18;border-radius:30px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.5);font-family:Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+  <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+
+  <!-- status bar -->
+  <div style="height:38px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 22px 4px;font:600 12px Manrope;color:#D5C39A"><span>9:41</span><span style="font-size:11px;letter-spacing:.05em">▮▮▮ ◷ 􀛨</span></div>
+
+  <!-- compact HUD -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 16px 10px;gap:10px">
+    <button style="width:38px;height:38px;border-radius:9px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div style="flex:1;text-align:center;min-width:0"><div style="font:700 8.5px Manrope;letter-spacing:.16em;color:#B88A45">БЕЛЫЙ · УР. 8</div><div style="font:600 16px 'Cormorant Garamond',serif;color:#D5C39A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Станция «Восход»</div></div>
+    <div style="display:flex;align-items:center;gap:5px;height:38px;padding:0 12px;border-radius:9px;border:1px solid rgba(213,195,154,.14);background:rgba(21,27,24,.6);flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.9"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2" stroke-linecap="round"/></svg><span style="font:600 15px 'JetBrains Mono',monospace;color:#D5C39A">02:14</span></div>
+  </div>
+
+  <!-- found pill row -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:0 16px 10px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="display:flex;align-items:baseline;gap:2px"><span style="font:700 19px Manrope;color:#d8af63">3</span><span style="font:600 13px Manrope;color:rgba(213,195,154,.5)">/ 7</span></div>
+      <span style="font:600 9px Manrope;letter-spacing:.12em;color:#879087">ОТЛИЧИЙ</span>
+    </div>
+    <div style="display:flex;gap:5px">
+      <span style="width:18px;height:18px;border-radius:5px;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+      <span style="width:18px;height:18px;border-radius:5px;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+      <span style="width:18px;height:18px;border-radius:5px;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+      <span style="width:18px;height:18px;border-radius:5px;border:1px dashed rgba(213,195,154,.28)"></span>
+      <span style="width:18px;height:18px;border-radius:5px;border:1px dashed rgba(213,195,154,.28)"></span>
+      <span style="width:18px;height:18px;border-radius:5px;border:1px dashed rgba(213,195,154,.28)"></span>
+      <span style="width:18px;height:18px;border-radius:5px;border:1px dashed rgba(213,195,154,.28)"></span>
+    </div>
+  </div>
+
+  <!-- stacked images -->
+  <div style="padding:0 16px;display:flex;flex-direction:column;gap:10px">
+    <!-- IMAGE A -->
+    <div style="position:relative;height:248px;border-radius:13px;overflow:hidden;border:1px solid rgba(213,195,154,.14);background:#1b211d">
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(213,195,154,.045) 0 12px,rgba(213,195,154,.015) 12px 24px)"></div>
+      <div style="position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 38%,rgba(96,206,168,.07),transparent 60%)"></div>
+      <div style="position:absolute;top:9px;left:10px;display:flex;align-items:center;gap:6px;height:22px;padding:0 9px;border-radius:6px;background:rgba(21,27,24,.7);border:1px solid rgba(184,138,69,.3)"><span style="font:700 9.5px Manrope;color:#d8af63">A</span><span style="font:600 8px Manrope;letter-spacing:.1em;color:#879087">ОРИГИНАЛ</span></div>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:rgba(135,144,135,.55)"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M3 16l4.5-4 3.5 3 4-4 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font:500 9px 'JetBrains Mono',monospace">ИЛЛЮСТРАЦИЯ A</span></div>
+      <div style="position:absolute;left:24%;top:34%;width:34px;height:34px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.2px solid #d8af63;box-shadow:0 0 10px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:15px;height:15px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+      <div style="position:absolute;left:70%;top:66%;width:34px;height:34px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.2px solid #d8af63;box-shadow:0 0 10px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:15px;height:15px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+    </div>
+    <!-- IMAGE B -->
+    <div style="position:relative;height:248px;border-radius:13px;overflow:hidden;border:1px solid rgba(216,175,99,.3);background:#1b211d;box-shadow:0 0 20px rgba(216,175,99,.08)">
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(213,195,154,.045) 0 12px,rgba(213,195,154,.015) 12px 24px)"></div>
+      <div style="position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 38%,rgba(96,206,168,.07),transparent 60%)"></div>
+      <div style="position:absolute;top:9px;left:10px;display:flex;align-items:center;gap:6px;height:22px;padding:0 9px;border-radius:6px;background:rgba(21,27,24,.7);border:1px solid rgba(184,138,69,.3)"><span style="font:700 9.5px Manrope;color:#d8af63">B</span><span style="font:600 8px Manrope;letter-spacing:.1em;color:#879087">НАЙДИТЕ ОТЛИЧИЯ</span></div>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:rgba(135,144,135,.55)"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M3 16l4.5-4 3.5 3 4-4 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font:500 9px 'JetBrains Mono',monospace">ИЛЛЮСТРАЦИЯ B</span></div>
+      <div style="position:absolute;left:24%;top:34%;width:34px;height:34px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.2px solid #d8af63;box-shadow:0 0 10px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:15px;height:15px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+      <div style="position:absolute;left:70%;top:66%;width:34px;height:34px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.2px solid #d8af63;box-shadow:0 0 10px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:15px;height:15px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+      <!-- hint zone -->
+      <div style="position:absolute;left:48%;top:48%;width:48px;height:48px;transform:translate(-50%,-50%);border-radius:50%;border:1.5px dashed rgba(216,175,99,.55);background:radial-gradient(circle,rgba(216,175,99,.12),transparent 70%);animation:pulse 2.4s ease-in-out infinite"></div>
+    </div>
+  </div>
+
+  <!-- bottom actions -->
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px 24px;display:flex;gap:10px;background:linear-gradient(180deg,transparent,#151B18 28%)">
+    <button style="flex:1;height:50px;border-radius:11px;border:1px solid rgba(184,138,69,.45);background:rgba(184,138,69,.1);color:#d8af63;font:700 13.5px Manrope;display:flex;align-items:center;justify-content:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z"/></svg>Подсказка<span style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;border-radius:5px;background:#d8af63;color:#1a130a;font:700 10px Manrope">2</span></button>
+    <button style="width:50px;height:50px;border-radius:11px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3" stroke-linecap="round"/><path d="M11 8v6M8 11h6" stroke-linecap="round"/></svg></button>
+  </div>
+</div>
+
+
+<!-- ============ MOBILE LANDSCAPE GAMEPLAY ============ -->
+<div data-drags-parent="1" style="position:absolute;left:1600px;top:998px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">MOBILE · ГОРИЗОНТ · 896 × 414</div>
+
+<div data-screen-label="Mobile landscape · Игровой экран" style="position:absolute;left:1600px;top:1042px;width:896px;height:414px;background:#151B18;border-radius:34px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.5);font-family:Manrope,sans-serif;color:#D5C39A;display:flex;flex-direction:column;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+  <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none;z-index:5"></div>
+
+  <!-- compact HUD (single row) -->
+  <div style="position:relative;flex-shrink:0;height:50px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 20px 0 16px;border-bottom:1px solid rgba(213,195,154,.12);background:linear-gradient(180deg,rgba(34,42,37,.92),rgba(21,27,24,.4))">
+    <div style="display:flex;align-items:center;gap:12px;min-width:0">
+      <button style="width:36px;height:36px;border-radius:9px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div style="width:1px;height:26px;background:rgba(213,195,154,.12);flex-shrink:0"></div>
+      <div style="min-width:0">
+        <div style="font:700 8.5px Manrope;letter-spacing:.2em;color:#B88A45">БЕЛЫЙ · УР. 8 / 13</div>
+        <div style="font:600 16px 'Cormorant Garamond',serif;color:#D5C39A;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Станция «Восход»</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:9px;flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:7px;height:38px;padding:0 13px;border-radius:9px;border:1px solid rgba(213,195,154,.14);background:rgba(21,27,24,.6)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.8"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2" stroke-linecap="round"/><path d="M9 2h6" stroke-linecap="round"/></svg><span style="font:600 16px 'JetBrains Mono',monospace;color:#D5C39A">02:14</span></div>
+      <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px 0 12px;border-radius:9px;border:1px solid rgba(184,138,69,.4);background:linear-gradient(180deg,rgba(184,138,69,.16),rgba(184,138,69,.05))"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><div style="display:flex;align-items:baseline;gap:2px"><span style="font:700 18px Manrope;color:#d8af63">3</span><span style="font:600 12px Manrope;color:rgba(213,195,154,.5)">/ 7</span></div></div>
+      <button style="display:flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:9px;border:1px solid rgba(184,138,69,.45);background:rgba(184,138,69,.08);color:#d8af63;font:700 12.5px Manrope;cursor:pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z"/></svg>Подсказка<span style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;border-radius:5px;background:#d8af63;color:#1a130a;font:700 10px Manrope">2</span></button>
+      <button style="width:38px;height:38px;border-radius:9px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+    </div>
+  </div>
+
+  <!-- PLAY AREA: two images side by side -->
+  <div style="position:relative;flex:1;display:flex;gap:14px;padding:13px 18px 11px;min-height:0">
+
+    <!-- IMAGE A -->
+    <div style="flex:1;position:relative;border-radius:13px;overflow:hidden;border:1px solid rgba(213,195,154,.14);background:#1b211d;box-shadow:inset 0 0 50px rgba(0,0,0,.5)">
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(213,195,154,.045) 0 12px,rgba(213,195,154,.015) 12px 24px)"></div>
+      <div style="position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 38%,rgba(96,206,168,.07),transparent 60%)"></div>
+      <div style="position:absolute;top:9px;left:10px;display:flex;align-items:center;gap:6px;height:22px;padding:0 9px;border-radius:6px;background:rgba(21,27,24,.7);border:1px solid rgba(184,138,69,.3)"><span style="font:700 9.5px Manrope;color:#d8af63">A</span><span style="font:600 8px Manrope;letter-spacing:.1em;color:#879087">ОРИГИНАЛ</span></div>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:rgba(135,144,135,.55)"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M3 16l4.5-4 3.5 3 4-4 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font:500 9px 'JetBrains Mono',monospace;letter-spacing:.06em">ИЛЛЮСТРАЦИЯ A</span></div>
+      <div style="position:absolute;left:22%;top:30%;width:38px;height:38px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.4px solid #d8af63;box-shadow:0 0 12px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+      <div style="position:absolute;left:68%;top:26%;width:38px;height:38px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.4px solid #d8af63;box-shadow:0 0 12px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+      <div style="position:absolute;left:44%;top:74%;width:38px;height:38px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.4px solid #d8af63;box-shadow:0 0 12px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+      <div style="position:absolute;left:84%;top:62%;width:54px;height:54px;transform:translate(-50%,-50%);border-radius:50%;border:1.5px dashed rgba(216,175,99,.55);background:radial-gradient(circle,rgba(216,175,99,.12),transparent 70%);animation:pulse 2.4s ease-in-out infinite"></div>
+    </div>
+
+    <!-- divider -->
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;flex-shrink:0">
+      <div style="flex:1;width:1px;background:linear-gradient(180deg,transparent,rgba(213,195,154,.2),transparent)"></div>
+      <div style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(184,138,69,.4);background:rgba(21,27,24,.7);display:flex;align-items:center;justify-content:center;color:#B88A45"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 7l-4 5 4 5M16 7l4 5-4 5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div style="flex:1;width:1px;background:linear-gradient(180deg,transparent,rgba(213,195,154,.2),transparent)"></div>
+    </div>
+
+    <!-- IMAGE B -->
+    <div style="flex:1;position:relative;border-radius:13px;overflow:hidden;border:1px solid rgba(216,175,99,.3);background:#1b211d;box-shadow:inset 0 0 50px rgba(0,0,0,.5),0 0 20px rgba(216,175,99,.06)">
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(213,195,154,.045) 0 12px,rgba(213,195,154,.015) 12px 24px)"></div>
+      <div style="position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 38%,rgba(96,206,168,.07),transparent 60%)"></div>
+      <div style="position:absolute;top:9px;left:10px;display:flex;align-items:center;gap:6px;height:22px;padding:0 9px;border-radius:6px;background:rgba(21,27,24,.7);border:1px solid rgba(184,138,69,.3)"><span style="font:700 9.5px Manrope;color:#d8af63">B</span><span style="font:600 8px Manrope;letter-spacing:.1em;color:#879087">НАЙДИТЕ ОТЛИЧИЯ</span></div>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:rgba(135,144,135,.55)"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M3 16l4.5-4 3.5 3 4-4 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font:500 9px 'JetBrains Mono',monospace;letter-spacing:.06em">ИЛЛЮСТРАЦИЯ B</span></div>
+      <div style="position:absolute;left:22%;top:30%;width:38px;height:38px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.4px solid #d8af63;box-shadow:0 0 12px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+      <div style="position:absolute;left:68%;top:26%;width:38px;height:38px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.4px solid #d8af63;box-shadow:0 0 12px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+      <div style="position:absolute;left:44%;top:74%;width:38px;height:38px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.4px solid #d8af63;box-shadow:0 0 12px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+      <div style="position:absolute;left:33%;top:50%;width:30px;height:30px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2px solid rgba(208,94,74,.85);background:rgba(208,94,74,.14)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#e08a78"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></div></div>
+      <div style="position:absolute;left:84%;top:62%;width:54px;height:54px;transform:translate(-50%,-50%);border-radius:50%;border:1.5px dashed rgba(216,175,99,.55);background:radial-gradient(circle,rgba(216,175,99,.12),transparent 70%);animation:pulse 2.4s ease-in-out infinite"></div>
+      <div style="position:absolute;left:84%;top:62%;width:36px;height:36px;transform:translate(-50%,-50%);border-radius:50%;border:2px solid rgba(216,175,99,.6);animation:ripple 1.8s ease-out infinite"></div>
+    </div>
+  </div>
+
+  <!-- home indicator -->
+  <div style="position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:rgba(213,195,154,.3);z-index:6"></div>
+</div>
+
+
+<!-- ============ LEVEL COMPLETE ============ -->
+<div data-drags-parent="1" style="position:absolute;left:2100px;top:34px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">DESKTOP · УРОВЕНЬ ПРОЙДЕН</div>
+
+<div data-screen-label="Desktop · Уровень пройден" style="position:absolute;left:2100px;top:78px;width:1440px;height:900px;background:#151B18;border-radius:8px;overflow:hidden;box-shadow:0 36px 90px rgba(0,0,0,.5);font-family:Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+
+  <!-- dimmed game behind -->
+  <div style="position:absolute;inset:0;filter:blur(4px) brightness(.42)">
+    <div style="height:74px;border-bottom:1px solid rgba(213,195,154,.12)"></div>
+    <div style="display:flex;gap:22px;padding:26px 30px"><div style="flex:1;height:560px;border-radius:13px;background:repeating-linear-gradient(45deg,rgba(213,195,154,.05) 0 14px,rgba(213,195,154,.02) 14px 28px),#1b211d"></div><div style="flex:1;height:560px;border-radius:13px;background:repeating-linear-gradient(45deg,rgba(213,195,154,.05) 0 14px,rgba(213,195,154,.02) 14px 28px),#1b211d"></div></div>
+  </div>
+  <div style="position:absolute;inset:0;background:radial-gradient(80% 80% at 50% 42%,rgba(13,18,15,.55),rgba(13,18,15,.88))"></div>
+
+  <!-- modal -->
+  <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:560px;background:linear-gradient(180deg,#27302b,#1c241e);border:1px solid rgba(184,138,69,.35);border-radius:18px;box-shadow:0 50px 120px rgba(0,0,0,.7),inset 0 1px 0 rgba(213,195,154,.08);overflow:hidden;animation:pop .5s cubic-bezier(.2,.8,.3,1.2)">
+    <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#d8af63,transparent)"></div>
+
+    <div style="padding:40px 48px 36px;text-align:center;position:relative">
+      <!-- seal -->
+      <div style="width:96px;height:96px;margin:0 auto 18px;border-radius:50%;background:radial-gradient(circle at 40% 34%,#3a7a64,#1e4435 72%);border:2.5px dashed rgba(155,217,187,.55);display:flex;align-items:center;justify-content:center;box-shadow:0 14px 36px rgba(0,0,0,.5),0 0 30px rgba(47,106,87,.4)"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cdeede" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <div style="font:600 11px Manrope;letter-spacing:.32em;color:#9bd9bb">УРОВЕНЬ 8 ПРОЙДЕН</div>
+      <h2 style="font:600 42px 'Cormorant Garamond',serif;color:#D5C39A;margin:8px 0 0">Все отличия найдены</h2>
+      <p style="font:400 14px Manrope;color:#879087;line-height:1.55;margin:10px auto 0;max-width:380px">Станция «Восход» расшифрована. Маршрут продолжается к следующему пункту экспедиции.</p>
+
+      <!-- stats -->
+      <div style="display:flex;gap:12px;margin:26px 0 24px">
+        <div style="flex:1;background:rgba(21,27,24,.5);border:1px solid rgba(213,195,154,.12);border-radius:12px;padding:16px 0"><div style="font:600 23px 'JetBrains Mono',monospace;color:#D5C39A">02:38</div><div style="font:600 9.5px Manrope;letter-spacing:.14em;color:#879087;margin-top:5px">ВРЕМЯ</div></div>
+        <div style="flex:1;background:rgba(21,27,24,.5);border:1px solid rgba(213,195,154,.12);border-radius:12px;padding:16px 0"><div style="font:600 23px Manrope;color:#9bd9bb">7 / 7</div><div style="font:600 9.5px Manrope;letter-spacing:.14em;color:#879087;margin-top:5px">ОТЛИЧИЙ</div></div>
+        <div style="flex:1;background:rgba(21,27,24,.5);border:1px solid rgba(213,195,154,.12);border-radius:12px;padding:16px 0"><div style="display:flex;align-items:center;justify-content:center;gap:3px"><svg width="17" height="17" viewBox="0 0 24 24" fill="#d8af63" stroke="#d8af63" stroke-width="1"><path d="M12 2l2.9 6.3 6.6.6-5 4.5 1.5 6.6L12 17l-6 3.5 1.5-6.6-5-4.5 6.6-.6z"/></svg><svg width="17" height="17" viewBox="0 0 24 24" fill="#d8af63" stroke="#d8af63" stroke-width="1"><path d="M12 2l2.9 6.3 6.6.6-5 4.5 1.5 6.6L12 17l-6 3.5 1.5-6.6-5-4.5 6.6-.6z"/></svg><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(213,195,154,.3)" stroke-width="1.4"><path d="M12 2l2.9 6.3 6.6.6-5 4.5 1.5 6.6L12 17l-6 3.5 1.5-6.6-5-4.5 6.6-.6z"/></svg></div><div style="font:600 9.5px Manrope;letter-spacing:.14em;color:#879087;margin-top:7px">ОЦЕНКА</div></div>
+      </div>
+
+      <!-- campaign progress -->
+      <div style="background:rgba(21,27,24,.4);border:1px solid rgba(213,195,154,.12);border-radius:12px;padding:15px 18px;margin-bottom:24px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:9px"><span style="font:600 11px Manrope;letter-spacing:.08em;color:#879087">БЕЛЫЙ МЕРИДИАН</span><span style="font:700 12px Manrope;color:#d8af63">8 / 13</span></div>
+        <div style="display:flex;gap:3px"><span style="flex:1;height:8px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:8px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:8px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:8px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:8px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:8px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:8px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:8px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f);box-shadow:0 0 10px rgba(216,175,99,.7)"></span><span style="flex:1;height:8px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:8px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:8px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:8px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:8px;border-radius:2px;background:rgba(213,195,154,.1)"></span></div>
+      </div>
+
+      <button style="width:100%;height:54px;border:none;border-radius:10px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 16px Manrope;cursor:pointer;box-shadow:0 12px 28px rgba(184,138,69,.32),inset 0 1px 0 rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;gap:9px">Уровень 9 · «Ледовый порог»<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      <div style="display:flex;gap:11px;margin-top:11px">
+        <button style="flex:1;height:46px;border:1px solid rgba(213,195,154,.14);border-radius:10px;background:transparent;color:#D5C39A;font:600 13.5px Manrope;cursor:pointer">Повторить</button>
+        <button style="flex:1;height:46px;border:1px solid rgba(213,195,154,.14);border-radius:10px;background:transparent;color:#D5C39A;font:600 13.5px Manrope;cursor:pointer">К выбору экспедиций</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TIME'S UP / NOT ALL FOUND ============ -->
+<div data-drags-parent="1" style="position:absolute;left:3640px;top:34px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">DESKTOP · ВРЕМЯ ВЫШЛО</div>
+
+<div data-screen-label="Desktop · Время вышло" style="position:absolute;left:3640px;top:78px;width:1440px;height:900px;background:#151B18;border-radius:8px;overflow:hidden;box-shadow:0 36px 90px rgba(0,0,0,.5);font-family:Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+
+  <!-- dimmed game behind -->
+  <div style="position:absolute;inset:0;filter:blur(4px) brightness(.4) saturate(.85)">
+    <div style="height:74px;border-bottom:1px solid rgba(213,195,154,.12)"></div>
+    <div style="display:flex;gap:22px;padding:26px 30px"><div style="flex:1;height:560px;border-radius:13px;background:repeating-linear-gradient(45deg,rgba(213,195,154,.05) 0 14px,rgba(213,195,154,.02) 14px 28px),#1b211d"></div><div style="flex:1;height:560px;border-radius:13px;background:repeating-linear-gradient(45deg,rgba(213,195,154,.05) 0 14px,rgba(213,195,154,.02) 14px 28px),#1b211d"></div></div>
+  </div>
+  <div style="position:absolute;inset:0;background:radial-gradient(80% 80% at 50% 42%,rgba(28,14,11,.5),rgba(13,18,15,.9))"></div>
+
+  <!-- modal -->
+  <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:560px;background:linear-gradient(180deg,#2c2622,#1f1b18);border:1px solid rgba(176,86,66,.4);border-radius:18px;box-shadow:0 50px 120px rgba(0,0,0,.7),inset 0 1px 0 rgba(213,195,154,.06);overflow:hidden;animation:pop .5s cubic-bezier(.2,.8,.3,1.2)">
+    <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#c9684f,transparent)"></div>
+
+    <div style="padding:40px 48px 36px;text-align:center;position:relative">
+      <!-- broken clock seal -->
+      <div style="width:96px;height:96px;margin:0 auto 18px;border-radius:50%;background:radial-gradient(circle at 40% 34%,#7a4a3c,#3a201a 72%);border:2.5px dashed rgba(224,138,120,.5);display:flex;align-items:center;justify-content:center;box-shadow:0 14px 36px rgba(0,0,0,.5),0 0 30px rgba(176,86,66,.32)"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#e8b3a6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M9 2h6"/><path d="M18.5 5.5l1.8-1.8"/></svg></div>
+      <div style="font:600 11px Manrope;letter-spacing:.32em;color:#e08a78">ВРЕМЯ ВЫШЛО</div>
+      <h2 style="font:600 42px 'Cormorant Garamond',serif;color:#D5C39A;margin:8px 0 0">Не все отличия найдены</h2>
+      <p style="font:400 14px Manrope;color:#879087;line-height:1.55;margin:10px auto 0;max-width:392px">След на станции «Восход» остыл. Вернитесь к снимкам и попробуйте пройти уровень ещё раз.</p>
+
+      <!-- stats -->
+      <div style="display:flex;gap:12px;margin:26px 0 24px">
+        <div style="flex:1;background:rgba(21,27,24,.5);border:1px solid rgba(213,195,154,.12);border-radius:12px;padding:16px 0"><div style="font:600 23px 'JetBrains Mono',monospace;color:#e08a78">00:00</div><div style="font:600 9.5px Manrope;letter-spacing:.14em;color:#879087;margin-top:5px">ТАЙМЕР</div></div>
+        <div style="flex:1;background:rgba(21,27,24,.5);border:1px solid rgba(213,195,154,.12);border-radius:12px;padding:16px 0"><div style="font:600 23px Manrope;color:#d8af63">5 / 7</div><div style="font:600 9.5px Manrope;letter-spacing:.14em;color:#879087;margin-top:5px">НАЙДЕНО</div></div>
+        <div style="flex:1;background:rgba(21,27,24,.5);border:1px solid rgba(213,195,154,.12);border-radius:12px;padding:16px 0"><div style="font:600 23px Manrope;color:#e08a78">2</div><div style="font:600 9.5px Manrope;letter-spacing:.14em;color:#879087;margin-top:5px">ОСТАЛОСЬ</div></div>
+      </div>
+
+      <!-- found tracker row -->
+      <div style="background:rgba(21,27,24,.4);border:1px solid rgba(213,195,154,.12);border-radius:12px;padding:15px 18px;margin-bottom:24px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font:600 11px Manrope;letter-spacing:.08em;color:#879087">ОТЛИЧИЯ НА УРОВНЕ</span><span style="font:700 12px Manrope;color:#d8af63">5 / 7</span></div>
+        <div style="display:flex;gap:7px">
+          <span style="flex:1;height:26px;border-radius:7px;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <span style="flex:1;height:26px;border-radius:7px;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <span style="flex:1;height:26px;border-radius:7px;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <span style="flex:1;height:26px;border-radius:7px;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <span style="flex:1;height:26px;border-radius:7px;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <span style="flex:1;height:26px;border-radius:7px;border:1.5px solid rgba(224,138,120,.5);background:rgba(208,94,74,.1);display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#e08a78" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>
+          <span style="flex:1;height:26px;border-radius:7px;border:1.5px solid rgba(224,138,120,.5);background:rgba(208,94,74,.1);display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#e08a78" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>
+        </div>
+      </div>
+
+      <button style="width:100%;height:54px;border:none;border-radius:10px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 16px Manrope;cursor:pointer;box-shadow:0 12px 28px rgba(184,138,69,.32),inset 0 1px 0 rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;gap:9px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Попробовать снова</button>
+      <div style="display:flex;gap:11px;margin-top:11px">
+        <button style="flex:1;height:46px;border:1px solid rgba(184,138,69,.4);border-radius:10px;background:rgba(184,138,69,.08);color:#d8af63;font:600 13.5px Manrope;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 8v5l3 1.5"/><circle cx="12" cy="12" r="9"/></svg>+30 сек · подсказка</button>
+        <button style="flex:1;height:46px;border:1px solid rgba(213,195,154,.14);border-radius:10px;background:transparent;color:#D5C39A;font:600 13.5px Manrope;cursor:pointer">К выбору экспедиций</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ============ MOBILE LANDSCAPE · ИГРА · ФЛИП-КАРТА (полноэкранная) ============ -->
+<div data-drags-parent="1" style="position:absolute;left:1600px;top:1540px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">MOBILE · ГОРИЗОНТ · ФЛИП · 896 × 414</div>
+
+<div data-screen-label="Mobile landscape · Игра (флип-карта)" style="position:absolute;left:1600px;top:1584px;width:896px;height:414px;background:#151B18;border-radius:34px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.5);font-family:Manrope,sans-serif;color:#D5C39A;display:flex;flex-direction:column;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+  <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none;z-index:6"></div>
+
+  <!-- compact HUD (single row) -->
+  <div style="position:relative;flex-shrink:0;height:50px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 20px 0 16px;border-bottom:1px solid rgba(213,195,154,.12);background:linear-gradient(180deg,rgba(34,42,37,.92),rgba(21,27,24,.4));z-index:4">
+    <div style="display:flex;align-items:center;gap:12px;min-width:0">
+      <button style="width:36px;height:36px;border-radius:9px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div style="width:1px;height:26px;background:rgba(213,195,154,.12);flex-shrink:0"></div>
+      <div style="min-width:0">
+        <div style="font:700 8.5px Manrope;letter-spacing:.2em;color:#B88A45">БЕЛЫЙ · УР. 8 / 13</div>
+        <div style="font:600 16px 'Cormorant Garamond',serif;color:#D5C39A;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Станция «Восход»</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:9px;flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:7px;height:38px;padding:0 13px;border-radius:9px;border:1px solid rgba(213,195,154,.14);background:rgba(21,27,24,.6)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.8"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2" stroke-linecap="round"/><path d="M9 2h6" stroke-linecap="round"/></svg><span style="font:600 16px 'JetBrains Mono',monospace;color:#D5C39A">02:14</span></div>
+      <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 14px 0 12px;border-radius:9px;border:1px solid rgba(184,138,69,.4);background:linear-gradient(180deg,rgba(184,138,69,.16),rgba(184,138,69,.05))"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><div style="display:flex;align-items:baseline;gap:2px"><span style="font:700 18px Manrope;color:#d8af63">3</span><span style="font:600 12px Manrope;color:rgba(213,195,154,.5)">/ 7</span></div></div>
+      <button style="display:flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:9px;border:1px solid rgba(184,138,69,.45);background:rgba(184,138,69,.08);color:#d8af63;font:700 12.5px Manrope;cursor:pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z"/></svg>Подсказка<span style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;border-radius:5px;background:#d8af63;color:#1a130a;font:700 10px Manrope">2</span></button>
+    </div>
+  </div>
+
+  <!-- PLAY AREA: full-bleed flip card -->
+  <div style="position:relative;flex:1;perspective:1900px;padding:12px 16px 14px;min-height:0;z-index:1">
+
+    <!-- A | B segmented indicator -->
+    <div style="position:absolute;left:50%;top:20px;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:3px;height:30px;padding:3px;border-radius:9px;background:rgba(16,21,18,.78);border:1px solid rgba(213,195,154,.16);backdrop-filter:blur(5px)">
+      <div style="display:flex;align-items:center;gap:6px;height:24px;padding:0 13px;border-radius:7px;transition:all .3s ease;{{ segAStyle }}"><span style="font:700 11px Manrope">A</span><span style="font:600 9px Manrope;letter-spacing:.1em">ОРИГИНАЛ</span></div>
+      <div style="display:flex;align-items:center;gap:6px;height:24px;padding:0 13px;border-radius:7px;transition:all .3s ease;{{ segBStyle }}"><span style="font:700 11px Manrope">B</span><span style="font:600 9px Manrope;letter-spacing:.1em">КОПИЯ</span></div>
+    </div>
+
+    <!-- flip card -->
+    <div style="position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.4,.05,.2,1);transform:{{ flipTransform }}">
+
+      <!-- FRONT · A (original) -->
+      <div style="position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:14px;overflow:hidden;border:1px solid rgba(213,195,154,.16);background:#1b211d;box-shadow:inset 0 0 60px rgba(0,0,0,.5)">
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(213,195,154,.045) 0 16px,rgba(213,195,154,.015) 16px 32px)"></div>
+        <div style="position:absolute;inset:0;background:radial-gradient(70% 70% at 50% 40%,rgba(96,206,168,.08),transparent 60%)"></div>
+        <div style="position:absolute;top:10px;left:12px;display:flex;align-items:center;gap:6px;height:24px;padding:0 11px;border-radius:7px;background:rgba(21,27,24,.74);border:1px solid rgba(184,138,69,.35)"><span style="font:700 11px Manrope;color:#d8af63">A</span><span style="font:600 8.5px Manrope;letter-spacing:.12em;color:#879087">АРХИВНЫЙ ОРИГИНАЛ</span></div>
+        <div style="position:absolute;top:10px;right:12px;font:500 9px 'JetBrains Mono',monospace;color:rgba(135,144,135,.7)">REF-0481-N</div>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;color:rgba(135,144,135,.5)"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M3 16l4.5-4 3.5 3 4-4 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font:500 10px 'JetBrains Mono',monospace;letter-spacing:.06em">ИЛЛЮСТРАЦИЯ СЦЕНЫ A · 1920×1280</span></div>
+        <div style="position:absolute;left:24%;top:34%;width:40px;height:40px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.4px solid #d8af63;box-shadow:0 0 14px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+        <div style="position:absolute;left:67%;top:28%;width:40px;height:40px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.4px solid #d8af63;box-shadow:0 0 14px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+        <div style="position:absolute;left:46%;top:74%;width:40px;height:40px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.4px solid #d8af63;box-shadow:0 0 14px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+      </div>
+
+      <!-- BACK · B (copy with differences) -->
+      <div style="position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);border-radius:14px;overflow:hidden;border:1px solid rgba(216,175,99,.34);background:#1b211d;box-shadow:inset 0 0 60px rgba(0,0,0,.5),0 0 22px rgba(216,175,99,.07)">
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(213,195,154,.045) 0 16px,rgba(213,195,154,.015) 16px 32px)"></div>
+        <div style="position:absolute;inset:0;background:radial-gradient(70% 70% at 50% 40%,rgba(96,206,168,.08),transparent 60%)"></div>
+        <div style="position:absolute;top:10px;left:12px;display:flex;align-items:center;gap:6px;height:24px;padding:0 11px;border-radius:7px;background:rgba(21,27,24,.74);border:1px solid rgba(184,138,69,.35)"><span style="font:700 11px Manrope;color:#d8af63">B</span><span style="font:600 8.5px Manrope;letter-spacing:.12em;color:#879087">КОПИЯ · НАЙДИТЕ ОТЛИЧИЯ</span></div>
+        <div style="position:absolute;top:10px;right:12px;font:500 9px 'JetBrains Mono',monospace;color:rgba(135,144,135,.7)">REF-0481-N·b</div>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;color:rgba(135,144,135,.5)"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M3 16l4.5-4 3.5 3 4-4 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font:500 10px 'JetBrains Mono',monospace;letter-spacing:.06em">КОПИЯ B · 1920×1280</span></div>
+        <div style="position:absolute;left:24%;top:34%;width:40px;height:40px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.4px solid #d8af63;box-shadow:0 0 14px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+        <div style="position:absolute;left:67%;top:28%;width:40px;height:40px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.4px solid #d8af63;box-shadow:0 0 14px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+        <div style="position:absolute;left:46%;top:74%;width:40px;height:40px;transform:translate(-50%,-50%)"><div style="position:absolute;inset:0;border-radius:50%;border:2.4px solid #d8af63;box-shadow:0 0 14px rgba(216,175,99,.5)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:17px;height:17px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+        <div style="position:absolute;left:84%;top:60%;width:50px;height:50px;transform:translate(-50%,-50%);border-radius:50%;border:1.5px dashed rgba(216,175,99,.55);background:radial-gradient(circle,rgba(216,175,99,.12),transparent 70%);animation:pulse 2.4s ease-in-out infinite"></div>
+      </div>
+    </div>
+
+    <!-- floating flip button -->
+    <button onClick="{{ toggleFlip }}" style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:9px;height:44px;padding:0 22px;border:none;border-radius:12px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 14px Manrope;cursor:pointer;box-shadow:0 10px 26px rgba(184,138,69,.4),inset 0 1px 0 rgba(255,255,255,.3);animation:hintsweep 3.2s ease-in-out infinite"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h13a4 4 0 0 1 0 8h-2"/><path d="M6 4L3 7l3 3"/><path d="M21 17H8a4 4 0 0 1 0-8h2"/><path d="M18 20l3-3-3-3"/></svg>{{ flipBtnLabel }}</button>
+  </div>
+
+  <!-- home indicator -->
+  <div style="position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:rgba(213,195,154,.3);z-index:6"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { flipped: false };
+  renderVals() {
+    var flipped = this.state.flipped;
+    var ON = 'background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a';
+    var OFF = 'background:transparent;color:#879087';
+    return {
+      flipTransform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+      flipBtnLabel: flipped ? 'Показать оригинал A' : 'Сравнить с копией B',
+      segAStyle: flipped ? OFF : ON,
+      segBStyle: flipped ? ON : OFF,
+      toggleFlip: () => this.setState(function(s){ return { flipped: !s.flipped }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

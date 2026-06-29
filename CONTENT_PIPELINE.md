@@ -33,7 +33,7 @@ The implementation workflow is:
 5. Update `ASSET_MANIFEST.md`, `ASSET_PROVENANCE.json`, and run `pnpm validate:content`.
 
 Hitboxes are authored as normalized coordinates from `0` to `1` relative to the rendered image bounds. Prefer circles for round zones, ellipses for stretched markup rings, and polygons only when the clickable shape is materially non-elliptical.
-`src/features/gameplay/PhotoComparator.tsx` renders scene images without cropping and draws found markers / area hints from those same normalized `hitArea*` / `hintArea` bounds, so the visible ring, click target and markup reference stay in the same coordinate space. Circle hitboxes are aspect-aware: `radius` is authored as the horizontal image-width fraction, while vertical radius is derived from the loaded image aspect ratio.
+`src/features/gameplay/PhotoComparator.tsx` renders scene images without cropping or stretching and draws found markers / area hints from those same normalized `hitArea*` / `hintArea` bounds, so the visible ring, click target and markup reference stay in the same coordinate space. Runtime photos use `object-fit: contain`; the comparator measures the contained image plane and ignores letterbox space when converting pointer coordinates. Circle hitboxes are aspect-aware: `radius` is authored as the horizontal image-width fraction, while vertical radius is derived from the loaded image aspect ratio.
 
 ## Intake status
 
@@ -44,7 +44,7 @@ Hitboxes are authored as normalized coordinates from `0` to `1` relative to the 
 - Level 3 (`nr-03-scene03`) is wired to `public/assets/scenes/northern-route/3/1.webp` and `2.webp`.
 - Level 3 hitboxes were transcribed from `public/assets/scenes/northern-route/3/3.webp` for lighthouse lens, open window, lantern count, map route and compass differences.
 - Level 4 (`nr-04-scene04`) is wired to `public/assets/scenes/northern-route/4/1.webp` and `2.webp`.
-- Level 4 hitboxes were transcribed from `public/assets/scenes/northern-route/4/3.webp` for switch, train door, barrel count, handcart, lantern color and fur glove differences.
+- Level 4 hitboxes were transcribed from `public/assets/scenes/northern-route/4/3.webp` for switch, train door, barrel count, handcart, lantern color and fur glove differences. The lower switch marker uses an ellipse, not a circle, so aspect-aware circle scaling does not make the clickable zone too tall.
 - Levels 5-12 (`nr-05` through `nr-12`) are wired to their runtime WebP scene pairs under `public/assets/scenes/northern-route/<level-order>/1.webp` and `2.webp`.
 - Levels 5-12 hitboxes are transcribed from their `3.webp` markup references in `src/content/levels.ts`, replacing the earlier scaffold coordinates. Levels 5, 6, 7, 8, 9, 10 and 12 were rechecked against the visible markup rings after aspect-aware circle rendering and ellipse hitboxes were added.
 - Level 13 (`nr-13-scene13`) is wired to `public/assets/scenes/northern-route/13/1.webp` and `2.webp`.

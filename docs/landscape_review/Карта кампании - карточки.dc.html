@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#151B18"/><g transform="translate(30,30)"><rect x="0" y="0" width="17" height="22" rx="2.5" fill="#222A25" stroke="#B88A45" stroke-width="1"/><rect x="0" y="0" width="17" height="11" rx="2.5" fill="#274659"/><rect x="23" y="0" width="17" height="22" rx="2.5" fill="#222A25" stroke="#d8af63" stroke-width="1.4"/><rect x="23" y="0" width="17" height="11" rx="2.5" fill="#22384c"/><circle cx="31.5" cy="16" r="2.4" fill="#d8af63"/></g></svg></template>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+@keyframes pulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.35)}}
+@keyframes ringpulse{0%{transform:scale(.7);opacity:.8}100%{transform:scale(1.5);opacity:0}}
+*{box-sizing:border-box}
+.scroll{scrollbar-width:thin;scrollbar-color:#a9762f rgba(213,195,154,.06)}
+.scroll::-webkit-scrollbar{width:8px;height:8px}
+.scroll::-webkit-scrollbar-track{background:rgba(213,195,154,.05);border-radius:4px;margin:6px}
+.scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#d8af63,#a9762f);border-radius:4px;border:1px solid rgba(21,27,24,.55)}
+.scroll::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#e7c074,#b3812f)}
+.scroll::-webkit-scrollbar-corner{background:transparent}
+</style>
+</helmet>
+
+<!-- ============================================================ -->
+<!-- DESKTOP · ЖУРНАЛ УРОВНЕЙ (КАРТОЧКИ) -->
+<!-- ============================================================ -->
+<div data-drags-parent="1" style="position:absolute;left:80px;top:34px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">DESKTOP · 1440 × 900 · ЖУРНАЛ УРОВНЕЙ</div>
+
+<div data-screen-label="Desktop · Журнал уровней" style="position:absolute;left:80px;top:78px;width:1440px;height:900px;background:#151B18;border-radius:8px;overflow:hidden;box-shadow:0 36px 90px rgba(0,0,0,.55);font-family:Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+
+  <div style="position:absolute;inset:0;background:radial-gradient(120% 70% at 50% -16%,rgba(47,106,87,.16),transparent 55%),repeating-radial-gradient(circle at 86% 14%,transparent 0 46px,rgba(184,138,69,.03) 46px 47px);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+
+  <!-- ===== TOP HUD ===== -->
+  <div style="position:relative;height:78px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;border-bottom:1px solid rgba(213,195,154,.12);background:linear-gradient(180deg,rgba(34,42,37,.92),rgba(21,27,24,.5));backdrop-filter:blur(6px);z-index:10">
+    <div style="display:flex;align-items:center;gap:16px">
+      <button style="width:44px;height:44px;border-radius:10px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>
+      <div style="width:1px;height:34px;background:rgba(213,195,154,.12)"></div>
+      <div>
+        <div style="font:700 10px Manrope;letter-spacing:.22em;color:#B88A45">ЭКСПЕДИЦИЯ · СЕВЕРНЫЙ МАРШРУТ</div>
+        <div style="font:600 24px 'Cormorant Garamond',serif;color:#D5C39A;margin-top:1px;letter-spacing:.01em">Белый меридиан</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:7px">
+      <div style="display:flex;align-items:center;gap:10px"><span style="font:600 9.5px Manrope;letter-spacing:.2em;color:#879087">ПРОГРЕСС ЭКСПЕДИЦИИ</span><span style="font:700 13px Manrope;color:#d8af63">{{ progLabel }}</span></div>
+      <div style="display:flex;gap:3px;width:300px">
+        <sc-for list="{{ segs }}" as="s" hint-placeholder-count="13"><span style="flex:1;height:6px;border-radius:2px;background:{{ s.bg }};box-shadow:{{ s.sh }}"></span></sc-for>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px">
+      <button style="display:flex;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:10px;border:1px solid rgba(184,138,69,.45);background:rgba(184,138,69,.08);color:#d8af63;font:700 12px Manrope;cursor:pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M11 6.5v9M6.5 11h9"></path><path d="m20 20-3.2-3.2"></path></svg>Карта маршрута</button>
+      <button style="width:44px;height:44px;border-radius:10px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3.2"></circle><path d="M19.4 13a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg></button>
+    </div>
+  </div>
+
+  <!-- ===== SUBHEADER + LEGEND ===== -->
+  <div style="position:relative;z-index:5;display:flex;align-items:flex-end;justify-content:space-between;padding:22px 30px 14px">
+    <div>
+      <div style="font:600 11px Manrope;letter-spacing:.3em;color:#B88A45">ЖУРНАЛ ЭКСПЕДИЦИИ · 13 УРОВНЕЙ</div>
+      <h1 style="font:600 32px 'Cormorant Garamond',serif;color:#D5C39A;margin:5px 0 0">Уровни маршрута</h1>
+    </div>
+    <div style="display:flex;gap:16px;align-items:center;padding:9px 16px;border-radius:10px;background:rgba(16,21,18,.6);border:1px solid rgba(213,195,154,.1)">
+      <div style="display:flex;align-items:center;gap:7px"><span style="width:13px;height:13px;border-radius:4px;background:linear-gradient(180deg,#dcb360,#a9762f)"></span><span style="font:600 10px Manrope;color:#879087">Пройдено</span></div>
+      <div style="display:flex;align-items:center;gap:7px"><span style="width:13px;height:13px;border-radius:4px;background:#1a221c;border:1.5px solid #d8af63"></span><span style="font:600 10px Manrope;color:#879087">Текущий</span></div>
+      <div style="display:flex;align-items:center;gap:7px"><span style="width:13px;height:13px;border-radius:4px;background:rgba(213,195,154,.05);border:1.5px dashed rgba(213,195,154,.3)"></span><span style="font:600 10px Manrope;color:#879087">Закрыто</span></div>
+    </div>
+  </div>
+
+  <!-- ===== LEVEL CARD GRID ===== -->
+  <div style="position:relative;z-index:5;display:grid;grid-template-columns:repeat(5,1fr);gap:18px;padding:6px 30px 30px">
+    <sc-for list="{{ levels }}" as="l" hint-placeholder-count="13">
+      <div style-hover="transform:translateY(-3px)" style="position:relative;display:flex;flex-direction:column;height:204px;background:#222A25;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .16s ease;{{ l.frame }}">
+
+        <!-- thumbnail scene -->
+        <div style="position:relative;height:108px;overflow:hidden;{{ l.thumbBg }}">
+          <div style="position:absolute;left:0;right:0;bottom:0;height:54%;background:{{ l.ridgeCol }};clip-path:polygon(0 70%,16% 40%,30% 60%,48% 30%,64% 58%,80% 36%,100% 56%,100% 100%,0 100%);opacity:.9"></div>
+          <div style="position:absolute;inset:0;background:var(--grain);opacity:.34;mix-blend-mode:overlay"></div>
+          <div style="position:absolute;inset:0;box-shadow:inset 0 -34px 46px rgba(13,20,26,.72)"></div>
+
+          <!-- number chip -->
+          <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:6px;background:rgba(16,21,18,.66);border:1px solid rgba(213,195,154,.18);backdrop-filter:blur(4px)"><span style="font:700 11px 'JetBrains Mono',monospace;letter-spacing:.06em;color:{{ l.numCol }}">{{ l.numLabel }}</span></div>
+
+          <!-- DONE seal -->
+          <sc-if value="{{ l.done }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:50%;background:linear-gradient(180deg,#dcb360,#a9762f);border:1px solid rgba(255,236,196,.5);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(184,138,69,.4)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          </sc-if>
+
+          <!-- CURRENT marker -->
+          <sc-if value="{{ l.current }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:10px;right:10px;display:flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:6px;background:rgba(16,21,18,.7);border:1px solid rgba(184,138,69,.5);backdrop-filter:blur(4px)"><span style="position:relative;width:7px;height:7px;border-radius:50%;background:#d8af63"><span style="position:absolute;inset:-3px;border-radius:50%;border:1.5px solid rgba(216,175,99,.6);animation:ringpulse 2.4s ease-out infinite"></span></span><span style="font:700 8.5px Manrope;letter-spacing:.14em;color:#D5C39A">ВЫ ЗДЕСЬ</span></div>
+          </sc-if>
+
+          <!-- LOCKED overlay + seal -->
+          <sc-if value="{{ l.locked }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 44%,rgba(16,21,18,.42),rgba(16,21,18,.74))"></div>
+            <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#caa05a,#7e5b2a 72%);border:1.5px solid rgba(255,236,196,.35);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.5),inset 0 2px 5px rgba(255,236,196,.4)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" stroke-width="1.9" stroke-linecap="round"><rect x="5" y="11" width="14" height="9.5" rx="1.6"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></div>
+            <sc-if value="{{ l.isFinal }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;bottom:9px;left:50%;transform:translateX(-50%);font:700 8px Manrope;letter-spacing:.24em;color:#B88A45">ФИНАЛ ЭКСПЕДИЦИИ</div></sc-if>
+          </sc-if>
+        </div>
+
+        <!-- body -->
+        <div style="flex:1;padding:12px 14px 13px;display:flex;flex-direction:column">
+          <div style="font:700 8.5px Manrope;letter-spacing:.16em;color:{{ l.kickerCol }}">{{ l.kicker }}</div>
+          <div style="font:600 18px 'Cormorant Garamond',serif;color:{{ l.nameCol }};line-height:1.12;margin-top:3px">{{ l.name }}</div>
+
+          <div style="margin-top:auto">
+            <!-- DONE footer: stars -->
+            <sc-if value="{{ l.done }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div style="display:flex;gap:3px">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="{{ l.star1 }}"><path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 21.3 6.2 20.4l1.1-6.5L2.6 9.3l6.5-.9z"></path></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="{{ l.star2 }}"><path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 21.3 6.2 20.4l1.1-6.5L2.6 9.3l6.5-.9z"></path></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="{{ l.star3 }}"><path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 21.3 6.2 20.4l1.1-6.5L2.6 9.3l6.5-.9z"></path></svg>
+                </div>
+                <span style="font:600 10.5px Manrope;color:#879087">Повторить</span>
+              </div>
+            </sc-if>
+            <!-- CURRENT footer: play -->
+            <sc-if value="{{ l.current }}" hint-placeholder-val="{{ false }}">
+              <button style="width:100%;height:36px;border:none;border-radius:7px;background:{{ playBg }};color:#1a130a;font:700 12.5px Manrope;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 7px 16px rgba(184,138,69,.32),inset 0 1px 0 rgba(255,255,255,.3)">Играть<svg width="12" height="12" viewBox="0 0 24 24" fill="#1a130a"><path d="M8 5v14l11-7z"></path></svg></button>
+            </sc-if>
+            <!-- LOCKED footer: condition -->
+            <sc-if value="{{ l.locked }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:6px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="{{ l.lockCol }}" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg><span style="font:600 10px Manrope;color:{{ l.lockCol }}">{{ l.lockText }}</span></div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="position:absolute;bottom:0;left:0;right:0;height:38px;display:flex;align-items:center;justify-content:center;gap:8px;border-top:1px solid rgba(213,195,154,.12);background:rgba(16,21,18,.5);font:500 10.5px Manrope;letter-spacing:.06em;color:#879087;z-index:6"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.8"><path d="M20 6L9 17l-5-5"></path></svg>Прогресс сохраняется автоматически · {{ doneLabel }} уровней пройдено</div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- MOBILE · ЖУРНАЛ УРОВНЕЙ (КАРТОЧКИ) -->
+<!-- ============================================================ -->
+<div data-drags-parent="1" style="position:absolute;left:1640px;top:34px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">MOBILE · 390 × 844</div>
+
+<div data-screen-label="Mobile · Журнал уровней" style="position:absolute;left:1640px;top:78px;width:390px;height:844px;background:#151B18;border-radius:30px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.55);font-family:Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+  <div style="position:absolute;inset:0;background:radial-gradient(120% 40% at 50% 0%,rgba(47,106,87,.16),transparent 50%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+
+  <!-- status bar -->
+  <div style="position:relative;height:38px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 22px 4px;font:600 12px Manrope;color:#D5C39A;z-index:8"><span>9:41</span><span style="font-size:11px;letter-spacing:.05em">▮▮▮ ◷ 􀛨</span></div>
+
+  <!-- top bar -->
+  <div style="position:relative;height:54px;display:flex;align-items:center;gap:11px;padding:0 14px;border-bottom:1px solid rgba(213,195,154,.12);background:linear-gradient(180deg,rgba(34,42,37,.95),rgba(21,27,24,.6));z-index:8">
+    <button style="width:38px;height:38px;border-radius:9px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>
+    <div style="flex:1;min-width:0"><div style="font:700 8.5px Manrope;letter-spacing:.18em;color:#B88A45">ЭКСПЕДИЦИЯ · СЕВЕР</div><div style="font:600 18px 'Cormorant Garamond',serif;color:#D5C39A;line-height:1.1">Белый меридиан</div></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+      <span style="font:700 12px Manrope;color:#d8af63">{{ progLabel }}</span>
+      <div style="display:flex;gap:2px;width:88px"><sc-for list="{{ segs }}" as="s" hint-placeholder-count="13"><span style="flex:1;height:4px;border-radius:1px;background:{{ s.bg }}"></span></sc-for></div>
+    </div>
+  </div>
+
+  <!-- section label -->
+  <div style="position:relative;padding:14px 18px 8px;z-index:6"><div style="font:600 9.5px Manrope;letter-spacing:.26em;color:#B88A45">ЖУРНАЛ · 13 УРОВНЕЙ</div><h1 style="font:600 24px 'Cormorant Garamond',serif;color:#D5C39A;margin:3px 0 0">Уровни маршрута</h1></div>
+
+  <!-- card grid (scroll region) -->
+  <div style="position:absolute;top:160px;bottom:96px;left:0;right:0;overflow:hidden;padding:6px 16px 0;z-index:5">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <sc-for list="{{ levels }}" as="l" hint-placeholder-count="8">
+        <div style="position:relative;display:flex;flex-direction:column;height:152px;background:#222A25;border-radius:12px;overflow:hidden;{{ l.frame }}">
+          <div style="position:relative;height:74px;overflow:hidden;{{ l.thumbBg }}">
+            <div style="position:absolute;left:0;right:0;bottom:0;height:56%;background:{{ l.ridgeCol }};clip-path:polygon(0 68%,18% 40%,34% 60%,52% 32%,68% 58%,84% 38%,100% 56%,100% 100%,0 100%);opacity:.9"></div>
+            <div style="position:absolute;inset:0;background:var(--grain);opacity:.32;mix-blend-mode:overlay"></div>
+            <div style="position:absolute;inset:0;box-shadow:inset 0 -24px 32px rgba(13,20,26,.7)"></div>
+            <div style="position:absolute;top:7px;left:7px;height:20px;padding:0 7px;border-radius:5px;background:rgba(16,21,18,.66);border:1px solid rgba(213,195,154,.18);display:flex;align-items:center"><span style="font:700 9.5px 'JetBrains Mono',monospace;color:{{ l.numCol }}">{{ l.numLabel }}</span></div>
+            <sc-if value="{{ l.done }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:linear-gradient(180deg,#dcb360,#a9762f);border:1px solid rgba(255,236,196,.5);display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></div></sc-if>
+            <sc-if value="{{ l.current }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:7px;right:7px;width:9px;height:9px;border-radius:50%;background:#d8af63;box-shadow:0 0 8px #d8af63"></div></sc-if>
+            <sc-if value="{{ l.locked }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:0;background:rgba(16,21,18,.6)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#caa05a,#7e5b2a 72%);border:1.5px solid rgba(255,236,196,.35);display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" stroke-width="2"><rect x="5" y="11" width="14" height="9.5" rx="1.6"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></div></sc-if>
+          </div>
+          <div style="flex:1;padding:9px 11px 10px;display:flex;flex-direction:column">
+            <div style="font:700 7.5px Manrope;letter-spacing:.14em;color:{{ l.kickerCol }}">{{ l.kicker }}</div>
+            <div style="font:600 15px 'Cormorant Garamond',serif;color:{{ l.nameCol }};line-height:1.1;margin-top:2px">{{ l.name }}</div>
+            <div style="margin-top:auto">
+              <sc-if value="{{ l.done }}" hint-placeholder-val="{{ true }}"><div style="display:flex;gap:2px"><svg width="12" height="12" viewBox="0 0 24 24" fill="{{ l.star1 }}"><path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 21.3 6.2 20.4l1.1-6.5L2.6 9.3l6.5-.9z"></path></svg><svg width="12" height="12" viewBox="0 0 24 24" fill="{{ l.star2 }}"><path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 21.3 6.2 20.4l1.1-6.5L2.6 9.3l6.5-.9z"></path></svg><svg width="12" height="12" viewBox="0 0 24 24" fill="{{ l.star3 }}"><path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 21.3 6.2 20.4l1.1-6.5L2.6 9.3l6.5-.9z"></path></svg></div></sc-if>
+              <sc-if value="{{ l.current }}" hint-placeholder-val="{{ false }}"><div style="font:700 10px Manrope;color:#d8af63;display:flex;align-items:center;gap:4px">Играть<svg width="9" height="9" viewBox="0 0 24 24" fill="#d8af63"><path d="M8 5v14l11-7z"></path></svg></div></sc-if>
+              <sc-if value="{{ l.locked }}" hint-placeholder-val="{{ false }}"><span style="font:600 9.5px Manrope;color:{{ l.lockCol }}">{{ l.lockText }}</span></sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- fades -->
+  <div style="position:absolute;left:0;right:0;top:160px;height:18px;background:linear-gradient(180deg,#151B18,transparent);pointer-events:none;z-index:6"></div>
+  <div style="position:absolute;left:0;right:0;bottom:96px;height:40px;background:linear-gradient(0deg,#151B18,transparent);pointer-events:none;z-index:6"></div>
+
+  <!-- bottom CTA -->
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px 22px;display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,transparent,#151B18 24%);z-index:7">
+    <div style="flex:1;min-width:0"><div style="font:700 8.5px Manrope;letter-spacing:.16em;color:#B88A45">ТЕКУЩИЙ УРОВЕНЬ · {{ progLabel }}</div><div style="font:600 17px 'Cormorant Garamond',serif;color:#D5C39A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ curName }}</div></div>
+    <button style="height:50px;padding:0 22px;border:none;border-radius:11px;background:{{ playBg }};color:#1a130a;font:700 14.5px Manrope;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 20px rgba(184,138,69,.32),inset 0 1px 0 rgba(255,255,255,.3);flex-shrink:0">Играть<svg width="15" height="15" viewBox="0 0 24 24" fill="#1a130a"><path d="M8 5v14l11-7z"></path></svg></button>
+  </div>
+
+  <!-- home indicator -->
+  <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:rgba(213,195,154,.3);z-index:9"></div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- MOBILE LANDSCAPE · ЖУРНАЛ УРОВНЕЙ · 896 × 414 -->
+<!-- ============================================================ -->
+<div data-drags-parent="1" style="position:absolute;left:1640px;top:954px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">MOBILE · ГОРИЗОНТ · 896 × 414</div>
+
+<div data-screen-label="Mobile landscape · Журнал уровней" style="position:absolute;left:1640px;top:998px;width:896px;height:414px;background:#151B18;border-radius:34px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.55);font-family:Manrope,sans-serif;color:#D5C39A;display:flex;flex-direction:column;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+  <div style="position:absolute;inset:0;background:radial-gradient(120% 60% at 50% 0%,rgba(47,106,87,.16),transparent 55%);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+
+  <!-- top bar -->
+  <div style="position:relative;flex-shrink:0;height:50px;display:flex;align-items:center;gap:13px;padding:0 18px;border-bottom:1px solid rgba(213,195,154,.12);background:linear-gradient(180deg,rgba(34,42,37,.95),rgba(21,27,24,.6));z-index:8">
+    <button style="width:36px;height:36px;border-radius:9px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.05);color:#D5C39A;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>
+    <div style="min-width:0"><div style="font:700 8.5px Manrope;letter-spacing:.18em;color:#B88A45">ЭКСПЕДИЦИЯ · СЕВЕР</div><div style="font:600 18px 'Cormorant Garamond',serif;color:#D5C39A;line-height:1.1">Белый меридиан</div></div>
+    <div style="flex:1"></div>
+    <div style="font:600 9.5px Manrope;letter-spacing:.26em;color:#B88A45;text-align:right">ЖУРНАЛ · 13 УРОВНЕЙ</div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
+      <span style="font:700 12px Manrope;color:#d8af63">{{ progLabel }}</span>
+      <div style="display:flex;gap:2px;width:140px"><sc-for list="{{ segs }}" as="s" hint-placeholder-count="13"><span style="flex:1;height:4px;border-radius:1px;background:{{ s.bg }}"></span></sc-for></div>
+    </div>
+  </div>
+
+  <!-- horizontally scrolling 2-row card grid -->
+  <div class="scroll" style="position:relative;flex:1;overflow-x:auto;overflow-y:hidden;padding:13px 18px;z-index:5">
+    <div style="display:grid;grid-auto-flow:column;grid-template-rows:1fr;grid-auto-columns:152px;gap:14px;height:100%">
+      <sc-for list="{{ levels }}" as="l" hint-placeholder-count="8">
+        <div style="position:relative;display:flex;flex-direction:column;height:100%;min-height:0;background:#222A25;border-radius:12px;overflow:hidden;{{ l.frame }}">
+          <div style="position:relative;height:120px;flex-shrink:0;overflow:hidden;{{ l.thumbBg }}">
+            <div style="position:absolute;left:0;right:0;bottom:0;height:56%;background:{{ l.ridgeCol }};clip-path:polygon(0 68%,18% 40%,34% 60%,52% 32%,68% 58%,84% 38%,100% 56%,100% 100%,0 100%);opacity:.9"></div>
+            <div style="position:absolute;inset:0;background:var(--grain);opacity:.32;mix-blend-mode:overlay"></div>
+            <div style="position:absolute;inset:0;box-shadow:inset 0 -24px 32px rgba(13,20,26,.7)"></div>
+            <div style="position:absolute;top:7px;left:7px;height:20px;padding:0 7px;border-radius:5px;background:rgba(16,21,18,.66);border:1px solid rgba(213,195,154,.18);display:flex;align-items:center"><span style="font:700 9.5px 'JetBrains Mono',monospace;color:{{ l.numCol }}">{{ l.numLabel }}</span></div>
+            <sc-if value="{{ l.done }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:linear-gradient(180deg,#dcb360,#a9762f);border:1px solid rgba(255,236,196,.5);display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></div></sc-if>
+            <sc-if value="{{ l.current }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:7px;right:7px;width:9px;height:9px;border-radius:50%;background:#d8af63;box-shadow:0 0 8px #d8af63"></div></sc-if>
+            <sc-if value="{{ l.locked }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:0;background:rgba(16,21,18,.6)"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#caa05a,#7e5b2a 72%);border:1.5px solid rgba(255,236,196,.35);display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" stroke-width="2"><rect x="5" y="11" width="14" height="9.5" rx="1.6"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></div></sc-if>
+          </div>
+          <div style="flex:1;min-height:0;padding:9px 11px 10px;display:flex;flex-direction:column">
+            <div style="font:700 7.5px Manrope;letter-spacing:.14em;color:{{ l.kickerCol }}">{{ l.kicker }}</div>
+            <div style="font:600 15px 'Cormorant Garamond',serif;color:{{ l.nameCol }};line-height:1.1;margin-top:2px">{{ l.name }}</div>
+            <div style="margin-top:auto">
+              <sc-if value="{{ l.done }}" hint-placeholder-val="{{ true }}"><div style="display:flex;gap:2px"><svg width="12" height="12" viewBox="0 0 24 24" fill="{{ l.star1 }}"><path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 21.3 6.2 20.4l1.1-6.5L2.6 9.3l6.5-.9z"></path></svg><svg width="12" height="12" viewBox="0 0 24 24" fill="{{ l.star2 }}"><path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 21.3 6.2 20.4l1.1-6.5L2.6 9.3l6.5-.9z"></path></svg><svg width="12" height="12" viewBox="0 0 24 24" fill="{{ l.star3 }}"><path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 21.3 6.2 20.4l1.1-6.5L2.6 9.3l6.5-.9z"></path></svg></div></sc-if>
+              <sc-if value="{{ l.current }}" hint-placeholder-val="{{ false }}"><div style="font:700 10px Manrope;color:#d8af63;display:flex;align-items:center;gap:4px">Играть<svg width="9" height="9" viewBox="0 0 24 24" fill="#d8af63"><path d="M8 5v14l11-7z"></path></svg></div></sc-if>
+              <sc-if value="{{ l.locked }}" hint-placeholder-val="{{ false }}"><span style="font:600 9.5px Manrope;color:{{ l.lockCol }}">{{ l.lockText }}</span></sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- right edge fade -->
+  <div style="position:absolute;right:0;top:50px;bottom:0;width:30px;background:linear-gradient(270deg,#151B18,transparent);pointer-events:none;z-index:6"></div>
+
+  <!-- bottom CTA -->
+  <div style="position:relative;flex-shrink:0;padding:10px 18px 16px;display:flex;align-items:center;gap:12px;border-top:1px solid rgba(213,195,154,.1);background:rgba(21,27,24,.55);z-index:7">
+    <div style="flex:1;min-width:0"><div style="font:700 8.5px Manrope;letter-spacing:.16em;color:#B88A45">ТЕКУЩИЙ УРОВЕНЬ · {{ progLabel }}</div><div style="font:600 17px 'Cormorant Garamond',serif;color:#D5C39A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ curName }}</div></div>
+    <button style="height:48px;padding:0 24px;border:none;border-radius:11px;background:{{ playBg }};color:#1a130a;font:700 14.5px Manrope;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 20px rgba(184,138,69,.32),inset 0 1px 0 rgba(255,255,255,.3);flex-shrink:0">Играть<svg width="15" height="15" viewBox="0 0 24 24" fill="#1a130a"><path d="M8 5v14l11-7z"></path></svg></button>
+  </div>
+
+  <!-- home indicator -->
+  <div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:rgba(213,195,154,.3);z-index:9"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1440, &quot;height&quot;: 900 },
+  &quot;completed&quot;: { &quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 7, &quot;min&quot;: 0, &quot;max&quot;: 13, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Прогресс&quot; },
+  &quot;showStars&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Карточки&quot; },
+  &quot;accent&quot;: { &quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#d8af63&quot;, &quot;options&quot;: [&quot;#d8af63&quot;, &quot;#6fc69e&quot;, &quot;#c98a5a&quot;], &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Карточки&quot; }
+}">
+class Component extends DCLogic {
+  names(){
+    return ['Базовый лагерь','Ледяные ворота','Перевал Молчания','Брошенная вышка','Расщелина','Снежный архив','Радиостанция','Станция «Восход»','Ледовый порог','Чёрный гребень','Хребет ветров','Затерянная долина','Сердце меридиана'];
+  }
+  scene(i){
+    if(i < 4)  return { bg:'radial-gradient(130% 90% at 28% -12%,rgba(96,206,168,.30),transparent 55%),linear-gradient(180deg,#152431,#274659 70%,#5b8290)', ridge:'#13212b' };
+    if(i < 8)  return { bg:'radial-gradient(130% 90% at 72% -12%,rgba(150,182,210,.24),transparent 55%),linear-gradient(180deg,#101a26,#22384c 70%,#3d5b6c)', ridge:'#0d1822' };
+    if(i < 12) return { bg:'radial-gradient(120% 80% at 50% -12%,rgba(120,150,170,.18),transparent 55%),linear-gradient(180deg,#0c1418,#16242b 70%,#284750)', ridge:'#0a1116' };
+    return { bg:'radial-gradient(80% 70% at 50% -12%,rgba(150,210,160,.32),transparent 55%),linear-gradient(180deg,#0e211a,#1c3a2c 70%,#3c6f52)', ridge:'#0c1c14' };
+  }
+  renderVals(){
+    var self = this;
+    var nm = this.names();
+    var completed = Math.max(0, Math.min(13, this.props.completed != null ? this.props.completed : 7));
+    var accent = this.props.accent || '#d8af63';
+    var showStars = this.props.showStars != null ? this.props.showStars : true;
+    var starsData = [3,2,3,3,2,3,3,2,3,3,3,2,3];
+    var STAR_ON = accent, STAR_OFF = 'rgba(213,195,154,.16)';
+
+    var levels = [];
+    for(var i=0;i<13;i++){
+      var done = i < completed, current = i === completed, locked = i > completed;
+      var isFinal = i === 12;
+      var sc = this.scene(i);
+      var frame, kicker, kickerCol, nameCol, numCol, lockText, lockCol;
+
+      if(done){
+        frame = 'border:1px solid rgba(184,138,69,.28);box-shadow:0 14px 30px rgba(0,0,0,.35)';
+        kicker = 'ПРОЙДЕНО'; kickerCol = '#B88A45'; nameCol = '#D5C39A'; numCol = '#d8af63';
+      } else if(current){
+        frame = 'border:1.5px solid '+accent+';box-shadow:0 22px 50px rgba(0,0,0,.5),0 0 0 4px rgba(184,138,69,.12),0 0 28px rgba(184,138,69,.2)';
+        kicker = 'ТЕКУЩИЙ УРОВЕНЬ'; kickerCol = accent; nameCol = '#D5C39A'; numCol = accent;
+      } else {
+        frame = 'border:1px solid rgba(213,195,154,.1);box-shadow:0 12px 26px rgba(0,0,0,.3)';
+        kicker = isFinal ? 'ФИНАЛ · ЗАКРЫТО' : 'ЗАКРЫТО'; kickerCol = '#879087'; nameCol = 'rgba(213,195,154,.5)'; numCol = 'rgba(213,195,154,.5)';
+        lockCol = (i === completed + 1) ? '#B88A45' : '#879087';
+        lockText = (i === completed + 1) ? 'Следующий уровень' : 'Завершите ур. ' + i;
+      }
+
+      var sn = done ? starsData[i] : 0;
+      levels.push({
+        num: i+1, numLabel: ('0'+(i+1)).slice(-2), name: nm[i],
+        done: done, current: current, locked: locked, isFinal: isFinal,
+        frame: frame, thumbBg: 'background:'+sc.bg, ridgeCol: sc.ridge,
+        kicker: kicker, kickerCol: kickerCol, nameCol: nameCol, numCol: numCol,
+        lockText: lockText, lockCol: lockCol,
+        star1: (showStars && sn>=1) ? STAR_ON : STAR_OFF,
+        star2: (showStars && sn>=2) ? STAR_ON : STAR_OFF,
+        star3: (showStars && sn>=3) ? STAR_ON : STAR_OFF
+      });
+    }
+
+    var segs = [];
+    for(var j=0;j<13;j++){
+      var bg = j < completed ? 'linear-gradient(180deg,#d8af63,#a9762f)' : (j === completed ? 'linear-gradient(180deg,#e7c074,#b3812f)' : 'rgba(213,195,154,.1)');
+      segs.push({ bg:bg, sh: j === completed ? '0 0 8px rgba(216,175,99,.65)' : 'none' });
+    }
+
+    return {
+      levels: levels, segs: segs,
+      progLabel: completed + ' / 13', doneLabel: completed,
+      curName: nm[Math.min(completed, 12)],
+      playBg: 'linear-gradient(180deg,'+accent+',#b3812f)'
+    };
+  }
+}
+</script>
+</body>
+</html>

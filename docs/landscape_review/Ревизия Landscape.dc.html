@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+.win{width:896px;height:414px;border-radius:34px;overflow:hidden;position:relative;background:#0c100e;border:1px solid rgba(213,195,154,.12);box-shadow:0 28px 64px rgba(0,0,0,.55),inset 0 0 0 1px rgba(0,0,0,.4)}
+.win > *{position:absolute!important;display:block}
+</style>
+</helmet>
+
+<div data-screen-label="Ревизия · Landscape · 896 × 414" style="position:relative;width:1980px;min-height:1200px;background:radial-gradient(120% 50% at 50% -8%,rgba(47,106,87,.14),transparent 55%),#0F1512;font-family:Manrope,sans-serif;color:#D5C39A;padding:56px 52px 76px;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+
+  <div style="position:absolute;inset:0;background:var(--grain);opacity:.04;mix-blend-mode:overlay;pointer-events:none"></div>
+
+  <!-- ===== HEADER ===== -->
+  <div style="position:relative;display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid rgba(213,195,154,.12);padding-bottom:26px">
+    <div style="max-width:1040px">
+      <div style="font:700 12px Manrope;letter-spacing:.34em;color:#B88A45">РЕВИЗИЯ ИНТЕРФЕЙСА · ГОРИЗОНТАЛЬНАЯ ОРИЕНТАЦИЯ</div>
+      <h1 style="font:600 46px 'Cormorant Garamond',serif;color:#D5C39A;margin:8px 0 0;line-height:1.04">Все landscape-экраны · 896 × 414</h1>
+      <p style="font:400 14.5px Manrope;color:#879087;line-height:1.6;margin:12px 0 0;max-width:760px">Восемь мобильных экранов в горизонтальной ориентации, включая два варианта игрового экрана «Найди отличия». Каждое окно показывает живой экран из исходного файла — правки в источнике отражаются здесь автоматически, а флип-карта во втором варианте игры кликабельна прямо тут.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:9px;flex-shrink:0;padding:14px 18px;border-radius:12px;background:rgba(16,21,18,.6);border:1px solid rgba(213,195,154,.1)">
+      <div style="display:flex;align-items:center;gap:9px"><span style="width:11px;height:11px;border-radius:3px;background:#6fc69e;box-shadow:0 0 8px rgba(111,198,158,.5)"></span><span style="font:600 11.5px Manrope;color:#9bd9bb">Контент помещается</span></div>
+      <div style="display:flex;align-items:center;gap:9px"><span style="width:11px;height:11px;border-radius:3px;background:#d8af63;box-shadow:0 0 8px rgba(216,175,99,.5)"></span><span style="font:600 11.5px Manrope;color:#e7c074">Горизонтальный скролл</span></div>
+      <div style="display:flex;align-items:center;gap:9px"><span style="width:11px;height:11px;border-radius:3px;background:#274659"></span><span style="font:600 11.5px Manrope;color:#879087">Модальное окно</span></div>
+    </div>
+  </div>
+
+  <!-- ===== GRID ===== -->
+  <div style="position:relative;display:grid;grid-template-columns:896px 896px;gap:52px 48px;margin-top:42px;justify-content:center">
+
+    <!-- 1 · Журнал уровней -->
+    <div id="rev-1" style="display:flex;flex-direction:column;gap:15px">
+      <div style="display:flex;align-items:center;gap:13px">
+        <div style="width:34px;height:34px;flex-shrink:0;border-radius:8px;background:rgba(184,138,69,.1);border:1px solid rgba(184,138,69,.4);display:flex;align-items:center;justify-content:center;font:700 13px 'JetBrains Mono',monospace;color:#d8af63">01</div>
+        <div style="flex:1;min-width:0">
+          <div style="font:700 9px Manrope;letter-spacing:.2em;color:#B88A45">КАРТА КАМПАНИИ · КАРТОЧКИ</div>
+          <div style="font:600 21px 'Cormorant Garamond',serif;color:#D5C39A;line-height:1.1">Журнал уровней</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:6px;background:rgba(216,175,99,.12);border:1px solid rgba(216,175,99,.4);flex-shrink:0"><span style="width:6px;height:6px;border-radius:2px;background:#d8af63"></span><span style="font:700 9.5px Manrope;letter-spacing:.1em;color:#e7c074">1 РЯД · СКРОЛЛ</span></div>
+      </div>
+      <div class="win"><dc-import name="Карта кампании - карточки" style="left:-1640px;top:-998px" hint-size="896px,414px"></dc-import></div>
+      <div style="display:flex;align-items:flex-start;gap:9px;font:400 12.5px Manrope;color:#879087;line-height:1.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6fc69e" stroke-width="2.4" style="flex-shrink:0;margin-top:1px"><path d="M20 6L9 17l-5-5"></path></svg><span>Карточки выстроены в <strong style="color:#D5C39A;font-weight:600">один ряд</strong> с горизонтальным скроллом; превью увеличены до 120px, заголовок и звёзды/CTA помещаются по высоте.</span></div>
+    </div>
+
+    <!-- 2 · Карта кампании -->
+    <div id="rev-2" style="display:flex;flex-direction:column;gap:15px">
+      <div style="display:flex;align-items:center;gap:13px">
+        <div style="width:34px;height:34px;flex-shrink:0;border-radius:8px;background:rgba(184,138,69,.1);border:1px solid rgba(184,138,69,.4);display:flex;align-items:center;justify-content:center;font:700 13px 'JetBrains Mono',monospace;color:#d8af63">02</div>
+        <div style="flex:1;min-width:0">
+          <div style="font:700 9px Manrope;letter-spacing:.2em;color:#B88A45">КАРТА КАМПАНИИ</div>
+          <div style="font:600 21px 'Cormorant Garamond',serif;color:#D5C39A;line-height:1.1">Маршрут экспедиции</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:6px;background:rgba(111,198,158,.12);border:1px solid rgba(111,198,158,.4);flex-shrink:0"><span style="width:6px;height:6px;border-radius:2px;background:#6fc69e"></span><span style="font:700 9.5px Manrope;letter-spacing:.1em;color:#9bd9bb">OK</span></div>
+      </div>
+      <div class="win"><dc-import name="Карта кампании" style="left:-1640px;top:-998px" hint-size="896px,414px"></dc-import></div>
+      <div style="display:flex;align-items:flex-start;gap:9px;font:400 12.5px Manrope;color:#879087;line-height:1.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6fc69e" stroke-width="2.4" style="flex-shrink:0;margin-top:1px"><path d="M20 6L9 17l-5-5"></path></svg><span>Маршрут масштабирован под альбомную высоту; верхний бар, узлы и нижний CTA не перекрываются, метка «Вы здесь» читается.</span></div>
+    </div>
+
+    <!-- 3 · Главное меню -->
+    <div id="rev-3" style="display:flex;flex-direction:column;gap:15px">
+      <div style="display:flex;align-items:center;gap:13px">
+        <div style="width:34px;height:34px;flex-shrink:0;border-radius:8px;background:rgba(184,138,69,.1);border:1px solid rgba(184,138,69,.4);display:flex;align-items:center;justify-content:center;font:700 13px 'JetBrains Mono',monospace;color:#d8af63">03</div>
+        <div style="flex:1;min-width:0">
+          <div style="font:700 9px Manrope;letter-spacing:.2em;color:#B88A45">МЕНЮ ЭКСПЕДИЦИЙ</div>
+          <div style="font:600 21px 'Cormorant Garamond',serif;color:#D5C39A;line-height:1.1">Главное меню</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:6px;background:rgba(216,175,99,.12);border:1px solid rgba(216,175,99,.4);flex-shrink:0"><span style="width:6px;height:6px;border-radius:2px;background:#d8af63"></span><span style="font:700 9.5px Manrope;letter-spacing:.1em;color:#e7c074">РЯД · СКРОЛЛ</span></div>
+      </div>
+      <div class="win"><dc-import name="Меню экспедиций" style="left:-80px;top:-2164px" hint-size="896px,414px"></dc-import></div>
+      <div style="display:flex;align-items:flex-start;gap:9px;font:400 12.5px Manrope;color:#879087;line-height:1.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6fc69e" stroke-width="2.4" style="flex-shrink:0;margin-top:1px"><path d="M20 6L9 17l-5-5"></path></svg><span>Левая колонка-интро фиксирована, карточки кампаний — в один ряд с горизонтальным скроллом (тематический скроллбар).</span></div>
+    </div>
+
+    <!-- 4 · Настройки -->
+    <div id="rev-4" style="display:flex;flex-direction:column;gap:15px">
+      <div style="display:flex;align-items:center;gap:13px">
+        <div style="width:34px;height:34px;flex-shrink:0;border-radius:8px;background:rgba(184,138,69,.1);border:1px solid rgba(184,138,69,.4);display:flex;align-items:center;justify-content:center;font:700 13px 'JetBrains Mono',monospace;color:#d8af63">04</div>
+        <div style="flex:1;min-width:0">
+          <div style="font:700 9px Manrope;letter-spacing:.2em;color:#B88A45">НАСТРОЙКИ</div>
+          <div style="font:600 21px 'Cormorant Garamond',serif;color:#D5C39A;line-height:1.1">Выбор языка</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:6px;background:rgba(40,70,89,.4);border:1px solid rgba(213,195,154,.18);flex-shrink:0"><span style="width:6px;height:6px;border-radius:2px;background:#274659"></span><span style="font:700 9.5px Manrope;letter-spacing:.1em;color:#a9b6c0">МОДАЛКА</span></div>
+      </div>
+      <div class="win"><dc-import name="Настройки" style="left:-1600px;top:-1042px" hint-size="896px,414px"></dc-import></div>
+      <div style="display:flex;align-items:flex-start;gap:9px;font:400 12.5px Manrope;color:#879087;line-height:1.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6fc69e" stroke-width="2.4" style="flex-shrink:0;margin-top:1px"><path d="M20 6L9 17l-5-5"></path></svg><span>Двухколоночная модалка: слева описание + «Готово», справа сетка языков 2×N с вертикальным скроллом в цветах темы.</span></div>
+    </div>
+
+    <!-- 5 · Paywall -->
+    <div id="rev-5" style="display:flex;flex-direction:column;gap:15px">
+      <div style="display:flex;align-items:center;gap:13px">
+        <div style="width:34px;height:34px;flex-shrink:0;border-radius:8px;background:rgba(184,138,69,.1);border:1px solid rgba(184,138,69,.4);display:flex;align-items:center;justify-content:center;font:700 13px 'JetBrains Mono',monospace;color:#d8af63">05</div>
+        <div style="flex:1;min-width:0">
+          <div style="font:700 9px Manrope;letter-spacing:.2em;color:#B88A45">МЕНЮ ЭКСПЕДИЦИЙ</div>
+          <div style="font:600 21px 'Cormorant Garamond',serif;color:#D5C39A;line-height:1.1">Paywall</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:6px;background:rgba(40,70,89,.4);border:1px solid rgba(213,195,154,.18);flex-shrink:0"><span style="width:6px;height:6px;border-radius:2px;background:#274659"></span><span style="font:700 9.5px Manrope;letter-spacing:.1em;color:#a9b6c0">МОДАЛКА</span></div>
+      </div>
+      <div class="win"><dc-import name="Меню экспедиций" style="left:-80px;top:-2704px" hint-size="896px,414px"></dc-import></div>
+      <div style="display:flex;align-items:flex-start;gap:9px;font:400 12.5px Manrope;color:#879087;line-height:1.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6fc69e" stroke-width="2.4" style="flex-shrink:0;margin-top:1px"><path d="M20 6L9 17l-5-5"></path></svg><span>Левая колонка с превью кампаний, справа список выгод и две кнопки CTA — всё помещается без обрезки по высоте.</span></div>
+    </div>
+
+    <!-- 6 · Модалка оценки -->
+    <div id="rev-6" style="display:flex;flex-direction:column;gap:15px">
+      <div style="display:flex;align-items:center;gap:13px">
+        <div style="width:34px;height:34px;flex-shrink:0;border-radius:8px;background:rgba(184,138,69,.1);border:1px solid rgba(184,138,69,.4);display:flex;align-items:center;justify-content:center;font:700 13px 'JetBrains Mono',monospace;color:#d8af63">06</div>
+        <div style="flex:1;min-width:0">
+          <div style="font:700 9px Manrope;letter-spacing:.2em;color:#B88A45">МОДАЛКА ОЦЕНКИ</div>
+          <div style="font:600 21px 'Cormorant Garamond',serif;color:#D5C39A;line-height:1.1">Оценка игры</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:6px;background:rgba(40,70,89,.4);border:1px solid rgba(213,195,154,.18);flex-shrink:0"><span style="width:6px;height:6px;border-radius:2px;background:#274659"></span><span style="font:700 9.5px Manrope;letter-spacing:.1em;color:#a9b6c0">МОДАЛКА</span></div>
+      </div>
+      <div class="win"><dc-import name="Модалка оценки" style="left:-1600px;top:-1042px" hint-size="896px,414px"></dc-import></div>
+      <div style="display:flex;align-items:flex-start;gap:9px;font:400 12.5px Manrope;color:#879087;line-height:1.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6fc69e" stroke-width="2.4" style="flex-shrink:0;margin-top:1px"><path d="M20 6L9 17l-5-5"></path></svg><span>Горизонтальная карточка: слева печать и заголовок, справа текст и обе кнопки («Оценить», «Позже») целиком в кадре.</span></div>
+    </div>
+
+    <!-- 7 · Игровой экран · вариант 1 -->
+    <div id="rev-7" style="display:flex;flex-direction:column;gap:15px">
+      <div style="display:flex;align-items:center;gap:13px">
+        <div style="width:34px;height:34px;flex-shrink:0;border-radius:8px;background:rgba(184,138,69,.1);border:1px solid rgba(184,138,69,.4);display:flex;align-items:center;justify-content:center;font:700 13px 'JetBrains Mono',monospace;color:#d8af63">07</div>
+        <div style="flex:1;min-width:0">
+          <div style="font:700 9px Manrope;letter-spacing:.2em;color:#B88A45">ИГРОВОЙ ЭКРАН · НАЙДИ ОТЛИЧИЯ</div>
+          <div style="font:600 21px 'Cormorant Garamond',serif;color:#D5C39A;line-height:1.1">Вариант 1 · Два снимка рядом</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:6px;background:rgba(111,198,158,.12);border:1px solid rgba(111,198,158,.4);flex-shrink:0"><span style="width:6px;height:6px;border-radius:2px;background:#6fc69e"></span><span style="font:700 9.5px Manrope;letter-spacing:.1em;color:#9bd9bb">A / B РЯДОМ</span></div>
+      </div>
+      <div class="win"><dc-import name="Игровой экран" style="left:-1600px;top:-1042px" hint-size="896px,414px"></dc-import></div>
+      <div style="display:flex;align-items:flex-start;gap:9px;font:400 12.5px Manrope;color:#879087;line-height:1.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6fc69e" stroke-width="2.4" style="flex-shrink:0;margin-top:1px"><path d="M20 6L9 17l-5-5"></path></svg><span>Снимки <strong style="color:#D5C39A;font-weight:600">A и B бок о бок</strong>; HUD, найденные метки, подсказка и таймер помещаются в одну полосу по высоте.</span></div>
+    </div>
+
+    <!-- 8 · Игровой экран · вариант 2 (флип) -->
+    <div id="rev-8" style="display:flex;flex-direction:column;gap:15px">
+      <div style="display:flex;align-items:center;gap:13px">
+        <div style="width:34px;height:34px;flex-shrink:0;border-radius:8px;background:rgba(184,138,69,.1);border:1px solid rgba(184,138,69,.4);display:flex;align-items:center;justify-content:center;font:700 13px 'JetBrains Mono',monospace;color:#d8af63">08</div>
+        <div style="flex:1;min-width:0">
+          <div style="font:700 9px Manrope;letter-spacing:.2em;color:#B88A45">ИГРОВОЙ ЭКРАН · НАЙДИ ОТЛИЧИЯ</div>
+          <div style="font:600 21px 'Cormorant Garamond',serif;color:#D5C39A;line-height:1.1">Вариант 2 · Флип-карта</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:6px;background:rgba(216,175,99,.12);border:1px solid rgba(216,175,99,.4);flex-shrink:0"><span style="width:6px;height:6px;border-radius:2px;background:#d8af63"></span><span style="font:700 9.5px Manrope;letter-spacing:.1em;color:#e7c074">ФЛИП · КЛИК</span></div>
+      </div>
+      <div class="win"><dc-import name="Игровой экран" style="left:-1600px;top:-1584px" hint-size="896px,414px"></dc-import></div>
+      <div style="display:flex;align-items:flex-start;gap:9px;font:400 12.5px Manrope;color:#879087;line-height:1.5"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="2.4" style="flex-shrink:0;margin-top:1px"><path d="M3 7h13a4 4 0 0 1 0 8M6 4L3 7l3 3M21 17H8a4 4 0 0 1 0-8M18 20l3-3-3-3"></path></svg><span>Один снимок <strong style="color:#D5C39A;font-weight:600">на весь экран</strong>; кнопка переворачивает карту A↔B (3D-флип). Нажмите кнопку в окне — карта перевернётся прямо здесь.</span></div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

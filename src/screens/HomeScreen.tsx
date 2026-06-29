@@ -166,7 +166,7 @@ function StatusBadge({ status, label }: { status: CampaignStatus; label: string 
 function LockInfoBox({ reason, hint }: { reason: string; hint: string }) {
   return (
     <div
-      className="flex items-start gap-2.5 rounded-[8px] px-3 py-2.5"
+      className="home-lock-info flex items-start gap-2.5 rounded-[8px] px-3 py-2.5"
       style={{
         background: "rgba(135,144,135,0.08)",
         border: "1px solid rgba(213,195,154,0.08)",
@@ -250,7 +250,7 @@ function TopBar({
 
   return (
     <header
-      className="flex items-center justify-between px-5 md:px-10"
+      className="home-topbar flex items-center justify-between px-5 md:px-10"
       style={{
         height: 78,
         borderBottom: "1px solid rgba(213,195,154,0.12)",
@@ -376,7 +376,7 @@ function DesktopCard({
 
   return (
     <div
-      className="flex flex-1 flex-col overflow-hidden rounded-[12px] transition-all duration-300 hover:-translate-y-0.5"
+      className="home-campaign-card flex flex-1 flex-col overflow-hidden rounded-[12px] transition-all duration-300 hover:-translate-y-0.5"
       style={{
         background: "#222A25",
         border: isHighlighted
@@ -456,7 +456,7 @@ function DesktopCard({
           >
             {t(`campaigns.${campaign.id}.title`)}
           </h2>
-          <span className="flex-shrink-0 font-bold text-exp-brass" style={{ fontSize: 18 }}>
+          <span className="home-campaign-progress flex-shrink-0 font-bold text-exp-brass" style={{ fontSize: 18 }}>
             {String(campaign.done).padStart(2, "0")}
             {" "}
             <span className="text-[13px] font-medium text-exp-muted">
@@ -785,9 +785,9 @@ function PaywallModal({
       />
 
       {/* ── Desktop modal (centered) ── */}
-      <div className="absolute inset-0 hidden items-center justify-center md:flex" style={{ pointerEvents: "none" }}>
+      <div className="paywall-desktop-layer absolute inset-0 hidden items-center justify-center md:flex" style={{ pointerEvents: "none" }}>
         <div
-          className="relative flex flex-col overflow-hidden"
+          className="paywall-dialog relative flex flex-col overflow-hidden"
           style={{
             width: 600,
             background: "linear-gradient(180deg,#27302b,#1d251f)",
@@ -1051,7 +1051,7 @@ export function HomeScreen() {
   const handleOpenAll = () => setPaywallOpen(true);
 
   return (
-    <div className="min-h-screen bg-exp-bg font-manrope text-exp-parch">
+    <div className="home-screen min-h-screen bg-exp-bg font-manrope text-exp-parch">
 
       {/* Top bar */}
       <TopBar
@@ -1061,7 +1061,7 @@ export function HomeScreen() {
       />
 
       {/* Page header */}
-      <section className="px-5 pb-2 pt-[34px] text-center md:px-10 md:pb-0">
+      <section className="home-hero px-5 pb-2 pt-[34px] text-center md:px-10 md:pb-0">
         <p className="mb-3 text-[11px] font-bold uppercase tracking-[.34em] text-exp-brass">
           {t("campaigns.supra")}
         </p>
@@ -1074,8 +1074,8 @@ export function HomeScreen() {
       </section>
 
       {/* Route sequence (desktop only) */}
-      <div className="mx-auto w-full max-w-[1460px]">
-        <div className="hidden md:block">
+      <div className="home-content mx-auto w-full max-w-[1460px]">
+        <div className="home-route hidden md:block">
           <RouteSequence
             statuses={campaigns.map((c) => c.status)}
             labels={campaigns.map((c) => t(`campaigns.${c.id}.title`).toUpperCase())}
@@ -1083,7 +1083,7 @@ export function HomeScreen() {
         </div>
 
       {/* ── Desktop card row ── */}
-      <div className="hidden gap-[26px] px-10 pb-4 md:flex">
+      <div className="home-campaign-row hidden gap-[26px] px-10 pb-4 md:flex">
         {campaigns.map((campaign) => (
           <DesktopCard
             key={campaign.id}

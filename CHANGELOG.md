@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- Added zero-balance area hints through Yandex rewarded ads: the hint button switches to an ad icon when magnifiers reach `0`, calls `ysdk.adv.showRewardedVideo()`, applies the hint only after a rewarded completion, and remains available for another ad-backed hint while more unrevealed differences exist.
+
+- Fixed area hints so their pulse no longer shifts away from authored `hintArea` bounds, made the hint ring more visible, and prevented repeated magnifier spending while an existing unfound hint is already active.
+
+- Corrected the `northern-route` level 4 switch hitbox from an aspect-scaled circle to an ellipse so the clickable zone matches the lower markup ring instead of covering extra vertical space.
+
+- Switched gameplay scene rendering from stretched `object-fit: fill` to `object-fit: contain` and anchored hit testing, found markers, hints and wrong-click feedback to the measured contained image plane so normalized hitboxes stay aligned with the visible image.
+
+- Recompressed all runtime WebP scene assets under `public/assets/scenes/` in place, preserving dimensions and paths while reducing total runtime image weight from about 101.6 MB to 43.2 MB; also whitespace-minified the project SVG images.
+
+- Made campaign level journal cards wider in the `map-level-grid`, including compact mobile landscape, so the cards read closer to square instead of tall rectangles.
+
+- Reworked mobile landscape layouts against `docs/landscape_review`: campaign selection, level journal, settings, paywall, and gameplay now use compact 896x414-oriented compositions; gameplay mobile landscape uses the variant-2 A/B flip-card instead of side-by-side photos.
+
 - Renamed the game to its official title everywhere it is shown to players: RU "Найди отличия: Тайны экспедиций", EN "Spot the Differences: Expedition Mysteries". Updated `src/i18n/{ru,en}/common.json` (`app.title` and the header brand tag `campaigns.supra` → "ТАЙНЫ ЭКСПЕДИЦИЙ" / "EXPEDITION MYSTERIES"), the `index.html` `<title>`, the e2e heading assertion in `tests/e2e/app.spec.ts`, and the store listing `title` fields in `docs/starter-data/catalog-copy.example.json` and `docs/starter-data/i18n/{ru,en}/common.json`.
 - Added the missing `ladder-foot` hitbox to `emerald-meridian` level 4 (`em-04-flooded-bridge`) in `src/content/emeraldMeridianLevels.ts`: a 10th annotation ring at the foot of the bridge ladder was drawn in `4/3.webp` but had no hit area. Transcribed it (`circle` at `cx 0.707, cy 0.712, r 0.046`, least-squares fit to the ring, verified via red overlay render), bringing level 4 to 10 rings so `requiredDifferences` now equals 10.
 - Fixed all 13 `emerald-meridian` chapter hitboxes in `src/content/emeraldMeridianLevels.ts` to match the rings drawn on each level's `3.webp` annotation image — both the count and the position/size/shape of every hit area were transcribed and visually verified against red overlay renders. Made the chapter find-ALL: removed the `differenceCounts` table and the "find any subset" comment, and set `requiredDifferences` to `perLevelDiffs[order - 1].length` so the required count always equals the number of drawn rings (per-level ring counts: 10, 9, 9, 9, 7, 9, 9, 11, 9, 10, 9, 9, 9). Fixes the prior `pnpm validate:content` failure where `requiredDifferences` did not match the number of differences.

@@ -4,6 +4,7 @@ import { getChapter, getLevelById } from "@/content/chapters";
 import { PhotoComparator } from "@/features/gameplay/PhotoComparator";
 import { LevelCompleteOverlay } from "@/features/gameplay/LevelCompleteOverlay";
 import { LevelFailedOverlay } from "@/features/gameplay/LevelFailedOverlay";
+import { mockPlatform } from "@/services/platform/mockPlatform";
 import { useGameStore } from "@/shared/store/gameStore";
 
 const TIME_LIMIT = 300; // 5 minutes
@@ -41,6 +42,7 @@ export function GameScreen({
   const [paused, setPaused] = useState(false);
   const [hintId, setHintId] = useState<string | undefined>();
   const [exactHintUsed, setExactHintUsed] = useState(false);
+  const [rewardedHintInFlight, setRewardedHintInFlight] = useState(false);
   const [pendingFinalStats, setPendingFinalStats] = useState<{
     found: number;
     mistakes: number;
@@ -68,13 +70,20 @@ export function GameScreen({
 
   // Countdown timer
   useEffect(() => {
-    if (showComplete || completionPending || timedOut || paused) return;
+    if (
+      showComplete ||
+      completionPending ||
+      timedOut ||
+      paused ||
+      rewardedHintInFlight
+    )
+      return;
     const id = window.setInterval(
       () => setTimeLeft((p) => Math.max(0, p - 1)),
       1000,
     );
     return () => window.clearInterval(id);
-  }, [showComplete, completionPending, timedOut, paused]);
+  }, [showComplete, completionPending, timedOut, paused, rewardedHintInFlight]);
 
   // Detect timeout
   useEffect(() => {
@@ -98,6 +107,8 @@ export function GameScreen({
   const displayFoundIds = showComplete
     ? level.differences.map((d) => d.id)
     : liveFoundIds;
+  const activeHintIsUnfound =
+    hintId !== undefined && !liveFoundIds.includes(hintId);
   const accuracyPct = Math.round(
     (liveFoundIds.length / Math.max(liveFoundIds.length + liveMistakes, 1)) *
       100,
@@ -109,6 +120,7 @@ export function GameScreen({
     usedExactHint = exactHintUsed,
   ) {
     if (completionPending || showComplete || timedOut) return;
+    if (hintId === differenceId) setHintId(undefined);
     recordDiff(levelId, differenceId);
     const nextFound = liveFoundIds.length + 1;
     if (nextFound >= level!.requiredDifferences && !finalStats) {
@@ -126,11 +138,39 @@ export function GameScreen({
     }
   }
 
-  function handleAreaHint() {
+  function revealNextAreaHint({
+    spendMagnifier,
+    skipActiveHint,
+  }: {
+    spendMagnifier: boolean;
+    skipActiveHint: boolean;
+  }) {
     if (showComplete || completionPending) return;
-    const next = level!.differences.find((d) => !liveFoundIds.includes(d.id));
-    if (!next || !spendMagnifiers(1)) return;
+    if (activeHintIsUnfound && !skipActiveHint) return;
+    const next = level!.differences.find(
+      (d) => !liveFoundIds.includes(d.id) && (!skipActiveHint || d.id !== hintId),
+    );
+    if (!next) return;
+    if (spendMagnifier && !spendMagnifiers(1)) return;
     setHintId(next.id);
+  }
+
+  async function handleAreaHint() {
+    if (showComplete || completionPending || rewardedHintInFlight) return;
+    if (magnifiers > 0) {
+      revealNextAreaHint({ spendMagnifier: true, skipActiveHint: false });
+      return;
+    }
+
+    setRewardedHintInFlight(true);
+    try {
+      const result = await mockPlatform.showRewarded();
+      if (result === "rewarded") {
+        revealNextAreaHint({ spendMagnifier: false, skipActiveHint: true });
+      }
+    } finally {
+      setRewardedHintInFlight(false);
+    }
   }
 
   function handleExactHint() {
@@ -172,9 +212,18 @@ export function GameScreen({
   }
 
   const campaignTitle = t(chapter.titleKey).toUpperCase();
+  const hasRewardedAreaHintTarget = level.differences.some(
+    (d) => !liveFoundIds.includes(d.id) && d.id !== hintId,
+  );
+  const canUseAreaHint =
+    !showComplete &&
+    !completionPending &&
+    !rewardedHintInFlight &&
+    liveFoundIds.length < level.requiredDifferences &&
+    (magnifiers > 0 ? !activeHintIsUnfound : hasRewardedAreaHintTarget);
 
   return (
-    <div className="fixed inset-0 flex flex-col overflow-hidden bg-exp-bg font-manrope text-exp-parch">
+    <div className="game-screen fixed inset-0 flex flex-col overflow-hidden bg-exp-bg font-manrope text-exp-parch">
       {/* ── Game content (blurred when overlay active) ─────────────────── */}
       <div
         className="flex flex-1 flex-col"
@@ -186,7 +235,7 @@ export function GameScreen({
       >
         {/* ── TOP HUD ──────────────────────────────────────────────────── */}
         <header
-          className="relative flex shrink-0 items-center justify-between pl-[30px] pr-[86px]"
+          className="game-hud relative flex shrink-0 items-center justify-between pl-[30px] pr-[86px]"
           style={{
             height: "74px",
             borderBottom: "1px solid rgba(213,195,154,.12)",
@@ -312,16 +361,13 @@ export function GameScreen({
           <div className="flex items-center gap-[10px]">
             <button
               onClick={handleAreaHint}
-              disabled={
-                showComplete ||
-                completionPending ||
-                liveFoundIds.length >= level.requiredDifferences
-              }
+              disabled={!canUseAreaHint}
               className="flex h-[44px] items-center gap-2 rounded-[9px] px-4 font-manrope text-[13px] font-bold text-exp-brass2 disabled:opacity-40"
               style={{
                 border: "1px solid rgba(184,138,69,.45)",
                 background: "rgba(184,138,69,.08)",
               }}
+              aria-busy={rewardedHintInFlight}
             >
               <svg
                 width="16"
@@ -337,12 +383,34 @@ export function GameScreen({
                 <path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z" />
               </svg>
               <span className="hidden sm:inline">{t("game.hintLabel")}</span>
-              <span
-                className="inline-flex min-w-[20px] items-center justify-center rounded-[6px] px-[5px] font-manrope text-[11px] font-bold text-[#1a130a]"
-                style={{ height: "20px", background: "#d8af63" }}
-              >
-                {magnifiers}
-              </span>
+              {magnifiers > 0 ? (
+                <span
+                  className="inline-flex min-w-[20px] items-center justify-center rounded-[6px] px-[5px] font-manrope text-[11px] font-bold text-[#1a130a]"
+                  style={{ height: "20px", background: "#d8af63" }}
+                >
+                  {magnifiers}
+                </span>
+              ) : (
+                <span
+                  className="inline-flex h-[20px] w-[24px] items-center justify-center rounded-[6px] text-[#1a130a]"
+                  style={{ background: "#d8af63" }}
+                  aria-hidden="true"
+                >
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="3" y="6" width="18" height="12" rx="2" />
+                    <path d="m10 9 5 3-5 3V9Z" fill="currentColor" stroke="none" />
+                  </svg>
+                </span>
+              )}
             </button>
 
             <button
@@ -416,7 +484,7 @@ export function GameScreen({
 
         {/* ── MOBILE COMPACT HUD ──────────────────────────────────────── */}
         <div
-          className="flex shrink-0 items-center justify-between px-4 pb-[10px] pt-[6px] sm:hidden"
+          className="game-mobile-title flex shrink-0 items-center justify-between px-4 pb-[10px] pt-[6px] sm:hidden"
           style={{ borderBottom: "1px solid rgba(213,195,154,.08)" }}
         >
           <div className="min-w-0 flex-1 text-center">
@@ -430,7 +498,7 @@ export function GameScreen({
         </div>
 
         {/* Mobile found row */}
-        <div className="flex shrink-0 items-center justify-between px-4 pb-[10px] sm:hidden">
+        <div className="game-mobile-found flex shrink-0 items-center justify-between px-4 pb-[10px] sm:hidden">
           <div className="flex items-center gap-2">
             <span className="font-manrope text-[19px] font-bold text-exp-brass2">
               {liveFoundIds.length}
@@ -476,7 +544,7 @@ export function GameScreen({
         </div>
 
         {/* ── PLAY AREA ──────────────────────────────────────────────── */}
-        <div className="flex flex-1 overflow-hidden px-4 pb-0 pt-3 sm:px-[30px] sm:pt-[26px]">
+        <div className="game-play-area flex flex-1 overflow-hidden px-4 pb-0 pt-3 sm:px-[30px] sm:pt-[26px]">
           <PhotoComparator
             level={level}
             foundIds={displayFoundIds}
@@ -494,7 +562,7 @@ export function GameScreen({
 
         {/* ── BOTTOM TRACKER ─────────────────────────────────────────── */}
         <footer
-          className="hidden shrink-0 items-center justify-between px-[30px] sm:flex"
+          className="game-footer hidden shrink-0 items-center justify-between px-[30px] sm:flex"
           style={{
             height: "74px",
             borderTop: "1px solid rgba(213,195,154,.12)",

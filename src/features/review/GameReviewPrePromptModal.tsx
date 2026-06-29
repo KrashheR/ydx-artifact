@@ -123,7 +123,7 @@ export function GameReviewPrePromptModal({
             aria-modal="true"
             aria-labelledby={titleId}
             aria-describedby={`${descriptionId} ${descriptionId}-desktop`}
-            className="relative w-full max-w-[520px] overflow-hidden rounded-[20px] sm:rounded-[16px]"
+            className="review-dialog relative w-full max-w-[520px] overflow-hidden rounded-[20px] sm:rounded-[16px]"
             initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: 12 }}
             animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
             exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: 8 }}
@@ -168,7 +168,7 @@ export function GameReviewPrePromptModal({
               </svg>
             </button>
 
-            <div className="px-6 pb-[26px] pt-[30px] text-center sm:px-[46px] sm:pb-[34px] sm:pt-[42px]">
+            <div className="review-dialog-content px-6 pb-[26px] pt-[30px] text-center sm:px-[46px] sm:pb-[34px] sm:pt-[42px]">
               <CompassMedallion />
 
               <div
@@ -202,7 +202,7 @@ export function GameReviewPrePromptModal({
                 {t("reviewPrompt.description")}
               </p>
 
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <div className="review-actions mt-7 flex flex-col gap-3 sm:flex-row">
                 <button
                   ref={reviewButtonRef}
                   type="button"

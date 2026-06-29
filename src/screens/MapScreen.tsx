@@ -366,9 +366,9 @@ export function MapScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-exp-bg font-manrope text-exp-parch">
+    <div className="map-screen min-h-screen bg-exp-bg font-manrope text-exp-parch">
       <div className="relative z-10 min-h-screen">
-        <div className="flex items-center gap-3 border-b border-[#D5C39A]/10 px-5 pb-4 pr-20 pt-3 md:px-10 md:pr-24">
+        <div className="map-topbar flex items-center gap-3 border-b border-[#D5C39A]/10 px-5 pb-4 pr-20 pt-3 md:px-10 md:pr-24">
           <button
             onClick={() => navigate({ kind: "home" })}
             aria-label={t("actions.back")}
@@ -400,7 +400,7 @@ export function MapScreen() {
           </div>
         </div>
 
-        <section className="px-5 pb-2 pt-[34px] text-center md:px-10 md:pb-0">
+        <section className="map-hero px-5 pb-2 pt-[34px] text-center md:px-10 md:pb-0">
           <p className="mb-3 text-[11px] font-bold uppercase tracking-[.34em] text-exp-brass">
             {t("campaigns.journalLabel", { count: chapter.levels.length })}
           </p>
@@ -409,10 +409,10 @@ export function MapScreen() {
           </h2>
         </section>
 
-        <div className="mx-auto w-full max-w-[1460px]">
-          <div className="hidden px-10 pb-4 pt-5 md:block">
-            <div className="overflow-hidden rounded-[20px] border border-[#D5C39A]/10 bg-[#101512]/70 px-4 py-4">
-              <div className="grid grid-cols-2 gap-4 overflow-y-auto pr-1 xl:grid-cols-4">
+        <div className="map-content mx-auto w-full max-w-[1460px]">
+          <div className="map-desktop-journal hidden px-10 pb-4 pt-5 md:block">
+            <div className="map-journal-shell overflow-hidden rounded-[20px] border border-[#D5C39A]/10 bg-[#101512]/70 px-4 py-4">
+              <div className="map-level-grid grid grid-cols-2 gap-4 overflow-y-auto pr-1 xl:grid-cols-3">
             {levelCards.map((level) => (
               <button
                 key={level.id}
@@ -420,7 +420,7 @@ export function MapScreen() {
                 disabled={level.locked}
                 onClick={() => startLevel(level.id)}
                 aria-label={`${t("campaigns.levelCode", { order: level.order })} ${level.title}`}
-                className={`group flex h-[338px] flex-col overflow-hidden rounded-[14px] bg-[#222A25] text-left transition ${
+                className={`map-level-card group flex h-[338px] flex-col overflow-hidden rounded-[14px] bg-[#222A25] text-left transition ${
                   level.current
                     ? "border-[1.5px] border-[#D8AF63] shadow-[0_22px_50px_rgba(0,0,0,.5),0_0_0_4px_rgba(184,138,69,.12)]"
                     : level.completed
@@ -428,7 +428,7 @@ export function MapScreen() {
                       : "border border-[#D5C39A]/10 shadow-[0_12px_26px_rgba(0,0,0,.3)]"
                 } disabled:cursor-not-allowed`}
               >
-                <div className="relative h-[196px] overflow-hidden">
+                  <div className="map-level-preview relative h-[196px] overflow-hidden">
                   <img src={level.previewSrc} alt="" className="h-full w-full object-cover" draggable={false} />
                   <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.58))]" />
                   <div className="absolute left-3 top-3 rounded-[6px] border border-[#D5C39A]/20 bg-[#101512]/66 px-2 py-1">
@@ -454,7 +454,7 @@ export function MapScreen() {
                   )}
                 </div>
 
-                <div className="flex flex-1 flex-col px-4 py-3">
+                <div className="map-level-body flex flex-1 flex-col px-4 py-3">
                   <p className={`text-[8.5px] font-bold uppercase tracking-[.16em] ${
                     level.current ? "text-[#D8AF63]" : level.completed ? "text-[#B88A45]" : "text-[#879087]"
                   }`}>

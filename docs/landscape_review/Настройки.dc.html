@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@keyframes pop{0%{transform:translate(-50%,-46%) scale(.94);opacity:0}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
+@keyframes pulseDot{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+*{box-sizing:border-box}
+.scroll{scrollbar-width:thin;scrollbar-color:#a9762f rgba(213,195,154,.06)}
+.scroll::-webkit-scrollbar{width:8px;height:8px}
+.scroll::-webkit-scrollbar-track{background:rgba(213,195,154,.05);border-radius:4px;margin:6px}
+.scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#d8af63,#a9762f);border-radius:4px;border:1px solid rgba(21,27,24,.55)}
+.scroll::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#e7c074,#b3812f)}
+.scroll::-webkit-scrollbar-corner{background:transparent}
+</style>
+</helmet>
+
+<!-- ============================================================= -->
+<!-- FRAME 1 · DESKTOP · НАСТРОЙКИ (в контексте карты) -->
+<!-- ============================================================= -->
+<div data-drags-parent="1" style="position:absolute;left:80px;top:34px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">DESKTOP · 1440 × 900 · НАСТРОЙКИ</div>
+
+<div data-screen-label="Desktop · Настройки" style="position:absolute;left:80px;top:78px;width:1440px;height:900px;background:#151B18;border-radius:8px;overflow:hidden;box-shadow:0 36px 90px rgba(0,0,0,.5);font-family:Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+
+  <!-- DIMMED CAMPAIGN-MAP BACKDROP -->
+  <div style="position:absolute;inset:0;filter:blur(3px) brightness(.5) saturate(.92)">
+    <div style="height:78px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;border-bottom:1px solid rgba(213,195,154,.12);background:linear-gradient(180deg,rgba(34,42,37,.9),rgba(21,27,24,.4))">
+      <div style="display:flex;align-items:center;gap:14px"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15.2" stroke="#B88A45" stroke-width="1.4"/><circle cx="17" cy="17" r="10.5" stroke="#B88A45" stroke-width=".7" opacity=".5"/><path d="M17 6.5 L20 17 L17 27.5 L14 17 Z" fill="#B88A45"/><path d="M17 6.5 L14 17 L17 27.5 Z" fill="#8a6730"/></svg><div><div style="font:700 12.5px Manrope;letter-spacing:.26em;color:#B88A45">ИЗУМРУДНЫЙ МЕРИДИАН</div><div style="font:500 10.5px Manrope;letter-spacing:.2em;color:#879087;margin-top:3px">АРХИВ ЭКСПЕДИЦИОННОГО ОБЩЕСТВА</div></div></div>
+      <div style="display:flex;align-items:center;gap:8px"><div style="font:600 9.5px Manrope;letter-spacing:.2em;color:#879087">ПРОГРЕСС</div><div style="width:96px;height:5px;border-radius:3px;background:rgba(213,195,154,.12);overflow:hidden"><div style="width:18%;height:100%;background:linear-gradient(90deg,#d8af63,#a9762f)"></div></div><div style="font:600 12px Manrope;color:#D5C39A">7 / 39</div></div>
+    </div>
+    <div style="text-align:center;padding:34px 0 18px"><div style="font:600 12px Manrope;letter-spacing:.34em;color:#B88A45">ЭКСПЕДИЦИОННЫЙ АРХИВ · ВЫБОР МАРШРУТА</div><h1 style="font:600 50px 'Cormorant Garamond',serif;color:#D5C39A;margin:8px 0 0">Выберите экспедицию</h1></div>
+    <div style="display:flex;gap:26px;padding:0 40px">
+      <div style="flex:1;border-radius:12px;overflow:hidden;border:1px solid rgba(184,138,69,.28);background:#222A25"><div style="position:relative;height:200px;background:radial-gradient(140% 95% at 26% -12%,rgba(96,206,168,.42),transparent 50%),linear-gradient(180deg,#152431,#274659 55%,#9fbac3)"><div style="position:absolute;left:0;right:0;bottom:0;height:44%;background:linear-gradient(180deg,#d2e2e8,#8eb0bc);clip-path:polygon(0 56%,24% 30%,46% 60%,70% 34%,100% 58%,100% 100%,0 100%)"></div></div><div style="padding:16px 18px"><div style="font:600 24px 'Cormorant Garamond',serif;color:#D5C39A">Белый меридиан</div></div></div>
+      <div style="flex:1;border-radius:12px;overflow:hidden;border:1px solid rgba(213,195,154,.12);background:#222A25"><div style="height:200px;background:radial-gradient(60% 55% at 70% 20%,rgba(255,212,148,.5),transparent 56%),linear-gradient(180deg,#3a2c18,#7a5a2f 42%,#e3c489)"></div><div style="padding:16px 18px"><div style="font:600 24px 'Cormorant Garamond',serif;color:rgba(213,195,154,.78)">Песчаный меридиан</div></div></div>
+      <div style="flex:1;border-radius:12px;overflow:hidden;border:1px solid rgba(213,195,154,.12);background:#222A25"><div style="height:200px;background:radial-gradient(70% 65% at 50% -12%,rgba(150,210,160,.34),transparent 56%),linear-gradient(180deg,#0e211a,#1c3a2c 45%,#3c6f52)"></div><div style="padding:16px 18px"><div style="font:600 24px 'Cormorant Garamond',serif;color:rgba(213,195,154,.78)">Изумрудный меридиан</div></div></div>
+    </div>
+  </div>
+  <div style="position:absolute;inset:0;background:radial-gradient(78% 78% at 50% 50%,rgba(13,18,15,.5),rgba(13,18,15,.85))"></div>
+
+  <!-- SETTINGS MODAL -->
+  <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:560px;background:linear-gradient(180deg,#27302b,#1d251f);border:1px solid rgba(184,138,69,.35);border-radius:16px;box-shadow:0 50px 120px rgba(0,0,0,.7),inset 0 1px 0 rgba(213,195,154,.08);overflow:hidden;animation:pop .45s cubic-bezier(.2,.8,.3,1.05)">
+    <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#d8af63,transparent)"></div>
+
+    <!-- HEADER -->
+    <div style="display:flex;align-items:center;gap:15px;padding:26px 28px 22px;border-bottom:1px solid rgba(213,195,154,.1)">
+      <div style="width:50px;height:50px;flex-shrink:0;border-radius:50%;background:radial-gradient(circle at 38% 32%,#caa05a,#7e5b2a 72%);border:2px solid rgba(255,236,196,.4);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(0,0,0,.5),inset 0 2px 6px rgba(255,236,196,.4)">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v2.4M12 19.1v2.4M21.5 12h-2.4M4.9 12H2.5M18.7 5.3l-1.7 1.7M7 17l-1.7 1.7M18.7 18.7L17 17M7 7L5.3 5.3"/></svg>
+      </div>
+      <div style="flex:1">
+        <div style="font:600 11px Manrope;letter-spacing:.32em;color:#B88A45">ЭКСПЕДИЦИОННОЕ СНАРЯЖЕНИЕ</div>
+        <h2 style="font:600 30px 'Cormorant Garamond',serif;color:#D5C39A;margin:3px 0 0">Настройки</h2>
+      </div>
+      <button aria-label="Закрыть" style="width:44px;height:44px;flex-shrink:0;border-radius:50%;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.04);color:#879087;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+
+    <!-- SECTION: LANGUAGE -->
+    <div style="padding:20px 28px 8px;display:flex;align-items:center;gap:9px">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.6"><circle cx="12" cy="12" r="9.3"/><path d="M3 12h18M12 2.7c2.6 2.5 4 5.8 4 9.3s-1.4 6.8-4 9.3c-2.6-2.5-4-5.8-4-9.3s1.4-6.8 4-9.3Z"/></svg>
+      <div style="font:700 11px Manrope;letter-spacing:.2em;color:#879087">ЯЗЫК ИНТЕРФЕЙСА</div>
+      <div style="flex:1;height:1px;background:rgba(213,195,154,.1)"></div>
+      <div style="font:600 10px Manrope;letter-spacing:.06em;color:#B88A45">{{ curName }}</div>
+    </div>
+
+    <!-- LANGUAGE LIST -->
+    <div class="scroll" style="max-height:368px;overflow-y:auto;padding:8px 22px 6px">
+      <sc-for list="{{ languages }}" as="lang" hint-placeholder-count="6">
+        <button onClick="{{ lang.onSelect }}" style="position:relative;width:100%;display:flex;align-items:center;gap:14px;padding:13px 16px;margin-bottom:6px;border:1px solid rgba(213,195,154,.08);border-radius:10px;background:rgba(21,27,24,.3);cursor:pointer;text-align:left">
+          <sc-if value="{{ lang.selected }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;border-radius:10px;border:1.5px solid rgba(184,138,69,.6);background:linear-gradient(180deg,rgba(184,138,69,.16),rgba(184,138,69,.05));box-shadow:0 0 0 1px rgba(184,138,69,.12);pointer-events:none"></div>
+            <div style="position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(180deg,#d8af63,#a9762f);pointer-events:none"></div>
+          </sc-if>
+          <div style="position:relative;width:30px;flex-shrink:0;font:600 11px 'JetBrains Mono',monospace;letter-spacing:.04em;color:#B88A45">{{ lang.codeUpper }}</div>
+          <div style="position:relative;flex:1">
+            <div style="font:600 15px Manrope;color:#D5C39A;line-height:1.2">{{ lang.native }}</div>
+            <div style="font:500 11px Manrope;color:#879087;margin-top:2px">{{ lang.english }}</div>
+          </div>
+          <sc-if value="{{ lang.selected }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative;width:24px;height:24px;flex-shrink:0;border-radius:50%;background:linear-gradient(180deg,#d8af63,#b3812f);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(184,138,69,.4)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 6"/></svg></div>
+          </sc-if>
+          <sc-if value="{{ lang.notSelected }}" hint-placeholder-val="{{ true }}">
+            <div style="position:relative;width:24px;height:24px;flex-shrink:0;border-radius:50%;border:1.5px solid rgba(213,195,154,.16)"></div>
+          </sc-if>
+        </button>
+      </sc-for>
+    </div>
+
+    <!-- FOOTER -->
+    <div style="padding:16px 28px 24px;border-top:1px solid rgba(213,195,154,.1);display:flex;align-items:center;justify-content:space-between;gap:16px">
+      <div style="display:flex;align-items:center;gap:8px;font:500 11px Manrope;color:rgba(135,144,135,.8)"><span style="width:5px;height:5px;border-radius:50%;background:#6fc69e;box-shadow:0 0 8px #6fc69e;animation:pulseDot 2.6s ease-in-out infinite"></span>Выбор сохраняется в профиле</div>
+      <button style="height:46px;padding:0 30px;border:none;border-radius:9px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 14px Manrope;cursor:pointer;box-shadow:0 10px 24px rgba(184,138,69,.3),inset 0 1px 0 rgba(255,255,255,.3)">Готово</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================= -->
+<!-- FRAME 2 · MOBILE · НАСТРОЙКИ (bottom sheet) -->
+<!-- ============================================================= -->
+<div data-drags-parent="1" style="position:absolute;left:1600px;top:34px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">MOBILE · 390 × 844</div>
+
+<div data-screen-label="Mobile · Настройки" style="position:absolute;left:1600px;top:78px;width:390px;height:844px;background:#151B18;border-radius:30px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.5);font-family:Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+  <!-- backdrop -->
+  <div style="position:absolute;inset:0;filter:blur(2.5px) brightness(.46)">
+    <div style="height:38px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 22px 4px;font:600 12px Manrope;color:#D5C39A"><span>9:41</span><span style="font-size:11px">▮▮▮ ◷ 􀛨</span></div>
+    <div style="height:52px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid rgba(213,195,154,.12)"><svg width="24" height="24" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15.2" stroke="#B88A45" stroke-width="1.6"/><path d="M17 6.5 L20 17 L17 27.5 L14 17 Z" fill="#B88A45"/></svg><div style="font:700 10px Manrope;letter-spacing:.18em;color:#B88A45">ИЗУМРУДНЫЙ МЕРИДИАН</div></div>
+    <div style="padding:16px 20px"><h1 style="font:600 28px 'Cormorant Garamond',serif;color:#D5C39A">Выберите экспедицию</h1><div style="height:128px;border-radius:14px;margin-top:14px;background:radial-gradient(140% 95% at 26% -12%,rgba(96,206,168,.42),transparent 50%),linear-gradient(180deg,#152431,#274659 55%,#9fbac3)"></div></div>
+  </div>
+  <div style="position:absolute;inset:0;background:rgba(11,15,12,.66)"></div>
+
+  <!-- bottom sheet -->
+  <div style="position:absolute;left:0;right:0;bottom:0;height:712px;background:linear-gradient(180deg,#27302b,#1a211c);border-top:1px solid rgba(184,138,69,.4);border-radius:26px 26px 30px 30px;box-shadow:0 -20px 60px rgba(0,0,0,.6);overflow:hidden;display:flex;flex-direction:column">
+    <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+    <div style="width:40px;height:4px;border-radius:2px;background:rgba(213,195,154,.25);margin:11px auto 0;flex-shrink:0"></div>
+
+    <!-- header -->
+    <div style="display:flex;align-items:center;gap:13px;padding:14px 20px 16px;flex-shrink:0">
+      <div style="width:44px;height:44px;flex-shrink:0;border-radius:50%;background:radial-gradient(circle at 38% 32%,#caa05a,#7e5b2a 72%);border:2px solid rgba(255,236,196,.4);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.5),inset 0 2px 6px rgba(255,236,196,.4)"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v2.4M12 19.1v2.4M21.5 12h-2.4M4.9 12H2.5M18.7 5.3l-1.7 1.7M7 17l-1.7 1.7M18.7 18.7L17 17M7 7L5.3 5.3"/></svg></div>
+      <div style="flex:1"><div style="font:600 10px Manrope;letter-spacing:.28em;color:#B88A45">СНАРЯЖЕНИЕ</div><h2 style="font:600 26px 'Cormorant Garamond',serif;color:#D5C39A;margin:2px 0 0">Настройки</h2></div>
+      <button aria-label="Закрыть" style="width:44px;height:44px;flex-shrink:0;border-radius:50%;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.04);color:#879087;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+
+    <!-- section label -->
+    <div style="padding:4px 20px 8px;display:flex;align-items:center;gap:9px;flex-shrink:0">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.6"><circle cx="12" cy="12" r="9.3"/><path d="M3 12h18M12 2.7c2.6 2.5 4 5.8 4 9.3s-1.4 6.8-4 9.3c-2.6-2.5-4-5.8-4-9.3s1.4-6.8 4-9.3Z"/></svg>
+      <div style="font:700 10.5px Manrope;letter-spacing:.2em;color:#879087">ЯЗЫК ИНТЕРФЕЙСА</div>
+      <div style="flex:1;height:1px;background:rgba(213,195,154,.1)"></div>
+    </div>
+
+    <!-- list -->
+    <div class="scroll" style="flex:1;overflow-y:auto;padding:4px 16px 6px">
+      <sc-for list="{{ languages }}" as="lang" hint-placeholder-count="6">
+        <button onClick="{{ lang.onSelect }}" style="position:relative;width:100%;display:flex;align-items:center;gap:13px;padding:13px 15px;margin-bottom:6px;border:1px solid rgba(213,195,154,.08);border-radius:10px;background:rgba(21,27,24,.3);cursor:pointer;text-align:left">
+          <sc-if value="{{ lang.selected }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;border-radius:10px;border:1.5px solid rgba(184,138,69,.6);background:linear-gradient(180deg,rgba(184,138,69,.16),rgba(184,138,69,.05));pointer-events:none"></div>
+            <div style="position:absolute;left:0;top:13px;bottom:13px;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(180deg,#d8af63,#a9762f);pointer-events:none"></div>
+          </sc-if>
+          <div style="position:relative;width:28px;flex-shrink:0;font:600 11px 'JetBrains Mono',monospace;color:#B88A45">{{ lang.codeUpper }}</div>
+          <div style="position:relative;flex:1"><div style="font:600 15px Manrope;color:#D5C39A;line-height:1.2">{{ lang.native }}</div><div style="font:500 10.5px Manrope;color:#879087;margin-top:2px">{{ lang.english }}</div></div>
+          <sc-if value="{{ lang.selected }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative;width:24px;height:24px;flex-shrink:0;border-radius:50%;background:linear-gradient(180deg,#d8af63,#b3812f);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(184,138,69,.4)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 6"/></svg></div>
+          </sc-if>
+          <sc-if value="{{ lang.notSelected }}" hint-placeholder-val="{{ true }}">
+            <div style="position:relative;width:24px;height:24px;flex-shrink:0;border-radius:50%;border:1.5px solid rgba(213,195,154,.16)"></div>
+          </sc-if>
+        </button>
+      </sc-for>
+    </div>
+
+    <!-- sticky footer -->
+    <div style="padding:12px 16px 26px;flex-shrink:0;background:linear-gradient(180deg,transparent,#1a211c 30%)">
+      <button style="width:100%;height:52px;border:none;border-radius:10px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 15px Manrope;box-shadow:0 10px 24px rgba(184,138,69,.3),inset 0 1px 0 rgba(255,255,255,.3)">Готово</button>
+    </div>
+  </div>
+  <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:rgba(213,195,154,.3)"></div>
+</div>
+
+
+<!-- ============================================================= -->
+<!-- FRAME 2b · MOBILE LANDSCAPE · НАСТРОЙКИ · 896 × 414 -->
+<!-- ============================================================= -->
+<div data-drags-parent="1" style="position:absolute;left:1600px;top:998px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">MOBILE · ГОРИЗОНТ · 896 × 414</div>
+
+<div data-screen-label="Mobile landscape · Настройки" style="position:absolute;left:1600px;top:1042px;width:896px;height:414px;background:#151B18;border-radius:34px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.5);font-family:Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+  <!-- backdrop -->
+  <div style="position:absolute;inset:0;filter:blur(3px) brightness(.46)">
+    <div style="height:46px;display:flex;align-items:center;gap:9px;padding:0 24px;border-bottom:1px solid rgba(213,195,154,.12)"><svg width="22" height="22" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15.2" stroke="#B88A45" stroke-width="1.6"/><path d="M17 6.5 L20 17 L17 27.5 L14 17 Z" fill="#B88A45"/></svg><div style="font:700 10px Manrope;letter-spacing:.18em;color:#B88A45">ИЗУМРУДНЫЙ МЕРИДИАН</div></div>
+    <div style="display:flex;gap:18px;padding:22px 24px"><div style="flex:1;height:300px;border-radius:14px;background:radial-gradient(140% 95% at 26% -12%,rgba(96,206,168,.42),transparent 50%),linear-gradient(180deg,#152431,#274659 55%,#9fbac3)"></div><div style="flex:1;height:300px;border-radius:14px;background:radial-gradient(60% 55% at 70% 20%,rgba(255,212,148,.5),transparent 56%),linear-gradient(180deg,#3a2c18,#7a5a2f 42%,#e3c489)"></div></div>
+  </div>
+  <div style="position:absolute;inset:0;background:radial-gradient(80% 80% at 50% 50%,rgba(13,18,15,.5),rgba(13,18,15,.85))"></div>
+
+  <!-- horizontal settings modal -->
+  <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:760px;height:344px;background:linear-gradient(180deg,#27302b,#1d251f);border:1px solid rgba(184,138,69,.35);border-radius:16px;box-shadow:0 50px 120px rgba(0,0,0,.7),inset 0 1px 0 rgba(213,195,154,.08);overflow:hidden;display:flex">
+    <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#d8af63,transparent)"></div>
+
+    <!-- left column -->
+    <div style="position:relative;width:264px;flex-shrink:0;padding:26px 24px;display:flex;flex-direction:column;border-right:1px solid rgba(213,195,154,.1);background:rgba(21,27,24,.25)">
+      <div style="display:flex;align-items:center;gap:13px">
+        <div style="width:48px;height:48px;flex-shrink:0;border-radius:50%;background:radial-gradient(circle at 38% 32%,#caa05a,#7e5b2a 72%);border:2px solid rgba(255,236,196,.4);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(0,0,0,.5),inset 0 2px 6px rgba(255,236,196,.4)"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v2.4M12 19.1v2.4M21.5 12h-2.4M4.9 12H2.5M18.7 5.3l-1.7 1.7M7 17l-1.7 1.7M18.7 18.7L17 17M7 7L5.3 5.3"/></svg></div>
+        <div><div style="font:600 9.5px Manrope;letter-spacing:.28em;color:#B88A45">СНАРЯЖЕНИЕ</div><h2 style="font:600 26px 'Cormorant Garamond',serif;color:#D5C39A;margin:2px 0 0">Настройки</h2></div>
+      </div>
+      <div style="margin-top:22px;display:flex;align-items:center;gap:9px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.6"><circle cx="12" cy="12" r="9.3"/><path d="M3 12h18M12 2.7c2.6 2.5 4 5.8 4 9.3s-1.4 6.8-4 9.3c-2.6-2.5-4-5.8-4-9.3s1.4-6.8 4-9.3Z"/></svg>
+        <div style="font:700 11px Manrope;letter-spacing:.2em;color:#879087">ЯЗЫК ИНТЕРФЕЙСА</div>
+      </div>
+      <div style="margin-top:8px;font:600 13px Manrope;color:#B88A45">Текущий: {{ curName }}</div>
+      <p style="font:400 11.5px Manrope;color:rgba(135,144,135,.8);line-height:1.55;margin:12px 0 0">Выберите язык интерфейса. Выбор сохраняется в профиле и применяется ко всем устройствам.</p>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:8px;font:500 10.5px Manrope;color:rgba(135,144,135,.8);margin-bottom:12px"><span style="width:5px;height:5px;border-radius:50%;background:#6fc69e;box-shadow:0 0 8px #6fc69e;animation:pulseDot 2.6s ease-in-out infinite"></span>Сохраняется автоматически</div>
+      <button style="width:100%;height:48px;border:none;border-radius:9px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 14px Manrope;cursor:pointer;box-shadow:0 10px 24px rgba(184,138,69,.3),inset 0 1px 0 rgba(255,255,255,.3)">Готово</button>
+    </div>
+
+    <!-- right: language grid -->
+    <div class="scroll" style="position:relative;flex:1;overflow-y:auto;padding:16px 18px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <sc-for list="{{ languages }}" as="lang" hint-placeholder-count="10">
+          <button onClick="{{ lang.onSelect }}" style="position:relative;width:100%;display:flex;align-items:center;gap:12px;padding:11px 14px;border:1px solid rgba(213,195,154,.08);border-radius:10px;background:rgba(21,27,24,.3);cursor:pointer;text-align:left">
+            <sc-if value="{{ lang.selected }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;inset:0;border-radius:10px;border:1.5px solid rgba(184,138,69,.6);background:linear-gradient(180deg,rgba(184,138,69,.16),rgba(184,138,69,.05));pointer-events:none"></div>
+              <div style="position:absolute;left:0;top:11px;bottom:11px;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(180deg,#d8af63,#a9762f);pointer-events:none"></div>
+            </sc-if>
+            <div style="position:relative;width:26px;flex-shrink:0;font:600 11px 'JetBrains Mono',monospace;color:#B88A45">{{ lang.codeUpper }}</div>
+            <div style="position:relative;flex:1;min-width:0"><div style="font:600 14px Manrope;color:#D5C39A;line-height:1.2">{{ lang.native }}</div><div style="font:500 10px Manrope;color:#879087;margin-top:1px">{{ lang.english }}</div></div>
+            <sc-if value="{{ lang.selected }}" hint-placeholder-val="{{ false }}">
+              <div style="position:relative;width:22px;height:22px;flex-shrink:0;border-radius:50%;background:linear-gradient(180deg,#d8af63,#b3812f);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(184,138,69,.4)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 6"/></svg></div>
+            </sc-if>
+            <sc-if value="{{ lang.notSelected }}" hint-placeholder-val="{{ true }}">
+              <div style="position:relative;width:22px;height:22px;flex-shrink:0;border-radius:50%;border:1.5px solid rgba(213,195,154,.16)"></div>
+            </sc-if>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+  <!-- home indicator -->
+  <div style="position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:rgba(213,195,154,.3)"></div>
+</div>
+
+
+<!-- ============================================================= -->
+<!-- FRAME 3 · MOBILE · RTL (العربية выбран) -->
+<!-- ============================================================= -->
+<div data-drags-parent="1" style="position:absolute;left:2090px;top:34px;font:600 13px Manrope,sans-serif;letter-spacing:.28em;color:rgba(60,52,40,.65)">MOBILE · RTL · العربية</div>
+
+<div data-screen-label="Mobile · RTL Настройки" dir="rtl" lang="ar" style="position:absolute;left:2090px;top:78px;width:390px;height:844px;background:#151B18;border-radius:30px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.5);font-family:'Noto Sans Arabic',Manrope,sans-serif;color:#D5C39A;--grain:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%222%22/></filter><rect width=%22120%22 height=%22120%22 filter=%22url(%23n)%22 opacity=%220.5%22/></svg>')">
+  <div style="position:absolute;inset:0;filter:blur(2.5px) brightness(.46)">
+    <div style="height:38px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 22px 4px;font:600 12px Manrope;color:#D5C39A;direction:ltr"><span>9:41</span><span style="font-size:11px">▮▮▮ ◷ 􀛨</span></div>
+    <div style="height:52px;display:flex;align-items:center;gap:9px;padding:0 18px;border-bottom:1px solid rgba(213,195,154,.12)"><svg width="24" height="24" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15.2" stroke="#B88A45" stroke-width="1.6"/><path d="M17 6.5 L20 17 L17 27.5 L14 17 Z" fill="#B88A45"/></svg><div style="font:700 12px 'Noto Sans Arabic';color:#B88A45">الزمرّد الزوالي</div></div>
+    <div style="padding:16px 20px"><h1 style="font:600 26px 'Noto Sans Arabic';color:#D5C39A">اختر بعثتك</h1><div style="height:128px;border-radius:14px;margin-top:14px;background:radial-gradient(140% 95% at 74% -12%,rgba(96,206,168,.42),transparent 50%),linear-gradient(180deg,#152431,#274659 55%,#9fbac3)"></div></div>
+  </div>
+  <div style="position:absolute;inset:0;background:rgba(11,15,12,.66)"></div>
+
+  <div style="position:absolute;left:0;right:0;bottom:0;height:712px;background:linear-gradient(180deg,#27302b,#1a211c);border-top:1px solid rgba(184,138,69,.4);border-radius:26px 26px 30px 30px;box-shadow:0 -20px 60px rgba(0,0,0,.6);overflow:hidden;display:flex;flex-direction:column">
+    <div style="position:absolute;inset:0;background:var(--grain);opacity:.05;mix-blend-mode:overlay;pointer-events:none"></div>
+    <div style="width:40px;height:4px;border-radius:2px;background:rgba(213,195,154,.25);margin:11px auto 0;flex-shrink:0"></div>
+
+    <div style="display:flex;align-items:center;gap:13px;padding:14px 20px 16px;flex-shrink:0">
+      <div style="width:44px;height:44px;flex-shrink:0;border-radius:50%;background:radial-gradient(circle at 38% 32%,#caa05a,#7e5b2a 72%);border:2px solid rgba(255,236,196,.4);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.5),inset 0 2px 6px rgba(255,236,196,.4)"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v2.4M12 19.1v2.4M21.5 12h-2.4M4.9 12H2.5M18.7 5.3l-1.7 1.7M7 17l-1.7 1.7M18.7 18.7L17 17M7 7L5.3 5.3"/></svg></div>
+      <div style="flex:1;text-align:right"><div style="font:600 11px 'Noto Sans Arabic';color:#B88A45">العتاد</div><h2 style="font:600 25px 'Noto Sans Arabic';color:#D5C39A;margin:2px 0 0">الإعدادات</h2></div>
+      <button aria-label="إغلاق" style="width:44px;height:44px;flex-shrink:0;border-radius:50%;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.04);color:#879087;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+
+    <div style="padding:4px 20px 8px;display:flex;align-items:center;gap:9px;flex-shrink:0">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.6"><circle cx="12" cy="12" r="9.3"/><path d="M3 12h18M12 2.7c2.6 2.5 4 5.8 4 9.3s-1.4 6.8-4 9.3c-2.6-2.5-4-5.8-4-9.3s1.4-6.8 4-9.3Z"/></svg>
+      <div style="font:700 11px 'Noto Sans Arabic';color:#879087">لغة الواجهة</div>
+      <div style="flex:1;height:1px;background:rgba(213,195,154,.1)"></div>
+    </div>
+
+    <div class="scroll" style="flex:1;overflow-y:auto;padding:4px 16px 6px">
+      <!-- Arabic selected -->
+      <div style="position:relative;width:100%;display:flex;align-items:center;gap:13px;padding:13px 15px;margin-bottom:6px;border-radius:10px;background:rgba(21,27,24,.3)">
+        <div style="position:absolute;inset:0;border-radius:10px;border:1.5px solid rgba(184,138,69,.6);background:linear-gradient(180deg,rgba(184,138,69,.16),rgba(184,138,69,.05))"></div>
+        <div style="position:absolute;right:0;top:13px;bottom:13px;width:3px;border-radius:3px 0 0 3px;background:linear-gradient(180deg,#d8af63,#a9762f)"></div>
+        <div style="position:relative;width:28px;flex-shrink:0;font:600 11px 'JetBrains Mono',monospace;color:#B88A45;direction:ltr;text-align:right">AR</div>
+        <div style="position:relative;flex:1;text-align:right"><div style="font:600 16px 'Noto Sans Arabic';color:#D5C39A;line-height:1.3">العربية</div><div style="font:500 11px 'Noto Sans Arabic';color:#879087">Arabic</div></div>
+        <div style="position:relative;width:24px;height:24px;flex-shrink:0;border-radius:50%;background:linear-gradient(180deg,#d8af63,#b3812f);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(184,138,69,.4)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a130a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 6"/></svg></div>
+      </div>
+      <!-- others -->
+      <div style="position:relative;width:100%;display:flex;align-items:center;gap:13px;padding:13px 15px;margin-bottom:6px;border:1px solid rgba(213,195,154,.08);border-radius:10px;background:rgba(21,27,24,.3)">
+        <div style="width:28px;flex-shrink:0;font:600 11px 'JetBrains Mono',monospace;color:#B88A45;direction:ltr;text-align:right">RU</div>
+        <div style="flex:1;text-align:right"><div style="font:600 15px 'Noto Sans Arabic';color:#D5C39A;line-height:1.3">الروسية</div><div style="font:500 10.5px 'Noto Sans Arabic';color:#879087">Russian</div></div>
+        <div style="width:24px;height:24px;flex-shrink:0;border-radius:50%;border:1.5px solid rgba(213,195,154,.16)"></div>
+      </div>
+      <div style="position:relative;width:100%;display:flex;align-items:center;gap:13px;padding:13px 15px;margin-bottom:6px;border:1px solid rgba(213,195,154,.08);border-radius:10px;background:rgba(21,27,24,.3)">
+        <div style="width:28px;flex-shrink:0;font:600 11px 'JetBrains Mono',monospace;color:#B88A45;direction:ltr;text-align:right">EN</div>
+        <div style="flex:1;text-align:right"><div style="font:600 15px 'Noto Sans Arabic';color:#D5C39A;line-height:1.3">الإنجليزية</div><div style="font:500 10.5px 'Noto Sans Arabic';color:#879087">English</div></div>
+        <div style="width:24px;height:24px;flex-shrink:0;border-radius:50%;border:1.5px solid rgba(213,195,154,.16)"></div>
+      </div>
+      <div style="position:relative;width:100%;display:flex;align-items:center;gap:13px;padding:13px 15px;margin-bottom:6px;border:1px solid rgba(213,195,154,.08);border-radius:10px;background:rgba(21,27,24,.3)">
+        <div style="width:28px;flex-shrink:0;font:600 11px 'JetBrains Mono',monospace;color:#B88A45;direction:ltr;text-align:right">TR</div>
+        <div style="flex:1;text-align:right"><div style="font:600 15px 'Noto Sans Arabic';color:#D5C39A;line-height:1.3">التركية</div><div style="font:500 10.5px 'Noto Sans Arabic';color:#879087">Turkish</div></div>
+        <div style="width:24px;height:24px;flex-shrink:0;border-radius:50%;border:1.5px solid rgba(213,195,154,.16)"></div>
+      </div>
+    </div>
+
+    <div style="padding:12px 16px 26px;flex-shrink:0;background:linear-gradient(180deg,transparent,#1a211c 30%)">
+      <button style="width:100%;height:52px;border:none;border-radius:10px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 15px 'Noto Sans Arabic';box-shadow:0 10px 24px rgba(184,138,69,.3),inset 0 1px 0 rgba(255,255,255,.3)">تم</button>
+    </div>
+  </div>
+  <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:rgba(213,195,154,.3)"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1440, &quot;height&quot;: 900 },
+  &quot;lang&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;ru&quot;,&quot;en&quot;,&quot;tr&quot;,&quot;ar&quot;,&quot;es&quot;,&quot;pt&quot;,&quot;de&quot;,&quot;fr&quot;,&quot;ja&quot;,&quot;zh&quot;], &quot;default&quot;: &quot;ru&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Язык&quot; }
+}">
+class Component extends DCLogic {
+  state = { lang: this.props.lang ?? 'ru' };
+  LANGS = [
+    { code: 'ru', native: 'Русский',   english: 'Russian' },
+    { code: 'en', native: 'English',   english: 'English' },
+    { code: 'tr', native: 'Türkçe',    english: 'Turkish' },
+    { code: 'ar', native: 'العربية',    english: 'Arabic' },
+    { code: 'es', native: 'Español',   english: 'Spanish' },
+    { code: 'pt', native: 'Português', english: 'Portuguese' },
+    { code: 'de', native: 'Deutsch',   english: 'German' },
+    { code: 'fr', native: 'Français',  english: 'French' },
+    { code: 'ja', native: '日本語',     english: 'Japanese' },
+    { code: 'zh', native: '中文',       english: 'Chinese' },
+  ];
+  renderVals() {
+    const cur = this.state.lang;
+    const languages = this.LANGS.map(l => ({
+      code: l.code,
+      codeUpper: l.code.toUpperCase(),
+      native: l.native,
+      english: l.english,
+      selected: l.code === cur,
+      notSelected: l.code !== cur,
+      onSelect: () => this.setState({ lang: l.code }),
+    }));
+    const curObj = this.LANGS.find(l => l.code === cur) || this.LANGS[0];
+    return { languages, curName: curObj.native };
+  }
+}
+</script>
+</body>
+</html>

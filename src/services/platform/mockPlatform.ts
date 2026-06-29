@@ -27,6 +27,10 @@ export interface InterstitialGateway {
   showInterstitial(callbacks?: InterstitialCallbacks): Promise<InterstitialResult>;
 }
 
+export interface RewardedGateway {
+  showRewarded(): Promise<RewardedResult>;
+}
+
 type YandexFeedbackApi = {
   canReview?: () => Promise<CanReviewResult>;
   requestReview?: () => Promise<RequestReviewResult | { sentFeedback?: boolean }>;
@@ -39,9 +43,17 @@ type YandexFullscreenAdCallbacks = {
   onOffline?: () => void;
 };
 
+type YandexRewardedAdCallbacks = {
+  onOpen?: () => void;
+  onRewarded?: () => void;
+  onClose?: () => void;
+  onError?: (error: unknown) => void;
+};
+
 type YandexGamesSdk = {
   adv?: {
     showFullscreenAdv?: (options: { callbacks?: YandexFullscreenAdCallbacks }) => void;
+    showRewardedVideo?: (options: { callbacks?: YandexRewardedAdCallbacks }) => void;
   };
   feedback?: YandexFeedbackApi;
   getPlayer?: () => Promise<YandexPlayer>;
@@ -70,6 +82,7 @@ declare global {
 
 let reviewGatewayOverride: GameReviewGateway | null = null;
 let interstitialGatewayOverride: InterstitialGateway | null = null;
+let rewardedGatewayOverride: RewardedGateway | null = null;
 let ysdkInitPromise: Promise<YandexGamesSdk | null> | null = null;
 
 function normalizeFeedbackSent(
@@ -118,8 +131,48 @@ export const mockPlatform = {
     return { sdkReady: Boolean(ysdk), localMock: !ysdk };
   },
   async showRewarded(): Promise<RewardedResult> {
-    await new Promise((resolve) => window.setTimeout(resolve, 300));
-    return "rewarded";
+    if (rewardedGatewayOverride) {
+      return rewardedGatewayOverride.showRewarded();
+    }
+
+    const ysdk = await getYandexSdk();
+    const adv = ysdk?.adv;
+
+    if (!adv?.showRewardedVideo) {
+      await new Promise((resolve) => window.setTimeout(resolve, 300));
+      return "rewarded";
+    }
+    const showRewardedVideo = adv.showRewardedVideo.bind(adv);
+
+    return new Promise((resolve) => {
+      let settled = false;
+      let rewarded = false;
+      const settle = (result: RewardedResult) => {
+        if (settled) return;
+        settled = true;
+        resolve(result);
+      };
+
+      try {
+        showRewardedVideo({
+          callbacks: {
+            onRewarded: () => {
+              rewarded = true;
+            },
+            onClose: () => {
+              settle(rewarded ? "rewarded" : "closed");
+            },
+            onError: (error) => {
+              logPlatformError("showRewarded", error);
+              settle("failed");
+            }
+          }
+        });
+      } catch (error) {
+        logPlatformError("showRewarded", error);
+        settle("failed");
+      }
+    });
   },
   async showInterstitial(callbacks: InterstitialCallbacks = {}): Promise<InterstitialResult> {
     if (interstitialGatewayOverride) {
@@ -212,5 +265,8 @@ export const mockPlatform = {
   },
   setInterstitialGatewayOverride(gateway: InterstitialGateway | null) {
     interstitialGatewayOverride = gateway;
+  },
+  setRewardedGatewayOverride(gateway: RewardedGateway | null) {
+    rewardedGatewayOverride = gateway;
   }
 };
