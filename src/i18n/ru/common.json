@@ -97,6 +97,11 @@
     "loadingAction": "Открываем…",
     "closeLabel": "Закрыть"
   },
+  "dev": {
+    "hitboxEditor": "HITBOX EDITOR",
+    "copyHitboxes": "Copy JSON",
+    "resetHitboxes": "Reset"
+  },
   "levels": {
     "nr01": {
       "title": "Пристань Борея"

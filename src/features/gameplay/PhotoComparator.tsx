@@ -28,8 +28,10 @@ type WrongClick = { key: number; x: number; y: number };
 type Size = { width: number; height: number };
 type ContainedRect = { left: number; top: number; width: number; height: number };
 type NormalizedPoint = { x: number; y: number; side: "A" | "B"; inImage: boolean };
+type HitboxEdit = { differenceId: string; side: "A" | "B"; clientX: number; clientY: number };
 
 let wrongClickSeq = 0;
+const HITBOX_EDITOR_STORAGE_PREFIX = "artifact.hitboxEditor.";
 
 export function PhotoComparator({
   level,
@@ -47,15 +49,25 @@ export function PhotoComparator({
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [imageAspectRatio, setImageAspectRatio] = useState(1586 / 992);
+  const [editableDifferences, setEditableDifferences] = useState<DifferenceDefinition[]>(() =>
+    cloneDifferences(level.differences)
+  );
   const pointer = useRef<PointerState | null>(null);
+  const hitboxEdit = useRef<HitboxEdit | null>(null);
   const [wrongClicksA, setWrongClicksA] = useState<WrongClick[]>([]);
   const [wrongClicksB, setWrongClicksB] = useState<WrongClick[]>([]);
+  const hitboxEditorEnabled = debugShowAllDifferences && debugUseMarkupReference;
+  const editorStorageKey = `${HITBOX_EDITOR_STORAGE_PREFIX}${level.id}`;
+
+  useEffect(() => {
+    setEditableDifferences(loadEditedDifferences(editorStorageKey, level.differences));
+  }, [editorStorageKey, level.differences]);
 
   const found = useMemo(
-    () => level.differences.filter((d) => foundIds.includes(d.id)),
-    [foundIds, level.differences]
+    () => editableDifferences.filter((d) => foundIds.includes(d.id)),
+    [editableDifferences, foundIds]
   );
-  const visibleMarkers = debugShowAllDifferences ? level.differences : found;
+  const visibleMarkers = debugShowAllDifferences ? editableDifferences : found;
 
   function addWrongClick(side: "A" | "B", x: number, y: number) {
     const key = wrongClickSeq++;
@@ -70,7 +82,7 @@ export function PhotoComparator({
     if (!active) return;
     if (!point.inImage) return;
 
-    const match = level.differences.find((d) => {
+    const match = editableDifferences.find((d) => {
       if (foundIds.includes(d.id)) return false;
       return hitTest(point.side === "A" ? d.hitAreaA : d.hitAreaB, point.x, point.y, imageAspectRatio);
     });
@@ -81,6 +93,40 @@ export function PhotoComparator({
       onMisclick();
       addWrongClick(point.side, point.x, point.y);
     }
+  }
+
+  function updateEditableDifferences(updater: (differences: DifferenceDefinition[]) => DifferenceDefinition[]) {
+    setEditableDifferences((current) => {
+      const next = updater(current);
+      if (hitboxEditorEnabled) {
+        window.localStorage.setItem(editorStorageKey, JSON.stringify(next));
+      }
+      return next;
+    });
+  }
+
+  function handleHitboxMove(differenceId: string, side: "A" | "B", dx: number, dy: number) {
+    updateEditableDifferences((differences) =>
+      differences.map((difference) => {
+        if (difference.id !== differenceId) return difference;
+        const shapeKey = side === "A" ? "hitAreaA" : "hitAreaB";
+        return {
+          ...difference,
+          [shapeKey]: moveShape(difference[shapeKey], dx, dy),
+          hintArea: moveShape(difference.hintArea, dx, dy)
+        };
+      })
+    );
+  }
+
+  async function copyEditedDifferences() {
+    const payload = JSON.stringify(editableDifferences, null, 2);
+    await window.navigator.clipboard?.writeText(payload);
+  }
+
+  function resetEditedDifferences() {
+    window.localStorage.removeItem(editorStorageKey);
+    setEditableDifferences(cloneDifferences(level.differences));
   }
 
   function renderPhoto(side: "A" | "B", mobile = false) {
@@ -125,10 +171,13 @@ export function PhotoComparator({
           hintDifference={hintId ? level.differences.find((d) => d.id === hintId) : undefined}
           wrongClicks={wrongClicks}
           debugShowAllDifferences={debugShowAllDifferences}
+          hitboxEditorEnabled={hitboxEditorEnabled}
+          hitboxEdit={hitboxEdit}
           onImageAspectRatio={setImageAspectRatio}
           onZoom={setZoom}
           onPan={setPan}
           onPointerPick={handlePointerUp}
+          onHitboxMove={handleHitboxMove}
           compareLabel={version === "A" ? t("game.labelOriginal") : t("game.labelCopy")}
         />
       </div>
@@ -229,6 +278,33 @@ export function PhotoComparator({
           {t("actions.compare")}
         </button>
       </div>
+
+      {hitboxEditorEnabled ? (
+        <div
+          className="absolute bottom-3 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-[10px] px-3 py-2"
+          style={{ border: "1px solid rgba(111,198,158,.45)", background: "rgba(21,27,24,.9)" }}
+        >
+          <span className="font-jetbrains text-[10px] font-semibold text-exp-success">
+            {t("dev.hitboxEditor")}
+          </span>
+          <button
+            type="button"
+            className="rounded-[7px] px-3 py-1 font-manrope text-[11px] font-bold text-[#102016]"
+            style={{ background: "#6fc69e" }}
+            onClick={copyEditedDifferences}
+          >
+            {t("dev.copyHitboxes")}
+          </button>
+          <button
+            type="button"
+            className="rounded-[7px] px-3 py-1 font-manrope text-[11px] font-bold text-exp-parch"
+            style={{ border: "1px solid rgba(213,195,154,.2)", background: "rgba(213,195,154,.06)" }}
+            onClick={resetEditedDifferences}
+          >
+            {t("dev.resetHitboxes")}
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -248,10 +324,13 @@ function PhotoCanvas({
   hintDifference,
   wrongClicks,
   debugShowAllDifferences,
+  hitboxEditorEnabled,
+  hitboxEdit,
   onImageAspectRatio,
   onZoom,
   onPan,
   onPointerPick,
+  onHitboxMove,
   compareLabel
 }: {
   levelId: string;
@@ -268,10 +347,13 @@ function PhotoCanvas({
   hintDifference?: DifferenceDefinition;
   wrongClicks: WrongClick[];
   debugShowAllDifferences: boolean;
+  hitboxEditorEnabled: boolean;
+  hitboxEdit: React.MutableRefObject<HitboxEdit | null>;
   onImageAspectRatio: (aspectRatio: number) => void;
   onZoom: React.Dispatch<React.SetStateAction<number>>;
   onPan: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
   onPointerPick: (point: NormalizedPoint) => void;
+  onHitboxMove: (differenceId: string, side: "A" | "B", dx: number, dy: number) => void;
   compareLabel: string;
 }) {
   const frameRef = useRef<HTMLDivElement | null>(null);
@@ -325,6 +407,15 @@ function PhotoCanvas({
         pointer.current = { id: e.pointerId, x: e.clientX, y: e.clientY, startX: e.clientX, startY: e.clientY };
       }}
       onPointerMove={(e) => {
+        if (hitboxEdit.current) {
+          if (imageRect.width <= 0 || imageRect.height <= 0) return;
+          const active = hitboxEdit.current;
+          const dx = (e.clientX - active.clientX) / zoom / imageRect.width;
+          const dy = (e.clientY - active.clientY) / zoom / imageRect.height;
+          hitboxEdit.current = { ...active, clientX: e.clientX, clientY: e.clientY };
+          onHitboxMove(active.differenceId, active.side, dx, dy);
+          return;
+        }
         if (!pointer.current) return;
         const dx = e.clientX - pointer.current.x;
         const dy = e.clientY - pointer.current.y;
@@ -338,6 +429,10 @@ function PhotoCanvas({
         }
       }}
       onPointerUp={(e) => {
+        if (hitboxEdit.current) {
+          hitboxEdit.current = null;
+          return;
+        }
         const active = pointer.current;
         if (!active) return;
         const dragged = Math.hypot(e.clientX - active.startX, e.clientY - active.startY) > 8;
@@ -394,6 +489,17 @@ function PhotoCanvas({
                 side={side}
                 debug={debugOnly}
                 aspectRatio={imageAspectRatio}
+                editable={hitboxEditorEnabled}
+                onEditStart={(event) => {
+                  event.stopPropagation();
+                  event.currentTarget.setPointerCapture(event.pointerId);
+                  hitboxEdit.current = {
+                    differenceId: d.id,
+                    side,
+                    clientX: event.clientX,
+                    clientY: event.clientY
+                  };
+                }}
               />
             );
           })}
@@ -423,12 +529,16 @@ function FoundMarker({
   difference,
   side,
   debug = false,
-  aspectRatio
+  aspectRatio,
+  editable = false,
+  onEditStart
 }: {
   difference: DifferenceDefinition;
   side: "A" | "B";
   debug?: boolean;
   aspectRatio: number;
+  editable?: boolean;
+  onEditStart?: (event: React.PointerEvent<HTMLSpanElement>) => void;
 }) {
   const shape = side === "A" ? difference.hitAreaA : difference.hitAreaB;
   const box = shapeBounds(shape, aspectRatio);
@@ -439,8 +549,12 @@ function FoundMarker({
         left: `${box.left * 100}%`,
         top: `${box.top * 100}%`,
         width: `${box.width * 100}%`,
-        height: `${box.height * 100}%`
+        height: `${box.height * 100}%`,
+        cursor: editable ? "grab" : undefined,
+        pointerEvents: editable ? "auto" : undefined,
+        touchAction: editable ? "none" : undefined
       }}
+      onPointerDown={editable ? onEditStart : undefined}
       aria-hidden
     >
       {/* Outer ring */}
@@ -597,4 +711,31 @@ function getContainedImageRect(size: Size, aspectRatio: number): ContainedRect {
 
 function clamp01(value: number) {
   return Math.max(0, Math.min(1, value));
+}
+
+function cloneDifferences(differences: DifferenceDefinition[]) {
+  return structuredClone(differences);
+}
+
+function loadEditedDifferences(storageKey: string, fallback: DifferenceDefinition[]) {
+  const stored = window.localStorage.getItem(storageKey);
+  if (!stored) return cloneDifferences(fallback);
+  try {
+    return JSON.parse(stored) as DifferenceDefinition[];
+  } catch {
+    return cloneDifferences(fallback);
+  }
+}
+
+function moveShape(shape: HitShape, dx: number, dy: number): HitShape {
+  if (shape.kind === "circle") {
+    return { ...shape, cx: clamp01(shape.cx + dx), cy: clamp01(shape.cy + dy) };
+  }
+  if (shape.kind === "ellipse") {
+    return { ...shape, cx: clamp01(shape.cx + dx), cy: clamp01(shape.cy + dy) };
+  }
+  return {
+    ...shape,
+    points: shape.points.map((point) => ({ x: clamp01(point.x + dx), y: clamp01(point.y + dy) }))
+  };
 }

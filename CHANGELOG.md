@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added a local hitbox authoring flow to layout-debug gameplay: `pnpm dev:validate` now lets reviewers drag visible difference markers, applies the edited coordinates immediately, persists them per level in localStorage, and exports the edited `differences` JSON for committing into `src/content/*`.
+
 - Added zero-balance area hints through Yandex rewarded ads: the hint button switches to an ad icon when magnifiers reach `0`, calls `ysdk.adv.showRewardedVideo()`, applies the hint only after a rewarded completion, and remains available for another ad-backed hint while more unrevealed differences exist.
 
 - Fixed area hints so their pulse no longer shifts away from authored `hintArea` bounds, made the hint ring more visible, and prevented repeated magnifier spending while an existing unfound hint is already active.
