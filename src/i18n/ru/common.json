@@ -99,6 +99,11 @@
   },
   "dev": {
     "hitboxEditor": "HITBOX EDITOR",
+    "hitboxEditorHelp": "Двигайте/меняйте любую сторону — обновятся обе",
+    "applyHitboxes": "Apply",
+    "applyingHitboxes": "Applying...",
+    "applyHitboxesDone": "Applied",
+    "applyHitboxesFailed": "Apply failed",
     "copyHitboxes": "Copy JSON",
     "resetHitboxes": "Reset"
   },

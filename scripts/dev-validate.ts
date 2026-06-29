@@ -8,7 +8,13 @@ const viteCli = join(dirname(require.resolve("vite/package.json")), "bin", "vite
 process.env.VITE_LAYOUT_DEBUG = "true";
 process.env.ALLOW_LAYOUT_DEBUG = "true";
 
-const result = spawnSync(process.execPath, [viteCli, "--host", "127.0.0.1", ...process.argv.slice(2)], {
+const viteArgs = process.argv.slice(2).filter((arg) => {
+  if (arg !== "cheat" && arg !== "--cheat") return true;
+  process.env.VITE_DEV_VALIDATE_CHEAT = "true";
+  return false;
+});
+
+const result = spawnSync(process.execPath, [viteCli, "--host", "127.0.0.1", ...viteArgs], {
   env: process.env,
   stdio: "inherit"
 });

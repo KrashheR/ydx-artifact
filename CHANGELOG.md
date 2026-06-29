@@ -2,7 +2,17 @@
 
 ## Unreleased
 
-- Added a local hitbox authoring flow to layout-debug gameplay: `pnpm dev:validate` now lets reviewers drag visible difference markers, applies the edited coordinates immediately, persists them per level in localStorage, and exports the edited `differences` JSON for committing into `src/content/*`.
+- Updated the layout-debug hitbox editor so dragging or resizing either A/B marker synchronously updates both side hitboxes and the shared hint area.
+
+- Added `pnpm dev:validate:cheat`, which starts the hitbox validation dev server and automatically applies the existing all-content dev unlock.
+
+- Excluded scene markup reference files named `3.webp` from production Vite build output while keeping them in `public` for content validation and local hitbox review.
+
+- Added a local hitbox authoring flow to layout-debug gameplay: `pnpm dev:validate` now lets reviewers drag visible difference markers, resize them from a bottom-right corner handle, applies edits immediately, persists them per level in localStorage, and exports the edited `differences` JSON for committing into `src/content/*`.
+
+- Added an "Apply" action to the layout-debug hitbox editor. In `pnpm dev:validate`, the browser now posts edited hitboxes to a dev-only Vite endpoint that writes them back into the matching `src/content/*` campaign module.
+
+- Added one-axis resize handles to the layout-debug hitbox editor: right and bottom handles resize width/height independently, while the corner handle still resizes both axes.
 
 - Added zero-balance area hints through Yandex rewarded ads: the hint button switches to an ad icon when magnifiers reach `0`, calls `ysdk.adv.showRewardedVideo()`, applies the hint only after a rewarded completion, and remains available for another ad-backed hint while more unrevealed differences exist.
 

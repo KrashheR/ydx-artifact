@@ -28,7 +28,16 @@ type WrongClick = { key: number; x: number; y: number };
 type Size = { width: number; height: number };
 type ContainedRect = { left: number; top: number; width: number; height: number };
 type NormalizedPoint = { x: number; y: number; side: "A" | "B"; inImage: boolean };
-type HitboxEdit = { differenceId: string; side: "A" | "B"; clientX: number; clientY: number };
+type ResizeAxis = "x" | "y" | "both";
+type HitboxEdit = {
+  differenceId: string;
+  side: "A" | "B";
+  mode: "move" | "resize";
+  resizeAxis?: ResizeAxis;
+  clientX: number;
+  clientY: number;
+};
+type ApplyStatus = "idle" | "saving" | "saved" | "error";
 
 let wrongClickSeq = 0;
 const HITBOX_EDITOR_STORAGE_PREFIX = "artifact.hitboxEditor.";
@@ -56,11 +65,13 @@ export function PhotoComparator({
   const hitboxEdit = useRef<HitboxEdit | null>(null);
   const [wrongClicksA, setWrongClicksA] = useState<WrongClick[]>([]);
   const [wrongClicksB, setWrongClicksB] = useState<WrongClick[]>([]);
+  const [applyStatus, setApplyStatus] = useState<ApplyStatus>("idle");
   const hitboxEditorEnabled = debugShowAllDifferences && debugUseMarkupReference;
   const editorStorageKey = `${HITBOX_EDITOR_STORAGE_PREFIX}${level.id}`;
 
   useEffect(() => {
     setEditableDifferences(loadEditedDifferences(editorStorageKey, level.differences));
+    setApplyStatus("idle");
   }, [editorStorageKey, level.differences]);
 
   const found = useMemo(
@@ -109,12 +120,16 @@ export function PhotoComparator({
     updateEditableDifferences((differences) =>
       differences.map((difference) => {
         if (difference.id !== differenceId) return difference;
-        const shapeKey = side === "A" ? "hitAreaA" : "hitAreaB";
-        return {
-          ...difference,
-          [shapeKey]: moveShape(difference[shapeKey], dx, dy),
-          hintArea: moveShape(difference.hintArea, dx, dy)
-        };
+        return moveDifferenceHitboxPair(difference, side, dx, dy);
+      })
+    );
+  }
+
+  function handleHitboxResize(differenceId: string, side: "A" | "B", dx: number, dy: number, axis: ResizeAxis) {
+    updateEditableDifferences((differences) =>
+      differences.map((difference) => {
+        if (difference.id !== differenceId) return difference;
+        return resizeDifferenceHitboxPair(difference, side, dx, dy, imageAspectRatio, axis);
       })
     );
   }
@@ -124,9 +139,35 @@ export function PhotoComparator({
     await window.navigator.clipboard?.writeText(payload);
   }
 
+  async function applyEditedDifferences() {
+    setApplyStatus("saving");
+    try {
+      const response = await fetch("/__dev/hitboxes/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          levelId: level.id,
+          chapterId: level.chapterId,
+          order: level.order,
+          differences: editableDifferences
+        })
+      });
+      const payload = (await response.json()) as { ok?: boolean; error?: string };
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.error ?? "Hitbox source update failed");
+      }
+      window.localStorage.removeItem(editorStorageKey);
+      setApplyStatus("saved");
+    } catch (error) {
+      console.error(error);
+      setApplyStatus("error");
+    }
+  }
+
   function resetEditedDifferences() {
     window.localStorage.removeItem(editorStorageKey);
     setEditableDifferences(cloneDifferences(level.differences));
+    setApplyStatus("idle");
   }
 
   function renderPhoto(side: "A" | "B", mobile = false) {
@@ -178,6 +219,7 @@ export function PhotoComparator({
           onPan={setPan}
           onPointerPick={handlePointerUp}
           onHitboxMove={handleHitboxMove}
+          onHitboxResize={handleHitboxResize}
           compareLabel={version === "A" ? t("game.labelOriginal") : t("game.labelCopy")}
         />
       </div>
@@ -287,14 +329,34 @@ export function PhotoComparator({
           <span className="font-jetbrains text-[10px] font-semibold text-exp-success">
             {t("dev.hitboxEditor")}
           </span>
+          <span className="hidden font-manrope text-[10px] font-semibold text-exp-muted sm:inline">
+            {t("dev.hitboxEditorHelp")}
+          </span>
           <button
             type="button"
             className="rounded-[7px] px-3 py-1 font-manrope text-[11px] font-bold text-[#102016]"
             style={{ background: "#6fc69e" }}
+            disabled={applyStatus === "saving"}
+            onClick={applyEditedDifferences}
+          >
+            {applyStatus === "saving" ? t("dev.applyingHitboxes") : t("dev.applyHitboxes")}
+          </button>
+          <button
+            type="button"
+            className="rounded-[7px] px-3 py-1 font-manrope text-[11px] font-bold text-[#102016]"
+            style={{ background: "rgba(111,198,158,.72)" }}
             onClick={copyEditedDifferences}
           >
             {t("dev.copyHitboxes")}
           </button>
+          {applyStatus === "saved" || applyStatus === "error" ? (
+            <span
+              className="font-manrope text-[10px] font-bold"
+              style={{ color: applyStatus === "saved" ? "#6fc69e" : "#ff9d8a" }}
+            >
+              {applyStatus === "saved" ? t("dev.applyHitboxesDone") : t("dev.applyHitboxesFailed")}
+            </span>
+          ) : null}
           <button
             type="button"
             className="rounded-[7px] px-3 py-1 font-manrope text-[11px] font-bold text-exp-parch"
@@ -331,6 +393,7 @@ function PhotoCanvas({
   onPan,
   onPointerPick,
   onHitboxMove,
+  onHitboxResize,
   compareLabel
 }: {
   levelId: string;
@@ -354,6 +417,7 @@ function PhotoCanvas({
   onPan: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
   onPointerPick: (point: NormalizedPoint) => void;
   onHitboxMove: (differenceId: string, side: "A" | "B", dx: number, dy: number) => void;
+  onHitboxResize: (differenceId: string, side: "A" | "B", dx: number, dy: number, axis: ResizeAxis) => void;
   compareLabel: string;
 }) {
   const frameRef = useRef<HTMLDivElement | null>(null);
@@ -413,7 +477,11 @@ function PhotoCanvas({
           const dx = (e.clientX - active.clientX) / zoom / imageRect.width;
           const dy = (e.clientY - active.clientY) / zoom / imageRect.height;
           hitboxEdit.current = { ...active, clientX: e.clientX, clientY: e.clientY };
-          onHitboxMove(active.differenceId, active.side, dx, dy);
+          if (active.mode === "resize") {
+            onHitboxResize(active.differenceId, active.side, dx, dy, active.resizeAxis ?? "both");
+          } else {
+            onHitboxMove(active.differenceId, active.side, dx, dy);
+          }
           return;
         }
         if (!pointer.current) return;
@@ -496,6 +564,19 @@ function PhotoCanvas({
                   hitboxEdit.current = {
                     differenceId: d.id,
                     side,
+                    mode: "move",
+                    clientX: event.clientX,
+                    clientY: event.clientY
+                  };
+                }}
+                onResizeStart={(event, axis) => {
+                  event.stopPropagation();
+                  event.currentTarget.setPointerCapture(event.pointerId);
+                  hitboxEdit.current = {
+                    differenceId: d.id,
+                    side,
+                    mode: "resize",
+                    resizeAxis: axis,
                     clientX: event.clientX,
                     clientY: event.clientY
                   };
@@ -531,7 +612,8 @@ function FoundMarker({
   debug = false,
   aspectRatio,
   editable = false,
-  onEditStart
+  onEditStart,
+  onResizeStart
 }: {
   difference: DifferenceDefinition;
   side: "A" | "B";
@@ -539,6 +621,7 @@ function FoundMarker({
   aspectRatio: number;
   editable?: boolean;
   onEditStart?: (event: React.PointerEvent<HTMLSpanElement>) => void;
+  onResizeStart?: (event: React.PointerEvent<HTMLSpanElement>, axis: ResizeAxis) => void;
 }) {
   const shape = side === "A" ? difference.hitAreaA : difference.hitAreaB;
   const box = shapeBounds(shape, aspectRatio);
@@ -587,6 +670,34 @@ function FoundMarker({
           </svg>
         </span>
       )}
+      {editable ? (
+        <span
+          className="absolute bottom-0 right-0 h-[14px] w-[14px] translate-x-1/2 translate-y-1/2 rounded-[3px]"
+          style={{
+            background: "#6fc69e",
+            border: "2px solid #102016",
+            boxShadow: "0 0 10px rgba(111,198,158,.65)",
+            cursor: "nwse-resize",
+            pointerEvents: "auto",
+            touchAction: "none"
+          }}
+          onPointerDown={(event) => onResizeStart?.(event, "both")}
+        />
+      ) : null}
+      {editable ? (
+        <span
+          className="absolute right-0 top-1/2 h-[22px] w-[10px] -translate-y-1/2 translate-x-1/2 rounded-[3px]"
+          style={resizeHandleStyle("ew-resize")}
+          onPointerDown={(event) => onResizeStart?.(event, "x")}
+        />
+      ) : null}
+      {editable ? (
+        <span
+          className="absolute bottom-0 left-1/2 h-[10px] w-[22px] -translate-x-1/2 translate-y-1/2 rounded-[3px]"
+          style={resizeHandleStyle("ns-resize")}
+          onPointerDown={(event) => onResizeStart?.(event, "y")}
+        />
+      ) : null}
     </span>
   );
 }
@@ -648,6 +759,17 @@ function WrongClickMarker({ x, y }: { x: number; y: number }) {
       </span>
     </span>
   );
+}
+
+function resizeHandleStyle(cursor: string): React.CSSProperties {
+  return {
+    background: "#6fc69e",
+    border: "2px solid #102016",
+    boxShadow: "0 0 10px rgba(111,198,158,.65)",
+    cursor,
+    pointerEvents: "auto",
+    touchAction: "none"
+  };
 }
 
 function shapeBounds(shape: HitShape, aspectRatio: number) {
@@ -727,6 +849,41 @@ function loadEditedDifferences(storageKey: string, fallback: DifferenceDefinitio
   }
 }
 
+function moveDifferenceHitboxPair(difference: DifferenceDefinition, side: "A" | "B", dx: number, dy: number) {
+  const activeShape = side === "A" ? difference.hitAreaA : difference.hitAreaB;
+  const movedActiveShape = moveShape(activeShape, dx, dy);
+  const nextHitAreaA = side === "A" ? movedActiveShape : moveShape(difference.hitAreaA, dx, dy);
+  const nextHitAreaB = side === "B" ? movedActiveShape : moveShape(difference.hitAreaB, dx, dy);
+
+  return {
+    ...difference,
+    hitAreaA: nextHitAreaA,
+    hitAreaB: nextHitAreaB,
+    hintArea: moveShape(difference.hintArea, dx, dy)
+  };
+}
+
+function resizeDifferenceHitboxPair(
+  difference: DifferenceDefinition,
+  side: "A" | "B",
+  dx: number,
+  dy: number,
+  aspectRatio: number,
+  axis: ResizeAxis
+) {
+  const activeShape = side === "A" ? difference.hitAreaA : difference.hitAreaB;
+  const resizedActiveShape = resizeShape(activeShape, dx, dy, aspectRatio, axis);
+  const nextHitAreaA = side === "A" ? resizedActiveShape : resizeShape(difference.hitAreaA, dx, dy, aspectRatio, axis);
+  const nextHitAreaB = side === "B" ? resizedActiveShape : resizeShape(difference.hitAreaB, dx, dy, aspectRatio, axis);
+
+  return {
+    ...difference,
+    hitAreaA: nextHitAreaA,
+    hitAreaB: nextHitAreaB,
+    hintArea: resizeShape(difference.hintArea, dx, dy, aspectRatio, axis)
+  };
+}
+
 function moveShape(shape: HitShape, dx: number, dy: number): HitShape {
   if (shape.kind === "circle") {
     return { ...shape, cx: clamp01(shape.cx + dx), cy: clamp01(shape.cy + dy) };
@@ -738,4 +895,52 @@ function moveShape(shape: HitShape, dx: number, dy: number): HitShape {
     ...shape,
     points: shape.points.map((point) => ({ x: clamp01(point.x + dx), y: clamp01(point.y + dy) }))
   };
+}
+
+function resizeShape(shape: HitShape, dx: number, dy: number, aspectRatio: number, axis: ResizeAxis): HitShape {
+  const resizeX = axis === "x" || axis === "both";
+  const resizeY = axis === "y" || axis === "both";
+
+  if (shape.kind === "circle") {
+    if (axis !== "both") {
+      return {
+        kind: "ellipse",
+        cx: shape.cx,
+        cy: shape.cy,
+        rx: clampHitSize(shape.radius + (resizeX ? dx : 0)),
+        ry: clampHitSize(shape.radius * aspectRatio + (resizeY ? dy : 0))
+      };
+    }
+    const radiusDelta = (dx + dy / aspectRatio) / 2;
+    return { ...shape, radius: clampHitSize(shape.radius + radiusDelta) };
+  }
+  if (shape.kind === "ellipse") {
+    return {
+      ...shape,
+      rx: clampHitSize(shape.rx + (resizeX ? dx : 0)),
+      ry: clampHitSize(shape.ry + (resizeY ? dy : 0))
+    };
+  }
+
+  const box = shapeBounds(shape, aspectRatio);
+  const center = {
+    x: box.left + box.width / 2,
+    y: box.top + box.height / 2
+  };
+  const width = Math.max(0.005, box.width);
+  const height = Math.max(0.005, box.height);
+  const scaleX = resizeX ? Math.max(0.1, (width + dx * 2) / width) : 1;
+  const scaleY = resizeY ? Math.max(0.1, (height + dy * 2) / height) : 1;
+
+  return {
+    ...shape,
+    points: shape.points.map((point) => ({
+      x: clamp01(center.x + (point.x - center.x) * scaleX),
+      y: clamp01(center.y + (point.y - center.y) * scaleY)
+    }))
+  };
+}
+
+function clampHitSize(value: number) {
+  return Math.max(0.005, Math.min(1, value));
 }

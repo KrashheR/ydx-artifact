@@ -35,7 +35,20 @@ export function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
-    void hydrate();
+    let cancelled = false;
+
+    async function hydrateForSession() {
+      await hydrate();
+      if (!cancelled && import.meta.env.DEV && import.meta.env.VITE_DEV_VALIDATE_CHEAT === "true") {
+        await useGameStore.getState().unlockAllDevContent();
+      }
+    }
+
+    void hydrateForSession();
+
+    return () => {
+      cancelled = true;
+    };
   }, [hydrate]);
 
   useEffect(() => {
