@@ -31,7 +31,7 @@
   },
   "game": {
     "found": "Найдено {{count}} / {{total}}",
-    "mistakes": "Ошибки: {{count}}",
+    "mistakes": "Ошибок: {{count}}",
     "magnifiers": "Лупы: {{count}}",
     "completed": "Снимок восстановлен",
     "accuracy": "Точность {{value}}%",
@@ -43,6 +43,10 @@
     "foundLabel": "НАЙДЕНО",
     "accuracyLabel": "ТОЧНОСТЬ",
     "hintLabel": "Подсказка",
+    "rewardedHintLabel": "Смотреть рекламу — получить подсказку",
+    "rewardedHintShort": "Реклама → подсказка",
+    "rewardedHintConfirm": "Посмотреть короткую рекламу и открыть одно отличие?",
+    "rewardedHintFailed": "Реклама недоступна. Попробуйте позже.",
     "completedBadge": "УРОВЕНЬ {{order}} ПРОЙДЕН",
     "completedTitle": "Все отличия найдены",
     "completedDesc": "Архивный снимок восстановлен. Маршрут продолжается к следующей точке экспедиции.",
@@ -96,16 +100,6 @@
     "laterAction": "Позже",
     "loadingAction": "Открываем…",
     "closeLabel": "Закрыть"
-  },
-  "dev": {
-    "hitboxEditor": "HITBOX EDITOR",
-    "hitboxEditorHelp": "Двигайте/меняйте любую сторону — обновятся обе",
-    "applyHitboxes": "Apply",
-    "applyingHitboxes": "Applying...",
-    "applyHitboxesDone": "Applied",
-    "applyHitboxesFailed": "Apply failed",
-    "copyHitboxes": "Copy JSON",
-    "resetHitboxes": "Reset"
   },
   "levels": {
     "nr01": {
@@ -241,8 +235,6 @@
     "campaignLabel": "ЭКСПЕДИЦИЯ",
     "heading": "Выберите экспедицию",
     "subheading": "Три маршрута. Один архив. Следуйте за уликами.",
-    "openAll": "Открыть все кампании",
-    "allUnlocked": "Все экспедиции открыты",
     "autoSave": "Прогресс сохраняется автоматически",
     "totalProgress": "{{done}} / {{total}}",
     "levelCount": "{{count}} УРОВНЕЙ",
@@ -281,21 +273,6 @@
       "available": "НОВАЯ ЭКСПЕДИЦИЯ",
       "completed": "ЭКСПЕДИЦИЯ ЗАВЕРШЕНА",
       "locked": "ЗАБЛОКИРОВАНО"
-    },
-    "paywall": {
-      "supra": "ПОЛНЫЙ ДОСТУП К АРХИВУ",
-      "heading": "Открыть все экспедиции",
-      "subheading": "Получите мгновенный доступ ко всем трём экспедициям — включая будущие кампании.",
-      "cta": "Открыть все кампании — {{price}}",
-      "skip": "Продолжить бесплатно",
-      "restore": "Восстановить покупки",
-      "benefits": {
-        "b0": "Все текущие кампании открываются сразу",
-        "b1": "Не нужно завершать предыдущую кампанию",
-        "b2": "Доступ ко всем 13 уровням каждой кампании",
-        "b3": "Будущие кампании также будут доступны",
-        "b4": "Покупка сохраняется в профиле игрока"
-      }
     }
   }
 }

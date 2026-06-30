@@ -13,7 +13,8 @@ void initPlatformLifecycle();
 if (import.meta.env.DEV) {
   window.__artifactDev = {
     unlockAllContent: async () => {
-      await useGameStore.getState().unlockAllDevContent();
+      const { unlockAllDevContent } = await import("@/dev/devContent");
+      await unlockAllDevContent();
       const { completedLevels, purchases } = useGameStore.getState().saveData;
 
       return {

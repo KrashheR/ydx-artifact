@@ -9,12 +9,14 @@
 - `mockPlatform.requestReview()` normalizes the documented `feedbackSent` response and tolerates the older `sentFeedback` example payload.
 - `mockPlatform.showRewarded()` calls `ysdk.adv.showRewardedVideo()` when available, grants only after `onRewarded` followed by close, and falls back to an immediate local mock reward in Vite/local mode.
 - `mockPlatform.showInterstitial()` calls `ysdk.adv.showFullscreenAdv()` when available and falls back to a short local mock open/close cycle in Vite/local mode.
+- `mockPlatform.getEnvironmentLanguage()` reads `ysdk.environment.i18n.lang` through the platform seam. On first/default saves the app maps this to `ru` or `en`; a manual Settings language choice is persisted and is not overwritten by SDK language on later launches.
 - SDK initialization is cached via a singleton promise and reuses `window.ysdk` when the host already initialized the SDK.
 
 Rewarded hint behavior:
 
 - the regular area hint button spends one magnifier while the player has a positive balance;
 - when the balance is `0`, the same button shows an ad icon and requests a rewarded Yandex ad;
+- the zero-balance CTA is explicit (`Реклама → подсказка` / `Ad → hint`) and opens a confirmation prompt before showing the ad;
 - the hint marker is applied only when the rewarded ad returns `rewarded`; closing or failing the ad returns the player to gameplay without a hint or penalty;
 - rewarded hint offers remain available after a rewarded hint while there are still unrevealed differences, so the player can watch another ad for another hint.
 
@@ -28,11 +30,12 @@ Forced interstitial cadence:
 
 Cloud save is wired through `src/services/storage/localSaveService.ts`:
 
-- `loadPersistentSave()` reads the local mirror and Yandex Player Data in parallel, validates both with `saveSchema`, and chooses the newest valid save by `updatedAt`.
+- `loadPersistentSave()` reads the local mirror and Yandex Player Data in parallel, validates/migrates both with `migrateSaveData()`, and chooses the newest valid save by `updatedAt`.
 - The cloud read path uses `ysdk.getPlayer().getData()` with a 4-second timeout.
 - `savePersistentSave()` writes the full save to the local mirror first, then best-effort syncs `ysdk.getPlayer().setData(save, flush)`.
 - The local mirror prefers `ysdk.getStorage()` and falls back to `window.localStorage`.
 - Cloud failures surface to the app as `saveStatus: "local-only"` and do not block gameplay.
+- In-progress level timer state is persisted as `elapsedActiveSeconds`, incremented only during visible, unpaused gameplay. Pauses, hidden tabs, SDK pause and rewarded ads do not reduce remaining level time.
 
 Local development remains safe:
 

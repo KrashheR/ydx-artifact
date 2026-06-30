@@ -101,7 +101,13 @@ export function SettingsModal({ isOpen, onClose }: Props) {
           role="dialog"
           aria-modal
           aria-labelledby={titleId}
-          className="fixed inset-0 z-[120] flex items-end sm:items-center sm:p-5"
+          className="fixed inset-0 z-[120] flex items-end sm:items-center"
+          style={{
+            paddingTop: "max(8px, env(safe-area-inset-top))",
+            paddingRight: "max(8px, env(safe-area-inset-right))",
+            paddingBottom: "max(8px, env(safe-area-inset-bottom))",
+            paddingLeft: "max(8px, env(safe-area-inset-left))"
+          }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -122,7 +128,7 @@ export function SettingsModal({ isOpen, onClose }: Props) {
           {/* Panel */}
           <motion.div
             ref={dialogRef}
-            className="settings-dialog relative flex w-full flex-col overflow-hidden sm:mx-auto sm:max-w-[560px] sm:rounded-2xl"
+            className="modal-panel settings-dialog relative flex w-full flex-col overflow-hidden sm:mx-auto sm:max-w-[560px] sm:rounded-2xl"
             initial={prefersReducedMotion ? { opacity: 0 } : { y: "100%" }}
             animate={{ y: 0, opacity: 1 }}
             exit={prefersReducedMotion ? { opacity: 0 } : { y: "100%" }}

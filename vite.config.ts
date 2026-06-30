@@ -116,6 +116,7 @@ export default defineConfig({
     }
   },
   build: {
+    target: "es2018",
     sourcemap: process.env.BUILD_SOURCEMAP === "true"
   }
 });

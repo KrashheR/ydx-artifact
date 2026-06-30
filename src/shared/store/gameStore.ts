@@ -4,14 +4,13 @@ import {
   type ReviewUnavailableReason,
   type SaveData
 } from "@/entities/save/schema";
-import { allLevels, getLevelById, type ChapterId } from "@/content/chapters";
+import { getLevelById, type ChapterId } from "@/content/chapters";
 import {
   clearPersistentSave,
   loadPersistentSave,
   savePersistentSave
 } from "@/services/storage/localSaveService";
 import { unlockedArtifactsForCompleted } from "@/shared/lib/progression";
-import { buildUnlockedDevSave, DEV_ALL_CAMPAIGNS_PRODUCT_ID } from "@/shared/lib/devCheats";
 
 type Screen =
   | { kind: "home" }
@@ -55,6 +54,8 @@ type GameStore = {
   ) => void;
   spendMagnifiers: (amount: number) => boolean;
   setLocale: (locale: "ru" | "en") => void;
+  setAutoLocale: (locale: "ru" | "en") => void;
+  addActiveLevelTime: (levelId: string, seconds: number, options?: { save?: boolean; flush?: boolean }) => void;
   claimDailyReward: (date: string) => void;
   clearPendingReviewPromptCheck: () => void;
   clearPendingInterstitialCheck: () => void;
@@ -67,7 +68,6 @@ type GameStore = {
   setReviewUnavailableReason: (reason?: ReviewUnavailableReason) => void;
   resetLevelProgress: (levelId: string) => void;
   resetSave: () => Promise<void>;
-  unlockAllDevContent: () => Promise<void>;
 };
 
 function ensureInProgress(saveData: SaveData, levelId: string): SaveData {
@@ -77,7 +77,7 @@ function ensureInProgress(saveData: SaveData, levelId: string): SaveData {
     inProgress: {
       levelId,
       foundDifferenceIds: [],
-      elapsedSeconds: 0,
+      elapsedActiveSeconds: 0,
       mistakes: 0
     }
   };
@@ -235,9 +235,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   setLocale(locale) {
     set((state) => ({
-      saveData: { ...state.saveData, settings: { ...state.saveData.settings, locale } }
+      saveData: { ...state.saveData, settings: { ...state.saveData.settings, locale, localeSource: "manual" } }
     }));
     void get().save({ flush: true });
+  },
+  setAutoLocale(locale) {
+    set((state) => {
+      if (state.saveData.settings.localeSource === "manual") return state;
+      if (state.saveData.settings.locale === locale && state.saveData.settings.localeSource === "auto") return state;
+      return {
+        saveData: {
+          ...state.saveData,
+          settings: { ...state.saveData.settings, locale, localeSource: "auto" }
+        }
+      };
+    });
+    void get().save({ flush: true });
+  },
+  addActiveLevelTime(levelId, seconds, options) {
+    const increment = Math.floor(seconds);
+    if (increment === 0) return;
+    set((state) => {
+      if (state.saveData.inProgress?.levelId !== levelId) return state;
+      return {
+        saveData: {
+          ...state.saveData,
+          inProgress: {
+            ...state.saveData.inProgress,
+            elapsedActiveSeconds: Math.max(
+              0,
+              state.saveData.inProgress.elapsedActiveSeconds + increment
+            )
+          }
+        }
+      };
+    });
+    if (options?.save ?? true) {
+      void get().save({ flush: options?.flush ?? false });
+    }
   },
   claimDailyReward(date) {
     set((state) => {
@@ -381,18 +416,4 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     });
   },
-  async unlockAllDevContent() {
-    const currentSave = get().saveData;
-    const allLevelsAlreadyCompleted = allLevels.every((level) => currentSave.completedLevels.includes(level.id));
-    const purchasesAlreadyUnlocked =
-      currentSave.purchases.noForcedInterstitials
-      && currentSave.purchases.productIds.includes(DEV_ALL_CAMPAIGNS_PRODUCT_ID);
-
-    const saveData = allLevelsAlreadyCompleted && purchasesAlreadyUnlocked
-      ? currentSave
-      : buildUnlockedDevSave(currentSave);
-
-    set({ saveData });
-    await get().save({ flush: true });
-  }
 }));

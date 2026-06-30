@@ -65,6 +65,11 @@ type YandexGamesSdk = {
     };
   };
   feedback?: YandexFeedbackApi;
+  environment?: {
+    i18n?: {
+      lang?: string;
+    };
+  };
   getPlayer?: () => Promise<YandexPlayer>;
   getStorage?: () => YandexStorage;
   on?: (eventName: "game_api_pause" | "game_api_resume", callback: () => void) => void;
@@ -140,6 +145,10 @@ export const mockPlatform = {
   async init() {
     const ysdk = await getYandexSdk();
     return { sdkReady: Boolean(ysdk), localMock: !ysdk };
+  },
+  async getEnvironmentLanguage(): Promise<string | undefined> {
+    const ysdk = await getYandexSdk();
+    return ysdk?.environment?.i18n?.lang;
   },
   async showRewarded(): Promise<RewardedResult> {
     if (rewardedGatewayOverride) {

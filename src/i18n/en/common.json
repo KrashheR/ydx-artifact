@@ -43,6 +43,10 @@
     "foundLabel": "FOUND",
     "accuracyLabel": "ACCURACY",
     "hintLabel": "Hint",
+    "rewardedHintLabel": "Watch ad — get a hint",
+    "rewardedHintShort": "Ad → hint",
+    "rewardedHintConfirm": "Watch a short ad to reveal one difference?",
+    "rewardedHintFailed": "Ad is unavailable. Try again later.",
     "completedBadge": "LEVEL {{order}} COMPLETE",
     "completedTitle": "All differences found",
     "completedDesc": "Archive photo restored. The route continues to the next expedition point.",
@@ -96,16 +100,6 @@
     "laterAction": "Later",
     "loadingAction": "Opening…",
     "closeLabel": "Close"
-  },
-  "dev": {
-    "hitboxEditor": "HITBOX EDITOR",
-    "hitboxEditorHelp": "Drag/resize either side to update both hitboxes",
-    "applyHitboxes": "Apply",
-    "applyingHitboxes": "Applying...",
-    "applyHitboxesDone": "Applied",
-    "applyHitboxesFailed": "Apply failed",
-    "copyHitboxes": "Copy JSON",
-    "resetHitboxes": "Reset"
   },
   "levels": {
     "nr01": {
@@ -241,8 +235,6 @@
     "campaignLabel": "EXPEDITION",
     "heading": "Choose Your Expedition",
     "subheading": "Three routes. One archive. Follow the clues.",
-    "openAll": "Unlock all campaigns",
-    "allUnlocked": "All expeditions unlocked",
     "autoSave": "Progress is saved automatically",
     "totalProgress": "{{done}} / {{total}}",
     "levelCount": "{{count}} LEVELS",
@@ -281,21 +273,6 @@
       "available": "NEW EXPEDITION",
       "completed": "EXPEDITION COMPLETE",
       "locked": "LOCKED"
-    },
-    "paywall": {
-      "supra": "FULL ARCHIVE ACCESS",
-      "heading": "Unlock All Expeditions",
-      "subheading": "Get instant access to all three expeditions — including future campaigns.",
-      "cta": "Unlock All Campaigns — {{price}}",
-      "skip": "Continue for Free",
-      "restore": "Restore Purchases",
-      "benefits": {
-        "b0": "All current campaigns unlock immediately",
-        "b1": "No need to complete the previous campaign first",
-        "b2": "Access to all 13 levels in each campaign",
-        "b3": "Future campaigns will also be available",
-        "b4": "Purchase is saved to your player profile"
-      }
     }
   }
 }

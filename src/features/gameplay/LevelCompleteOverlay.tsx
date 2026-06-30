@@ -58,14 +58,14 @@ export function LevelCompleteOverlay({
   const chapterDone = completedLevelIds.filter((id) => chapter.levels.some((l) => l.id === id)).length;
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center">
+    <div className="absolute inset-0 z-50 flex items-center justify-center p-3">
       <div
         className="absolute inset-0"
         style={{ background: "radial-gradient(80% 80% at 50% 42%, rgba(13,18,15,.55), rgba(13,18,15,.88))" }}
       />
 
       <div
-        className="relative z-10 w-[560px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[18px] font-manrope"
+        className="modal-panel relative z-10 w-[560px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[18px] font-manrope"
         style={{
           background: "linear-gradient(180deg, #27302b, #1c241e)",
           border: "1px solid rgba(184,138,69,.35)",

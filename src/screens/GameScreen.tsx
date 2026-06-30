@@ -38,14 +38,15 @@ export function GameScreen({
   const recordMiss = useGameStore((s) => s.recordMisclick);
   const completeLevel = useGameStore((s) => s.completeLevel);
   const spendMagnifiers = useGameStore((s) => s.spendMagnifiers);
+  const addActiveLevelTime = useGameStore((s) => s.addActiveLevelTime);
+  const save = useGameStore((s) => s.save);
   const claimDailyReward = useGameStore((s) => s.claimDailyReward);
   const resetLevelProgress = useGameStore((s) => s.resetLevelProgress);
 
-  const [startedAt] = useState(() => Date.now());
-  const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timedOut, setTimedOut] = useState(false);
   const [paused, setPaused] = useState(false);
   const [platformPaused, setPlatformPaused] = useState(getIsPlatformPaused);
+  const [pageVisible, setPageVisible] = useState(() => !document.hidden);
   const [hintId, setHintId] = useState<string | undefined>();
   const [exactHintUsed, setExactHintUsed] = useState(false);
   const [rewardedHintInFlight, setRewardedHintInFlight] = useState(false);
@@ -60,6 +61,7 @@ export function GameScreen({
     elapsed: number;
   } | null>(null);
   const completeOverlayDelayRef = useRef<number | null>(null);
+  const activeTimerSaveCounterRef = useRef(0);
 
   const level = getLevelById(levelId);
   const chapter = level ? getChapter(level.chapterId) : null;
@@ -70,18 +72,35 @@ export function GameScreen({
       : [];
   const liveMistakes =
     saveData.inProgress?.levelId === levelId ? saveData.inProgress.mistakes : 0;
+  const liveElapsedActiveSeconds =
+    saveData.inProgress?.levelId === levelId ? saveData.inProgress.elapsedActiveSeconds : 0;
+  const timeLeft = Math.max(0, TIME_LIMIT - liveElapsedActiveSeconds);
   const completionPending = pendingFinalStats !== null;
   const showComplete = finalStats !== null;
   const showOverlay = showComplete || timedOut;
   const gameplayBlocked =
     paused ||
     platformPaused ||
+    !pageVisible ||
     rewardedHintInFlight ||
     showComplete ||
     completionPending ||
     timedOut;
 
   useEffect(() => subscribePlatformPause(setPlatformPaused), []);
+
+  useEffect(() => {
+    const syncVisibility = () => {
+      setPageVisible(!document.hidden);
+      void save({ flush: true });
+    };
+    document.addEventListener("visibilitychange", syncVisibility);
+    window.addEventListener("pagehide", syncVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", syncVisibility);
+      window.removeEventListener("pagehide", syncVisibility);
+    };
+  }, [save]);
 
   useEffect(() => {
     setGameplayActive(!gameplayBlocked);
@@ -94,15 +113,17 @@ export function GameScreen({
     return () => window.removeEventListener("contextmenu", preventContextMenu);
   }, []);
 
-  // Countdown timer
+  // Active gameplay timer.
   useEffect(() => {
     if (gameplayBlocked) return;
-    const id = window.setInterval(
-      () => setTimeLeft((p) => Math.max(0, p - 1)),
-      1000,
-    );
+    const id = window.setInterval(() => {
+      activeTimerSaveCounterRef.current += 1;
+      addActiveLevelTime(levelId, 1, {
+        save: activeTimerSaveCounterRef.current % 5 === 0
+      });
+    }, 1000);
     return () => window.clearInterval(id);
-  }, [gameplayBlocked]);
+  }, [addActiveLevelTime, gameplayBlocked, levelId]);
 
   // Detect timeout
   useEffect(() => {
@@ -143,7 +164,7 @@ export function GameScreen({
     recordDiff(levelId, differenceId);
     const nextFound = liveFoundIds.length + 1;
     if (nextFound >= level!.requiredDifferences && !finalStats) {
-      const elapsed = Math.round((Date.now() - startedAt) / 1000);
+      const elapsed = liveElapsedActiveSeconds;
       const stats = { found: nextFound, mistakes: liveMistakes, elapsed };
       setPendingFinalStats(stats);
       completeOverlayDelayRef.current = window.setTimeout(() => {
@@ -181,11 +202,16 @@ export function GameScreen({
       return;
     }
 
+    const confirmed = window.confirm(t("game.rewardedHintConfirm"));
+    if (!confirmed) return;
+    void save({ flush: true });
     setRewardedHintInFlight(true);
     try {
       const result = await mockPlatform.showRewarded();
       if (result === "rewarded") {
         revealNextAreaHint({ spendMagnifier: false, skipActiveHint: true });
+      } else if (result === "failed") {
+        window.alert(t("game.rewardedHintFailed"));
       }
     } finally {
       setRewardedHintInFlight(false);
@@ -209,7 +235,6 @@ export function GameScreen({
     setPendingFinalStats(null);
     setFinalStats(null);
     setTimedOut(false);
-    setTimeLeft(TIME_LIMIT);
     setPaused(false);
     setHintId(undefined);
     setExactHintUsed(false);
@@ -221,13 +246,14 @@ export function GameScreen({
 
   function handleMap() {
     if (completionPending) return;
+    void save({ flush: true });
     navigate({ kind: "map", chapterId });
   }
 
   function handleExtendTime() {
     if (!spendMagnifiers(2)) return;
     setTimedOut(false);
-    setTimeLeft(30);
+    addActiveLevelTime(levelId, -30, { save: true, flush: true });
   }
 
   const campaignTitle = t(chapter.titleKey).toUpperCase();
@@ -254,9 +280,12 @@ export function GameScreen({
       >
         {/* ── TOP HUD ──────────────────────────────────────────────────── */}
         <header
-          className="game-hud relative flex shrink-0 items-center justify-between pl-[30px] pr-[86px]"
+          className="game-hud relative flex shrink-0 items-center justify-between gap-2 pl-[30px] pr-[86px]"
           style={{
-            height: "74px",
+            minHeight: "74px",
+            paddingLeft: "max(12px, env(safe-area-inset-left))",
+            paddingRight: "max(56px, env(safe-area-inset-right))",
+            paddingTop: "max(6px, env(safe-area-inset-top))",
             borderBottom: "1px solid rgba(213,195,154,.12)",
             background:
               "linear-gradient(180deg, rgba(34,42,37,.92), rgba(21,27,24,.4))",
@@ -381,12 +410,14 @@ export function GameScreen({
             <button
               onClick={handleAreaHint}
               disabled={!canUseAreaHint}
-              className="flex h-[44px] items-center gap-2 rounded-[9px] px-4 font-manrope text-[13px] font-bold text-exp-brass2 disabled:opacity-40"
+              className="flex min-h-[44px] items-center gap-2 rounded-[9px] px-4 font-manrope text-[13px] font-bold text-exp-brass2 disabled:opacity-40"
               style={{
                 border: "1px solid rgba(184,138,69,.45)",
                 background: "rgba(184,138,69,.08)",
               }}
               aria-busy={rewardedHintInFlight}
+              aria-label={magnifiers > 0 ? t("game.hintLabel") : t("game.rewardedHintLabel")}
+              title={magnifiers > 0 ? t("game.hintLabel") : t("game.rewardedHintLabel")}
             >
               <svg
                 width="16"
@@ -401,7 +432,9 @@ export function GameScreen({
                 <path d="M9 18h6M10 21h4" />
                 <path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z" />
               </svg>
-              <span className="hidden sm:inline">{t("game.hintLabel")}</span>
+              <span className="hidden sm:inline">
+                {magnifiers > 0 ? t("game.hintLabel") : t("game.rewardedHintShort")}
+              </span>
               {magnifiers > 0 ? (
                 <span
                   className="inline-flex min-w-[20px] items-center justify-center rounded-[6px] px-[5px] font-manrope text-[11px] font-bold text-[#1a130a]"
@@ -442,6 +475,7 @@ export function GameScreen({
                   : "rgba(213,195,154,.05)",
               }}
               aria-label={paused ? t("actions.resume") : t("actions.pause")}
+              title={paused ? t("actions.resume") : t("actions.pause")}
             >
               {paused ? (
                 <svg
@@ -485,6 +519,7 @@ export function GameScreen({
                 background: "rgba(213,195,154,.05)",
               }}
               aria-label={t("actions.hintExact")}
+              title={t("actions.hintExact")}
             >
               <svg
                 width="19"

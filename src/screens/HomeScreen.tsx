@@ -207,32 +207,6 @@ function BrassButton({
   );
 }
 
-// ─── Outline secondary button ─────────────────────────────────────────────────
-
-function OutlineButton({
-  onClick,
-  height = 46,
-  children,
-}: {
-  onClick?: () => void;
-  height?: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex w-full items-center justify-center rounded-[8px] text-[13.5px] font-bold text-exp-parch/75 transition hover:border-exp-brass/50 active:opacity-80"
-      style={{
-        height,
-        border: "1px solid rgba(213,195,154,0.25)",
-        background: "transparent",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
 // ─── Round icon button ────────────────────────────────────────────────────────
 
 // ─── Top bar ─────────────────────────────────────────────────────────────────
@@ -240,11 +214,9 @@ function OutlineButton({
 function TopBar({
   totalDone,
   totalAll,
-  onOpenAll,
 }: {
   totalDone: number;
   totalAll: number;
-  onOpenAll: () => void;
 }) {
   const { t } = useTranslation();
 
@@ -295,15 +267,6 @@ function TopBar({
           className="hidden h-6 w-px md:block"
           style={{ background: "rgba(213,195,154,0.15)" }}
         />
-
-        {/* Open all CTA (desktop) */}
-        <button
-          onClick={onOpenAll}
-          className="hidden h-10 items-center rounded-[8px] px-4 text-[13px] font-bold text-exp-brass transition hover:bg-exp-brass/10 md:flex"
-          style={{ border: "1px solid rgba(184,138,69,0.45)" }}
-        >
-          {t("campaigns.openAll")}
-        </button>
       </div>
     </header>
   );
@@ -363,11 +326,9 @@ function RouteSequence({
 function DesktopCard({
   campaign,
   onContinue,
-  onOpenAll,
 }: {
   campaign: Campaign;
   onContinue: () => void;
-  onOpenAll: () => void;
 }) {
   const { t } = useTranslation();
   const locked = campaign.status === "locked";
@@ -494,11 +455,6 @@ function DesktopCard({
                 reason={t(`campaigns.${campaign.id}.lockReason`)}
                 hint={campaign.lockHint ?? ""}
               />
-              <div className="mt-4">
-                <OutlineButton onClick={onOpenAll} height={46}>
-                  {t("campaigns.openAll")}
-                </OutlineButton>
-              </div>
             </>
           )}
         </div>
@@ -665,297 +621,6 @@ function MobileCompactCard({
   );
 }
 
-// ─── Paywall modal ────────────────────────────────────────────────────────────
-
-const BENEFIT_KEYS = ["b0", "b1", "b2", "b3", "b4"] as const;
-
-function MiniCampaignPreview({
-  id,
-  label,
-  height,
-}: {
-  id: CampaignId;
-  label: string;
-  height: number;
-}) {
-  return (
-    <div className="flex flex-1 flex-col gap-1.5">
-      <div
-        className="relative w-full overflow-hidden rounded-[8px]"
-        style={{ height, background: PREVIEW_BG[id] }}
-      >
-        <img
-          src={PREVIEW_IMAGE[id]}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover"
-          draggable={false}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg,transparent 40%,rgba(13,20,26,.65) 100%)",
-          }}
-        />
-      </div>
-      <p className="text-center text-[10px] font-semibold uppercase tracking-[.08em] text-exp-parch/60">
-        {label}
-      </p>
-    </div>
-  );
-}
-
-function LockMedallion({ size }: { size: number }) {
-  return (
-    <div
-      className="mx-auto flex flex-shrink-0 items-center justify-center rounded-full"
-      style={{
-        width: size,
-        height: size,
-        background: "radial-gradient(circle,rgba(40,50,45,0.9),rgba(21,27,24,0.97))",
-        boxShadow: "0 0 0 2px rgba(184,138,69,.28), 0 0 0 4px rgba(184,138,69,.08)",
-      }}
-    >
-      <LockIcon size={Math.round(size * 0.44)} color="#B88A45" />
-    </div>
-  );
-}
-
-function CloseButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label="Закрыть"
-      className="absolute right-1 top-2 flex items-center justify-center rounded-full transition hover:bg-white/5 active:bg-white/10"
-      style={{ width: 44, height: 44 }}
-    >
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-        <path
-          d="M1 1l12 12M13 1L1 13"
-          stroke="#D5C39A"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-        />
-      </svg>
-    </button>
-  );
-}
-
-function PaywallModal({
-  isOpen,
-  onClose,
-  price,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  price: string;
-}) {
-  const { t } = useTranslation();
-  const campaignIds: CampaignId[] = ["white", "sand", "emerald"];
-
-  React.useEffect(() => {
-    if (!isOpen) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
-  const brassLine = (
-    <div
-      className="flex-shrink-0"
-      style={{ height: 3, background: "linear-gradient(90deg,#B88A45,#D8AF63,#B88A45)" }}
-    />
-  );
-
-  return (
-    <div className="fixed inset-0 z-50">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0"
-        onClick={onClose}
-        style={{
-          background:
-            "radial-gradient(ellipse at center,rgba(13,18,15,.55),rgba(13,18,15,.86))",
-          backdropFilter: "blur(3px)",
-        }}
-      />
-
-      {/* ── Desktop modal (centered) ── */}
-      <div className="paywall-desktop-layer absolute inset-0 hidden items-center justify-center md:flex" style={{ pointerEvents: "none" }}>
-        <div
-          className="paywall-dialog relative flex flex-col overflow-hidden"
-          style={{
-            width: 600,
-            background: "linear-gradient(180deg,#27302b,#1d251f)",
-            border: "1px solid rgba(184,138,69,.35)",
-            borderRadius: 16,
-            boxShadow: "0 50px 120px rgba(0,0,0,.7)",
-            pointerEvents: "auto",
-          }}
-        >
-          {brassLine}
-          <CloseButton onClick={onClose} />
-
-          <div className="flex flex-col items-center px-11 pb-[30px] pt-[38px]">
-            <LockMedallion size={58} />
-
-            <p className="mt-5 text-[11px] font-bold uppercase tracking-[.28em] text-exp-brass">
-              {t("campaigns.paywall.supra")}
-            </p>
-            <h2 className="mt-2 text-center font-cormorant text-[38px] font-semibold leading-tight text-exp-parch">
-              {t("campaigns.paywall.heading")}
-            </h2>
-            <p className="mt-2 text-center text-[14px] leading-[1.55] text-exp-muted">
-              {t("campaigns.paywall.subheading")}
-            </p>
-
-            {/* Mini campaign previews */}
-            <div className="mt-6 flex w-full gap-3">
-              {campaignIds.map((id) => (
-                <MiniCampaignPreview
-                  key={id}
-                  id={id}
-                  label={t(`campaigns.${id}.title`)}
-                  height={78}
-                />
-              ))}
-            </div>
-
-            {/* Benefits — 5 items on desktop */}
-            <div
-              className="mt-5 w-full rounded-[10px] px-4 py-3.5"
-              style={{
-                background: "rgba(213,195,154,.04)",
-                border: "1px solid rgba(213,195,154,.10)",
-              }}
-            >
-              <div className="flex flex-col gap-2.5">
-                {BENEFIT_KEYS.map((k) => (
-                  <div key={k} className="flex items-start gap-3">
-                    <span className="mt-[2px] flex-shrink-0">
-                      <CheckIcon size={12} color="#6FC69E" />
-                    </span>
-                    <p className="text-[13px] leading-[1.5] text-exp-parch/80">
-                      {t(`campaigns.paywall.benefits.${k}`)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* CTAs */}
-            <div className="mt-5 w-full">
-              <BrassButton height={54}>
-                {t("campaigns.paywall.cta", { price })}
-              </BrassButton>
-            </div>
-            <div className="mt-3 w-full">
-              <OutlineButton onClick={onClose} height={46}>
-                {t("campaigns.paywall.skip")}
-              </OutlineButton>
-            </div>
-            <button className="mt-3 text-[12px] text-exp-muted/70 transition hover:text-exp-muted">
-              {t("campaigns.paywall.restore")}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Mobile bottom sheet ── */}
-      <div
-        className="absolute bottom-0 left-0 right-0 flex flex-col overflow-hidden md:hidden"
-        style={{
-          height: 690,
-          background: "linear-gradient(180deg,#27302b,#1d251f)",
-          border: "1px solid rgba(184,138,69,.35)",
-          borderRadius: "26px 26px 0 0",
-          boxShadow: "0 -20px 60px rgba(0,0,0,.7)",
-        }}
-      >
-        {brassLine}
-
-        {/* Grab handle */}
-        <div className="flex justify-center pt-3">
-          <div
-            style={{
-              width: 40,
-              height: 4,
-              background: "rgba(213,195,154,.2)",
-              borderRadius: 2,
-            }}
-          />
-        </div>
-
-        <CloseButton onClick={onClose} />
-
-        <div className="flex flex-col items-center overflow-y-auto px-5 pb-8 pt-5">
-          <LockMedallion size={52} />
-
-          <p className="mt-4 text-[10px] font-bold uppercase tracking-[.28em] text-exp-brass">
-            {t("campaigns.paywall.supra")}
-          </p>
-          <h2 className="mt-2 text-center font-cormorant text-[30px] font-semibold leading-tight text-exp-parch">
-            {t("campaigns.paywall.heading")}
-          </h2>
-
-          {/* Mini campaign previews */}
-          <div className="mt-5 flex w-full gap-2">
-            {campaignIds.map((id) => (
-              <MiniCampaignPreview
-                key={id}
-                id={id}
-                label={t(`campaigns.${id}.title`)}
-                height={64}
-              />
-            ))}
-          </div>
-
-          {/* Benefits — 3 items on mobile */}
-          <div
-            className="mt-4 w-full rounded-[10px] px-4 py-3"
-            style={{
-              background: "rgba(213,195,154,.04)",
-              border: "1px solid rgba(213,195,154,.10)",
-            }}
-          >
-            <div className="flex flex-col gap-2">
-              {BENEFIT_KEYS.slice(0, 3).map((k) => (
-                <div key={k} className="flex items-start gap-2.5">
-                  <span className="mt-[2px] flex-shrink-0">
-                    <CheckIcon size={12} color="#6FC69E" />
-                  </span>
-                  <p className="text-[12.5px] leading-[1.5] text-exp-parch/80">
-                    {t(`campaigns.paywall.benefits.${k}`)}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* CTAs */}
-          <div className="mt-4 w-full">
-            <BrassButton height={54}>
-              {t("campaigns.paywall.cta", { price })}
-            </BrassButton>
-          </div>
-          <div className="mt-3 w-full">
-            <OutlineButton onClick={onClose} height={48}>
-              {t("campaigns.paywall.skip")}
-            </OutlineButton>
-          </div>
-          <button className="mt-3 text-[12px] text-exp-muted/70 transition hover:text-exp-muted">
-            {t("campaigns.paywall.restore")}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Main screen ──────────────────────────────────────────────────────────────
 
 export function HomeScreen() {
@@ -1031,10 +696,6 @@ export function HomeScreen() {
     },
   ];
 
-  const [paywallOpen, setPaywallOpen] = React.useState(false);
-  // TODO: replace with real price from Yandex billing catalog
-  const price = "—";
-
   const handleOpenCampaign = (campaignId: CampaignId) => {
     if (campaignId === "white") {
       navigate({ kind: "map", chapterId: chapters["northern-route"].id });
@@ -1048,8 +709,6 @@ export function HomeScreen() {
       navigate({ kind: "map", chapterId: chapters["emerald-meridian"].id });
     }
   };
-  const handleOpenAll = () => setPaywallOpen(true);
-
   return (
     <div className="home-screen min-h-screen bg-exp-bg font-manrope text-exp-parch">
 
@@ -1057,7 +716,6 @@ export function HomeScreen() {
       <TopBar
         totalDone={completedLevels.length}
         totalAll={totalAll}
-        onOpenAll={handleOpenAll}
       />
 
       {/* Page header */}
@@ -1089,7 +747,6 @@ export function HomeScreen() {
             key={campaign.id}
             campaign={campaign}
             onContinue={() => handleOpenCampaign(campaign.id)}
-            onOpenAll={handleOpenAll}
           />
         ))}
       </div>
@@ -1124,26 +781,6 @@ export function HomeScreen() {
           <p className="text-[10.5px] text-exp-muted">{t("campaigns.autoSave")}</p>
         </footer>
       </div>
-
-      {/* Mobile sticky CTA */}
-      <div
-        className="fixed bottom-0 left-0 right-0 flex justify-center pb-6 pt-5 md:hidden"
-        style={{ background: "linear-gradient(180deg,transparent,#151B18 50%)" }}
-      >
-        <button
-          onClick={handleOpenAll}
-          className="flex h-[50px] w-[calc(100%-2rem)] max-w-sm items-center justify-center rounded-[9px] text-[13.5px] font-bold text-exp-parch/75 transition hover:bg-white/5 active:bg-white/10"
-          style={{ border: "1px solid rgba(213,195,154,0.22)", background: "rgba(213,195,154,0.06)" }}
-        >
-          {t("campaigns.openAll")}
-        </button>
-      </div>
-
-      <PaywallModal
-        isOpen={paywallOpen}
-        onClose={() => setPaywallOpen(false)}
-        price={price}
-      />
 
     </div>
   );

@@ -340,7 +340,7 @@
       "id": "nr-13-scene-b",
       "path": "public/assets/scenes/northern-route/13/2.webp",
       "status": "production-intake",
-      "source": "content owner image provided in workspace, converted from public/assets/scenes/northern-route/13/2.png",
+      "source": "existing workspace WebP retained as scene B and paired with updated public/assets/scenes/northern-route/13/1.webp",
       "approval": "pending-owner-license-confirmation"
     },
     {

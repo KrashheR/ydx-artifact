@@ -1,4 +1,4 @@
-import { createDefaultSave, saveSchema, type SaveData } from "@/entities/save/schema";
+import { createDefaultSave, migrateSaveData, type SaveData } from "@/entities/save/schema";
 import { getYandexSdk, type YandexPlayer, type YandexStorage } from "@/services/platform/mockPlatform";
 
 const SAVE_KEY = "anomaly-archive-save-v1";
@@ -19,7 +19,7 @@ export type SaveResult = {
 
 function parseSave(value: unknown): SaveData | null {
   try {
-    return saveSchema.parse(value);
+    return migrateSaveData(value);
   } catch {
     return null;
   }
@@ -203,7 +203,7 @@ export async function loadLocalSaveLegacy(): Promise<SaveData> {
   try {
     const raw = window.localStorage.getItem(SAVE_KEY);
     if (!raw) return createDefaultSave();
-    return saveSchema.parse(JSON.parse(raw));
+    return migrateSaveData(JSON.parse(raw));
   } catch {
     return createDefaultSave();
   }

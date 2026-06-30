@@ -49,6 +49,12 @@ select {
   font: inherit;
 }
 
+.modal-panel {
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 :where(a, button, [role="button"], input, select, textarea, summary) {
   -webkit-tap-highlight-color: transparent;
 }
@@ -311,15 +317,6 @@ select {
   .home-screen footer,
   .home-screen > .fixed.bottom-0 {
     display: none !important;
-  }
-
-  .paywall-dialog {
-    width: min(744px, calc(100vw - 34px)) !important;
-    max-height: calc(100dvh - 34px);
-  }
-
-  .paywall-desktop-layer {
-    display: flex !important;
   }
 
   .map-hero {
@@ -599,5 +596,11 @@ select {
   .review-actions {
     margin-top: 18px !important;
     flex-direction: column !important;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .modal-panel {
+    max-height: calc(100dvh - 12px);
   }
 }

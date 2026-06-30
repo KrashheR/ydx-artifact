@@ -101,7 +101,13 @@ export function GameReviewPrePromptModal({
       {isOpen ? (
         <motion.div
           aria-hidden={false}
-          className="fixed inset-0 z-[120] flex items-center justify-center p-5"
+          className="fixed inset-0 z-[120] flex items-center justify-center"
+          style={{
+            paddingTop: "max(8px, env(safe-area-inset-top))",
+            paddingRight: "max(8px, env(safe-area-inset-right))",
+            paddingBottom: "max(8px, env(safe-area-inset-bottom))",
+            paddingLeft: "max(8px, env(safe-area-inset-left))"
+          }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -123,7 +129,7 @@ export function GameReviewPrePromptModal({
             aria-modal="true"
             aria-labelledby={titleId}
             aria-describedby={`${descriptionId} ${descriptionId}-desktop`}
-            className="review-dialog relative w-full max-w-[520px] overflow-hidden rounded-[20px] sm:rounded-[16px]"
+            className="modal-panel review-dialog relative w-full max-w-[520px] overflow-hidden rounded-[20px] sm:rounded-[16px]"
             initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: 12 }}
             animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
             exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: 8 }}

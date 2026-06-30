@@ -7,7 +7,9 @@ import { GameScreen } from "@/screens/GameScreen";
 import { HomeScreen } from "@/screens/HomeScreen";
 import { MapScreen } from "@/screens/MapScreen";
 import { SettingsModal } from "@/screens/SettingsScreen";
+import { mockPlatform } from "@/services/platform/mockPlatform";
 import { notifyGameReady } from "@/services/platform/platformLifecycle";
+import { resolveInitialLocale } from "@/shared/lib/locale";
 import { useGameStore } from "@/shared/store/gameStore";
 
 function SettingsGearIcon() {
@@ -32,6 +34,7 @@ export function App() {
   const screen = useGameStore((state) => state.screen);
   const hydrate = useGameStore((state) => state.hydrate);
   const save = useGameStore((state) => state.save);
+  const setAutoLocale = useGameStore((state) => state.setAutoLocale);
   const locale = useGameStore((state) => state.saveData.settings.locale);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -40,8 +43,13 @@ export function App() {
 
     async function hydrateForSession() {
       await hydrate();
+      const sdkLanguage = await mockPlatform.getEnvironmentLanguage();
+      if (!cancelled) {
+        setAutoLocale(resolveInitialLocale(sdkLanguage));
+      }
       if (!cancelled && import.meta.env.DEV && import.meta.env.VITE_DEV_VALIDATE_CHEAT === "true") {
-        await useGameStore.getState().unlockAllDevContent();
+        const { unlockAllDevContent } = await import("@/dev/devContent");
+        await unlockAllDevContent();
       }
       if (!cancelled) {
         void notifyGameReady();
@@ -53,11 +61,13 @@ export function App() {
     return () => {
       cancelled = true;
     };
-  }, [hydrate]);
+  }, [hydrate, setAutoLocale]);
 
   useEffect(() => {
     void i18n.changeLanguage(locale);
-  }, [i18n, locale]);
+    document.documentElement.lang = locale;
+    document.title = t("app.title");
+  }, [i18n, locale, t]);
 
   useEffect(() => {
     const onPageHide = () => void save({ flush: true });

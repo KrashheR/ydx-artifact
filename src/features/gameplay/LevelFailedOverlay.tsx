@@ -18,14 +18,14 @@ export function LevelFailedOverlay({ level, found, canExtend, onRetry, onExtend,
   const remaining = level.requiredDifferences - found;
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center">
+    <div className="absolute inset-0 z-50 flex items-center justify-center p-3">
       <div
         className="absolute inset-0"
         style={{ background: "radial-gradient(80% 80% at 50% 42%, rgba(28,14,11,.5), rgba(13,18,15,.9))" }}
       />
 
       <div
-        className="relative z-10 w-[560px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[18px] font-manrope"
+        className="modal-panel relative z-10 w-[560px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[18px] font-manrope"
         style={{
           background: "linear-gradient(180deg, #2c2622, #1f1b18)",
           border: "1px solid rgba(176,86,66,.4)",

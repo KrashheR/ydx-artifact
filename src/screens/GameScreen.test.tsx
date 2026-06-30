@@ -31,6 +31,9 @@ vi.mock("@/features/gameplay/PhotoComparator", () => ({
 describe("GameScreen", () => {
   beforeEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    vi.spyOn(window, "alert").mockImplementation(() => undefined);
     mockPlatform.setRewardedGatewayOverride(null);
     useGameStore.setState({
       screen: { kind: "home" },
@@ -110,7 +113,7 @@ describe("GameScreen", () => {
 
     render(<GameScreen levelId={level.id} mode="campaign" />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Подсказка|Hint/ }));
+    fireEvent.click(screen.getByRole("button", { name: /рекламу|ad/i }));
 
     await screen.findByTestId("active-hint");
     expect(showRewarded).toHaveBeenCalledTimes(1);
@@ -129,7 +132,7 @@ describe("GameScreen", () => {
 
     render(<GameScreen levelId={level.id} mode="campaign" />);
 
-    const hintButton = screen.getByRole("button", { name: /Подсказка|Hint/ });
+    const hintButton = screen.getByRole("button", { name: /рекламу|ad/i });
     fireEvent.click(hintButton);
 
     await screen.findByTestId("active-hint");
@@ -156,7 +159,7 @@ describe("GameScreen", () => {
 
     render(<GameScreen levelId={level.id} mode="campaign" />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Подсказка|Hint/ }));
+    fireEvent.click(screen.getByRole("button", { name: /рекламу|ad/i }));
 
     await waitFor(() => expect(showRewarded).toHaveBeenCalledTimes(1));
     expect(screen.queryByTestId("active-hint")).not.toBeInTheDocument();

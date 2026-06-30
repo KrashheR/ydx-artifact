@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Fixed Yandex prepublication blockers: `pnpm release:zip` now creates `dist-yandex.zip` from the contents of `dist/` and validates root `index.html` plus forbidden macOS/system/source-map entries.
+- Regenerated `northern-route` level 13 scene A from the owner-provided PNG as a compressed WebP, removed the source PNG from runtime assets, and kept A/B validation passing for the 9-difference finale.
+- Removed the unfinished campaign paywall from production UI. Locked campaigns now only explain gameplay unlock requirements; purchase CTA, modal, restore button and stub price are gone.
+- Added first-run locale detection from `ysdk.environment.i18n.lang`, persisted manual locale source, `<html lang>` updates and localized `document.title`.
+- Migrated saves to version 2 with `elapsedActiveSeconds` for in-progress levels, safe v1 migration and active-time-only gameplay timer persistence.
+- Made zero-magnifier hint CTA explicit for rewarded ads and added a confirmation prompt before showing rewarded video.
+- Split hitbox editor controls into a dev-only lazy chunk, removed production internal REF labels, and replaced `structuredClone` with a JSON-compatible clone helper.
+- Added adaptive modal max-height scrolling and tightened the gameplay HUD safe-area layout for small mobile viewports.
+- Extended content validation with A/B hash comparison, WebP dimension checks and normalized hotspot bounds checks.
+
 - Added Yandex Games launch lifecycle handling for moderation readiness: production now loads `/sdk.js`, sends `LoadingAPI.ready()` once after hydration, subscribes to `game_api_pause` / `game_api_resume`, and centralizes `GameplayAPI.start()` / `stop()` around active gameplay.
 
 - Removed the Google Fonts runtime hotlink from `index.html`, switched Tailwind font stacks to system/local fallbacks, and strengthened production browser behavior by suppressing page scroll, image drag, text selection and gameplay context menus.

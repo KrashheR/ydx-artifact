@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getSceneMarkupAsset } from "@/content/sceneAssets";
 import type { DifferenceDefinition, HitShape, LevelDefinition } from "@/entities/level/schema";
@@ -41,6 +41,9 @@ type ApplyStatus = "idle" | "saving" | "saved" | "error";
 
 let wrongClickSeq = 0;
 const HITBOX_EDITOR_STORAGE_PREFIX = "artifact.hitboxEditor.";
+const HitboxEditorControls = import.meta.env.DEV
+  ? lazy(() => import("./dev/HitboxEditorControls").then((module) => ({ default: module.HitboxEditorControls })))
+  : null;
 
 export function PhotoComparator({
   level,
@@ -134,36 +137,6 @@ export function PhotoComparator({
     );
   }
 
-  async function copyEditedDifferences() {
-    const payload = JSON.stringify(editableDifferences, null, 2);
-    await window.navigator.clipboard?.writeText(payload);
-  }
-
-  async function applyEditedDifferences() {
-    setApplyStatus("saving");
-    try {
-      const response = await fetch("/__dev/hitboxes/apply", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          levelId: level.id,
-          chapterId: level.chapterId,
-          order: level.order,
-          differences: editableDifferences
-        })
-      });
-      const payload = (await response.json()) as { ok?: boolean; error?: string };
-      if (!response.ok || !payload.ok) {
-        throw new Error(payload.error ?? "Hitbox source update failed");
-      }
-      window.localStorage.removeItem(editorStorageKey);
-      setApplyStatus("saved");
-    } catch (error) {
-      console.error(error);
-      setApplyStatus("error");
-    }
-  }
-
   function resetEditedDifferences() {
     window.localStorage.removeItem(editorStorageKey);
     setEditableDifferences(cloneDifferences(level.differences));
@@ -191,9 +164,11 @@ export function PhotoComparator({
               </span>
               <span className="font-manrope text-[11px] font-semibold tracking-[.18em] text-exp-muted">{label}</span>
             </div>
-            <span className="font-jetbrains text-[10px] font-medium" style={{ color: "rgba(135,144,135,.7)" }}>
-              REF-{level.id.toUpperCase()}-{side}
-            </span>
+            {hitboxEditorEnabled ? (
+              <span className="font-jetbrains text-[10px] font-medium" style={{ color: "rgba(135,144,135,.7)" }}>
+                {level.id.toUpperCase()}-{side}
+              </span>
+            ) : null}
           </div>
         )}
 
@@ -321,51 +296,19 @@ export function PhotoComparator({
         </button>
       </div>
 
-      {hitboxEditorEnabled ? (
-        <div
-          className="absolute bottom-3 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-[10px] px-3 py-2"
-          style={{ border: "1px solid rgba(111,198,158,.45)", background: "rgba(21,27,24,.9)" }}
-        >
-          <span className="font-jetbrains text-[10px] font-semibold text-exp-success">
-            {t("dev.hitboxEditor")}
-          </span>
-          <span className="hidden font-manrope text-[10px] font-semibold text-exp-muted sm:inline">
-            {t("dev.hitboxEditorHelp")}
-          </span>
-          <button
-            type="button"
-            className="rounded-[7px] px-3 py-1 font-manrope text-[11px] font-bold text-[#102016]"
-            style={{ background: "#6fc69e" }}
-            disabled={applyStatus === "saving"}
-            onClick={applyEditedDifferences}
-          >
-            {applyStatus === "saving" ? t("dev.applyingHitboxes") : t("dev.applyHitboxes")}
-          </button>
-          <button
-            type="button"
-            className="rounded-[7px] px-3 py-1 font-manrope text-[11px] font-bold text-[#102016]"
-            style={{ background: "rgba(111,198,158,.72)" }}
-            onClick={copyEditedDifferences}
-          >
-            {t("dev.copyHitboxes")}
-          </button>
-          {applyStatus === "saved" || applyStatus === "error" ? (
-            <span
-              className="font-manrope text-[10px] font-bold"
-              style={{ color: applyStatus === "saved" ? "#6fc69e" : "#ff9d8a" }}
-            >
-              {applyStatus === "saved" ? t("dev.applyHitboxesDone") : t("dev.applyHitboxesFailed")}
-            </span>
-          ) : null}
-          <button
-            type="button"
-            className="rounded-[7px] px-3 py-1 font-manrope text-[11px] font-bold text-exp-parch"
-            style={{ border: "1px solid rgba(213,195,154,.2)", background: "rgba(213,195,154,.06)" }}
-            onClick={resetEditedDifferences}
-          >
-            {t("dev.resetHitboxes")}
-          </button>
-        </div>
+      {hitboxEditorEnabled && HitboxEditorControls ? (
+        <Suspense fallback={null}>
+          <HitboxEditorControls
+            differences={editableDifferences}
+            levelId={level.id}
+            chapterId={level.chapterId}
+            order={level.order}
+            storageKey={editorStorageKey}
+            applyStatus={applyStatus}
+            onApplyStatus={setApplyStatus}
+            onReset={resetEditedDifferences}
+          />
+        </Suspense>
       ) : null}
     </div>
   );
@@ -836,7 +779,7 @@ function clamp01(value: number) {
 }
 
 function cloneDifferences(differences: DifferenceDefinition[]) {
-  return structuredClone(differences);
+  return JSON.parse(JSON.stringify(differences)) as DifferenceDefinition[];
 }
 
 function loadEditedDifferences(storageKey: string, fallback: DifferenceDefinition[]) {

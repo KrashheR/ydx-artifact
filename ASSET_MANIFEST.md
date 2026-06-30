@@ -75,5 +75,5 @@ Campaign selection screen previews are stored beside each chapter package as `pu
 | nr-12-scene-b | `public/assets/scenes/northern-route/12/2.webp` | scene B | production-intake | content owner image converted from PNG |
 | nr-12-markup | `public/assets/scenes/northern-route/12/3.webp` | markup reference | authoring-only | content owner markup reference converted from PNG |
 | nr-13-scene-a | `public/assets/scenes/northern-route/13/1.webp` | scene A | production-intake | content owner image converted from PNG |
-| nr-13-scene-b | `public/assets/scenes/northern-route/13/2.webp` | scene B | production-intake | content owner image converted from PNG |
+| nr-13-scene-b | `public/assets/scenes/northern-route/13/2.webp` | scene B | production-intake | existing workspace WebP retained as B after updated scene A intake |
 | nr-13-markup | `public/assets/scenes/northern-route/13/3.webp` | markup reference | authoring-only | content owner markup reference converted from PNG |

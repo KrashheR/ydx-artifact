@@ -39,6 +39,7 @@ pnpm test
 pnpm validate:content
 pnpm agent:check
 pnpm build
+pnpm release:zip
 pnpm dev:validate
 pnpm dev:validate:cheat
 pnpm test:e2e
@@ -50,6 +51,7 @@ For broad agent edits, `pnpm agent:check` runs lint, typecheck and content valid
 Production builds exclude scene markup reference files named `3.webp` from `dist/assets/scenes/**`; the source files stay in `public` for `pnpm validate:content`, `pnpm dev:validate`, and local hitbox review.
 Production builds also exclude unused scene placeholder SVGs and keep the Yandex Games SDK as the platform-provided `/sdk.js` script in `index.html`.
 Production builds do not emit sourcemaps by default to keep the Yandex upload smaller. Use `BUILD_SOURCEMAP=true pnpm build` when a diagnostic build needs `.map` files.
+`pnpm release:zip` packages the contents of `dist/` into `dist-yandex.zip`, verifies root `index.html`, and excludes macOS/system junk plus sourcemaps.
 
 ## Scope Implemented
 
@@ -68,6 +70,7 @@ Production builds do not emit sourcemaps by default to keep the Yandex upload sm
 - Circle/polygon hit testing, found markers, hints, misclicks and completion.
 - Yandex Player Data cloud saves with a `ysdk.getStorage()` / `localStorage` mirror fallback and versioned schema.
 - Yandex Games SDK lifecycle: `/sdk.js` bootstrap, early pause/resume subscription, one-shot `LoadingAPI.ready()` after hydration, and centralized `GameplayAPI.start()` / `stop()` for active gameplay.
+- First-run locale auto-detection through `ysdk.environment.i18n.lang`, with persisted manual RU/EN override.
 - Mock platform adapter and diagnostics copy.
 - Campaign journal review pre-prompt wired to the Yandex Games feedback API seam with local dev mocks.
 
