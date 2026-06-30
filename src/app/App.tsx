@@ -7,6 +7,7 @@ import { GameScreen } from "@/screens/GameScreen";
 import { HomeScreen } from "@/screens/HomeScreen";
 import { MapScreen } from "@/screens/MapScreen";
 import { SettingsModal } from "@/screens/SettingsScreen";
+import { notifyGameReady } from "@/services/platform/platformLifecycle";
 import { useGameStore } from "@/shared/store/gameStore";
 
 function SettingsGearIcon() {
@@ -41,6 +42,9 @@ export function App() {
       await hydrate();
       if (!cancelled && import.meta.env.DEV && import.meta.env.VITE_DEV_VALIDATE_CHEAT === "true") {
         await useGameStore.getState().unlockAllDevContent();
+      }
+      if (!cancelled) {
+        void notifyGameReady();
       }
     }
 

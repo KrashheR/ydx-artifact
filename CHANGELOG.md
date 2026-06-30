@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Added Yandex Games launch lifecycle handling for moderation readiness: production now loads `/sdk.js`, sends `LoadingAPI.ready()` once after hydration, subscribes to `game_api_pause` / `game_api_resume`, and centralizes `GameplayAPI.start()` / `stop()` around active gameplay.
+
+- Removed the Google Fonts runtime hotlink from `index.html`, switched Tailwind font stacks to system/local fallbacks, and strengthened production browser behavior by suppressing page scroll, image drag, text selection and gameplay context menus.
+
+- Extended the production build cleanup to exclude unused scene placeholder SVGs alongside local `3.webp` markup references.
+
 - Recompressed all WebP scene assets under `public/assets/scenes/` in place again, preserving dimensions and paths while reducing total WebP weight from 43.2 MB to 25.5 MB.
 
 - Disabled production sourcemap emission by default to reduce the release build size; diagnostic builds can still opt in with `BUILD_SOURCEMAP=true pnpm build`.

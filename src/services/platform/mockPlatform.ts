@@ -55,9 +55,20 @@ type YandexGamesSdk = {
     showFullscreenAdv?: (options: { callbacks?: YandexFullscreenAdCallbacks }) => void;
     showRewardedVideo?: (options: { callbacks?: YandexRewardedAdCallbacks }) => void;
   };
+  features?: {
+    LoadingAPI?: {
+      ready?: () => void;
+    };
+    GameplayAPI?: {
+      start?: () => void;
+      stop?: () => void;
+    };
+  };
   feedback?: YandexFeedbackApi;
   getPlayer?: () => Promise<YandexPlayer>;
   getStorage?: () => YandexStorage;
+  on?: (eventName: "game_api_pause" | "game_api_resume", callback: () => void) => void;
+  off?: (eventName: "game_api_pause" | "game_api_resume", callback: () => void) => void;
 };
 
 export type YandexPlayer = {
@@ -102,7 +113,7 @@ function logPlatformError(scope: string, error: unknown) {
 export async function getYandexSdk(): Promise<YandexGamesSdk | null> {
   if (window.ysdk) return window.ysdk;
 
-  if (mockPlatform.mode === "mock" || typeof window === "undefined") {
+  if (import.meta.env.VITE_PLATFORM_MODE === "mock" || typeof window === "undefined") {
     return null;
   }
 
@@ -125,7 +136,7 @@ export async function getYandexSdk(): Promise<YandexGamesSdk | null> {
 }
 
 export const mockPlatform = {
-  mode: import.meta.env.VITE_PLATFORM_MODE ?? "mock",
+  mode: import.meta.env.VITE_PLATFORM_MODE ?? "auto",
   async init() {
     const ysdk = await getYandexSdk();
     return { sdkReady: Boolean(ysdk), localMock: !ysdk };

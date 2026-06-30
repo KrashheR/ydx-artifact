@@ -5,6 +5,11 @@ import { PhotoComparator } from "@/features/gameplay/PhotoComparator";
 import { LevelCompleteOverlay } from "@/features/gameplay/LevelCompleteOverlay";
 import { LevelFailedOverlay } from "@/features/gameplay/LevelFailedOverlay";
 import { mockPlatform } from "@/services/platform/mockPlatform";
+import {
+  getIsPlatformPaused,
+  setGameplayActive,
+  subscribePlatformPause
+} from "@/services/platform/platformLifecycle";
 import { useGameStore } from "@/shared/store/gameStore";
 
 const TIME_LIMIT = 300; // 5 minutes
@@ -40,6 +45,7 @@ export function GameScreen({
   const [timeLeft, setTimeLeft] = useState(TIME_LIMIT);
   const [timedOut, setTimedOut] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [platformPaused, setPlatformPaused] = useState(getIsPlatformPaused);
   const [hintId, setHintId] = useState<string | undefined>();
   const [exactHintUsed, setExactHintUsed] = useState(false);
   const [rewardedHintInFlight, setRewardedHintInFlight] = useState(false);
@@ -67,23 +73,36 @@ export function GameScreen({
   const completionPending = pendingFinalStats !== null;
   const showComplete = finalStats !== null;
   const showOverlay = showComplete || timedOut;
+  const gameplayBlocked =
+    paused ||
+    platformPaused ||
+    rewardedHintInFlight ||
+    showComplete ||
+    completionPending ||
+    timedOut;
+
+  useEffect(() => subscribePlatformPause(setPlatformPaused), []);
+
+  useEffect(() => {
+    setGameplayActive(!gameplayBlocked);
+    return () => setGameplayActive(false);
+  }, [gameplayBlocked]);
+
+  useEffect(() => {
+    const preventContextMenu = (event: MouseEvent) => event.preventDefault();
+    window.addEventListener("contextmenu", preventContextMenu);
+    return () => window.removeEventListener("contextmenu", preventContextMenu);
+  }, []);
 
   // Countdown timer
   useEffect(() => {
-    if (
-      showComplete ||
-      completionPending ||
-      timedOut ||
-      paused ||
-      rewardedHintInFlight
-    )
-      return;
+    if (gameplayBlocked) return;
     const id = window.setInterval(
       () => setTimeLeft((p) => Math.max(0, p - 1)),
       1000,
     );
     return () => window.clearInterval(id);
-  }, [showComplete, completionPending, timedOut, paused, rewardedHintInFlight]);
+  }, [gameplayBlocked]);
 
   // Detect timeout
   useEffect(() => {
@@ -119,7 +138,7 @@ export function GameScreen({
     differenceId: string,
     usedExactHint = exactHintUsed,
   ) {
-    if (completionPending || showComplete || timedOut) return;
+    if (completionPending || showComplete || timedOut || platformPaused) return;
     if (hintId === differenceId) setHintId(undefined);
     recordDiff(levelId, differenceId);
     const nextFound = liveFoundIds.length + 1;
@@ -156,7 +175,7 @@ export function GameScreen({
   }
 
   async function handleAreaHint() {
-    if (showComplete || completionPending || rewardedHintInFlight) return;
+    if (showComplete || completionPending || rewardedHintInFlight || platformPaused) return;
     if (magnifiers > 0) {
       revealNextAreaHint({ spendMagnifier: true, skipActiveHint: false });
       return;
@@ -174,7 +193,7 @@ export function GameScreen({
   }
 
   function handleExactHint() {
-    if (showComplete || completionPending) return;
+    if (showComplete || completionPending || platformPaused) return;
     const next = level!.differences.find((d) => !liveFoundIds.includes(d.id));
     if (!next || !spendMagnifiers(2)) return;
     setExactHintUsed(true);
@@ -551,7 +570,7 @@ export function GameScreen({
             hintId={hintId}
             onDifference={handleDifference}
             onMisclick={() => {
-              if (!completionPending) recordMiss(levelId);
+              if (!completionPending && !platformPaused) recordMiss(levelId);
             }}
             labelA={t("game.labelOriginal")}
             labelB={t("game.labelCopy")}

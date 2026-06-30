@@ -2,6 +2,9 @@
 
 `src/services/platform/mockPlatform.ts` is the current adapter seam. It now wraps the Yandex review API, rewarded advertising API and fullscreen advertising API:
 
+- Production `index.html` loads the Yandex Games SDK from `/sdk.js`; local/dev runs still fall back safely when `window.YaGames` is absent.
+- `src/services/platform/platformLifecycle.ts` initializes the SDK lifecycle early, subscribes to `game_api_pause` / `game_api_resume`, sends `ysdk.features.LoadingAPI.ready()` once after save hydration and the interactive shell are available, and centralizes `ysdk.features.GameplayAPI.start()` / `stop()`.
+- `GameScreen` routes active gameplay through that lifecycle controller: the timer, scene input and GameplayAPI are stopped while the game is paused, a rewarded/interstitial/native dialog is active, the level is completed/failed, or the platform sends `game_api_pause`.
 - `mockPlatform.canReview()` safely returns `{ value: false, reason: "UNKNOWN" }` when Yandex SDK or `ysdk.feedback` is unavailable.
 - `mockPlatform.requestReview()` normalizes the documented `feedbackSent` response and tolerates the older `sentFeedback` example payload.
 - `mockPlatform.showRewarded()` calls `ysdk.adv.showRewardedVideo()` when available, grants only after `onRewarded` followed by close, and falls back to an immediate local mock reward in Vite/local mode.
@@ -34,5 +37,6 @@ Cloud save is wired through `src/services/storage/localSaveService.ts`:
 Local development remains safe:
 
 - the app does not crash without Yandex SDK;
+- direct `pnpm` may be unavailable in some managed shells; the equivalent local binaries (`./node_modules/.bin/eslint`, `./node_modules/.bin/tsc`, `./node_modules/.bin/vite`, `./node_modules/.bin/tsx`) can validate the same code without reinstalling dependencies;
 - `window.__artifactDev?.setReviewMock("sent" | "closed" | "unavailable" | "error")` overrides the review gateway in Vite dev mode;
 - `window.__artifactDev?.triggerReviewPromptDemo()` seeds the third-level map scenario and queues the review check for manual verification.

@@ -5,7 +5,10 @@ import "@/app/styles.css";
 import "@/i18n";
 import { getChapterLevels } from "@/content/chapters";
 import { mockPlatform } from "@/services/platform/mockPlatform";
+import { initPlatformLifecycle } from "@/services/platform/platformLifecycle";
 import { useGameStore } from "@/shared/store/gameStore";
+
+void initPlatformLifecycle();
 
 if (import.meta.env.DEV) {
   window.__artifactDev = {

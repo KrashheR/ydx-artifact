@@ -31,20 +31,35 @@ async function removeSceneMarkupReferences(dir: string): Promise<number> {
   return removed.reduce((total, count) => total + count, 0);
 }
 
-function excludeSceneMarkupReferencesFromBuild(): Plugin {
+async function removeDirectory(dir: string): Promise<number> {
+  try {
+    const entries = await readdir(dir);
+    await rm(dir, { recursive: true, force: true });
+    return entries.length > 0 ? 1 : 0;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return 0;
+    throw error;
+  }
+}
+
+function excludeNonRuntimeSceneAssetsFromBuild(): Plugin {
   let resolvedConfig: ResolvedConfig;
 
   return {
-    name: "exclude-scene-markup-references-from-build",
+    name: "exclude-non-runtime-scene-assets-from-build",
     apply: "build",
     configResolved(config) {
       resolvedConfig = config;
     },
     async closeBundle() {
       const scenesDir = join(resolvedConfig.root, resolvedConfig.build.outDir, "assets", "scenes");
-      const removed = await removeSceneMarkupReferences(scenesDir);
-      if (removed > 0) {
-        this.info(`Excluded ${removed} scene markup reference assets from production build`);
+      const removedMarkupReferences = await removeSceneMarkupReferences(scenesDir);
+      const removedPlaceholderDirs = await removeDirectory(join(scenesDir, "northern-route", "placeholder"));
+      if (removedMarkupReferences > 0) {
+        this.info(`Excluded ${removedMarkupReferences} scene markup reference assets from production build`);
+      }
+      if (removedPlaceholderDirs > 0) {
+        this.info("Excluded unused scene placeholder assets from production build");
       }
     }
   };
@@ -94,7 +109,7 @@ function readRequestBody(req: import("node:http").IncomingMessage) {
 }
 
 export default defineConfig({
-  plugins: [react(), hitboxSourceWriter(), excludeSceneMarkupReferencesFromBuild()],
+  plugins: [react(), hitboxSourceWriter(), excludeNonRuntimeSceneAssetsFromBuild()],
   resolve: {
     alias: {
       "@": "/src"

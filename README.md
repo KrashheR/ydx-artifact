@@ -48,6 +48,7 @@ For broad agent edits, `pnpm agent:check` runs lint, typecheck and content valid
 `pnpm dev:validate` starts the Vite dev server with gameplay scenes swapped to each level's `3.*` markup reference and all difference hitboxes visible for live alignment checks.
 `pnpm dev:validate:cheat` starts the same validation server and automatically unlocks all currently implemented campaigns and levels in the local dev save.
 Production builds exclude scene markup reference files named `3.webp` from `dist/assets/scenes/**`; the source files stay in `public` for `pnpm validate:content`, `pnpm dev:validate`, and local hitbox review.
+Production builds also exclude unused scene placeholder SVGs and keep the Yandex Games SDK as the platform-provided `/sdk.js` script in `index.html`.
 Production builds do not emit sourcemaps by default to keep the Yandex upload smaller. Use `BUILD_SOURCEMAP=true pnpm build` when a diagnostic build needs `.map` files.
 
 ## Scope Implemented
@@ -66,6 +67,7 @@ Production builds do not emit sourcemaps by default to keep the Yandex upload sm
 - Responsive photo comparator with desktop side-by-side and mobile A/B toggle.
 - Circle/polygon hit testing, found markers, hints, misclicks and completion.
 - Yandex Player Data cloud saves with a `ysdk.getStorage()` / `localStorage` mirror fallback and versioned schema.
+- Yandex Games SDK lifecycle: `/sdk.js` bootstrap, early pause/resume subscription, one-shot `LoadingAPI.ready()` after hydration, and centralized `GameplayAPI.start()` / `stop()` for active gameplay.
 - Mock platform adapter and diagnostics copy.
 - Campaign journal review pre-prompt wired to the Yandex Games feedback API seam with local dev mocks.
 
