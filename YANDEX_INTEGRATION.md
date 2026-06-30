@@ -3,7 +3,7 @@
 `src/services/platform/mockPlatform.ts` is the current adapter seam. It now wraps the Yandex review API, rewarded advertising API and fullscreen advertising API:
 
 - Production `index.html` loads the Yandex Games SDK from `/sdk.js`; local/dev runs still fall back safely when `window.YaGames` is absent.
-- `src/services/platform/platformLifecycle.ts` initializes the SDK lifecycle early, subscribes to `game_api_pause` / `game_api_resume`, sends `ysdk.features.LoadingAPI.ready()` once after save hydration and the interactive shell are available, and centralizes `ysdk.features.GameplayAPI.start()` / `stop()`.
+- `src/services/platform/platformLifecycle.ts` initializes the SDK lifecycle early, subscribes to `game_api_pause` / `game_api_resume`, sends `ysdk.features.LoadingAPI.ready()` once after the bootstrap gate has hydrated save data, applied the final locale/title, preloaded first-screen campaign previews, waited for fonts and rendered the interactive home screen, and centralizes `ysdk.features.GameplayAPI.start()` / `stop()`.
 - `GameScreen` routes active gameplay through that lifecycle controller: the timer, scene input and GameplayAPI are stopped while the game is paused, a rewarded/interstitial/native dialog is active, the level is completed/failed, or the platform sends `game_api_pause`.
 - `mockPlatform.canReview()` safely returns `{ value: false, reason: "UNKNOWN" }` when Yandex SDK or `ysdk.feedback` is unavailable.
 - `mockPlatform.requestReview()` normalizes the documented `feedbackSent` response and tolerates the older `sentFeedback` example payload.
@@ -11,6 +11,7 @@
 - `mockPlatform.showInterstitial()` calls `ysdk.adv.showFullscreenAdv()` when available and falls back to a short local mock open/close cycle in Vite/local mode.
 - `mockPlatform.getEnvironmentLanguage()` reads `ysdk.environment.i18n.lang` through the platform seam. On first/default saves the app maps this to `ru` or `en`; a manual Settings language choice is persisted and is not overwritten by SDK language on later launches.
 - SDK initialization is cached via a singleton promise and reuses `window.ysdk` when the host already initialized the SDK.
+- Production Vite builds use `@vitejs/plugin-legacy` for `Safari >= 9`, `iOS >= 9` and `Android >= 5`, producing both modern module scripts and legacy `nomodule` scripts/polyfills for the declared Yandex platform range.
 
 Rewarded hint behavior:
 

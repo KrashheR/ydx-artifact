@@ -34,6 +34,7 @@
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@playwright/test": "^1.49.1",
+    "@vitejs/plugin-legacy": "^6.0.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@types/node": "^22.10.5",

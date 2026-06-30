@@ -512,6 +512,8 @@ if (import.meta.env.DEV) {
 
 ## 10. Добавить legacy browser support или безопасно ограничить браузеры
 
+Статус: реализовано через `@vitejs/plugin-legacy` в `vite.config.ts` для `Safari >= 9`, `iOS >= 9`, `Android >= 5`; production build должен содержать modern bundle, legacy bundle, `nomodule` script и polyfills.
+
 ### Проблема
 Production bundle использует современные возможности:
 
@@ -558,10 +560,8 @@ export default defineConfig({
   plugins: [
     react(),
     legacy({
-      targets: [
-        'defaults',
-        'not IE 11',
-      ],
+      targets: ['Safari >= 9', 'iOS >= 9', 'Android >= 5'],
+      modernPolyfills: true,
     }),
   ],
   build: {
@@ -939,7 +939,7 @@ Campaign | Level | Desktop | Portrait | Landscape | Hints | Save/Resume | Status
 - нет английских строк в русском интерфейсе;
 - нет русских строк в английском интерфейсе;
 - SDK не инициализируется повторно;
-- `LoadingAPI.ready()` вызывается после загрузки критичных данных;
+- `LoadingAPI.ready()` вызывается после гидратации сохранения, финального переключения локали, загрузки preview-изображений первого экрана, готовности шрифтов и отрисовки интерактивного Home;
 - приложение работает при недоступном SDK в локальном режиме;
 - итоговый ZIP соответствует требованиям.
 

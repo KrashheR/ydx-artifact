@@ -49,6 +49,31 @@ select {
   font: inherit;
 }
 
+.app-bootstrap-screen {
+  display: flex;
+  min-height: 100dvh;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(216, 175, 99, 0.14), transparent 18rem),
+    #151b18;
+}
+
+.app-bootstrap-mark {
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(213, 195, 154, 0.24);
+  border-top-color: #d8af63;
+  border-radius: 50%;
+  animation: bootstrap-spin 0.9s linear infinite;
+}
+
+@keyframes bootstrap-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .modal-panel {
   max-height: calc(100dvh - 24px);
   overflow-y: auto;

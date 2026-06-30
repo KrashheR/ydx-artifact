@@ -66,9 +66,10 @@
    - получение remote flags;
    - загрузку shell assets и locale.
 6. Выполнить merge save.
-7. Отрисовать полностью интерактивный Home или Continue screen.
-8. Вызвать `ysdk.features.LoadingAPI.ready()` ровно один раз.
-9. Не начинать gameplay, пока платформа находится в pause из-за стартовой рекламы.
+7. До показа интерактивного Home или Continue screen завершить bootstrap: применить финальную локаль из SDK/сохранения, обновить `<html lang>` и `document.title`, загрузить preview-ассеты первого экрана и дождаться `document.fonts.ready`, если API доступен.
+8. Отрисовать полностью интерактивный Home или Continue screen, пропустить минимум два `requestAnimationFrame`.
+9. Вызвать `ysdk.features.LoadingAPI.ready()` ровно один раз.
+10. Не начинать gameplay, пока платформа находится в pause из-за стартовой рекламы.
 
 ## LoadingAPI.ready
 
@@ -77,6 +78,7 @@
 - нет blocking loader;
 - первая кнопка работает;
 - локализация готова;
+- preview-изображения первого экрана загружены;
 - основной шрифт не вызывает layout shift;
 - SDK failure имеет fallback;
 - можно начать tutorial или продолжить игру.

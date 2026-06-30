@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Delayed `LoadingAPI.ready()` behind a single bootstrap gate: save hydration, SDK/manual locale resolution, i18n/title/lang updates, first-screen preview image preload, font readiness and two rendered frames now complete before the interactive home screen replaces the loader; added regression coverage for the SDK `en` startup path.
+- Added Vite legacy build support for `Safari >= 9`, `iOS >= 9` and `Android >= 5` via `@vitejs/plugin-legacy`, including legacy bundles, `nomodule` scripts and polyfills in production output.
 - Fixed Yandex prepublication blockers: `pnpm release:zip` now creates `dist-yandex.zip` from the contents of `dist/` and validates root `index.html` plus forbidden macOS/system/source-map entries.
 - Regenerated `northern-route` level 13 scene A from the owner-provided PNG as a compressed WebP, removed the source PNG from runtime assets, and kept A/B validation passing for the 9-difference finale.
 - Removed the unfinished campaign paywall from production UI. Locked campaigns now only explain gameplay unlock requirements; purchase CTA, modal, restore button and stub price are gone.

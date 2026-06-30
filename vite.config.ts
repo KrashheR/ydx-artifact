@@ -1,4 +1,5 @@
 import react from "@vitejs/plugin-react";
+import legacy from "@vitejs/plugin-legacy";
 import type { Dirent } from "node:fs";
 import { readdir, rm } from "node:fs/promises";
 import { join } from "node:path";
@@ -109,14 +110,21 @@ function readRequestBody(req: import("node:http").IncomingMessage) {
 }
 
 export default defineConfig({
-  plugins: [react(), hitboxSourceWriter(), excludeNonRuntimeSceneAssetsFromBuild()],
+  plugins: [
+    react(),
+    legacy({
+      targets: ["Safari >= 9", "iOS >= 9", "Android >= 5"],
+      modernPolyfills: true
+    }),
+    hitboxSourceWriter(),
+    excludeNonRuntimeSceneAssetsFromBuild()
+  ],
   resolve: {
     alias: {
       "@": "/src"
     }
   },
   build: {
-    target: "es2018",
     sourcemap: process.env.BUILD_SOURCEMAP === "true"
   }
 });

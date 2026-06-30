@@ -7,10 +7,47 @@ import { GameScreen } from "@/screens/GameScreen";
 import { HomeScreen } from "@/screens/HomeScreen";
 import { MapScreen } from "@/screens/MapScreen";
 import { SettingsModal } from "@/screens/SettingsScreen";
+import { campaignManifestList } from "@/content/campaignManifest";
+import { getChapterPreviewAsset } from "@/content/sceneAssets";
 import { mockPlatform } from "@/services/platform/mockPlatform";
 import { notifyGameReady } from "@/services/platform/platformLifecycle";
 import { resolveInitialLocale } from "@/shared/lib/locale";
 import { useGameStore } from "@/shared/store/gameStore";
+
+function nextFrame() {
+  return new Promise<void>((resolve) => {
+    if (typeof requestAnimationFrame === "function") {
+      requestAnimationFrame(() => resolve());
+      return;
+    }
+    window.setTimeout(resolve, 16);
+  });
+}
+
+function preloadImage(src: string) {
+  return new Promise<void>((resolve) => {
+    const image = new Image();
+    image.onload = () => resolve();
+    image.onerror = () => resolve();
+    image.src = src;
+  });
+}
+
+async function preloadCriticalImages() {
+  await Promise.all(campaignManifestList.map((campaign) => preloadImage(getChapterPreviewAsset(campaign.id))));
+}
+
+async function waitForFonts() {
+  await document.fonts?.ready;
+}
+
+function BootstrapScreen() {
+  return (
+    <main className="app-bootstrap-screen" aria-busy="true" aria-label="Loading">
+      <div className="app-bootstrap-mark" aria-hidden="true" />
+    </main>
+  );
+}
 
 function SettingsGearIcon() {
   return (
@@ -37,37 +74,55 @@ export function App() {
   const setAutoLocale = useGameStore((state) => state.setAutoLocale);
   const locale = useGameStore((state) => state.saveData.settings.locale);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [bootstrapped, setBootstrapped] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function hydrateForSession() {
+    async function bootstrap() {
       await hydrate();
       const sdkLanguage = await mockPlatform.getEnvironmentLanguage();
-      if (!cancelled) {
-        setAutoLocale(resolveInitialLocale(sdkLanguage));
+      if (cancelled) return;
+
+      const savedSettings = useGameStore.getState().saveData.settings;
+      const nextLocale = savedSettings.localeSource === "manual" ? savedSettings.locale : resolveInitialLocale(sdkLanguage);
+      if (savedSettings.localeSource !== "manual") {
+        setAutoLocale(nextLocale);
       }
+      await i18n.changeLanguage(nextLocale);
+      document.documentElement.lang = nextLocale;
+      document.title = i18n.t("app.title");
+
       if (!cancelled && import.meta.env.DEV && import.meta.env.VITE_DEV_VALIDATE_CHEAT === "true") {
         const { unlockAllDevContent } = await import("@/dev/devContent");
         await unlockAllDevContent();
       }
+
+      await preloadCriticalImages();
+      await waitForFonts();
+      if (cancelled) return;
+
+      setBootstrapped(true);
+      await nextFrame();
+      await nextFrame();
       if (!cancelled) {
-        void notifyGameReady();
+        await notifyGameReady();
       }
     }
 
-    void hydrateForSession();
+    void bootstrap();
 
     return () => {
       cancelled = true;
     };
-  }, [hydrate, setAutoLocale]);
+  }, [hydrate, i18n, setAutoLocale]);
 
   useEffect(() => {
+    if (!bootstrapped) return;
     void i18n.changeLanguage(locale);
     document.documentElement.lang = locale;
     document.title = t("app.title");
-  }, [i18n, locale, t]);
+  }, [bootstrapped, i18n, locale, t]);
 
   useEffect(() => {
     const onPageHide = () => void save({ flush: true });
@@ -94,13 +149,17 @@ export function App() {
     }
   }, [screen]);
 
+  if (!bootstrapped) {
+    return <BootstrapScreen />;
+  }
+
   return (
     <main className="min-h-screen bg-exp-bg text-graphite">
       <AnimatePresence mode="wait">
         <motion.div
           key={`${screen.kind}-${"chapterId" in screen ? screen.chapterId : ""}-${"levelId" in screen ? screen.levelId : ""}`}
           className="min-h-screen"
-          initial={{ opacity: 0 }}
+          initial={false}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.18 }}
