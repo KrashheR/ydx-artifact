@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+- Reworked compact landscape home campaign selection into a one-card carousel controlled by left/right arrows.
+
+- Fixed the app bootstrap locale sync so the shell no longer repeatedly calls `i18n.changeLanguage()` after the active locale is already applied.
+
+- Guarded comparator frame-size and pan synchronization against repeated no-op state updates.
+
+- Reduced the gameplay timer font to 16px on mobile while keeping the larger HUD timer on wider screens.
+
+- Restored the mobile landscape A/B flip button label while keeping the control in the right-edge safe-area slot.
+
+- Tightened mobile gameplay and level-card typography, and moved the mobile landscape A/B flip control into a side control slot so it no longer covers the scene image.
+
+- Pinned the mobile home campaign CTA to the bottom of each active campaign card.
+
+- Fixed gameplay comparator sizing so 16:10 scene images keep their real aspect ratio on desktop, mobile portrait and mobile landscape instead of stretching into square-ish play slots.
+
+- Renamed the Russian mobile A/B compare button to "Перевернуть".
+- Fixed gameplay image panning so zoomed scenes keep the same drag overscroll allowance on the bottom edge as on the top, left and right edges.
+- Fixed the campaign mission journal so level lists scroll inside the game viewport with a custom brass scrollbar instead of relying on blocked page scrolling.
+- Matched mission level-card hover motion to campaign cards on the campaign journal.
 - Delayed `LoadingAPI.ready()` behind a single bootstrap gate: save hydration, SDK/manual locale resolution, i18n/title/lang updates, first-screen preview image preload, font readiness and two rendered frames now complete before the interactive home screen replaces the loader; added regression coverage for the SDK `en` startup path.
 - Added Vite legacy build support for `Safari >= 9`, `iOS >= 9` and `Android >= 5` via `@vitejs/plugin-legacy`, including legacy bundles, `nomodule` scripts and polyfills in production output.
 - Fixed Yandex prepublication blockers: `pnpm release:zip` now creates `dist-yandex.zip` from the contents of `dist/` and validates root `index.html` plus forbidden macOS/system/source-map entries.

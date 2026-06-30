@@ -119,10 +119,12 @@ export function App() {
 
   useEffect(() => {
     if (!bootstrapped) return;
-    void i18n.changeLanguage(locale);
+    if (i18n.resolvedLanguage !== locale && i18n.language !== locale) {
+      void i18n.changeLanguage(locale);
+    }
     document.documentElement.lang = locale;
-    document.title = t("app.title");
-  }, [bootstrapped, i18n, locale, t]);
+    document.title = i18n.t("app.title");
+  }, [bootstrapped, i18n, locale]);
 
   useEffect(() => {
     const onPageHide = () => void save({ flush: true });

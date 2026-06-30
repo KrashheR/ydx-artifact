@@ -13,6 +13,8 @@
     "daily": "Daily",
     "settings": "Settings",
     "back": "Back",
+    "previous": "Previous",
+    "next": "Next",
     "compare": "Compare A/B",
     "hintArea": "Area hint",
     "hintExact": "Exact reveal",

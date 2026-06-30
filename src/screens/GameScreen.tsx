@@ -8,7 +8,7 @@ import { mockPlatform } from "@/services/platform/mockPlatform";
 import {
   getIsPlatformPaused,
   setGameplayActive,
-  subscribePlatformPause
+  subscribePlatformPause,
 } from "@/services/platform/platformLifecycle";
 import { useGameStore } from "@/shared/store/gameStore";
 
@@ -73,7 +73,9 @@ export function GameScreen({
   const liveMistakes =
     saveData.inProgress?.levelId === levelId ? saveData.inProgress.mistakes : 0;
   const liveElapsedActiveSeconds =
-    saveData.inProgress?.levelId === levelId ? saveData.inProgress.elapsedActiveSeconds : 0;
+    saveData.inProgress?.levelId === levelId
+      ? saveData.inProgress.elapsedActiveSeconds
+      : 0;
   const timeLeft = Math.max(0, TIME_LIMIT - liveElapsedActiveSeconds);
   const completionPending = pendingFinalStats !== null;
   const showComplete = finalStats !== null;
@@ -119,7 +121,7 @@ export function GameScreen({
     const id = window.setInterval(() => {
       activeTimerSaveCounterRef.current += 1;
       addActiveLevelTime(levelId, 1, {
-        save: activeTimerSaveCounterRef.current % 5 === 0
+        save: activeTimerSaveCounterRef.current % 5 === 0,
       });
     }, 1000);
     return () => window.clearInterval(id);
@@ -188,7 +190,8 @@ export function GameScreen({
     if (showComplete || completionPending) return;
     if (activeHintIsUnfound && !skipActiveHint) return;
     const next = level!.differences.find(
-      (d) => !liveFoundIds.includes(d.id) && (!skipActiveHint || d.id !== hintId),
+      (d) =>
+        !liveFoundIds.includes(d.id) && (!skipActiveHint || d.id !== hintId),
     );
     if (!next) return;
     if (spendMagnifier && !spendMagnifiers(1)) return;
@@ -196,7 +199,13 @@ export function GameScreen({
   }
 
   async function handleAreaHint() {
-    if (showComplete || completionPending || rewardedHintInFlight || platformPaused) return;
+    if (
+      showComplete ||
+      completionPending ||
+      rewardedHintInFlight ||
+      platformPaused
+    )
+      return;
     if (magnifiers > 0) {
       revealNextAreaHint({ spendMagnifier: true, skipActiveHint: false });
       return;
@@ -359,7 +368,7 @@ export function GameScreen({
                 <path d="M9 2h6" strokeLinecap="round" />
               </svg>
               <span
-                className="font-jetbrains text-[22px] font-semibold tracking-[.04em]"
+                className="font-jetbrains text-[16px] font-semibold tracking-[.04em] sm:text-[22px]"
                 style={{ color: timeLeft <= 30 ? "#e08a78" : "#D5C39A" }}
               >
                 {formatTime(timeLeft)}
@@ -389,7 +398,7 @@ export function GameScreen({
                 <path d="m21 21-4.3-4.3" />
               </svg>
               <div className="flex items-baseline gap-0.5">
-                <span className="font-manrope text-[24px] font-bold text-exp-brass2">
+                <span className="font-manrope text-[24px] font-bold text-exp-brass2 md:text-[17px]">
                   {liveFoundIds.length}
                 </span>
                 <span
@@ -399,7 +408,7 @@ export function GameScreen({
                   / {level.requiredDifferences}
                 </span>
               </div>
-              <span className="hidden font-manrope text-[10.5px] font-semibold tracking-[.12em] text-exp-muted sm:block">
+              <span className="hidden font-manrope text-[10.5px] font-semibold tracking-[.12em] text-exp-muted sm:block md:text-[12px]">
                 {t("game.diffCount")}
               </span>
             </div>
@@ -416,8 +425,16 @@ export function GameScreen({
                 background: "rgba(184,138,69,.08)",
               }}
               aria-busy={rewardedHintInFlight}
-              aria-label={magnifiers > 0 ? t("game.hintLabel") : t("game.rewardedHintLabel")}
-              title={magnifiers > 0 ? t("game.hintLabel") : t("game.rewardedHintLabel")}
+              aria-label={
+                magnifiers > 0
+                  ? t("game.hintLabel")
+                  : t("game.rewardedHintLabel")
+              }
+              title={
+                magnifiers > 0
+                  ? t("game.hintLabel")
+                  : t("game.rewardedHintLabel")
+              }
             >
               <svg
                 width="16"
@@ -433,7 +450,9 @@ export function GameScreen({
                 <path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z" />
               </svg>
               <span className="hidden sm:inline">
-                {magnifiers > 0 ? t("game.hintLabel") : t("game.rewardedHintShort")}
+                {magnifiers > 0
+                  ? t("game.hintLabel")
+                  : t("game.rewardedHintShort")}
               </span>
               {magnifiers > 0 ? (
                 <span
@@ -459,7 +478,11 @@ export function GameScreen({
                     strokeLinejoin="round"
                   >
                     <rect x="3" y="6" width="18" height="12" rx="2" />
-                    <path d="m10 9 5 3-5 3V9Z" fill="currentColor" stroke="none" />
+                    <path
+                      d="m10 9 5 3-5 3V9Z"
+                      fill="currentColor"
+                      stroke="none"
+                    />
                   </svg>
                 </span>
               )}

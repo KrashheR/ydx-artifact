@@ -55,7 +55,11 @@ select {
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(circle at 50% 34%, rgba(216, 175, 99, 0.14), transparent 18rem),
+    radial-gradient(
+      circle at 50% 34%,
+      rgba(216, 175, 99, 0.14),
+      transparent 18rem
+    ),
     #151b18;
 }
 
@@ -80,6 +84,34 @@ select {
   overscroll-behavior: contain;
 }
 
+.map-scroll-area {
+  overscroll-behavior: contain;
+  scrollbar-color: #b88a45 rgba(213, 195, 154, 0.07);
+  scrollbar-width: thin;
+}
+
+.map-scroll-area::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.map-scroll-area::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(213, 195, 154, 0.08), rgba(16, 21, 18, 0.18)),
+    rgba(16, 21, 18, 0.58);
+}
+
+.map-scroll-area::-webkit-scrollbar-thumb {
+  border: 2px solid rgba(16, 21, 18, 0.82);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #d8af63, #a9762f 58%, #7e5b2a);
+}
+
+.map-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #e7c074, #b88a45 58%, #8c6a34);
+}
+
 :where(a, button, [role="button"], input, select, textarea, summary) {
   -webkit-tap-highlight-color: transparent;
 }
@@ -88,6 +120,117 @@ select {
   user-select: none;
   -webkit-user-drag: none;
   touch-action: none;
+}
+
+.game-play-area {
+  min-height: 0;
+}
+
+.photo-comparator {
+  width: 100%;
+  min-height: 0;
+}
+
+.comparator-desktop,
+.comparator-mobile-portrait,
+.comparator-landscape-flip {
+  min-height: 0;
+}
+
+.comparator-desktop {
+  align-items: center;
+}
+
+.comparator-photo-column {
+  min-width: 0;
+  min-height: 0;
+}
+
+.comparator-photo-frame {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.comparator-photo-size {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.comparator-photo {
+  aspect-ratio: var(--scene-aspect-ratio, 1.598);
+  width: 100%;
+  height: 100%;
+  flex: 0 1 auto;
+}
+
+@media (max-width: 767px) and (orientation: portrait) {
+  .game-mobile-title {
+    padding-bottom: 8px !important;
+    padding-top: 5px !important;
+  }
+
+  .game-mobile-title > div > div:first-child {
+    font-size: 7.5px !important;
+    letter-spacing: 0.13em !important;
+  }
+
+  .game-mobile-title > div > div:last-child {
+    font-size: 14.5px !important;
+    line-height: 1.05 !important;
+  }
+
+  .game-mobile-found {
+    padding-bottom: 8px !important;
+  }
+
+  .game-mobile-found span:first-child {
+    font-size: 17px !important;
+  }
+
+  .game-mobile-found span:nth-child(2) {
+    font-size: 12px !important;
+  }
+
+  .game-mobile-found span:nth-child(3) {
+    font-size: 8px !important;
+    letter-spacing: 0.1em !important;
+  }
+
+  .comparator-portrait-flip-button {
+    min-height: 46px !important;
+    margin-top: 10px !important;
+    border-radius: 10px !important;
+    font-size: 12.5px !important;
+  }
+
+  .map-mobile-level-list {
+    gap: 10px !important;
+    padding-top: 14px !important;
+  }
+
+  .map-mobile-level-list > button {
+    height: 140px !important;
+  }
+
+  .map-mobile-level-list > button > div:first-child {
+    height: 68px !important;
+  }
+
+  .map-mobile-level-list h3 {
+    font-size: 17px !important;
+    line-height: 1.02 !important;
+  }
+
+  .map-mobile-level-list p,
+  .map-mobile-level-list span {
+    font-size: 8.5px !important;
+  }
 }
 
 @keyframes game-pop {
@@ -260,32 +403,51 @@ select {
     padding-right: 16px;
   }
 
+  .home-campaign-carousel-shell {
+    width: min(340px, calc(100vw - 288px));
+  }
+
   .home-campaign-row {
     display: flex !important;
     height: calc(100dvh - 82px);
-    gap: 14px !important;
-    overflow-x: auto;
+    gap: 0 !important;
+    overflow-x: hidden;
     overflow-y: hidden;
-    padding: 16px 0 10px !important;
-    scrollbar-width: thin;
-    scrollbar-color: #a9762f rgba(213, 195, 154, 0.06);
+    padding: 16px 48px 10px !important;
+    scrollbar-width: none;
   }
 
-  .home-campaign-row::-webkit-scrollbar,
+  .home-campaign-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .home-campaign-landscape-controls {
+    display: block !important;
+    position: absolute;
+    inset: 16px 0 10px;
+    pointer-events: none;
+  }
+
+  .home-campaign-landscape-controls button {
+    pointer-events: auto;
+  }
+
+  .home-campaign-card--landscape-inactive {
+    display: none !important;
+  }
+
   .map-level-grid::-webkit-scrollbar,
   .settings-language-list::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 
-  .home-campaign-row::-webkit-scrollbar-track,
   .map-level-grid::-webkit-scrollbar-track,
   .settings-language-list::-webkit-scrollbar-track {
     background: rgba(213, 195, 154, 0.05);
     border-radius: 4px;
   }
 
-  .home-campaign-row::-webkit-scrollbar-thumb,
   .map-level-grid::-webkit-scrollbar-thumb,
   .settings-language-list::-webkit-scrollbar-thumb {
     border: 1px solid rgba(21, 27, 24, 0.55);
@@ -294,9 +456,9 @@ select {
   }
 
   .home-campaign-card {
-    width: 198px;
-    min-width: 198px;
-    flex: 0 0 198px !important;
+    width: 100%;
+    min-width: 0;
+    flex: 0 0 100% !important;
     border-radius: 14px !important;
   }
 
@@ -454,10 +616,6 @@ select {
     padding-right: 10px !important;
   }
 
-  .game-hud > div:nth-child(2) span {
-    font-size: 16px !important;
-  }
-
   .game-hud > div:last-child {
     gap: 7px !important;
   }
@@ -488,6 +646,7 @@ select {
 
   .comparator-landscape-flip {
     display: flex !important;
+    padding-right: max(58px, calc(48px + env(safe-area-inset-right)));
   }
 
   .comparator-flip-stage {
@@ -519,8 +678,26 @@ select {
   }
 
   .comparator-flip-button {
-    bottom: 14px;
-    animation: landscape-hintsweep 3.2s ease-in-out infinite;
+    bottom: auto;
+    left: auto !important;
+    right: max(8px, env(safe-area-inset-right));
+    top: 50%;
+    min-height: 44px !important;
+    width: auto;
+    max-width: min(178px, calc(100vw - 16px - env(safe-area-inset-right)));
+    min-width: 44px;
+    padding: 0 14px !important;
+    border-radius: 999px !important;
+    font-size: 12px !important;
+    line-height: 1.05;
+    text-align: center;
+    white-space: nowrap;
+    transform: translateY(-50%) !important;
+  }
+
+  .comparator-flip-button svg {
+    width: 18px;
+    height: 18px;
   }
 
   .settings-dialog {

@@ -23,42 +23,136 @@ interface Campaign {
 
 function CompassIcon({ size = 36 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 36 36" fill="none" aria-hidden="true">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 36 36"
+      fill="none"
+      aria-hidden="true"
+    >
       <circle cx="18" cy="18" r="16" stroke="#B88A45" strokeWidth="1.5" />
       <circle cx="18" cy="18" r="2" fill="#B88A45" />
       <polygon points="18,6 20.5,18 18,22 15.5,18" fill="#D8AF63" />
       <polygon points="18,30 20.5,18 18,14 15.5,18" fill="#879087" />
-      <text x="18" y="11" textAnchor="middle" fill="#D5C39A" fontSize="5"
-        style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700 }}>N</text>
+      <text
+        x="18"
+        y="11"
+        textAnchor="middle"
+        fill="#D5C39A"
+        fontSize="5"
+        style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700 }}
+      >
+        N
+      </text>
     </svg>
   );
 }
 
-function LockIcon({ size = 18, color = "#879087" }: { size?: number; color?: string }) {
+function LockIcon({
+  size = 18,
+  color = "#879087",
+}: {
+  size?: number;
+  color?: string;
+}) {
   return (
-    <svg width={size} height={size} viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <rect x="3" y="8" width="12" height="9" rx="2" stroke={color} strokeWidth="1.6" />
-      <path d="M6 8V6a3 3 0 0 1 6 0v2" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 18 18"
+      fill="none"
+      aria-hidden="true"
+    >
+      <rect
+        x="3"
+        y="8"
+        width="12"
+        height="9"
+        rx="2"
+        stroke={color}
+        strokeWidth="1.6"
+      />
+      <path
+        d="M6 8V6a3 3 0 0 1 6 0v2"
+        stroke={color}
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
 
-function CheckIcon({ size = 14, color = "#6FC69E" }: { size?: number; color?: string }) {
+function CheckIcon({
+  size = 14,
+  color = "#6FC69E",
+}: {
+  size?: number;
+  color?: string;
+}) {
   return (
-    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <path d="M2 7l3.5 3.5L12 4" stroke={color} strokeWidth="1.8"
-        strokeLinecap="round" strokeLinejoin="round" />
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 14 14"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M2 7l3.5 3.5L12 4"
+        stroke={color}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
 function SnowflakeIcon({ size = 20 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <line x1="10" y1="2" x2="10" y2="18" stroke="#D5C39A" strokeWidth="1.4" strokeLinecap="round" />
-      <line x1="2" y1="10" x2="18" y2="10" stroke="#D5C39A" strokeWidth="1.4" strokeLinecap="round" />
-      <line x1="4" y1="4" x2="16" y2="16" stroke="#D5C39A" strokeWidth="1.4" strokeLinecap="round" />
-      <line x1="16" y1="4" x2="4" y2="16" stroke="#D5C39A" strokeWidth="1.4" strokeLinecap="round" />
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+    >
+      <line
+        x1="10"
+        y1="2"
+        x2="10"
+        y2="18"
+        stroke="#D5C39A"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+      <line
+        x1="2"
+        y1="10"
+        x2="18"
+        y2="10"
+        stroke="#D5C39A"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+      <line
+        x1="4"
+        y1="4"
+        x2="16"
+        y2="16"
+        stroke="#D5C39A"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+      <line
+        x1="16"
+        y1="4"
+        x2="4"
+        y2="16"
+        stroke="#D5C39A"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
       <circle cx="10" cy="10" r="2" fill="#D5C39A" />
     </svg>
   );
@@ -67,7 +161,13 @@ function SnowflakeIcon({ size = 20 }: { size?: number }) {
 function SunIcon({ size = 20 }: { size?: number }) {
   const rays = [0, 45, 90, 135, 180, 225, 270, 315];
   return (
-    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+    >
       <circle cx="10" cy="10" r="3.5" stroke="#D5C39A" strokeWidth="1.4" />
       {rays.map((angle) => {
         const rad = (angle * Math.PI) / 180;
@@ -76,8 +176,16 @@ function SunIcon({ size = 20 }: { size?: number }) {
         const x2 = 10 + 8 * Math.cos(rad);
         const y2 = 10 + 8 * Math.sin(rad);
         return (
-          <line key={angle} x1={x1} y1={y1} x2={x2} y2={y2}
-            stroke="#D5C39A" strokeWidth="1.4" strokeLinecap="round" />
+          <line
+            key={angle}
+            x1={x1}
+            y1={y1}
+            x2={x2}
+            y2={y2}
+            stroke="#D5C39A"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+          />
         );
       })}
     </svg>
@@ -86,10 +194,28 @@ function SunIcon({ size = 20 }: { size?: number }) {
 
 function LeafIcon({ size = 20 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <path d="M10 18C10 18 3 13 3 8C3 4.5 6.5 2 10 2C13.5 2 17 4.5 17 8C17 13 10 18 10 18Z"
-        stroke="#D5C39A" strokeWidth="1.4" fill="none" />
-      <line x1="10" y1="18" x2="10" y2="8" stroke="#D5C39A" strokeWidth="1.2" strokeLinecap="round" />
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M10 18C10 18 3 13 3 8C3 4.5 6.5 2 10 2C13.5 2 17 4.5 17 8C17 13 10 18 10 18Z"
+        stroke="#D5C39A"
+        strokeWidth="1.4"
+        fill="none"
+      />
+      <line
+        x1="10"
+        y1="18"
+        x2="10"
+        y2="8"
+        stroke="#D5C39A"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -97,7 +223,8 @@ function LeafIcon({ size = 20 }: { size?: number }) {
 // ─── Preview backgrounds ──────────────────────────────────────────────────────
 
 const PREVIEW_BG: Record<CampaignId, string> = {
-  white: "radial-gradient(ellipse at 50% -10%, #9FBAC3 0%, #274659 45%, #152431 100%)",
+  white:
+    "radial-gradient(ellipse at 50% -10%, #9FBAC3 0%, #274659 45%, #152431 100%)",
   sand: "linear-gradient(180deg, #3A2C18 0%, #7A5A2F 50%, #E3C489 100%)",
   emerald: "linear-gradient(180deg, #0E211A 0%, #1C3A2C 50%, #3C6F52 100%)",
 };
@@ -108,7 +235,10 @@ const PREVIEW_IMAGE: Record<CampaignId, string> = {
   emerald: getChapterPreviewAsset("emerald-meridian"),
 };
 
-const CAMPAIGN_SYMBOL: Record<CampaignId, (props: { size?: number }) => React.ReactElement> = {
+const CAMPAIGN_SYMBOL: Record<
+  CampaignId,
+  (props: { size?: number }) => React.ReactElement
+> = {
   white: SnowflakeIcon,
   sand: SunIcon,
   emerald: LeafIcon,
@@ -116,11 +246,34 @@ const CAMPAIGN_SYMBOL: Record<CampaignId, (props: { size?: number }) => React.Re
 
 // ─── Status badge colours ─────────────────────────────────────────────────────
 
-const STATUS_STYLE: Record<CampaignStatus, { bg: string; text: string }> = {
-  in_progress: { bg: "rgba(184,138,69,.18)", text: "#D8AF63" },
-  available:   { bg: "rgba(47,106,87,.22)",  text: "#6FC69E" },
-  completed:   { bg: "rgba(47,106,87,.22)",  text: "#9BD9BB" },
-  locked:      { bg: "rgba(135,144,135,.12)", text: "#879087" },
+const STATUS_STYLE: Record<
+  CampaignStatus,
+  { accent: string; bg: string; border: string; text: string }
+> = {
+  in_progress: {
+    accent: "#D8AF63",
+    bg: "rgba(31,28,21,.72)",
+    border: "rgba(216,175,99,.44)",
+    text: "#F0D9A4",
+  },
+  available: {
+    accent: "#6FC69E",
+    bg: "rgba(23,38,32,.72)",
+    border: "rgba(111,198,158,.42)",
+    text: "#BCE7D0",
+  },
+  completed: {
+    accent: "#9BD9BB",
+    bg: "rgba(23,40,33,.72)",
+    border: "rgba(155,217,187,.42)",
+    text: "#CDEFD9",
+  },
+  locked: {
+    accent: "#879087",
+    bg: "rgba(31,35,33,.72)",
+    border: "rgba(135,144,135,.36)",
+    text: "#C8C5B8",
+  },
 };
 
 // ─── Segmented progress bar ───────────────────────────────────────────────────
@@ -149,13 +302,30 @@ function SegmentBar({ done, total = 13 }: { done: number; total?: number }) {
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 
-function StatusBadge({ status, label }: { status: CampaignStatus; label: string }) {
+function StatusBadge({
+  status,
+  label,
+}: {
+  status: CampaignStatus;
+  label: string;
+}) {
   const s = STATUS_STYLE[status];
   return (
     <span
-      className="absolute left-2.5 top-2.5 inline-flex items-center rounded-[5px] px-[11px] py-[4px] text-[10px] font-bold tracking-[.12em]"
-      style={{ background: s.bg, color: s.text, backdropFilter: "blur(8px)" }}
+      className="absolute left-2 top-2 inline-flex max-w-[calc(100%-16px)] items-center gap-1.5 rounded-[5px] border py-[3px] pl-[6px] pr-[8px] text-[9px] font-bold uppercase leading-none tracking-[.07em] sm:left-2.5 sm:top-2.5 sm:py-[4px] sm:pl-[7px] sm:pr-[9px] sm:text-[10px] md:hidden"
+      style={{
+        background: s.bg,
+        borderColor: s.border,
+        backdropFilter: "blur(8px)",
+        boxShadow: "0 4px 12px rgba(0,0,0,.24)",
+        color: s.text,
+        textShadow: "0 1px 1px rgba(0,0,0,.55)",
+      }}
     >
+      <span
+        className="h-[10px] w-[2px] flex-shrink-0 rounded-full sm:h-[11px]"
+        style={{ background: s.accent }}
+      />
       {label}
     </span>
   );
@@ -172,9 +342,13 @@ function LockInfoBox({ reason, hint }: { reason: string; hint: string }) {
         border: "1px solid rgba(213,195,154,0.08)",
       }}
     >
-      <span className="mt-[1px] flex-shrink-0"><LockIcon size={15} color="#879087" /></span>
+      <span className="mt-[1px] flex-shrink-0">
+        <LockIcon size={15} color="#879087" />
+      </span>
       <div>
-        <p className="text-[12.5px] leading-[1.5] text-exp-parch/70">{reason}</p>
+        <p className="text-[12.5px] leading-[1.5] text-exp-parch/70">
+          {reason}
+        </p>
         <p className="mt-0.5 text-[11px] text-exp-muted">{hint}</p>
       </div>
     </div>
@@ -199,7 +373,8 @@ function BrassButton({
       style={{
         height,
         background: "linear-gradient(180deg,#D8AF63,#B88A45)",
-        boxShadow: "0 8px 20px rgba(184,138,69,0.28), inset 0 1px 0 rgba(255,255,255,0.3)",
+        boxShadow:
+          "0 8px 20px rgba(184,138,69,0.28), inset 0 1px 0 rgba(255,255,255,0.3)",
       }}
     >
       {children}
@@ -210,6 +385,51 @@ function BrassButton({
 // ─── Round icon button ────────────────────────────────────────────────────────
 
 // ─── Top bar ─────────────────────────────────────────────────────────────────
+
+function CarouselArrow({
+  direction,
+  label,
+  onClick,
+}: {
+  direction: "previous" | "next";
+  label: string;
+  onClick: () => void;
+}) {
+  const isPrevious = direction === "previous";
+
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onClick={onClick}
+      className={`absolute top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border transition active:scale-95 ${
+        isPrevious ? "left-2" : "right-2"
+      }`}
+      style={{
+        background: "rgba(21,27,24,0.78)",
+        borderColor: "rgba(213,195,154,0.2)",
+        boxShadow: "0 10px 24px rgba(0,0,0,.34)",
+      }}
+    >
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 20 20"
+        fill="none"
+        aria-hidden="true"
+        className={isPrevious ? "" : "rotate-180"}
+      >
+        <path
+          d="M12.5 4.5 7 10l5.5 5.5"
+          stroke="#D8AF63"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+  );
+}
 
 function TopBar({
   totalDone,
@@ -300,7 +520,10 @@ function RouteSequence({
               style={
                 isActive(status)
                   ? { background: "#B88A45", border: "1px solid #B88A45" }
-                  : { background: "transparent", border: "1px solid rgba(213,195,154,0.28)" }
+                  : {
+                      background: "transparent",
+                      border: "1px solid rgba(213,195,154,0.28)",
+                    }
               }
             >
               {status === "completed" ? (
@@ -326,18 +549,25 @@ function RouteSequence({
 function DesktopCard({
   campaign,
   onContinue,
+  isLandscapeCarouselActive = true,
 }: {
   campaign: Campaign;
   onContinue: () => void;
+  isLandscapeCarouselActive?: boolean;
 }) {
   const { t } = useTranslation();
   const locked = campaign.status === "locked";
-  const isHighlighted = campaign.status === "in_progress" || campaign.status === "available";
+  const isHighlighted =
+    campaign.status === "in_progress" || campaign.status === "available";
   const Symbol = CAMPAIGN_SYMBOL[campaign.id];
 
   return (
     <div
-      className="home-campaign-card flex flex-1 flex-col overflow-hidden rounded-[12px] transition-all duration-300 hover:-translate-y-0.5"
+      className={`home-campaign-card flex flex-1 flex-col overflow-hidden rounded-[12px] transition-all duration-300 hover:-translate-y-0.5 ${
+        isLandscapeCarouselActive
+          ? ""
+          : "home-campaign-card--landscape-inactive"
+      }`}
       style={{
         background: "#222A25",
         border: isHighlighted
@@ -362,7 +592,8 @@ function DesktopCard({
         <div
           className="absolute inset-0"
           style={{
-            background: "linear-gradient(180deg,transparent 50%,rgba(13,20,26,0.7) 100%)",
+            background:
+              "linear-gradient(180deg,transparent 50%,rgba(13,20,26,0.7) 100%)",
           }}
         />
 
@@ -396,7 +627,7 @@ function DesktopCard({
         ) : (
           <>
             <div
-              className="absolute right-3 top-3 flex h-[38px] w-[38px] items-center justify-center rounded-full"
+              className="absolute right-3 top-3 flex h-[38px] w-[38px] items-center justify-center rounded-full md:hidden"
               style={{ background: "rgba(21,27,24,.62)" }}
             >
               <Symbol size={20} />
@@ -412,14 +643,14 @@ function DesktopCard({
       <div className="flex flex-1 flex-col p-[18px_20px_20px]">
         {/* Title row */}
         <div className="flex items-baseline justify-between gap-2">
-          <h2
-            className="font-cormorant text-[27px] font-semibold leading-tight text-exp-parch"
-          >
+          <h2 className="font-cormorant text-[27px] font-semibold leading-tight text-exp-parch md:text-[20px]">
             {t(`campaigns.${campaign.id}.title`)}
           </h2>
-          <span className="home-campaign-progress flex-shrink-0 font-bold text-exp-brass" style={{ fontSize: 18 }}>
-            {String(campaign.done).padStart(2, "0")}
-            {" "}
+          <span
+            className="home-campaign-progress flex-shrink-0 font-bold text-exp-brass"
+            style={{ fontSize: 18 }}
+          >
+            {String(campaign.done).padStart(2, "0")}{" "}
             <span className="text-[13px] font-medium text-exp-muted">
               / {String(campaign.total).padStart(2, "0")}
             </span>
@@ -432,7 +663,7 @@ function DesktopCard({
         </p>
 
         {/* Footer section */}
-        <div className="mt-auto pt-4">
+        <div className="flex flex-1 flex-col pt-4">
           {!locked ? (
             <>
               <SegmentBar done={campaign.done} total={campaign.total} />
@@ -441,7 +672,7 @@ function DesktopCard({
                   {t("campaigns.lastLevel", { name: campaign.lastLevelName })}
                 </p>
               )}
-              <div className="mt-4">
+              <div className="mt-auto pt-4">
                 <BrassButton onClick={onContinue} height={46}>
                   {campaign.status === "in_progress"
                     ? t("actions.continue")
@@ -474,14 +705,19 @@ function MobileFullCard({
 }) {
   const { t } = useTranslation();
   const Symbol = CAMPAIGN_SYMBOL[campaign.id];
+  const locked = campaign.status === "locked";
 
   return (
     <div
-      className="overflow-hidden rounded-[12px]"
+      className="flex min-h-[360px] flex-col overflow-hidden rounded-[12px]"
       style={{
         background: "#222A25",
-        border: "1px solid rgba(184,138,69,0.28)",
-        boxShadow: "0 16px 38px rgba(0,0,0,.32)",
+        border: locked
+          ? "1px solid rgba(213,195,154,0.10)"
+          : "1px solid rgba(184,138,69,0.28)",
+        boxShadow: locked
+          ? "0 12px 30px rgba(0,0,0,.3)"
+          : "0 16px 38px rgba(0,0,0,.32)",
       }}
     >
       {/* Preview */}
@@ -498,30 +734,54 @@ function MobileFullCard({
         <div
           className="absolute inset-0"
           style={{
-            background: "linear-gradient(180deg,transparent 50%,rgba(13,20,26,0.7) 100%)",
+            background:
+              "linear-gradient(180deg,transparent 50%,rgba(13,20,26,0.7) 100%)",
           }}
         />
         <StatusBadge
           status={campaign.status}
           label={t(`campaigns.status.${campaign.status}`)}
         />
-        <div
-          className="absolute right-3 top-3 flex h-[34px] w-[34px] items-center justify-center rounded-full"
-          style={{ background: "rgba(21,27,24,.62)" }}
-        >
-          <Symbol size={18} />
-        </div>
+        {locked ? (
+          <>
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(circle,rgba(21,27,24,.18),rgba(21,27,24,.66))",
+              }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div
+                className="flex h-[58px] w-[58px] items-center justify-center rounded-full"
+                style={{
+                  background:
+                    "radial-gradient(circle,rgba(40,50,45,0.88),rgba(21,27,24,0.96))",
+                  boxShadow: "0 0 0 2px rgba(213,195,154,0.12)",
+                }}
+              >
+                <LockIcon size={23} color="#879087" />
+              </div>
+            </div>
+          </>
+        ) : (
+          <div
+            className="absolute right-3 top-3 flex h-[34px] w-[34px] items-center justify-center rounded-full"
+            style={{ background: "rgba(21,27,24,.62)" }}
+          >
+            <Symbol size={18} />
+          </div>
+        )}
       </div>
 
       {/* Body */}
-      <div className="p-4">
+      <div className="flex flex-1 flex-col p-4">
         <div className="flex items-baseline justify-between gap-2">
           <h2 className="font-cormorant text-[22px] font-semibold text-exp-parch">
             {t(`campaigns.${campaign.id}.title`)}
           </h2>
           <span className="flex-shrink-0 text-[15px] font-bold text-exp-brass">
-            {String(campaign.done).padStart(2, "0")}
-            {" "}
+            {String(campaign.done).padStart(2, "0")}{" "}
             <span className="text-[11px] font-medium text-exp-muted">
               / {String(campaign.total).padStart(2, "0")}
             </span>
@@ -532,21 +792,30 @@ function MobileFullCard({
           {t(`campaigns.${campaign.id}.description`)}
         </p>
 
-        <div className="mt-3">
-          <SegmentBar done={campaign.done} total={campaign.total} />
-          {campaign.lastLevelName && (
-            <p className="mt-1.5 text-[11px] text-exp-muted">
-              {t("campaigns.lastLevel", { name: campaign.lastLevelName })}
-            </p>
-          )}
-        </div>
+        {!locked && (
+          <div className="mt-3">
+            <SegmentBar done={campaign.done} total={campaign.total} />
+            {campaign.lastLevelName && (
+              <p className="mt-1.5 text-[11px] text-exp-muted">
+                {t("campaigns.lastLevel", { name: campaign.lastLevelName })}
+              </p>
+            )}
+          </div>
+        )}
 
-        <div className="mt-3">
-          <BrassButton onClick={onContinue} height={50}>
-            {campaign.status === "in_progress"
-              ? t("actions.continue")
-              : t("actions.start")}
-          </BrassButton>
+        <div className="mt-auto pt-3">
+          {locked ? (
+            <LockInfoBox
+              reason={t(`campaigns.${campaign.id}.lockReason`)}
+              hint={campaign.lockHint ?? ""}
+            />
+          ) : (
+            <BrassButton onClick={onContinue} height={50}>
+              {campaign.status === "in_progress"
+                ? t("actions.continue")
+                : t("actions.start")}
+            </BrassButton>
+          )}
         </div>
       </div>
     </div>
@@ -555,67 +824,69 @@ function MobileFullCard({
 
 // ─── Mobile compact card (locked campaign) ────────────────────────────────────
 
-function MobileCompactCard({
-  campaign,
+function MobileCampaignCarousel({
+  campaigns,
+  activeIndex,
+  onSelect,
+  onContinue,
 }: {
-  campaign: Campaign;
+  campaigns: Campaign[];
+  activeIndex: number;
+  onSelect: (index: number) => void;
+  onContinue: (campaignId: CampaignId) => void;
 }) {
   const { t } = useTranslation();
+  const activeCampaign = campaigns[activeIndex] ?? campaigns[0];
+  const selectPrevious = () => {
+    onSelect((activeIndex - 1 + campaigns.length) % campaigns.length);
+  };
+  const selectNext = () => {
+    onSelect((activeIndex + 1) % campaigns.length);
+  };
 
   return (
-    <div
-      className="flex h-[104px] overflow-hidden rounded-[12px]"
-      style={{
-        background: "#222A25",
-        border: "1px solid rgba(213,195,154,0.10)",
-        boxShadow: "0 8px 20px rgba(0,0,0,.28)",
-      }}
-    >
-      {/* Square preview */}
-      <div
-        className="relative h-full w-[108px] flex-shrink-0 overflow-hidden"
-        style={{ background: PREVIEW_BG[campaign.id] }}
-      >
-        <img
-          src={PREVIEW_IMAGE[campaign.id]}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover"
-          draggable={false}
+    <div className="px-4 pb-36 pt-5 md:hidden">
+      <div className="relative">
+        <MobileFullCard
+          key={activeCampaign.id}
+          campaign={activeCampaign}
+          onContinue={() => onContinue(activeCampaign.id)}
         />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(circle,rgba(21,27,24,.18),rgba(21,27,24,.66))",
-          }}
+        <CarouselArrow
+          direction="previous"
+          label={t("actions.previous")}
+          onClick={selectPrevious}
         />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div
-            className="flex h-[44px] w-[44px] items-center justify-center rounded-full"
-            style={{
-              background:
-                "radial-gradient(circle,rgba(40,50,45,0.88),rgba(21,27,24,0.96))",
-            }}
-          >
-            <LockIcon size={18} color="#879087" />
-          </div>
-        </div>
+        <CarouselArrow
+          direction="next"
+          label={t("actions.next")}
+          onClick={selectNext}
+        />
       </div>
 
-      {/* Text */}
-      <div className="flex flex-col justify-center gap-1 px-3">
-        <h3 className="font-cormorant text-[19px] font-semibold leading-tight text-exp-parch">
-          {t(`campaigns.${campaign.id}.title`)}
-        </h3>
-        <div className="flex items-center gap-1.5">
-          <LockIcon size={12} color="#879087" />
-          <p className="text-[11.5px] text-exp-muted">
-            {t(`campaigns.${campaign.id}.lockReason`)}
-          </p>
-        </div>
-        {campaign.lockHint && (
-          <p className="text-[10.5px] text-exp-muted/70">{campaign.lockHint}</p>
-        )}
+      <div className="mt-4 flex h-11 items-center justify-center gap-2">
+        {campaigns.map((campaign, index) => (
+          <button
+            key={campaign.id}
+            type="button"
+            aria-label={t(`campaigns.${campaign.id}.title`)}
+            aria-current={index === activeIndex ? "true" : undefined}
+            onClick={() => onSelect(index)}
+            className="flex h-11 w-11 items-center justify-center rounded-full"
+          >
+            <span
+              className="h-2.5 w-2.5 rounded-full transition"
+              style={{
+                background:
+                  index === activeIndex ? "#D8AF63" : "rgba(213,195,154,0.22)",
+                boxShadow:
+                  index === activeIndex
+                    ? "0 0 0 4px rgba(216,175,99,0.12)"
+                    : "none",
+              }}
+            />
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -631,11 +902,19 @@ export function HomeScreen() {
   const northernRouteLevels = getChapterLevels("northern-route");
   const sandMeridianLevels = getChapterLevels("sand-meridian");
   const emeraldMeridianLevels = getChapterLevels("emerald-meridian");
-  const nrDone = northernRouteLevels.filter((l) => completedLevels.includes(l.id)).length;
+  const nrDone = northernRouteLevels.filter((l) =>
+    completedLevels.includes(l.id),
+  ).length;
   const nrTotal = northernRouteLevels.length;
   const nrStatus: CampaignStatus =
-    nrDone === 0 ? "available" : nrDone === nrTotal ? "completed" : "in_progress";
-  const sandDone = sandMeridianLevels.filter((l) => completedLevels.includes(l.id)).length;
+    nrDone === 0
+      ? "available"
+      : nrDone === nrTotal
+        ? "completed"
+        : "in_progress";
+  const sandDone = sandMeridianLevels.filter((l) =>
+    completedLevels.includes(l.id),
+  ).length;
   const sandTotal = sandMeridianLevels.length;
   const sandUnlocked = nrDone === nrTotal;
   const sandStatus: CampaignStatus = !sandUnlocked
@@ -645,7 +924,9 @@ export function HomeScreen() {
       : sandDone === sandTotal
         ? "completed"
         : "in_progress";
-  const emeraldDone = emeraldMeridianLevels.filter((l) => completedLevels.includes(l.id)).length;
+  const emeraldDone = emeraldMeridianLevels.filter((l) =>
+    completedLevels.includes(l.id),
+  ).length;
   const emeraldTotal = emeraldMeridianLevels.length;
   const emeraldUnlocked = sandDone === sandTotal;
   const emeraldStatus: CampaignStatus = !emeraldUnlocked
@@ -656,15 +937,15 @@ export function HomeScreen() {
         ? "completed"
         : "in_progress";
 
-  const lastCompleted = [...northernRouteLevels].reverse().find((l) =>
-    completedLevels.includes(l.id)
-  );
-  const sandLastCompleted = [...sandMeridianLevels].reverse().find((l) =>
-    completedLevels.includes(l.id)
-  );
-  const emeraldLastCompleted = [...emeraldMeridianLevels].reverse().find((l) =>
-    completedLevels.includes(l.id)
-  );
+  const lastCompleted = [...northernRouteLevels]
+    .reverse()
+    .find((l) => completedLevels.includes(l.id));
+  const sandLastCompleted = [...sandMeridianLevels]
+    .reverse()
+    .find((l) => completedLevels.includes(l.id));
+  const emeraldLastCompleted = [...emeraldMeridianLevels]
+    .reverse()
+    .find((l) => completedLevels.includes(l.id));
 
   const totalAll = nrTotal + sandTotal + emeraldTotal;
 
@@ -682,19 +963,32 @@ export function HomeScreen() {
       done: sandDone,
       total: sandTotal,
       lastLevelName: sandLastCompleted ? t(sandLastCompleted.titleKey) : null,
-      lockHint: sandUnlocked ? undefined : t("campaigns.sand.levelsLeft", { count: nrTotal - nrDone }),
+      lockHint: sandUnlocked
+        ? undefined
+        : t("campaigns.sand.levelsLeft", { count: nrTotal - nrDone }),
     },
     {
       id: "emerald",
       status: emeraldStatus,
       done: emeraldDone,
       total: emeraldTotal,
-      lastLevelName: emeraldLastCompleted ? t(emeraldLastCompleted.titleKey) : null,
+      lastLevelName: emeraldLastCompleted
+        ? t(emeraldLastCompleted.titleKey)
+        : null,
       lockHint: emeraldUnlocked
         ? undefined
         : t("campaigns.emerald.levelsLeft", { count: sandTotal - sandDone }),
     },
   ];
+  const [mobileCampaignIndex, setMobileCampaignIndex] = React.useState(0);
+  const selectPreviousCampaign = () => {
+    setMobileCampaignIndex(
+      (index) => (index - 1 + campaigns.length) % campaigns.length,
+    );
+  };
+  const selectNextCampaign = () => {
+    setMobileCampaignIndex((index) => (index + 1) % campaigns.length);
+  };
 
   const handleOpenCampaign = (campaignId: CampaignId) => {
     if (campaignId === "white") {
@@ -711,12 +1005,8 @@ export function HomeScreen() {
   };
   return (
     <div className="home-screen min-h-screen bg-exp-bg font-manrope text-exp-parch">
-
       {/* Top bar */}
-      <TopBar
-        totalDone={completedLevels.length}
-        totalAll={totalAll}
-      />
+      <TopBar totalDone={completedLevels.length} totalAll={totalAll} />
 
       {/* Page header */}
       <section className="home-hero px-5 pb-2 pt-[34px] text-center md:px-10 md:pb-0">
@@ -732,43 +1022,52 @@ export function HomeScreen() {
       </section>
 
       {/* Route sequence (desktop only) */}
-      <div className="home-content mx-auto w-full max-w-[1460px]">
+      <div className="home-content mx-auto w-full max-w-[1460px] md:flex md:justify-center">
         <div className="home-route hidden md:block">
           <RouteSequence
             statuses={campaigns.map((c) => c.status)}
-            labels={campaigns.map((c) => t(`campaigns.${c.id}.title`).toUpperCase())}
+            labels={campaigns.map((c) =>
+              t(`campaigns.${c.id}.title`).toUpperCase(),
+            )}
           />
         </div>
 
-      {/* ── Desktop card row ── */}
-      <div className="home-campaign-row hidden gap-[26px] px-10 pb-4 md:flex">
-        {campaigns.map((campaign) => (
-          <DesktopCard
-            key={campaign.id}
-            campaign={campaign}
-            onContinue={() => handleOpenCampaign(campaign.id)}
-          />
-        ))}
-      </div>
-
-      {/* ── Mobile card stack ── */}
-      </div>
-
-      <div className="flex flex-col gap-3 px-4 pb-36 pt-5 md:hidden">
-        {campaigns
-          .filter((campaign) => campaign.status !== "locked")
-          .map((campaign) => (
-            <MobileFullCard
-              key={campaign.id}
-              campaign={campaign}
-              onContinue={() => handleOpenCampaign(campaign.id)}
+        {/* ── Desktop card row ── */}
+        <div className="home-campaign-carousel-shell relative">
+          <div className="home-campaign-row hidden gap-[26px] px-10 pb-4 md:flex">
+            {campaigns.map((campaign, index) => (
+              <DesktopCard
+                key={campaign.id}
+                campaign={campaign}
+                isLandscapeCarouselActive={index === mobileCampaignIndex}
+                onContinue={() => handleOpenCampaign(campaign.id)}
+              />
+            ))}
+          </div>
+          <div className="home-campaign-landscape-controls hidden">
+            <CarouselArrow
+              direction="previous"
+              label={t("actions.previous")}
+              onClick={selectPreviousCampaign}
             />
-          ))}
-        {campaigns
-          .filter((campaign) => campaign.status === "locked")
-          .map((campaign) => (
-            <MobileCompactCard key={campaign.id} campaign={campaign} />
-          ))}
+            <CarouselArrow
+              direction="next"
+              label={t("actions.next")}
+              onClick={selectNextCampaign}
+            />
+          </div>
+        </div>
+
+        {/* ── Mobile card stack ── */}
+      </div>
+
+      <div className="hidden">
+        <MobileCampaignCarousel
+          campaigns={campaigns}
+          activeIndex={mobileCampaignIndex}
+          onSelect={setMobileCampaignIndex}
+          onContinue={handleOpenCampaign}
+        />
       </div>
 
       {/* Footer (desktop) */}
@@ -778,10 +1077,11 @@ export function HomeScreen() {
           style={{ borderColor: "rgba(213,195,154,0.09)" }}
         >
           <CheckIcon size={12} color="#6FC69E" />
-          <p className="text-[10.5px] text-exp-muted">{t("campaigns.autoSave")}</p>
+          <p className="text-[10.5px] text-exp-muted">
+            {t("campaigns.autoSave")}
+          </p>
         </footer>
       </div>
-
     </div>
   );
 }
