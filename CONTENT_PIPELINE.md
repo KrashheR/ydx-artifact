@@ -53,7 +53,8 @@ Hitboxes are authored as normalized coordinates from `0` to `1` relative to the 
 - Campaign journal/map card previews resolve to each campaign's runtime `1.webp` asset via `src/content/sceneAssets.ts` and `src/content/campaignManifest.ts`.
 - `sand-meridian` is connected from `docs/plot/sand_meridian/map-handoff/sand-meridian-map-layout.json` and runtime assets in `public/assets/scenes/sand-meredian/`.
 - `sand-meridian` map placement is data-driven; no manual point coordinates remain in `MapScreen`.
-- `sand-meridian` gameplay now uses transcribed hitboxes for levels 1-13 based on each scene's `public/assets/scenes/sand-meredian/<level-order>/3.webp` markup reference. Levels 3, 7, 11, 12 and 13 were rechecked against their markup references and include their marked circles.
+- `sand-meridian` gameplay now uses transcribed hitboxes for levels 1-13 based on each scene's `public/assets/scenes/sand-meredian/<level-order>/3.webp` markup reference. Levels 3, 7, 11, 12 and 13 were rechecked against their markup references; level 11 currently keeps 10 playable zones and level 12 keeps 7 after pruning extra authored hitboxes.
+- Keep `sand-meridian` per-level hitbox overrides inline inside `sandMeridianDifferenceOverrides`; the local hitbox editor's Apply endpoint rewrites those numeric properties directly.
 - `emerald-meridian` is connected from `docs/plot/emerald-meredian/emerald_meridian_story_map_placement_guide.md` and runtime assets in `public/assets/scenes/emerald-meridian/`.
 - `emerald-meridian` map placement is stored in `src/content/chapters.ts` as a sequential 13-point route derived from the story placement guide until a dedicated handoff JSON is supplied.
 - `emerald-meridian` gameplay hitboxes in `src/content/emeraldMeridianLevels.ts` are transcribed from each level's `3.webp` annotation rings (find-ALL: `requiredDifferences` equals the number of rings per level — 10, 9, 9, 10, 7, 9, 9, 11, 9, 10, 9, 9, 9).

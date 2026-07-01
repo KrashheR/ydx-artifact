@@ -53,7 +53,7 @@ For broad agent edits, `pnpm agent:check` runs lint, typecheck and content valid
 Production builds exclude scene markup reference files named `3.webp` from `dist/assets/scenes/**`; the source files stay in `public` for `pnpm validate:content`, `pnpm dev:validate`, and local hitbox review.
 Production builds also exclude unused scene placeholder SVGs and keep the Yandex Games SDK as the platform-provided `/sdk.js` script in `index.html`.
 Production builds do not emit sourcemaps by default to keep the Yandex upload smaller. Use `BUILD_SOURCEMAP=true pnpm build` when a diagnostic build needs `.map` files.
-`pnpm release:zip` packages the contents of `dist/` into `dist-yandex.zip`, verifies root `index.html`, and excludes macOS/system junk plus sourcemaps.
+`pnpm release:zip` packages the contents of `dist/` into `dist-yandex.zip` with the Node-based release packager, verifies root `index.html`, and excludes macOS/system junk plus sourcemaps. It does not require system `zip` / `unzip` binaries.
 
 ## Scope Implemented
 

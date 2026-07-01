@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Pruned extra `sand-meridian` hitboxes from levels 11 and 12, and made levels 12/13 editable through the local hitbox Apply endpoint by keeping their overrides inline.
+
+- Made `pnpm release:zip` independent from system `zip` / `unzip` binaries by replacing the shell-out packaging step with a Node-based ZIP writer and in-script entry validation.
+
 - Fixed replay completion ratings so improved attempts update the saved best stars, worse attempts no longer downgrade the best result, and campaign cards render the saved star count.
 
 - Normalized mobile landscape gameplay HUD controls to 38px height with 12px text.
