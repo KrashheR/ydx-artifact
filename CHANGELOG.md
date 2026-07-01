@@ -2,7 +2,15 @@
 
 ## Unreleased
 
-- Pruned extra `sand-meridian` hitboxes from levels 11 and 12, and made levels 12/13 editable through the local hitbox Apply endpoint by keeping their overrides inline.
+- Removed two extra upper-right hitboxes (`bird-glyph`, `incense-sticks`) from `emerald-meridian` level 8, reducing the level to 9 required differences.
+
+- Removed two extra upper-right hitboxes (`top-foliage`, `stone-step`) from `emerald-meridian` level 5, reducing the level to 5 required differences.
+
+- Removed three extra upper-right hitboxes (`carabiner`, `ladder-foot`, `right-edge`) from `emerald-meridian` level 4, reducing the level to 7 required differences.
+
+- Removed the extra upper-right `hanging-leaves` hitbox from `emerald-meridian` level 3, reducing the level to 8 required differences.
+
+- Pruned extra `sand-meridian` hitboxes from levels 11, 12 and 13, and made levels 12/13 editable through the local hitbox Apply endpoint by keeping their overrides inline.
 
 - Made `pnpm release:zip` independent from system `zip` / `unzip` binaries by replacing the shell-out packaging step with a Node-based ZIP writer and in-script entry validation.
 

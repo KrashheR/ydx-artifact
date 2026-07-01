@@ -117,31 +117,27 @@ const sandMeridianDifferenceOverrides = {
       { id: "bridge-post", shape: { kind: "ellipse", cx: 0.7941, cy: 0.3402, rx: 0.089, ry: 0.1423 } },
       { id: "plank-span", shape: { kind: "ellipse", cx: 0.5786, cy: 0.4181, rx: 0.1272, ry: 0.2003 } },
       { id: "bridge-planks", x: 0.4052, y: 0.6495, radius: 0.0539 },
-      { id: "left-lantern", x: 0.1169, y: 0.6775, radius: 0.04 },
+      { id: "left-lantern", x: 0.3834, y: 0.0959, radius: 0.04 },
       { id: "winch", x: 0.287, y: 0.801, radius: 0.065 },
-      { id: "bridge-net", shape: { kind: "ellipse", cx: 0.6498, cy: 0.6644, rx: 0.0969, ry: 0.2159 } }
+      { id: "bridge-net", shape: { kind: "ellipse", cx: 0.6498, cy: 0.6567, rx: 0.1187, ry: 0.2159 } }
     ],
   12: [
       { id: "mirror", x: 0.17, y: 0.378, radius: 0.05 },
       { id: "survey-rods", shape: { kind: "ellipse", cx: 0.3952, cy: 0.3137, rx: 0.06, ry: 0.1742 } },
       { id: "telescope", x: 0.7323, y: 0.3752, radius: 0.0888 },
       { id: "tent", shape: { kind: "ellipse", cx: 0.877, cy: 0.159, rx: 0.119, ry: 0.1738 } },
-      { id: "wall-notch", x: 0.1196, y: 0.8227, radius: 0.04 },
-      { id: "gnomon", x: 0.5, y: 0.516, radius: 0.06 },
-      { id: "shadow-arc", x: 0.303, y: 0.9193, radius: 0.085 },
-      { id: "floor-sector", shape: { kind: "ellipse", cx: 0.5045, cy: 0.6716, rx: 0.2144, ry: 0.25 } },
-      { id: "ring-gap", x: 0.2174, y: 0.9027, radius: 0.07 }
+      { id: "gnomon", shape: { kind: "ellipse", cx: 0.4993, cy: 0.5275, rx: 0.06, ry: 0.1549 } },
+      { id: "floor-sector", shape: { kind: "ellipse", cx: 0.501, cy: 0.6573, rx: 0.2505, ry: 0.25 } }
     ],
   13: [
-      { id: "generator", x: 0.179, y: 0.563, radius: 0.048 },
-      { id: "tablet-pot", x: 0.461, y: 0.493, radius: 0.036 },
-      { id: "map-rolls", x: 0.553, y: 0.696, radius: 0.05 },
-      { id: "floor-tool", x: 0.597, y: 0.555, radius: 0.037 },
+      { id: "tablet-pot", x: 0.4582, y: 0.4926, radius: 0.036 },
+      { id: "map-rolls", shape: { kind: "ellipse", cx: 0.4459, cy: 0.7018, rx: 0.1688, ry: 0.1099 } },
+      { id: "floor-tool", x: 0.608, y: 0.5699, radius: 0.037 },
       { id: "door-lantern", x: 0.684, y: 0.483, radius: 0.046 },
-      { id: "side-passage", x: 0.768, y: 0.271, radius: 0.042 },
-      { id: "hanging-cloth", x: 0.852, y: 0.334, radius: 0.063 },
+      { id: "side-passage", shape: { kind: "ellipse", cx: 0.768, cy: 0.3302, rx: 0.042, ry: 0.1876 } },
+      { id: "hanging-cloth", shape: { kind: "ellipse", cx: 0.8474, cy: 0.3876, rx: 0.063, ry: 0.2388 } },
       { id: "rope-coils", x: 0.773, y: 0.614, radius: 0.064 },
-      { id: "case-tablet", x: 0.789, y: 0.834, radius: 0.033 }
+      { id: "case-tablet", x: 0.8561, y: 0.8694, radius: 0.033 }
     ]
 } as const;
 
