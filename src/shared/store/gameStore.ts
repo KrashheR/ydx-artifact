@@ -10,7 +10,7 @@ import {
   loadPersistentSave,
   savePersistentSave
 } from "@/services/storage/localSaveService";
-import { unlockedArtifactsForCompleted } from "@/shared/lib/progression";
+import { isBetterLevelResult, unlockedArtifactsForCompleted } from "@/shared/lib/progression";
 
 type Screen =
   | { kind: "home" }
@@ -49,7 +49,6 @@ type GameStore = {
   completeLevel: (
     levelId: string,
     durationSeconds: number,
-    exactHintUsed: boolean,
     mode?: "campaign" | "daily"
   ) => void;
   spendMagnifiers: (amount: number) => boolean;
@@ -173,7 +172,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
     void get().save();
   },
-  completeLevel(levelId, durationSeconds, exactHintUsed, mode = "campaign") {
+  completeLevel(levelId, durationSeconds, mode = "campaign") {
     set((state) => {
       const level = getLevelById(levelId);
       if (!level) return state;
@@ -182,7 +181,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const accuracy = foundCount / Math.max(foundCount + mistakes, 1);
       const seals = ["completed"];
       if (accuracy >= 0.85) seals.push("accurate-eye");
-      if (!exactHintUsed) seals.push("no-intervention");
+      seals.push("no-intervention");
+      const completedResult = {
+        durationSeconds,
+        accuracy,
+        mistakes,
+        hintsUsed: 0,
+        seals
+      };
+      const currentBest = state.saveData.bestResults[levelId];
+      const bestResults = isBetterLevelResult(completedResult, currentBest)
+        ? {
+            ...state.saveData.bestResults,
+            [levelId]: completedResult
+          }
+        : state.saveData.bestResults;
       const wasAlreadyCompleted = state.saveData.completedLevels.includes(levelId);
       const completedLevels = wasAlreadyCompleted
         ? state.saveData.completedLevels
@@ -192,16 +205,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         completedLevels,
         inProgress: null,
         magnifiers: state.saveData.magnifiers + (level.reward.magnifiers ?? 0),
-        bestResults: {
-          ...state.saveData.bestResults,
-          [levelId]: {
-            durationSeconds,
-            accuracy,
-            mistakes,
-            hintsUsed: exactHintUsed ? 1 : 0,
-            seals
-          }
-        }
+        bestResults
       });
       const shouldQueueReviewCheck = mode === "campaign" && !wasAlreadyCompleted;
       const shouldQueueInterstitialCheck =

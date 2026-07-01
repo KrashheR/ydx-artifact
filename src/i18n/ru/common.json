@@ -17,7 +17,6 @@
     "next": "Вперед",
     "compare": "Перевернуть",
     "hintArea": "Ориентир",
-    "hintExact": "Проявитель",
     "pause": "Пауза",
     "resume": "Продолжить",
     "resetSave": "Сбросить сохранение",
@@ -31,6 +30,11 @@
     "dailyCount": "{{count}} daily",
     "artifactCount": "{{count}} артефактов"
   },
+  "orientation": {
+    "eyebrow": "ПОВЕРНИТЕ УСТРОЙСТВО",
+    "title": "Игра работает в горизонтальном режиме",
+    "description": "Поверните телефон в landscape, чтобы продолжить экспедицию."
+  },
   "game": {
     "found": "Найдено {{count}} / {{total}}",
     "mistakes": "Ошибок: {{count}}",
@@ -41,7 +45,7 @@
     "levelBadge": "{{campaign}} · УРОВЕНЬ {{current}} / {{total}}",
     "labelOriginal": "АРХИВНЫЙ СНИМОК · ОРИГИНАЛ",
     "labelCopy": "КОПИЯ · НАЙДИТЕ РАСХОЖДЕНИЯ",
-    "diffCount": "ОТЛИЧИЙ",
+    "diffCount": "Отличий",
     "foundLabel": "НАЙДЕНО",
     "accuracyLabel": "ТОЧНОСТЬ",
     "hintLabel": "Подсказка",

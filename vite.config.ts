@@ -76,7 +76,7 @@ function hitboxSourceWriter(): Plugin {
       resolvedConfig = config;
     },
     configureServer(server) {
-      if (process.env.VITE_LAYOUT_DEBUG !== "true") return;
+      if (process.env.VITE_LAYOUT_DEBUG !== "true" && process.env.VITE_FINAL_VALIDATE !== "true") return;
 
       server.middlewares.use("/__dev/hitboxes/apply", async (req, res) => {
         if (req.method !== "POST") {

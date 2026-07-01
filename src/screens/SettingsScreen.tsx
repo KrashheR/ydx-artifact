@@ -195,7 +195,7 @@ export function SettingsModal({ isOpen, onClose }: Props) {
                 type="button"
                 onClick={onClose}
                 aria-label={t("settings.closeLabel")}
-                className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-exp-muted transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+                className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-exp-muted transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass md:hidden"
                 style={{
                   border: "1px solid rgba(213,195,154,.14)",
                   background: "rgba(213,195,154,.04)",

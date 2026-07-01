@@ -48,6 +48,23 @@ function CompassIcon({ size = 36 }: { size?: number }) {
   );
 }
 
+function SettingsGearIcon() {
+  return (
+    <svg
+      width="19"
+      height="19"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="3.2" />
+      <path d="M19.4 13a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
+    </svg>
+  );
+}
+
 function LockIcon({
   size = 18,
   color = "#879087",
@@ -434,15 +451,17 @@ function CarouselArrow({
 function TopBar({
   totalDone,
   totalAll,
+  onOpenSettings,
 }: {
   totalDone: number;
   totalAll: number;
+  onOpenSettings: () => void;
 }) {
   const { t } = useTranslation();
 
   return (
     <header
-      className="home-topbar flex items-center justify-between px-5 md:px-10"
+      className="app-screen-topbar home-topbar flex items-center justify-between px-5 md:px-10"
       style={{
         height: 78,
         borderBottom: "1px solid rgba(213,195,154,0.12)",
@@ -462,7 +481,7 @@ function TopBar({
       </div>
 
       {/* Right cluster */}
-      <div className="flex items-center gap-3 pr-14 md:gap-4">
+      <div className="flex items-center gap-3 md:gap-4">
         {/* Overall progress (desktop only) */}
         <div className="hidden flex-col items-end gap-1 md:flex">
           <p className="text-[11px] text-exp-muted">
@@ -487,6 +506,19 @@ function TopBar({
           className="hidden h-6 w-px md:block"
           style={{ background: "rgba(213,195,154,0.15)" }}
         />
+        <button
+          type="button"
+          onClick={onOpenSettings}
+          aria-label={t("actions.settings")}
+          title={t("actions.settings")}
+          className="home-settings-button flex h-11 w-11 shrink-0 items-center justify-center rounded-[9px] text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+          style={{
+            border: "1px solid rgba(213,195,154,.14)",
+            background: "rgba(213,195,154,.05)",
+          }}
+        >
+          <SettingsGearIcon />
+        </button>
       </div>
     </header>
   );
@@ -563,9 +595,10 @@ function DesktopCard({
 
   return (
     <div
+      aria-hidden={!isLandscapeCarouselActive}
       className={`home-campaign-card flex flex-1 flex-col overflow-hidden rounded-[12px] transition-all duration-300 hover:-translate-y-0.5 ${
         isLandscapeCarouselActive
-          ? ""
+          ? "home-campaign-card--landscape-active"
           : "home-campaign-card--landscape-inactive"
       }`}
       style={{
@@ -836,7 +869,6 @@ function MobileCampaignCarousel({
   onContinue: (campaignId: CampaignId) => void;
 }) {
   const { t } = useTranslation();
-  const activeCampaign = campaigns[activeIndex] ?? campaigns[0];
   const selectPrevious = () => {
     onSelect((activeIndex - 1 + campaigns.length) % campaigns.length);
   };
@@ -847,11 +879,28 @@ function MobileCampaignCarousel({
   return (
     <div className="px-4 pb-36 pt-5 md:hidden">
       <div className="relative">
-        <MobileFullCard
-          key={activeCampaign.id}
-          campaign={activeCampaign}
-          onContinue={() => onContinue(activeCampaign.id)}
-        />
+        <div className="home-mobile-campaign-stage">
+          {campaigns.map((campaign, index) => {
+            const isActive = index === activeIndex;
+
+            return (
+              <div
+                key={campaign.id}
+                aria-hidden={!isActive}
+                className={`home-mobile-campaign-slide ${
+                  isActive
+                    ? "home-mobile-campaign-slide--active"
+                    : "home-mobile-campaign-slide--inactive"
+                }`}
+              >
+                <MobileFullCard
+                  campaign={campaign}
+                  onContinue={() => onContinue(campaign.id)}
+                />
+              </div>
+            );
+          })}
+        </div>
         <CarouselArrow
           direction="previous"
           label={t("actions.previous")}
@@ -894,7 +943,11 @@ function MobileCampaignCarousel({
 
 // ─── Main screen ──────────────────────────────────────────────────────────────
 
-export function HomeScreen() {
+export function HomeScreen({
+  onOpenSettings,
+}: {
+  onOpenSettings: () => void;
+}) {
   const { t } = useTranslation();
   const navigate = useGameStore((s) => s.navigate);
   const completedLevels = useGameStore((s) => s.saveData.completedLevels);
@@ -1006,7 +1059,11 @@ export function HomeScreen() {
   return (
     <div className="home-screen min-h-screen bg-exp-bg font-manrope text-exp-parch">
       {/* Top bar */}
-      <TopBar totalDone={completedLevels.length} totalAll={totalAll} />
+      <TopBar
+        totalDone={completedLevels.length}
+        totalAll={totalAll}
+        onOpenSettings={onOpenSettings}
+      />
 
       {/* Page header */}
       <section className="home-hero px-5 pb-2 pt-[34px] text-center md:px-10 md:pb-0">
@@ -1022,7 +1079,7 @@ export function HomeScreen() {
       </section>
 
       {/* Route sequence (desktop only) */}
-      <div className="home-content mx-auto w-full max-w-[1460px] md:flex md:justify-center">
+      <div className="home-content mx-auto w-full max-w-[1460px]">
         <div className="home-route hidden md:block">
           <RouteSequence
             statuses={campaigns.map((c) => c.status)}
@@ -1061,14 +1118,12 @@ export function HomeScreen() {
         {/* ── Mobile card stack ── */}
       </div>
 
-      <div className="hidden">
-        <MobileCampaignCarousel
-          campaigns={campaigns}
-          activeIndex={mobileCampaignIndex}
-          onSelect={setMobileCampaignIndex}
-          onContinue={handleOpenCampaign}
-        />
-      </div>
+      <MobileCampaignCarousel
+        campaigns={campaigns}
+        activeIndex={mobileCampaignIndex}
+        onSelect={setMobileCampaignIndex}
+        onContinue={handleOpenCampaign}
+      />
 
       {/* Footer (desktop) */}
       <div className="mx-auto hidden w-full max-w-[1460px] md:block">

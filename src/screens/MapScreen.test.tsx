@@ -39,7 +39,7 @@ describe("MapScreen", () => {
       }
     });
 
-    render(<MapScreen />);
+    render(<MapScreen onOpenSettings={() => undefined} />);
 
     expect(screen.getByRole("heading", { name: "Песчаный меридиан" })).toBeInTheDocument();
 

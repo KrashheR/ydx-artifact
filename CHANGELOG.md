@@ -2,7 +2,25 @@
 
 ## Unreleased
 
-- Reworked compact landscape home campaign selection into a one-card carousel controlled by left/right arrows.
+- Fixed replay completion ratings so improved attempts update the saved best stars, worse attempts no longer downgrade the best result, and campaign cards render the saved star count.
+
+- Normalized mobile landscape gameplay HUD controls to 38px height with 12px text.
+
+- Moved the home campaign-selection and campaign-map settings buttons into their topbars instead of rendering them as fixed overlay controls.
+
+- Standardized the desktop header height, horizontal padding and settings button size/offset across home, campaign journal and gameplay screens.
+
+- Moved the gameplay settings button into the HUD controls and removed the pause button from gameplay.
+
+- Removed the Exact Reveal / "Проявитель" gameplay mechanic; the gameplay gear button now opens settings on mobile instead of spending magnifiers.
+
+- Reworked level success/failure result modals for phone landscape so the summary, progress and actions fit within the compact gameplay viewport.
+
+- Changed campaign carousel paging to crossfade cards instead of hiding and replacing them instantly.
+
+- Added the mobile landscape home campaign carousel, kept the desktop campaign row independent from carousel state, and blocked phone portrait with a rotate-device gate.
+
+- Centered and widened the mobile landscape home campaign card, and moved carousel arrows farther away from the card edges.
 
 - Fixed the app bootstrap locale sync so the shell no longer repeatedly calls `i18n.changeLanguage()` after the active locale is already applied.
 
@@ -72,6 +90,7 @@
 
 - Renamed the game to its official title everywhere it is shown to players: RU "Найди отличия: Тайны экспедиций", EN "Spot the Differences: Expedition Mysteries". Updated `src/i18n/{ru,en}/common.json` (`app.title` and the header brand tag `campaigns.supra` → "ТАЙНЫ ЭКСПЕДИЦИЙ" / "EXPEDITION MYSTERIES"), the `index.html` `<title>`, the e2e heading assertion in `tests/e2e/app.spec.ts`, and the store listing `title` fields in `docs/starter-data/catalog-copy.example.json` and `docs/starter-data/i18n/{ru,en}/common.json`.
 - Added the missing `ladder-foot` hitbox to `emerald-meridian` level 4 (`em-04-flooded-bridge`) in `src/content/emeraldMeridianLevels.ts`: a 10th annotation ring at the foot of the bridge ladder was drawn in `4/3.webp` but had no hit area. Transcribed it (`circle` at `cx 0.707, cy 0.712, r 0.046`, least-squares fit to the ring, verified via red overlay render), bringing level 4 to 10 rings so `requiredDifferences` now equals 10.
+- Added `pnpm validate:final`, a final A/B hitbox review server that draws the editable hitbox overlay over real `1.*` and `2.*` gameplay images while keeping the same drag, resize, copy and apply controls as `pnpm dev:validate`.
 - Fixed all 13 `emerald-meridian` chapter hitboxes in `src/content/emeraldMeridianLevels.ts` to match the rings drawn on each level's `3.webp` annotation image — both the count and the position/size/shape of every hit area were transcribed and visually verified against red overlay renders. Made the chapter find-ALL: removed the `differenceCounts` table and the "find any subset" comment, and set `requiredDifferences` to `perLevelDiffs[order - 1].length` so the required count always equals the number of drawn rings (per-level ring counts: 10, 9, 9, 9, 7, 9, 9, 11, 9, 10, 9, 9, 9). Fixes the prior `pnpm validate:content` failure where `requiredDifferences` did not match the number of differences.
 
 - Moved the settings entry point into the app shell so the gear button is always clickable in the top-right corner on every screen and opens the shared settings modal.

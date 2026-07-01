@@ -35,9 +35,9 @@
 
 Обязательные layouts:
 
-- mobile portrait — полноэкранный A/B toggle;
-- mobile landscape — две touch-фотографии рядом;
-- tablet portrait — toggle либо адаптивный split;
+- mobile portrait — только rotate-device gate, игровой layout не поддерживается;
+- mobile landscape — компактный landscape UI с A/B flip-card;
+- tablet portrait — допускается только если область не попадает в phone portrait gate; phone-sized portrait всегда блокируется;
 - tablet landscape — side-by-side;
 - desktop — side-by-side.
 
@@ -339,7 +339,7 @@ Version:
 - startup ad pause/resume;
 - rewarded error;
 - interstitial error;
-- rotation portrait ↔ landscape;
+- rotation portrait gate ↔ landscape gameplay;
 - minimize/restore;
 - tab switch;
 - resize;

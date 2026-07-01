@@ -7,6 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "dev:validate": "tsx scripts/dev-validate.ts",
     "dev:validate:cheat": "tsx scripts/dev-validate.ts --cheat",
+    "validate:final": "tsx scripts/dev-validate.ts --final",
     "preview": "vite preview --host 127.0.0.1",
     "build": "tsc -b && vite build",
     "lint": "eslint .",

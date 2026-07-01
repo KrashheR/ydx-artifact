@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { LevelDefinition } from "@/entities/level/schema";
 import type { ChapterDefinition } from "@/content/chapters";
+import { starsForAccuracy } from "@/shared/lib/progression";
 
 type Props = {
   level: LevelDefinition;
@@ -9,7 +10,6 @@ type Props = {
   required: number;
   mistakes: number;
   elapsedSeconds: number;
-  exactHintUsed: boolean;
   completedLevelIds: string[];
   nextLevelOrder?: number;
   nextLevelTitle?: string;
@@ -20,12 +20,6 @@ type Props = {
 
 function formatTime(s: number) {
   return `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
-}
-
-function starsCount(accuracy: number, exactHintUsed: boolean): 1 | 2 | 3 {
-  if (accuracy >= 0.85 && !exactHintUsed) return 3;
-  if (accuracy >= 0.6) return 2;
-  return 1;
 }
 
 function Stars({ count }: { count: 1 | 2 | 3 }) {
@@ -44,17 +38,17 @@ function Stars({ count }: { count: 1 | 2 | 3 }) {
   );
 }
 
-const statCard = "flex flex-1 flex-col items-center rounded-xl border border-exp-parch/[.12] py-4";
+const statCard = "result-stat-card flex flex-1 flex-col items-center rounded-xl border border-exp-parch/[.12] py-4";
 const statLabel = "mt-[5px] text-[9.5px] font-semibold tracking-[.14em] text-exp-muted";
 const secondaryBtn = "flex-1 rounded-[10px] border border-exp-parch/[.14] bg-transparent py-3 text-[13.5px] font-semibold text-exp-parch";
 
 export function LevelCompleteOverlay({
-  level, chapter, found, required, mistakes, elapsedSeconds, exactHintUsed,
+  level, chapter, found, required, mistakes, elapsedSeconds,
   completedLevelIds, nextLevelOrder, nextLevelTitle, onNext, onRetry, onMap
 }: Props) {
   const { t } = useTranslation();
   const accuracy = found / Math.max(found + mistakes, 1);
-  const stars = starsCount(accuracy, exactHintUsed);
+  const stars = starsForAccuracy(accuracy);
   const chapterDone = completedLevelIds.filter((id) => chapter.levels.some((l) => l.id === id)).length;
 
   return (
@@ -65,7 +59,7 @@ export function LevelCompleteOverlay({
       />
 
       <div
-        className="modal-panel relative z-10 w-[560px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[18px] font-manrope"
+        className="modal-panel result-dialog relative z-10 w-[560px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[18px] font-manrope"
         style={{
           background: "linear-gradient(180deg, #27302b, #1c241e)",
           border: "1px solid rgba(184,138,69,.35)",
@@ -75,9 +69,10 @@ export function LevelCompleteOverlay({
       >
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: "linear-gradient(90deg, transparent, #d8af63, transparent)" }} />
 
-        <div className="relative px-12 py-10 text-center">
+        <div className="result-dialog-content relative px-12 py-10 text-center">
+          <div className="result-hero">
           <div
-            className="mx-auto mb-[18px] flex h-24 w-24 items-center justify-center rounded-full"
+            className="result-icon mx-auto mb-[18px] flex h-24 w-24 items-center justify-center rounded-full"
             style={{
               background: "radial-gradient(circle at 40% 34%, #3a7a64, #1e4435 72%)",
               border: "2.5px dashed rgba(155,217,187,.55)",
@@ -89,17 +84,19 @@ export function LevelCompleteOverlay({
             </svg>
           </div>
 
-          <div className="text-[11px] font-semibold tracking-[.32em] text-exp-success2">
+          <div className="result-badge text-[11px] font-semibold tracking-[.32em] text-exp-success2">
             {t("game.completedBadge", { order: level.order })}
           </div>
-          <h2 className="mt-2 font-cormorant text-[42px] font-semibold leading-tight text-exp-parch">
+          <h2 className="result-title mt-2 font-cormorant text-[42px] font-semibold leading-tight text-exp-parch">
             {t("game.completedTitle")}
           </h2>
-          <p className="mx-auto mt-2.5 max-w-[380px] text-[14px] leading-[1.55] text-exp-muted">
+          <p className="result-desc mx-auto mt-2.5 max-w-[380px] text-[14px] leading-[1.55] text-exp-muted">
             {t("game.completedDesc")}
           </p>
+          </div>
 
-          <div className="mt-[26px] flex gap-3">
+          <div className="result-body">
+          <div className="result-stats mt-[26px] flex gap-3">
             <div className={statCard} style={{ background: "rgba(21,27,24,.5)" }}>
               <div className="font-jetbrains text-[23px] font-semibold text-exp-parch">{formatTime(elapsedSeconds)}</div>
               <div className={statLabel}>{t("game.statTime")}</div>
@@ -114,7 +111,7 @@ export function LevelCompleteOverlay({
             </div>
           </div>
 
-          <div className="mb-6 mt-3 rounded-xl border border-exp-parch/[.12] px-[18px] py-[15px]" style={{ background: "rgba(21,27,24,.4)" }}>
+          <div className="result-progress mb-6 mt-3 rounded-xl border border-exp-parch/[.12] px-[18px] py-[15px]" style={{ background: "rgba(21,27,24,.4)" }}>
             <div className="mb-[9px] flex justify-between">
               <span className="text-[11px] font-semibold tracking-[.08em] text-exp-muted">{t(chapter.titleKey).toUpperCase()}</span>
               <span className="text-[12px] font-bold text-exp-brass2">{chapterDone} / {chapter.levels.length}</span>
@@ -140,7 +137,7 @@ export function LevelCompleteOverlay({
           {onNext ? (
             <button
               onClick={onNext}
-              className="flex w-full items-center justify-center gap-[9px] rounded-[10px] border-none py-[17px] text-[16px] font-bold text-[#1a130a]"
+              className="result-primary flex w-full items-center justify-center gap-[9px] rounded-[10px] border-none py-[17px] text-[16px] font-bold text-[#1a130a]"
               style={{
                 background: "linear-gradient(180deg, #d8af63, #b3812f)",
                 boxShadow: "0 12px 28px rgba(184,138,69,.32), inset 0 1px 0 rgba(255,255,255,.3)"
@@ -154,7 +151,7 @@ export function LevelCompleteOverlay({
           ) : (
             <button
               onClick={onRetry}
-              className="w-full rounded-[10px] border-none py-[17px] text-[16px] font-bold text-[#1a130a]"
+              className="result-primary w-full rounded-[10px] border-none py-[17px] text-[16px] font-bold text-[#1a130a]"
               style={{
                 background: "linear-gradient(180deg, #d8af63, #b3812f)",
                 boxShadow: "0 12px 28px rgba(184,138,69,.32), inset 0 1px 0 rgba(255,255,255,.3)"
@@ -164,7 +161,7 @@ export function LevelCompleteOverlay({
             </button>
           )}
 
-          <div className="mt-[11px] flex gap-[11px]">
+          <div className="result-actions mt-[11px] flex gap-[11px]">
             {onNext && (
               <button onClick={onRetry} className={secondaryBtn}>
                 {t("game.retry")}
@@ -173,6 +170,7 @@ export function LevelCompleteOverlay({
             <button onClick={onMap} className={secondaryBtn}>
               {t("game.toMap")}
             </button>
+          </div>
           </div>
         </div>
       </div>

@@ -10,7 +10,7 @@ type Props = {
   onMap: () => void;
 };
 
-const statCard = "flex flex-1 flex-col items-center rounded-xl border border-exp-parch/[.12] py-4";
+const statCard = "result-stat-card flex flex-1 flex-col items-center rounded-xl border border-exp-parch/[.12] py-4";
 const statLabel = "mt-[5px] text-[9.5px] font-semibold tracking-[.14em] text-exp-muted";
 
 export function LevelFailedOverlay({ level, found, canExtend, onRetry, onExtend, onMap }: Props) {
@@ -25,7 +25,7 @@ export function LevelFailedOverlay({ level, found, canExtend, onRetry, onExtend,
       />
 
       <div
-        className="modal-panel relative z-10 w-[560px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[18px] font-manrope"
+        className="modal-panel result-dialog relative z-10 w-[560px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[18px] font-manrope"
         style={{
           background: "linear-gradient(180deg, #2c2622, #1f1b18)",
           border: "1px solid rgba(176,86,66,.4)",
@@ -35,9 +35,10 @@ export function LevelFailedOverlay({ level, found, canExtend, onRetry, onExtend,
       >
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: "linear-gradient(90deg, transparent, #c9684f, transparent)" }} />
 
-        <div className="relative px-12 py-10 text-center">
+        <div className="result-dialog-content relative px-12 py-10 text-center">
+          <div className="result-hero">
           <div
-            className="mx-auto mb-[18px] flex h-24 w-24 items-center justify-center rounded-full"
+            className="result-icon mx-auto mb-[18px] flex h-24 w-24 items-center justify-center rounded-full"
             style={{
               background: "radial-gradient(circle at 40% 34%, #7a4a3c, #3a201a 72%)",
               border: "2.5px dashed rgba(224,138,120,.5)",
@@ -52,17 +53,19 @@ export function LevelFailedOverlay({ level, found, canExtend, onRetry, onExtend,
             </svg>
           </div>
 
-          <div className="text-[11px] font-semibold tracking-[.32em]" style={{ color: "#e08a78" }}>
+          <div className="result-badge text-[11px] font-semibold tracking-[.32em]" style={{ color: "#e08a78" }}>
             {t("game.timeoutBadge")}
           </div>
-          <h2 className="mt-2 font-cormorant text-[42px] font-semibold leading-tight text-exp-parch">
+          <h2 className="result-title mt-2 font-cormorant text-[42px] font-semibold leading-tight text-exp-parch">
             {t("game.timeoutTitle")}
           </h2>
-          <p className="mx-auto mt-2.5 max-w-[392px] text-[14px] leading-[1.55] text-exp-muted">
+          <p className="result-desc mx-auto mt-2.5 max-w-[392px] text-[14px] leading-[1.55] text-exp-muted">
             {t("game.timeoutDesc")}
           </p>
+          </div>
 
-          <div className="mt-[26px] flex gap-3">
+          <div className="result-body">
+          <div className="result-stats mt-[26px] flex gap-3">
             <div className={statCard} style={{ background: "rgba(21,27,24,.5)" }}>
               <div className="font-jetbrains text-[23px] font-semibold" style={{ color: "#e08a78" }}>00:00</div>
               <div className={statLabel}>{t("game.statTimer")}</div>
@@ -77,7 +80,7 @@ export function LevelFailedOverlay({ level, found, canExtend, onRetry, onExtend,
             </div>
           </div>
 
-          <div className="mb-6 mt-3 rounded-xl border border-exp-parch/[.12] px-[18px] py-[15px]" style={{ background: "rgba(21,27,24,.4)" }}>
+          <div className="result-progress result-diff-progress mb-6 mt-3 rounded-xl border border-exp-parch/[.12] px-[18px] py-[15px]" style={{ background: "rgba(21,27,24,.4)" }}>
             <div className="mb-[10px] flex justify-between">
               <span className="text-[11px] font-semibold tracking-[.08em] text-exp-muted">
                 {t("game.diffsOnLevel")}
@@ -113,7 +116,7 @@ export function LevelFailedOverlay({ level, found, canExtend, onRetry, onExtend,
 
           <button
             onClick={onRetry}
-            className="flex w-full items-center justify-center gap-[9px] rounded-[10px] border-none py-[17px] text-[16px] font-bold text-[#1a130a]"
+            className="result-primary flex w-full items-center justify-center gap-[9px] rounded-[10px] border-none py-[17px] text-[16px] font-bold text-[#1a130a]"
             style={{
               background: "linear-gradient(180deg, #d8af63, #b3812f)",
               boxShadow: "0 12px 28px rgba(184,138,69,.32), inset 0 1px 0 rgba(255,255,255,.3)"
@@ -126,7 +129,7 @@ export function LevelFailedOverlay({ level, found, canExtend, onRetry, onExtend,
             {t("game.retryAgain")}
           </button>
 
-          <div className="mt-[11px] flex gap-[11px]">
+          <div className="result-actions mt-[11px] flex gap-[11px]">
             <button
               onClick={onExtend}
               disabled={!canExtend}
@@ -145,6 +148,7 @@ export function LevelFailedOverlay({ level, found, canExtend, onRetry, onExtend,
             >
               {t("game.toMap")}
             </button>
+          </div>
           </div>
         </div>
       </div>

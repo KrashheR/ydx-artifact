@@ -18,6 +18,7 @@ type PhotoComparatorProps = {
   labelB?: string;
   debugShowAllDifferences?: boolean;
   debugUseMarkupReference?: boolean;
+  debugEnableHitboxEditor?: boolean;
 };
 
 type PointerState = {
@@ -74,6 +75,7 @@ export function PhotoComparator({
   labelB,
   debugShowAllDifferences = false,
   debugUseMarkupReference = false,
+  debugEnableHitboxEditor = false,
 }: PhotoComparatorProps) {
   const { t } = useTranslation();
   const [version, setVersion] = useState<"A" | "B">("A");
@@ -89,7 +91,7 @@ export function PhotoComparator({
   const [wrongClicksB, setWrongClicksB] = useState<WrongClick[]>([]);
   const [applyStatus, setApplyStatus] = useState<ApplyStatus>("idle");
   const hitboxEditorEnabled =
-    debugShowAllDifferences && debugUseMarkupReference;
+    debugShowAllDifferences && debugEnableHitboxEditor;
   const editorStorageKey = `${HITBOX_EDITOR_STORAGE_PREFIX}${level.id}`;
 
   useEffect(() => {

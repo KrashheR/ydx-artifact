@@ -7,7 +7,7 @@ import { runNativeReviewFlow } from "@/features/review/reviewFlow";
 import { isReviewPrePromptLocallyEligible } from "@/features/review/reviewPrompt";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
 import { mockPlatform } from "@/services/platform/mockPlatform";
-import { isLevelUnlocked } from "@/shared/lib/progression";
+import { isLevelUnlocked, starsForAccuracy } from "@/shared/lib/progression";
 import { useGameStore } from "@/shared/store/gameStore";
 
 function BackIcon() {
@@ -26,6 +26,23 @@ function BackIcon() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+function SettingsGearIcon() {
+  return (
+    <svg
+      width="19"
+      height="19"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="3.2" />
+      <path d="M19.4 13a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
     </svg>
   );
 }
@@ -127,9 +144,14 @@ type LevelCardState = {
   current: boolean;
   locked: boolean;
   footerLabel: string;
+  starCount: 0 | 1 | 2 | 3;
 };
 
-export function MapScreen() {
+export function MapScreen({
+  onOpenSettings,
+}: {
+  onOpenSettings: () => void;
+}) {
   const { t } = useTranslation();
   const screen = useGameStore((state) => state.screen);
   const saveData = useGameStore((state) => state.saveData);
@@ -212,6 +234,12 @@ export function MapScreen() {
         const unlocked = isLevelUnlocked(level.id, saveData);
         const current = unlocked && !completed;
         const locked = !unlocked;
+        const bestResult = saveData.bestResults[level.id];
+        const starCount = completed
+          ? bestResult
+            ? starsForAccuracy(bestResult.accuracy)
+            : 1
+          : 0;
         const footerLabel = locked
           ? t("campaigns.finishLevel", { level: level.order - 1 })
           : current
@@ -227,6 +255,7 @@ export function MapScreen() {
           current,
           locked,
           footerLabel,
+          starCount,
         };
       }),
     [chapter.id, chapter.levels, saveData, t],
@@ -488,7 +517,7 @@ export function MapScreen() {
   return (
     <div className="map-screen h-dvh overflow-hidden bg-exp-bg font-manrope text-exp-parch">
       <div className="relative z-10 flex h-full min-h-0 flex-col">
-        <div className="map-topbar flex items-center gap-3 border-b border-[#D5C39A]/10 px-5 pb-4 pr-20 pt-3 md:px-10 md:pr-24">
+        <div className="app-screen-topbar map-topbar flex items-center gap-3 border-b border-[#D5C39A]/10 px-5 pb-4 pt-3 md:px-10">
           <button
             onClick={() => navigate({ kind: "home" })}
             aria-label={t("actions.back")}
@@ -524,6 +553,19 @@ export function MapScreen() {
               ))}
             </div>
           </div>
+          <button
+            type="button"
+            onClick={onOpenSettings}
+            aria-label={t("actions.settings")}
+            title={t("actions.settings")}
+            className="map-settings-button flex h-11 w-11 shrink-0 items-center justify-center rounded-[9px] text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+            style={{
+              border: "1px solid rgba(213,195,154,.14)",
+              background: "rgba(213,195,154,.05)",
+            }}
+          >
+            <SettingsGearIcon />
+          </button>
         </div>
 
         <section className="map-hero px-5 pb-2 pt-[34px] text-center md:px-10 md:pb-0">
@@ -613,9 +655,9 @@ export function MapScreen() {
                         {level.completed && (
                           <div className="flex items-center justify-between">
                             <div className="flex gap-[3px]">
-                              <StarIcon filled />
-                              <StarIcon filled />
-                              <StarIcon filled />
+                              <StarIcon filled={level.starCount >= 1} />
+                              <StarIcon filled={level.starCount >= 2} />
+                              <StarIcon filled={level.starCount >= 3} />
                             </div>
                             <span className="text-[10.5px] font-semibold text-[#879087]">
                               {t("campaigns.replay")}
@@ -724,9 +766,9 @@ export function MapScreen() {
                   <div className="mt-auto">
                     {level.completed && (
                       <div className="flex gap-[2px]">
-                        <StarIcon filled />
-                        <StarIcon filled />
-                        <StarIcon filled />
+                        <StarIcon filled={level.starCount >= 1} />
+                        <StarIcon filled={level.starCount >= 2} />
+                        <StarIcon filled={level.starCount >= 3} />
                       </div>
                     )}
                     {level.current && (

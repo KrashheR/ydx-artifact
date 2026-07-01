@@ -29,8 +29,8 @@
     }
   ],
   "rewardedPlacements": {
-    "exact_hint": {
-      "reward": "reveal_one_difference"
+    "area_hint": {
+      "reward": "highlight_one_difference_area"
     },
     "post_level_bonus": {
       "reward": {

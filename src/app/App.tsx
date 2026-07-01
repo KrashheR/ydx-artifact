@@ -66,6 +66,35 @@ function SettingsGearIcon() {
   );
 }
 
+function OrientationGate() {
+  const { t } = useTranslation();
+
+  return (
+    <aside className="orientation-gate" role="dialog" aria-modal="true">
+      <div className="orientation-gate__mark" aria-hidden="true">
+        <svg
+          width="44"
+          height="44"
+          viewBox="0 0 44 44"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+        >
+          <rect x="11" y="7" width="22" height="30" rx="5" />
+          <path d="M15 28h14" strokeLinecap="round" />
+          <path d="M30 12c5 2 8 6 8 11" strokeLinecap="round" />
+          <path d="M36 20l2 3 2-3" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </div>
+      <p className="orientation-gate__eyebrow">
+        {t("orientation.eyebrow")}
+      </p>
+      <h1>{t("orientation.title")}</h1>
+      <p>{t("orientation.description")}</p>
+    </aside>
+  );
+}
+
 export function App() {
   const { i18n, t } = useTranslation();
   const screen = useGameStore((state) => state.screen);
@@ -139,11 +168,17 @@ export function App() {
   const current = useMemo(() => {
     switch (screen.kind) {
       case "home":
-        return <HomeScreen />;
+        return <HomeScreen onOpenSettings={() => setSettingsOpen(true)} />;
       case "map":
-        return <MapScreen />;
+        return <MapScreen onOpenSettings={() => setSettingsOpen(true)} />;
       case "game":
-        return <GameScreen levelId={screen.levelId} mode={screen.mode} />;
+        return (
+          <GameScreen
+            levelId={screen.levelId}
+            mode={screen.mode}
+            onOpenSettings={() => setSettingsOpen(true)}
+          />
+        );
       case "daily":
         return <DailyScreen />;
       case "collection":
@@ -169,22 +204,25 @@ export function App() {
           {current}
         </motion.div>
       </AnimatePresence>
-      <button
-        type="button"
-        onClick={() => setSettingsOpen(true)}
-        aria-label={t("actions.settings")}
-        className={`app-settings-button app-settings-button--${screen.kind} fixed right-4 top-4 z-[90] flex h-11 w-11 items-center justify-center rounded-[9px] text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass`}
-        style={{
-          border: "1px solid rgba(213,195,154,.14)",
-          background: "rgba(213,195,154,.05)",
-        }}
-      >
-        <SettingsGearIcon />
-      </button>
+      {screen.kind !== "game" && screen.kind !== "map" && screen.kind !== "home" && (
+        <button
+          type="button"
+          onClick={() => setSettingsOpen(true)}
+          aria-label={t("actions.settings")}
+          className={`app-settings-button app-settings-button--${screen.kind} fixed z-[90] flex items-center justify-center text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass`}
+          style={{
+            border: "1px solid rgba(213,195,154,.14)",
+            background: "rgba(213,195,154,.05)",
+          }}
+        >
+          <SettingsGearIcon />
+        </button>
+      )}
       <SettingsModal
         isOpen={settingsOpen}
         onClose={() => setSettingsOpen(false)}
       />
+      <OrientationGate />
     </main>
   );
 }

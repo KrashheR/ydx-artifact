@@ -95,7 +95,7 @@ See `tokens.json` for full values.
 | 12 | 3 rapid errors → brief block | Inline state | 3rd rapid misclick |
 | 13 | Hint: Ориентир active | Gameplay overlay | Area hint used |
 | 14 | Hint selection panel | Bottom sheet | Hint button tap |
-| 15 | Rewarded loading | Modal | Проявитель via ad |
+| 15 | Rewarded loading | Modal | Area hint via ad |
 | 16 | Rewarded unavailable | Modal | Ad SDK failure |
 | 17 | Rewarded success | Modal | onRewarded |
 | 18 | Pause | Modal | Pause button |
@@ -133,21 +133,26 @@ See `tokens.json` for full values.
 ### Breakpoints
 | Name | Width | Layout |
 |---|---|---|
-| mobile-sm | 360px | Mobile portrait A/B toggle |
-| mobile | 390px | Mobile portrait A/B toggle |
-| tablet | 768px | Portrait → A/B toggle; Landscape → side-by-side |
+| mobile-sm | 360px | Portrait blocked; landscape-only gameplay |
+| mobile | 390px | Portrait blocked; landscape-only gameplay |
+| tablet | 768px | Landscape gameplay; portrait should show rotate-device gate on phone-sized viewports |
 | desktop-sm | 1280px | Side-by-side, compact sidebar |
 | desktop | 1440px | Side-by-side, full sidebar |
+
+### Mobile Orientation
+- Mobile phones support landscape only. Portrait is not a playable layout and must show a rotate-device gate instead of rendering home, map, gameplay, settings, or modal content as the primary experience.
+- Mobile landscape uses the compact 896×414-oriented layouts from `docs/landscape_review/`, including the one-card campaign carousel on the home screen.
 
 ### Game Hub
 - **≥1280px:** Sidebar (260px fixed) + map area. 12-node route visible in full.
 - **768–1279px:** Sidebar collapses to top strip or drawer. Map scrolls vertically.
-- **<768px:** Full-screen vertical scroll. Continue CTA pinned to top. Map as vertical list.
+- **<768px portrait:** Rotate-device gate only.
+- **<768px landscape:** Compact landscape layout; home campaign selection is a one-card carousel with left/right controls.
 
 ### Gameplay
 - **≥768px landscape / ≥1280px:** Two photos side-by-side, sync zoom/pan, click on either.
-- **<768px portrait / tablet portrait:** Single photo full-screen. Compare button at bottom thumb zone. Tap = toggle A/B. Hold = peek other version. Release = return.
-- **<768px landscape (844×390, 640×360):** Side-by-side touch. Compact right-edge HUD strip (60px). Safe-area insets respected.
+- **<768px portrait:** Rotate-device gate only; do not add or maintain a portrait A/B gameplay layout.
+- **<768px landscape (844×390, 640×360):** A/B flip-card mobile gameplay. Safe-area insets respected.
 
 ### Minimum sizes
 - Body text mobile: 16px
@@ -185,7 +190,7 @@ Display: "Найдите {remaining} расхождений" + dot row (teal=fou
 
 ### HintButton
 ```
-Props: type ('area'|'exact'), cost (1|2), magnifierBalance, onUse, rewardedAvailable
+Props: type ('area'), cost (1), magnifierBalance, onUse, rewardedAvailable
 States: available, insufficient-balance, rewarded-offer, loading-ad, used
 ```
 
@@ -214,7 +219,7 @@ Props: sceneTitle, date, streakDays, claimed (boolean), onPlay, onClose
 
 ### RewardModal (Rewarded Ad)
 ```
-Props: placement ('exact_hint'|'post_level_bonus'|'daily_bonus'), reward (string),
+Props: placement ('area_hint'|'post_level_bonus'|'daily_bonus'), reward (string),
        state ('loading'|'unavailable'|'success'), onWatch, onFallback, onClose
 Rule: onClose without onRewarded → no reward granted; onError → return to level
 ```

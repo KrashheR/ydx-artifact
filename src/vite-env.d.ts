@@ -3,6 +3,7 @@
 declare global {
   interface ImportMetaEnv {
     readonly VITE_LAYOUT_DEBUG?: string;
+    readonly VITE_FINAL_VALIDATE?: string;
     readonly VITE_DEV_VALIDATE_CHEAT?: string;
   }
 

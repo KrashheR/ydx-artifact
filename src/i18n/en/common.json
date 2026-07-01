@@ -15,9 +15,8 @@
     "back": "Back",
     "previous": "Previous",
     "next": "Next",
-    "compare": "Compare A/B",
+    "compare": "Compare",
     "hintArea": "Area hint",
-    "hintExact": "Exact reveal",
     "pause": "Pause",
     "resume": "Resume",
     "resetSave": "Reset save",
@@ -31,6 +30,11 @@
     "dailyCount": "{{count}} daily",
     "artifactCount": "{{count}} artifacts"
   },
+  "orientation": {
+    "eyebrow": "ROTATE DEVICE",
+    "title": "The game runs in landscape",
+    "description": "Turn your phone to landscape to continue the expedition."
+  },
   "game": {
     "found": "Found {{count}} / {{total}}",
     "mistakes": "Mistakes: {{count}}",
@@ -41,7 +45,7 @@
     "levelBadge": "{{campaign}} · LEVEL {{current}} / {{total}}",
     "labelOriginal": "ARCHIVE PHOTO · ORIGINAL",
     "labelCopy": "COPY · SPOT DIFFERENCES",
-    "diffCount": "FOUND",
+    "diffCount": "Found",
     "foundLabel": "FOUND",
     "accuracyLabel": "ACCURACY",
     "hintLabel": "Hint",

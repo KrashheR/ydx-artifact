@@ -43,7 +43,7 @@ describe("MapScreen interstitial flow", () => {
     });
     mockPlatform.setInterstitialGatewayOverride({ showInterstitial });
 
-    render(<MapScreen />);
+    render(<MapScreen onOpenSettings={() => undefined} />);
 
     await act(async () => {
       await new Promise((resolve) => window.setTimeout(resolve, 300));
@@ -70,7 +70,7 @@ describe("MapScreen interstitial flow", () => {
       }
     }));
 
-    render(<MapScreen />);
+    render(<MapScreen onOpenSettings={() => undefined} />);
 
     await waitFor(() => {
       expect(useGameStore.getState().interstitialRuntime.pendingMapCheckCompletedLevels).toBeNull();
@@ -90,16 +90,16 @@ describe("MapScreen interstitial flow", () => {
       }
     });
 
-    useGameStore.getState().completeLevel(campaignLevels[0].id, 42, false, "campaign");
+    useGameStore.getState().completeLevel(campaignLevels[0].id, 42, "campaign");
     expect(useGameStore.getState().interstitialRuntime.pendingMapCheckCompletedLevels).toBeNull();
 
-    useGameStore.getState().completeLevel(campaignLevels[1].id, 43, false, "campaign");
+    useGameStore.getState().completeLevel(campaignLevels[1].id, 43, "campaign");
     expect(useGameStore.getState().interstitialRuntime.pendingMapCheckCompletedLevels).toBeNull();
 
-    useGameStore.getState().completeLevel(campaignLevels[2].id, 44, false, "campaign");
+    useGameStore.getState().completeLevel(campaignLevels[2].id, 44, "campaign");
     expect(useGameStore.getState().interstitialRuntime.pendingMapCheckCompletedLevels).toBe(3);
 
-    useGameStore.getState().completeLevel(campaignLevels[2].id, 45, false, "campaign");
+    useGameStore.getState().completeLevel(campaignLevels[2].id, 45, "campaign");
     expect(useGameStore.getState().interstitialRuntime.pendingMapCheckCompletedLevels).toBe(3);
   });
 });

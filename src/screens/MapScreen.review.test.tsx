@@ -36,7 +36,7 @@ describe("MapScreen review prompt flow", () => {
       requestReview: vi.fn(async () => ({ feedbackSent: true }))
     });
 
-    render(<MapScreen />);
+    render(<MapScreen onOpenSettings={() => undefined} />);
 
     await act(async () => {
       await new Promise((resolve) => window.setTimeout(resolve, 650));
@@ -59,7 +59,7 @@ describe("MapScreen review prompt flow", () => {
     };
     mockPlatform.setReviewGatewayOverride(gateway);
 
-    render(<MapScreen />);
+    render(<MapScreen onOpenSettings={() => undefined} />);
 
     await act(async () => {
       await new Promise((resolve) => window.setTimeout(resolve, 650));

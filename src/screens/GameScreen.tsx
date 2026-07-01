@@ -15,6 +15,8 @@ import { useGameStore } from "@/shared/store/gameStore";
 const TIME_LIMIT = 300; // 5 minutes
 const COMPLETE_OVERLAY_DELAY_MS = 200;
 const DEBUG_LAYOUT_MODE = import.meta.env.VITE_LAYOUT_DEBUG === "true";
+const FINAL_VALIDATE_MODE = import.meta.env.VITE_FINAL_VALIDATE === "true";
+const noop = () => undefined;
 
 function formatTime(s: number) {
   return `${Math.floor(s / 60)
@@ -22,12 +24,31 @@ function formatTime(s: number) {
     .padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
 }
 
+function SettingsGearIcon() {
+  return (
+    <svg
+      width="19"
+      height="19"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="3.2" />
+      <path d="M19.4 13a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
+    </svg>
+  );
+}
+
 export function GameScreen({
   levelId,
   mode,
+  onOpenSettings = noop,
 }: {
   levelId: string;
   mode: "campaign" | "daily";
+  onOpenSettings?: () => void;
 }) {
   const { t } = useTranslation();
 
@@ -44,11 +65,9 @@ export function GameScreen({
   const resetLevelProgress = useGameStore((s) => s.resetLevelProgress);
 
   const [timedOut, setTimedOut] = useState(false);
-  const [paused, setPaused] = useState(false);
   const [platformPaused, setPlatformPaused] = useState(getIsPlatformPaused);
   const [pageVisible, setPageVisible] = useState(() => !document.hidden);
   const [hintId, setHintId] = useState<string | undefined>();
-  const [exactHintUsed, setExactHintUsed] = useState(false);
   const [rewardedHintInFlight, setRewardedHintInFlight] = useState(false);
   const [pendingFinalStats, setPendingFinalStats] = useState<{
     found: number;
@@ -81,7 +100,6 @@ export function GameScreen({
   const showComplete = finalStats !== null;
   const showOverlay = showComplete || timedOut;
   const gameplayBlocked =
-    paused ||
     platformPaused ||
     !pageVisible ||
     rewardedHintInFlight ||
@@ -157,10 +175,7 @@ export function GameScreen({
   );
   const chapterId = level.chapterId;
 
-  function handleDifference(
-    differenceId: string,
-    usedExactHint = exactHintUsed,
-  ) {
+  function handleDifference(differenceId: string) {
     if (completionPending || showComplete || timedOut || platformPaused) return;
     if (hintId === differenceId) setHintId(undefined);
     recordDiff(levelId, differenceId);
@@ -172,7 +187,7 @@ export function GameScreen({
       completeOverlayDelayRef.current = window.setTimeout(() => {
         setPendingFinalStats(null);
         setFinalStats(stats);
-        completeLevel(levelId, elapsed, usedExactHint, mode);
+        completeLevel(levelId, elapsed, mode);
         if (mode === "daily")
           claimDailyReward(new Date().toISOString().slice(0, 10));
         completeOverlayDelayRef.current = null;
@@ -227,14 +242,6 @@ export function GameScreen({
     }
   }
 
-  function handleExactHint() {
-    if (showComplete || completionPending || platformPaused) return;
-    const next = level!.differences.find((d) => !liveFoundIds.includes(d.id));
-    if (!next || !spendMagnifiers(2)) return;
-    setExactHintUsed(true);
-    handleDifference(next.id, true);
-  }
-
   function handleRetry() {
     if (completeOverlayDelayRef.current !== null) {
       window.clearTimeout(completeOverlayDelayRef.current);
@@ -244,9 +251,7 @@ export function GameScreen({
     setPendingFinalStats(null);
     setFinalStats(null);
     setTimedOut(false);
-    setPaused(false);
     setHintId(undefined);
-    setExactHintUsed(false);
   }
 
   function handleNext() {
@@ -289,12 +294,12 @@ export function GameScreen({
       >
         {/* ── TOP HUD ──────────────────────────────────────────────────── */}
         <header
-          className="game-hud relative flex shrink-0 items-center justify-between gap-2 pl-[30px] pr-[86px]"
+          className="app-screen-topbar game-hud relative flex shrink-0 items-center justify-between gap-2 pl-[30px] pr-[86px]"
           style={{
-            minHeight: "74px",
-            paddingLeft: "max(12px, env(safe-area-inset-left))",
-            paddingRight: "max(56px, env(safe-area-inset-right))",
-            paddingTop: "max(6px, env(safe-area-inset-top))",
+            minHeight: "78px",
+            paddingLeft: "max(40px, calc(40px + env(safe-area-inset-left)))",
+            paddingRight: "max(40px, calc(40px + env(safe-area-inset-right)))",
+            paddingTop: "max(0px, env(safe-area-inset-top))",
             borderBottom: "1px solid rgba(213,195,154,.12)",
             background:
               "linear-gradient(180deg, rgba(34,42,37,.92), rgba(21,27,24,.4))",
@@ -489,73 +494,19 @@ export function GameScreen({
             </button>
 
             <button
-              onClick={() => setPaused((p) => !p)}
-              className="flex h-[44px] w-[44px] items-center justify-center rounded-[9px] text-exp-parch"
-              style={{
-                border: "1px solid rgba(213,195,154,.14)",
-                background: paused
-                  ? "rgba(213,195,154,.12)"
-                  : "rgba(213,195,154,.05)",
-              }}
-              aria-label={paused ? t("actions.resume") : t("actions.pause")}
-              title={paused ? t("actions.resume") : t("actions.pause")}
-            >
-              {paused ? (
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                >
-                  <path d="M5 3l14 9-14 9V3z" />
-                </svg>
-              ) : (
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                >
-                  <rect x="6" y="5" width="4" height="14" rx="1" />
-                  <rect x="14" y="5" width="4" height="14" rx="1" />
-                </svg>
-              )}
-            </button>
-
-            <button
-              onClick={handleExactHint}
-              disabled={
-                showComplete ||
-                completionPending ||
-                liveFoundIds.length >= level.requiredDifferences ||
-                magnifiers < 2
-              }
-              className="flex h-[44px] w-[44px] items-center justify-center rounded-[9px] text-exp-parch disabled:opacity-40"
+              type="button"
+              onClick={onOpenSettings}
+              className="app-settings-button app-settings-button--game flex h-[44px] w-[44px] items-center justify-center rounded-[9px] text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
               style={{
                 border: "1px solid rgba(213,195,154,.14)",
                 background: "rgba(213,195,154,.05)",
               }}
-              aria-label={t("actions.hintExact")}
-              title={t("actions.hintExact")}
+              aria-label={t("actions.settings")}
+              title={t("actions.settings")}
             >
-              <svg
-                width="19"
-                height="19"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <circle cx="12" cy="12" r="3.2" />
-                <path d="M19.4 13a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
-              </svg>
+              <SettingsGearIcon />
             </button>
+
           </div>
         </header>
 
@@ -632,8 +583,9 @@ export function GameScreen({
             }}
             labelA={t("game.labelOriginal")}
             labelB={t("game.labelCopy")}
-            debugShowAllDifferences={DEBUG_LAYOUT_MODE}
+            debugShowAllDifferences={DEBUG_LAYOUT_MODE || FINAL_VALIDATE_MODE}
             debugUseMarkupReference={DEBUG_LAYOUT_MODE}
+            debugEnableHitboxEditor={DEBUG_LAYOUT_MODE || FINAL_VALIDATE_MODE}
           />
         </div>
 
@@ -740,7 +692,6 @@ export function GameScreen({
           required={level.requiredDifferences}
           mistakes={finalStats.mistakes}
           elapsedSeconds={finalStats.elapsed}
-          exactHintUsed={exactHintUsed}
           completedLevelIds={saveData.completedLevels}
           nextLevelOrder={nextLevel?.order}
           nextLevelTitle={nextLevel ? t(nextLevel.titleKey) : undefined}

@@ -68,8 +68,8 @@
 
 ## E. Responsive and browser behavior
 
-- [ ] 360×640 portrait.
-- [ ] 390×844 portrait.
+- [ ] 360×640 portrait shows rotate-device gate only.
+- [ ] 390×844 portrait shows rotate-device gate only.
 - [ ] 640×360 landscape.
 - [ ] 844×390 landscape.
 - [ ] 768×1024 tablet.

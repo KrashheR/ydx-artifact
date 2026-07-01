@@ -122,8 +122,7 @@
       "en"
     ],
     "hints": [
-      "area_hint",
-      "exact_reveal"
+      "area_hint"
     ],
     "monetization": {
       "rewarded": true,
@@ -403,7 +402,7 @@
       {
         "id": "no-intervention",
         "titleRu": "Без вмешательства",
-        "condition": "exact_hint_not_used"
+        "condition": "level_completed"
       }
     ]
   },
@@ -413,13 +412,6 @@
       "titleRu": "Ориентир",
       "effect": "temporarily_highlight_hint_area",
       "costMagnifiers": 1
-    },
-    "exactReveal": {
-      "id": "exact_reveal",
-      "titleRu": "Проявитель",
-      "effect": "reveal_one_exact_difference",
-      "costMagnifiers": 2,
-      "rewardedAlternative": true
     },
     "noDeadEndRule": "Если реклама или SDK недоступны, игрок возвращается в уровень без потери прогресса и может продолжать поиск."
   },
@@ -496,7 +488,7 @@
   },
   "monetization": {
     "rewardedPlacements": [
-      "exact_hint",
+      "area_hint_rewarded",
       "post_level_bonus_magnifiers",
       "recover_missed_daily_reward"
     ],
