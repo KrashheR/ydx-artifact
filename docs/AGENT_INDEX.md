@@ -23,4 +23,4 @@ Open only the row that matches the task, then follow references from that area.
 
 - Large design exports under `docs/design-reference/` and `docs/menu-design/` are references, not first reads.
 - Use `docs/design-reference/CODEX_HANDOFF.md` for UI rules before opening full HTML exports.
-- `src/content/campaignManifest.ts` is the source for campaign asset folders, preview filenames, map backgrounds, and legacy folder notes.
+- `src/content/campaignManifest.ts` is the source for campaign asset folders, preview filenames, map aspect ratios, and legacy folder notes.

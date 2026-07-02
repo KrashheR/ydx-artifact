@@ -22,13 +22,6 @@
       "approval": "not-for-production"
     },
     {
-      "id": "sand-meridian-background",
-      "path": "public/assets/scenes/sand-meredian/background.webp",
-      "status": "production-intake",
-      "source": "content owner chapter map background provided in workspace, converted to WebP",
-      "approval": "pending-owner-license-confirmation"
-    },
-    {
       "id": "sand-meridian-preview",
       "path": "public/assets/scenes/sand-meredian/preview.webp",
       "status": "production-intake",
@@ -40,13 +33,6 @@
       "path": "public/assets/scenes/sand-meredian",
       "status": "production-intake",
       "source": "content owner sand-meridian scene package provided in workspace; includes level folders 1-13 with 1.webp/2.webp runtime pairs and 3.webp markup references",
-      "approval": "pending-owner-license-confirmation"
-    },
-    {
-      "id": "emerald-meridian-background",
-      "path": "public/assets/scenes/emerald-meridian/bg.webp",
-      "status": "production-intake",
-      "source": "content owner chapter map background provided in workspace, converted to WebP",
       "approval": "pending-owner-license-confirmation"
     },
     {
@@ -68,13 +54,6 @@
       "path": "public/assets/scenes/northern-route/preview.webp",
       "status": "production-intake",
       "source": "content owner campaign menu preview provided in workspace, converted to WebP",
-      "approval": "pending-owner-license-confirmation"
-    },
-    {
-      "id": "northern-route-background",
-      "path": "public/assets/scenes/northern-route/background.webp",
-      "status": "production-intake",
-      "source": "content owner chapter map background provided in workspace, converted to WebP",
       "approval": "pending-owner-license-confirmation"
     },
     {

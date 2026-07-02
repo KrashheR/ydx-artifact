@@ -10,7 +10,7 @@
 
 1. В Яндекс Метрике создаешь счетчик для игры.
 2. Берешь номер счетчика, например `12345678`.
-3. Перед сборкой игры передаешь этот номер в переменную `VITE_YANDEX_METRICA_ID`.
+3. Добавляешь этот номер в `.env.production.local` как `VITE_YANDEX_METRICA_ID`.
 4. Собираешь архив игры.
 5. В Метрике создаешь цели с именами вроде `aa_level_complete`.
 6. Загружаешь архив в Консоль Яндекс Игр.
@@ -19,14 +19,14 @@ HTML-код счетчика вручную в `index.html` вставлять �
 
 ## Что где настраивается
 
-| Что нужно | Где делать | Нужно ли уже лезть в код |
-|---|---|---|
-| Загрузка SDK Яндекс Игр | В коде игры, `index.html` | Уже сделано |
-| `LoadingAPI.ready()` и `GameplayAPI.start()/stop()` | В сервисах игры | Уже сделано |
-| Счетчик для продуктовых событий | В Яндекс Метрике | Нужно создать счетчик |
-| ID счетчика | В переменной сборки `VITE_YANDEX_METRICA_ID` | Нужно указать перед build |
-| Цели `aa_level_complete`, `aa_level_start` и т.д. | В Яндекс Метрике, раздел "Цели" | Нужно создать руками |
-| Загрузка архива игры | В Консоли Яндекс Игр | Делается как обычный релиз |
+| Что нужно                                           | Где делать                                             | Нужно ли уже лезть в код                         |
+| --------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------ |
+| Загрузка SDK Яндекс Игр                             | В коде игры, `index.html`                              | Уже сделано                                      |
+| `LoadingAPI.ready()` и `GameplayAPI.start()/stop()` | В сервисах игры                                        | Уже сделано                                      |
+| Счетчик для продуктовых событий                     | В Яндекс Метрике                                       | Нужно создать счетчик                            |
+| ID счетчика                                         | В `.env.production.local` как `VITE_YANDEX_METRICA_ID` | Автоматически читается dev/build/release scripts |
+| Цели `aa_level_complete`, `aa_level_start` и т.д.   | В Яндекс Метрике, раздел "Цели"                        | Нужно создать руками                             |
+| Загрузка архива игры                                | В Консоли Яндекс Игр                                   | Делается как обычный релиз                       |
 
 ## Что тебе нужно сделать один раз
 
@@ -53,6 +53,8 @@ VITE_YANDEX_METRICA_ID=12345678
 
 Этот файл нужен только на твоем компьютере и не должен попадать в репозиторий, потому что это локальная настройка сборки.
 
+`pnpm dev`, `pnpm dev:validate`, `pnpm build` и release-проверки через `pnpm build` автоматически подхватывают `VITE_*` значения из `.env.production.local`. Если переменная уже задана в консоли вручную, она имеет приоритет над значением из файла.
+
 Можно и без файла, одной командой в PowerShell:
 
 ```powershell
@@ -62,7 +64,7 @@ pnpm build
 
 ### 3. Собрать архив для Яндекс Игр
 
-После того как ID счетчика задан:
+После того как ID счетчика задан в `.env.production.local`:
 
 ```powershell
 pnpm build
@@ -105,14 +107,13 @@ aa_review_native_sent
 
 В Консоли Яндекс Игр ничего специального для этих кастомных событий делать не нужно.
 
-Там ты просто загружаешь архив игры как обычно. Главное, чтобы архив был собран с `VITE_YANDEX_METRICA_ID`.
+Там ты просто загружаешь архив игры как обычно. Главное, чтобы архив был собран с `VITE_YANDEX_METRICA_ID`; при наличии `.env.production.local` обычного `pnpm build` достаточно.
 
 ### 6. Проверить, что все работает
 
 Локально:
 
 ```powershell
-$env:VITE_YANDEX_METRICA_ID="12345678"
 $env:VITE_ANALYTICS_DEBUG="true"
 pnpm dev
 ```
@@ -120,7 +121,7 @@ pnpm dev
 Потом открой игру, пройди кусок геймплея и в DevTools Console введи:
 
 ```js
-window.__artifactAnalyticsEvents
+window.__artifactAnalyticsEvents;
 ```
 
 Если видишь массив событий `game_ready`, `level_start`, `difference_found`, `level_complete`, значит внутренняя отправка работает.
@@ -171,52 +172,52 @@ window.__artifactAnalyticsEvents
 
 В поле названия цели можно вставлять человекочитаемое название из первой колонки.
 
-| Нормальное название цели | Идентификатор цели |
-|---|---|
-| Открытие игры | `aa_game_open` |
-| Сохранение загружено | `aa_save_loaded` |
-| Игра готова | `aa_game_ready` |
-| Просмотр экрана | `aa_screen_view` |
-| Настройки открыты | `aa_settings_opened` |
-| Настройки закрыты | `aa_settings_closed` |
-| Язык изменен | `aa_settings_language_changed` |
-| Кампания выбрана | `aa_campaign_selected` |
-| Клик по закрытой кампании | `aa_locked_campaign_clicked` |
-| Клик по карточке уровня | `aa_level_card_clicked` |
-| Прогресс кампании | `aa_campaign_progress` |
-| Старт уровня | `aa_level_start` |
-| Отличие найдено | `aa_difference_found` |
-| Ошибочный клик на уровне | `aa_level_misclick` |
-| Подсказка показана | `aa_hint_revealed` |
-| Лупы потрачены | `aa_magnifiers_spent` |
-| Проигрыш по таймеру | `aa_level_failed_timeout` |
-| Время уровня продлено | `aa_level_time_extended` |
-| Повтор уровня | `aa_level_retry` |
-| Выход с уровня на карту | `aa_level_exit_to_map` |
-| Клик по следующему уровню | `aa_level_next_clicked` |
-| Уровень завершен | `aa_level_complete` |
-| Старт daily-уровня | `aa_daily_start_clicked` |
-| Daily-награда получена | `aa_daily_reward_claimed` |
-| Оффер rewarded-подсказки открыт | `aa_rewarded_hint_offer_opened` |
-| Rewarded-подсказка запрошена | `aa_rewarded_hint_requested` |
-| Rewarded-подсказка выдала награду | `aa_rewarded_hint_rewarded` |
-| Rewarded-подсказка закрыта без награды | `aa_rewarded_hint_closed` |
-| Rewarded-подсказка не загрузилась | `aa_rewarded_hint_failed` |
-| Interstitial подходит по условиям | `aa_interstitial_eligible` |
-| Interstitial запрошен | `aa_interstitial_request` |
-| Interstitial открыт | `aa_interstitial_open` |
-| Interstitial закрыт | `aa_interstitial_close` |
-| Interstitial ошибка | `aa_interstitial_error` |
-| Review prompt доступен | `aa_review_prompt_eligible` |
-| Review prompt показан | `aa_review_prompt_shown` |
-| Review prompt: нажата оценка | `aa_review_prompt_review_clicked` |
-| Review prompt: нажато позже | `aa_review_prompt_later_clicked` |
-| Review prompt закрыт | `aa_review_prompt_closed` |
-| Native review запрошен | `aa_review_native_requested` |
-| Native review отправлен | `aa_review_native_sent` |
-| Native review закрыт без отправки | `aa_review_native_closed` |
-| Native review недоступен | `aa_review_native_unavailable` |
-| Native review ошибка | `aa_review_native_error` |
+| Нормальное название цели               | Идентификатор цели                |
+| -------------------------------------- | --------------------------------- |
+| Открытие игры                          | `aa_game_open`                    |
+| Сохранение загружено                   | `aa_save_loaded`                  |
+| Игра готова                            | `aa_game_ready`                   |
+| Просмотр экрана                        | `aa_screen_view`                  |
+| Настройки открыты                      | `aa_settings_opened`              |
+| Настройки закрыты                      | `aa_settings_closed`              |
+| Язык изменен                           | `aa_settings_language_changed`    |
+| Кампания выбрана                       | `aa_campaign_selected`            |
+| Клик по закрытой кампании              | `aa_locked_campaign_clicked`      |
+| Клик по карточке уровня                | `aa_level_card_clicked`           |
+| Прогресс кампании                      | `aa_campaign_progress`            |
+| Старт уровня                           | `aa_level_start`                  |
+| Отличие найдено                        | `aa_difference_found`             |
+| Ошибочный клик на уровне               | `aa_level_misclick`               |
+| Подсказка показана                     | `aa_hint_revealed`                |
+| Лупы потрачены                         | `aa_magnifiers_spent`             |
+| Проигрыш по таймеру                    | `aa_level_failed_timeout`         |
+| Время уровня продлено                  | `aa_level_time_extended`          |
+| Повтор уровня                          | `aa_level_retry`                  |
+| Выход с уровня на карту                | `aa_level_exit_to_map`            |
+| Клик по следующему уровню              | `aa_level_next_clicked`           |
+| Уровень завершен                       | `aa_level_complete`               |
+| Старт daily-уровня                     | `aa_daily_start_clicked`          |
+| Daily-награда получена                 | `aa_daily_reward_claimed`         |
+| Оффер rewarded-подсказки открыт        | `aa_rewarded_hint_offer_opened`   |
+| Rewarded-подсказка запрошена           | `aa_rewarded_hint_requested`      |
+| Rewarded-подсказка выдала награду      | `aa_rewarded_hint_rewarded`       |
+| Rewarded-подсказка закрыта без награды | `aa_rewarded_hint_closed`         |
+| Rewarded-подсказка не загрузилась      | `aa_rewarded_hint_failed`         |
+| Interstitial подходит по условиям      | `aa_interstitial_eligible`        |
+| Interstitial запрошен                  | `aa_interstitial_request`         |
+| Interstitial открыт                    | `aa_interstitial_open`            |
+| Interstitial закрыт                    | `aa_interstitial_close`           |
+| Interstitial ошибка                    | `aa_interstitial_error`           |
+| Review prompt доступен                 | `aa_review_prompt_eligible`       |
+| Review prompt показан                  | `aa_review_prompt_shown`          |
+| Review prompt: нажата оценка           | `aa_review_prompt_review_clicked` |
+| Review prompt: нажато позже            | `aa_review_prompt_later_clicked`  |
+| Review prompt закрыт                   | `aa_review_prompt_closed`         |
+| Native review запрошен                 | `aa_review_native_requested`      |
+| Native review отправлен                | `aa_review_native_sent`           |
+| Native review закрыт без отправки      | `aa_review_native_closed`         |
+| Native review недоступен               | `aa_review_native_unavailable`    |
+| Native review ошибка                   | `aa_review_native_error`          |
 
 Если не хочется заводить все 44 цели сразу, начни с минимального набора:
 
@@ -449,10 +450,15 @@ ym(counterId, "reachGoal", "aa_level_complete", payload);
 
 ## Шаг 3. Собрать игру с ID счетчика
 
-PowerShell:
+Добавь ID в `.env.production.local`:
+
+```env
+VITE_YANDEX_METRICA_ID=12345678
+```
+
+Затем собери архив:
 
 ```powershell
-$env:VITE_YANDEX_METRICA_ID="12345678"
 pnpm build
 pnpm release:zip
 ```
@@ -462,7 +468,6 @@ pnpm release:zip
 Локальная проверка с консольным логом:
 
 ```powershell
-$env:VITE_YANDEX_METRICA_ID="12345678"
 $env:VITE_ANALYTICS_DEBUG="true"
 pnpm dev
 ```
@@ -470,7 +475,7 @@ pnpm dev
 В браузере можно проверить буфер:
 
 ```js
-window.__artifactAnalyticsEvents
+window.__artifactAnalyticsEvents;
 ```
 
 ## Шаг 4. Создать цели в Метрике
@@ -487,19 +492,19 @@ window.__artifactAnalyticsEvents
 
 Рекомендуемые цели для старта:
 
-| Цель в Метрике | Что показывает |
-|---|---|
-| `aa_game_ready` | Игра дошла до первого интерактивного экрана. |
-| `aa_level_start` | Игрок начал уровень. |
-| `aa_difference_found` | Игрок нашел отличие. |
-| `aa_level_complete` | Игрок прошел уровень. |
-| `aa_level_failed_timeout` | Игрок проиграл по таймеру. |
-| `aa_hint_revealed` | Игрок использовал подсказку. |
-| `aa_rewarded_hint_requested` | Игрок запросил rewarded-рекламу за подсказку. |
-| `aa_rewarded_hint_rewarded` | Rewarded-реклама выдала награду. |
-| `aa_interstitial_open` | Открылась полноэкранная реклама. |
-| `aa_daily_reward_claimed` | Daily награда получена. |
-| `aa_review_native_sent` | Игрок отправил отзыв/оценку через native flow. |
+| Цель в Метрике               | Что показывает                                 |
+| ---------------------------- | ---------------------------------------------- |
+| `aa_game_ready`              | Игра дошла до первого интерактивного экрана.   |
+| `aa_level_start`             | Игрок начал уровень.                           |
+| `aa_difference_found`        | Игрок нашел отличие.                           |
+| `aa_level_complete`          | Игрок прошел уровень.                          |
+| `aa_level_failed_timeout`    | Игрок проиграл по таймеру.                     |
+| `aa_hint_revealed`           | Игрок использовал подсказку.                   |
+| `aa_rewarded_hint_requested` | Игрок запросил rewarded-рекламу за подсказку.  |
+| `aa_rewarded_hint_rewarded`  | Rewarded-реклама выдала награду.               |
+| `aa_interstitial_open`       | Открылась полноэкранная реклама.               |
+| `aa_daily_reward_claimed`    | Daily награда получена.                        |
+| `aa_review_native_sent`      | Игрок отправил отзыв/оценку через native flow. |
 
 Не создавай отдельную цель под каждый `levelId` или `differenceId`: у Метрики есть лимит целей на счетчик, а детализация уже уходит в payload события.
 
@@ -533,7 +538,7 @@ aa_game_ready
 
 ## Шаг 6. Проверка перед релизом
 
-1. Собрать с `VITE_YANDEX_METRICA_ID`.
+1. Проверить, что `.env.production.local` содержит `VITE_YANDEX_METRICA_ID`.
 2. Запустить `pnpm build`.
 3. Открыть preview/dev build и пройти один уровень.
 4. В консоли проверить `window.__artifactAnalyticsEvents`.

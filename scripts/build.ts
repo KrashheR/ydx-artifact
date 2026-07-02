@@ -4,6 +4,7 @@ import { dirname, join } from "node:path";
 import { loadProductionViteEnv } from "./vite-env";
 
 const require = createRequire(import.meta.url);
+const tscCli = require.resolve("typescript/bin/tsc");
 const viteCli = join(
   dirname(require.resolve("vite/package.json")),
   "bin",
@@ -12,19 +13,22 @@ const viteCli = join(
 
 loadProductionViteEnv();
 
-const viteArgs = process.argv.slice(2).filter((arg) => {
-  if (arg !== "cheat" && arg !== "--cheat") return true;
-  process.env.VITE_DEV_VALIDATE_CHEAT = "true";
-  return false;
+const tscResult = spawnSync(process.execPath, [tscCli, "-b"], {
+  env: process.env,
+  stdio: "inherit",
 });
 
-const result = spawnSync(
+if (tscResult.status !== 0) {
+  process.exit(tscResult.status ?? 1);
+}
+
+const viteResult = spawnSync(
   process.execPath,
-  [viteCli, "--host", "127.0.0.1", ...viteArgs],
+  [viteCli, "build", ...process.argv.slice(2)],
   {
     env: process.env,
     stdio: "inherit",
   },
 );
 
-process.exit(result.status ?? 1);
+process.exit(viteResult.status ?? 1);

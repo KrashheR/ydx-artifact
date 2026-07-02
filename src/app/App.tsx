@@ -180,9 +180,9 @@ export function App() {
     };
   }, [hydrate, i18n, setAutoLocale]);
 
-  // Once the home screen is visible, warm the map card previews, map
-  // backgrounds and likely next level scenes in the background, so opening a
-  // campaign shows already-cached images. Idle-scheduled and non-blocking.
+  // Once the home screen is visible, warm the map card previews and likely
+  // next level scenes in the background, so opening a campaign shows
+  // already-cached images. Idle-scheduled and non-blocking.
   useEffect(() => {
     if (!bootstrapped) return;
     const start = () => void prefetchHomeIdleAssets(useGameStore.getState().saveData);

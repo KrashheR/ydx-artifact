@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-- Added an idle background prefetch after the home screen appears: map backgrounds and level card previews of unlocked campaigns (plus the likely next levels' scene pairs) are warmed one image at a time via `src/shared/lib/scenePrefetch.ts`, so opening a campaign map shows already-cached images; skipped when the browser reports data-saver.
+- Removed obsolete campaign-folder map background assets (`bg.webp` / `background.webp`) from runtime wiring, content validation, prefetch and asset provenance; campaign maps now rely on card previews and configured route aspect ratios only.
+
+- Vite command wrappers now load production-local `VITE_*` env from `.env.production.local` for `pnpm dev`, `pnpm dev:validate` and `pnpm build`, so `VITE_YANDEX_METRICA_ID` is included consistently in local, build and release validation flows. `pnpm metrika:goals` also reads the counter ID from `.env.production.local`.
+
+- Added an idle background prefetch after the home screen appears: level card previews of unlocked campaigns (plus the likely next levels' scene pairs) are warmed one image at a time via `src/shared/lib/scenePrefetch.ts`, so opening a campaign map shows already-cached images; skipped when the browser reports data-saver.
 
 - Loading performance pass: home/map cards now use generated compressed previews (`pnpm assets:previews` creates `card.webp` per level and `preview-sm.webp` per campaign, ~74% smaller; full-size `preview.webp` and `3.webp` are excluded from the production build), map card images are lazy-loaded, app bootstrap runs save hydration, preview warmup and font readiness in parallel, GameScreen preloads both scene images on level start and prefetches the next level's pair from the completion overlay, and Collection/Daily/Settings ship as lazy chunks outside the entry bundle.
 

@@ -21,7 +21,6 @@ export type ChapterDefinition = {
   id: ChapterId;
   campaignId: "white" | "sand" | "emerald";
   titleKey: string;
-  backgroundAsset: string;
   aspectRatio: number;
   levels: LevelDefinition[];
   mapPoints: MapPointDefinition[];
@@ -74,7 +73,6 @@ export const chapters: Record<ChapterId, ChapterDefinition> = {
     id: "northern-route",
     campaignId: campaignManifest["northern-route"].campaignId,
     titleKey: campaignManifest["northern-route"].titleKey,
-    backgroundAsset: campaignManifest["northern-route"].backgroundAsset,
     aspectRatio: campaignManifest["northern-route"].mapAspectRatio,
     levels: northernRouteLevels,
     mapPoints: northernRouteMapPoints
@@ -83,7 +81,6 @@ export const chapters: Record<ChapterId, ChapterDefinition> = {
     id: "sand-meridian",
     campaignId: campaignManifest["sand-meridian"].campaignId,
     titleKey: campaignManifest["sand-meridian"].titleKey,
-    backgroundAsset: campaignManifest["sand-meridian"].backgroundAsset,
     aspectRatio: campaignManifest["sand-meridian"].mapAspectRatio,
     levels: sandMeridianLevels,
     mapPoints: sandMeridianMapPoints
@@ -92,7 +89,6 @@ export const chapters: Record<ChapterId, ChapterDefinition> = {
     id: "emerald-meridian",
     campaignId: campaignManifest["emerald-meridian"].campaignId,
     titleKey: campaignManifest["emerald-meridian"].titleKey,
-    backgroundAsset: campaignManifest["emerald-meridian"].backgroundAsset,
     aspectRatio: campaignManifest["emerald-meridian"].mapAspectRatio,
     levels: emeraldMeridianLevels,
     mapPoints: emeraldMeridianMapPoints

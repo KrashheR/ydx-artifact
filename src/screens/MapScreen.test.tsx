@@ -14,7 +14,7 @@ describe("MapScreen", () => {
     }
   });
 
-  it("keeps campaign map aspect ratios aligned with the authored background assets", () => {
+  it("keeps campaign map aspect ratios aligned with the authored route layouts", () => {
     expect(chapterList.map((chapter) => chapter.aspectRatio)).toEqual([
       1672 / 941,
       1586 / 992,

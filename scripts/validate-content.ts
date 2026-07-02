@@ -173,7 +173,6 @@ for (const chapter of chapterList) {
   if (chapter.levels.length !== chapter.mapPoints.length) {
     errors.push(`${chapter.id}: levels count does not match map point count`);
   }
-  validateAssetPath(`${chapter.id}: background`, chapter.backgroundAsset, { requireProvenance: true });
   validateAssetPath(`${chapter.id}: preview`, getChapterPreviewAsset(chapter.id), { requireProvenance: true });
   if (!hasLocaleKey(ruLocale, chapter.titleKey)) errors.push(`${chapter.id}: missing RU locale key ${chapter.titleKey}`);
   if (!hasLocaleKey(enLocale, chapter.titleKey)) errors.push(`${chapter.id}: missing EN locale key ${chapter.titleKey}`);

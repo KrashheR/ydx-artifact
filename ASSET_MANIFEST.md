@@ -36,14 +36,11 @@ Re-run `pnpm assets:previews` after adding or replacing scene images. The produc
 | placeholder-a | `public/assets/scenes/northern-route/placeholder/a.svg` | scene A | placeholder | local SVG generated for scaffold |
 | placeholder-b | `public/assets/scenes/northern-route/placeholder/b.svg` | scene B | placeholder | local SVG generated for scaffold |
 | placeholder-thumb | `public/assets/scenes/northern-route/placeholder/thumb.svg` | thumbnail | placeholder | local SVG generated for scaffold |
-| sand-meridian-background | `public/assets/scenes/sand-meredian/background.webp` | chapter map background | production-intake | content owner image provided in workspace, converted to WebP |
 | sand-meridian-preview | `public/assets/scenes/sand-meredian/preview.webp` | campaign menu preview | production-intake | content owner image provided in workspace, converted to WebP |
 | sand-meridian-package | `public/assets/scenes/sand-meredian/` | campaign scene package | production-intake | content owner package with scene triplets for folders `1-13` |
 | sm-01-13-markup | `public/assets/scenes/sand-meredian/<level-order>/3.webp` | markup reference | authoring-only | folders `1-13` transcribed into gameplay hitboxes in `src/content/sandMeridianLevels.ts`; levels 3, 7, 11, 12 and 13 include their marked circles after recheck |
-| emerald-meridian-background | `public/assets/scenes/emerald-meridian/bg.webp` | chapter map background | production-intake | content owner image provided in workspace, converted to WebP |
 | emerald-meridian-preview | `public/assets/scenes/emerald-meridian/preview.webp` | campaign menu preview | production-intake | content owner image provided in workspace, converted to WebP |
 | emerald-meridian-package | `public/assets/scenes/emerald-meridian/` | campaign scene package | production-intake | content owner package with scene triplets for folders `1-13` |
-| northern-route-background | `public/assets/scenes/northern-route/background.webp` | chapter map background | production-intake | content owner image provided in workspace, converted to WebP |
 | northern-route-preview | `public/assets/scenes/northern-route/preview.webp` | campaign menu preview | production-intake | content owner image provided in workspace, converted to WebP |
 | nr-01-scene-a | `public/assets/scenes/northern-route/1/1.webp` | scene A | production-intake | content owner image converted from PNG |
 | nr-01-scene-b | `public/assets/scenes/northern-route/1/2.webp` | scene B | production-intake | content owner image converted from PNG |

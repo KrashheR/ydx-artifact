@@ -46,19 +46,17 @@ export function getLikelyNextLevels(save: SaveData): LevelDefinition[] {
 }
 
 /**
- * Background warmup for what the player will see after the home screen: map
- * backgrounds and level card previews of unlocked chapters, then the scene
- * pairs of the likely next levels. Images load one at a time so the prefetch
- * never competes with itself for bandwidth, and everything is best-effort —
- * the browser cache is the only consumer. Skipped when the browser reports a
- * data-saver preference.
+ * Background warmup for what the player will see after the home screen: level
+ * card previews of unlocked chapters, then the scene pairs of the likely next
+ * levels. Images load one at a time so the prefetch never competes with itself
+ * for bandwidth, and everything is best-effort — the browser cache is the only
+ * consumer. Skipped when the browser reports a data-saver preference.
  */
 export async function prefetchHomeIdleAssets(save: SaveData) {
   const connection = (navigator as { connection?: { saveData?: boolean } }).connection;
   if (connection?.saveData) return;
 
   for (const chapter of getUnlockedChapters(save)) {
-    await preloadImage(chapter.backgroundAsset);
     for (const level of chapter.levels) {
       await preloadImage(getCampaignCardPreviewAsset(chapter.id, level.order));
     }

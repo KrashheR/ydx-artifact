@@ -14,20 +14,20 @@ Open the Vite URL printed by the command. The default platform mode is local moc
 In local development, you can unlock all currently implemented campaigns and levels from the browser console:
 
 ```js
-await window.__artifactDev?.unlockAllContent()
+await window.__artifactDev?.unlockAllContent();
 ```
 
 To reset the local save after that:
 
 ```js
-await window.__artifactDev?.resetSave()
+await window.__artifactDev?.resetSave();
 ```
 
 To exercise the review prompt locally without Yandex SDK:
 
 ```js
-window.__artifactDev?.setReviewMock?.("sent")
-await window.__artifactDev?.triggerReviewPromptDemo?.()
+window.__artifactDev?.setReviewMock?.("sent");
+await window.__artifactDev?.triggerReviewPromptDemo?.();
 ```
 
 ## Checks
@@ -53,8 +53,8 @@ For broad agent edits, `pnpm agent:check` runs lint, typecheck and content valid
 `pnpm validate:final` starts the same hitbox editor over the final gameplay `1.*` and `2.*` scene images instead of the `3.*` markup reference, so A/B hitboxes can be moved, resized, copied and applied against the real pair.
 Production builds exclude scene markup reference files named `3.webp` from `dist/assets/scenes/**`; the source files stay in `public` for `pnpm validate:content`, `pnpm dev:validate`, and local hitbox review.
 Production builds also exclude unused scene placeholder SVGs and keep the Yandex Games SDK as the platform-provided `/sdk.js` script in `index.html`.
-Custom gameplay analytics can be enabled for production builds by setting `VITE_YANDEX_METRICA_ID=<counter id>` before `pnpm build`; setup steps and the Metrica goal list are documented in `docs/YANDEX_METRICS_SETUP_GUIDE.md`.
-Use `pnpm metrika:goals` to dry-run Yandex Metrica goal setup, then `pnpm metrika:goals -- --apply` to create missing JavaScript-event goals through the Metrica Management API.
+Custom gameplay analytics can be enabled by adding `VITE_YANDEX_METRICA_ID=<counter id>` to `.env.production.local`; `pnpm dev`, `pnpm dev:validate`, `pnpm build` and release validation load that production-local Vite env automatically. Setup steps and the Metrica goal list are documented in `docs/YANDEX_METRICS_SETUP_GUIDE.md`.
+Use `pnpm metrika:goals` to dry-run Yandex Metrica goal setup, then `pnpm metrika:goals -- --apply` to create missing JavaScript-event goals through the Metrica Management API. The goals script reads the counter ID from `.env.metrica.local`, `.env.production.local` or `.env.local`.
 Production builds do not emit sourcemaps by default to keep the Yandex upload smaller. Use `BUILD_SOURCEMAP=true pnpm build` when a diagnostic build needs `.map` files.
 `pnpm release:zip` packages the contents of `dist/` into `dist-yandex.zip` with the Node-based release packager, verifies root `index.html`, and excludes macOS/system junk plus sourcemaps. It does not require system `zip` / `unzip` binaries.
 
@@ -68,7 +68,7 @@ Production builds do not emit sourcemaps by default to keep the Yandex upload sm
 - All 13 `northern-route` levels are wired to local scene intake assets listed in `ASSET_MANIFEST.md`; every level now uses hitboxes transcribed from its `3.webp` markup reference.
 - All 13 `sand-meridian` levels are wired to compressed local WebP scene pairs under `public/assets/scenes/sand-meredian/`; levels 1-13 use hitboxes transcribed from their matching `3.webp` markup references.
 - All 13 `emerald-meridian` levels are wired to compressed local WebP scene pairs under `public/assets/scenes/emerald-meridian/`; route points follow `docs/plot/emerald-meredian/emerald_meridian_story_map_placement_guide.md`, and gameplay hitboxes are transcribed from markup references with the level 3, 4, 5 and 8 upper-right extra hitboxes pruned.
-- Campaign metadata such as runtime asset folders, preview filenames, map backgrounds and legacy folder notes is centralized in `src/content/campaignManifest.ts`.
+- Campaign metadata such as runtime asset folders, preview filenames, map aspect ratios and legacy folder notes is centralized in `src/content/campaignManifest.ts`.
 - `GameScreen` layout-debug mode is opt-in via `VITE_LAYOUT_DEBUG=true pnpm dev`: the comparator draws all authored difference markers immediately and swaps scene `1/2` assets for the local `3.*` markup reference on both sides so button/marker positions can be adjusted visually.
 - `pnpm dev:validate` runs the same hitbox-alignment view through Vite dev/HMR so hitbox edits can be reviewed live against `3.*`; `pnpm validate:final` uses the final gameplay `1.*`/`2.*` images with the same editor. In these modes, visible hitbox markers are draggable; drag the marker frame to move it, the right/bottom handles to resize one axis, or the bottom-right handle to resize both axes. Dragging or resizing either A/B marker updates both side hitboxes and the shared hint area synchronously. Edits apply immediately to the current level, persist in localStorage for that level, and the on-screen "Apply" button writes the edited hitboxes back into the relevant `src/content/*` level module through a local dev-only Vite endpoint. "Copy JSON" still copies the edited `differences` array, and "Reset" clears the local authoring override.
 - Responsive photo comparator with desktop side-by-side and mobile landscape A/B flip; mobile portrait is blocked by a rotate-device gate and is not a playable layout.

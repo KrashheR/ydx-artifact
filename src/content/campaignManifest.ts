@@ -9,7 +9,6 @@ export type CampaignManifestEntry = {
   assetFolder: string;
   previewFilename: string;
   cardPreviewFilename: string;
-  backgroundAsset: string;
   mapAspectRatio: number;
   notes?: string;
 };
@@ -22,7 +21,6 @@ export const campaignManifest: Record<ChapterId, CampaignManifestEntry> = {
     assetFolder: "northern-route",
     previewFilename: "preview-sm.webp",
     cardPreviewFilename: "card.webp",
-    backgroundAsset: "/assets/scenes/northern-route/background.webp",
     mapAspectRatio: 1672 / 941
   },
   "sand-meridian": {
@@ -32,7 +30,6 @@ export const campaignManifest: Record<ChapterId, CampaignManifestEntry> = {
     assetFolder: "sand-meredian",
     previewFilename: "preview-sm.webp",
     cardPreviewFilename: "card.webp",
-    backgroundAsset: "/assets/scenes/sand-meredian/background.webp",
     mapAspectRatio: 1586 / 992,
     notes: "`sand-meredian` is the legacy runtime folder for the `sand-meridian` campaign."
   },
@@ -43,7 +40,6 @@ export const campaignManifest: Record<ChapterId, CampaignManifestEntry> = {
     assetFolder: "emerald-meridian",
     previewFilename: "preview-sm.webp",
     cardPreviewFilename: "card.webp",
-    backgroundAsset: "/assets/scenes/emerald-meridian/bg.webp",
     mapAspectRatio: 1672 / 941
   }
 };
