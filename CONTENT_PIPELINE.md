@@ -30,7 +30,8 @@ The implementation workflow is:
 2. Wire `1.webp` to `imageA` and `2.webp` to `imageB` in the campaign level builder under `src/content/`.
 3. Use `3.webp` only as the authoring reference for hitboxes. Do not show it in gameplay.
 4. Transcribe each marked area from `3.webp` into normalized `hitAreaA`, `hitAreaB`, and `hintArea` data in `src/content/levels.ts`.
-5. Update `ASSET_MANIFEST.md`, `ASSET_PROVENANCE.json`, and run `pnpm validate:content`.
+5. Run `pnpm assets:previews` to regenerate the compressed card/menu previews (`card.webp`, `preview-sm.webp`) used at runtime.
+6. Update `ASSET_MANIFEST.md`, `ASSET_PROVENANCE.json`, and run `pnpm validate:content`.
 
 Hitboxes are authored as normalized coordinates from `0` to `1` relative to the rendered image bounds. Prefer circles for round zones, ellipses for stretched markup rings, and polygons only when the clickable shape is materially non-elliptical.
 `src/features/gameplay/PhotoComparator.tsx` renders scene images without cropping or stretching and draws found markers / area hints from those same normalized `hitArea*` / `hintArea` bounds, so the visible ring, click target and markup reference stay in the same coordinate space. Runtime photos use `object-fit: contain`; the comparator measures the contained image plane and ignores letterbox space when converting pointer coordinates. Circle hitboxes are aspect-aware: `radius` is authored as the horizontal image-width fraction, while vertical radius is derived from the loaded image aspect ratio.
@@ -50,7 +51,7 @@ Hitboxes are authored as normalized coordinates from `0` to `1` relative to the 
 - Level 13 (`nr-13-scene13`) is wired to `public/assets/scenes/northern-route/13/1.webp` and `2.webp`.
 - Level 13 hitboxes were transcribed from `public/assets/scenes/northern-route/13/3.webp` for the tent opening, survey device, mug, rope coil, tarp, rope marker, striped post, bridge and seagull differences. `1.webp` was regenerated from the owner-provided `1.png` prepublication replacement; `2.webp` is retained as the paired B scene and now differs from A.
 - Runtime scene, markup, preview and map background assets in `public/assets/scenes/` are WebP. Keep source masters outside runtime folders if they need to be preserved.
-- Campaign journal/map card previews resolve to each campaign's runtime `1.webp` asset via `src/content/sceneAssets.ts` and `src/content/campaignManifest.ts`.
+- Campaign journal/map card previews resolve to each level's generated `card.webp` derivative (and home campaign cards to `preview-sm.webp`) via `src/content/sceneAssets.ts` and `src/content/campaignManifest.ts`; regenerate them with `pnpm assets:previews` after scene intake. Full-size `preview.webp` sources and `3.webp` markup references are excluded from the production build.
 - `sand-meridian` is connected from `docs/plot/sand_meridian/map-handoff/sand-meridian-map-layout.json` and runtime assets in `public/assets/scenes/sand-meredian/`.
 - `sand-meridian` map placement is data-driven; no manual point coordinates remain in `MapScreen`.
 - `sand-meridian` gameplay now uses transcribed hitboxes for levels 1-13 based on each scene's `public/assets/scenes/sand-meredian/<level-order>/3.webp` markup reference. Levels 3, 7, 11, 12 and 13 were rechecked against their markup references; level 11 currently keeps 10 playable zones, level 12 keeps 6 and level 13 keeps 8 after pruning extra authored hitboxes.

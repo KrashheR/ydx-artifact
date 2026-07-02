@@ -11,6 +11,7 @@ import {
   setGameplayActive,
   subscribePlatformPause,
 } from "@/services/platform/platformLifecycle";
+import { preloadImages } from "@/shared/lib/imagePreload";
 import { useGameStore } from "@/shared/store/gameStore";
 import { MAX_MAGNIFIERS } from "@/entities/save/schema";
 
@@ -329,6 +330,21 @@ export function GameScreen({
     window.addEventListener("contextmenu", preventContextMenu);
     return () => window.removeEventListener("contextmenu", preventContextMenu);
   }, []);
+
+  // Warm both scene images up front: only one side is mounted in mobile
+  // portrait, so without this the B image starts downloading on first toggle.
+  useEffect(() => {
+    if (!level) return;
+    void preloadImages([level.imageA, level.imageB]);
+  }, [level]);
+
+  // While the completion overlay is open, prefetch the next level's pair so
+  // "next level" starts with warm images.
+  useEffect(() => {
+    if (!showComplete || !level || !chapter) return;
+    const upcoming = chapter.levels.find((l) => l.order === level.order + 1);
+    if (upcoming) void preloadImages([upcoming.imageA, upcoming.imageB]);
+  }, [showComplete, level, chapter]);
 
   // Active gameplay timer.
   useEffect(() => {

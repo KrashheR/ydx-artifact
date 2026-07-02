@@ -634,6 +634,8 @@ export function MapScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
                       <img
                         src={level.previewSrc}
                         alt=""
+                        loading="lazy"
+                        decoding="async"
                         className={`h-full w-full object-cover ${
                           level.locked ? "map-level-preview-image--locked" : ""
                         }`}
@@ -770,6 +772,8 @@ export function MapScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
                   <img
                     src={level.previewSrc}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover"
                     draggable={false}
                   />

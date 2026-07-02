@@ -1,18 +1,17 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CollectionScreen } from "@/screens/CollectionScreen";
-import { DailyScreen } from "@/screens/DailyScreen";
 import { GameScreen } from "@/screens/GameScreen";
 import { HomeScreen } from "@/screens/HomeScreen";
 import { MapScreen } from "@/screens/MapScreen";
-import { SettingsModal } from "@/screens/SettingsScreen";
 import { campaignManifestList } from "@/content/campaignManifest";
 import { getChapterPreviewAsset } from "@/content/sceneAssets";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
 import { mockPlatform } from "@/services/platform/mockPlatform";
 import { notifyGameReady } from "@/services/platform/platformLifecycle";
+import { preloadImage } from "@/shared/lib/imagePreload";
 import { resolveInitialLocale } from "@/shared/lib/locale";
+import { prefetchHomeIdleAssets } from "@/shared/lib/scenePrefetch";
 import { useGameStore } from "@/shared/store/gameStore";
 
 function nextFrame() {
@@ -25,14 +24,17 @@ function nextFrame() {
   });
 }
 
-function preloadImage(src: string) {
-  return new Promise<void>((resolve) => {
-    const image = new Image();
-    image.onload = () => resolve();
-    image.onerror = () => resolve();
-    image.src = src;
-  });
-}
+// Secondary surfaces load as separate chunks so they don't weigh down the
+// initial bundle; home/map/game stay in the entry chunk as the critical path.
+const CollectionScreen = lazy(() =>
+  import("@/screens/CollectionScreen").then((module) => ({ default: module.CollectionScreen }))
+);
+const DailyScreen = lazy(() =>
+  import("@/screens/DailyScreen").then((module) => ({ default: module.DailyScreen }))
+);
+const SettingsModal = lazy(() =>
+  import("@/screens/SettingsScreen").then((module) => ({ default: module.SettingsModal }))
+);
 
 async function preloadCriticalImages() {
   await Promise.all(campaignManifestList.map((campaign) => preloadImage(getChapterPreviewAsset(campaign.id))));
@@ -104,10 +106,14 @@ export function App() {
   const setAutoLocale = useGameStore((state) => state.setAutoLocale);
   const locale = useGameStore((state) => state.saveData.settings.locale);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // Keeps the lazy settings chunk out of the initial load: the modal is
+  // mounted on first open and stays mounted so close animations still play.
+  const [settingsMounted, setSettingsMounted] = useState(false);
   const [bootstrapped, setBootstrapped] = useState(false);
 
   const openSettings = useCallback((source: string) => {
     trackAnalyticsEvent("settings_opened", { source, screen: screen.kind });
+    setSettingsMounted(true);
     setSettingsOpen(true);
   }, [screen.kind]);
 
@@ -123,26 +129,36 @@ export function App() {
       trackAnalyticsEvent("game_open", {
         language: i18n.resolvedLanguage ?? i18n.language
       });
-      await hydrate();
-      const sdkLanguage = await mockPlatform.getEnvironmentLanguage();
-      if (cancelled) return;
 
-      const savedSettings = useGameStore.getState().saveData.settings;
-      const nextLocale = savedSettings.localeSource === "manual" ? savedSettings.locale : resolveInitialLocale(sdkLanguage);
-      if (savedSettings.localeSource !== "manual") {
-        setAutoLocale(nextLocale);
-      }
-      await i18n.changeLanguage(nextLocale);
-      document.documentElement.lang = nextLocale;
-      document.title = i18n.t("app.title");
+      // Save hydration + locale resolution is independent from asset warmup,
+      // so the three run in parallel instead of serially.
+      const applyLocale = async () => {
+        await hydrate();
+        const sdkLanguage = await mockPlatform.getEnvironmentLanguage();
+        if (cancelled) return i18n.resolvedLanguage ?? i18n.language;
 
-      if (!cancelled && import.meta.env.DEV && import.meta.env.VITE_DEV_VALIDATE_CHEAT === "true") {
-        const { unlockAllDevContent } = await import("@/dev/devContent");
-        await unlockAllDevContent();
-      }
+        const savedSettings = useGameStore.getState().saveData.settings;
+        const nextLocale = savedSettings.localeSource === "manual" ? savedSettings.locale : resolveInitialLocale(sdkLanguage);
+        if (savedSettings.localeSource !== "manual") {
+          setAutoLocale(nextLocale);
+        }
+        await i18n.changeLanguage(nextLocale);
+        document.documentElement.lang = nextLocale;
+        document.title = i18n.t("app.title");
 
-      await preloadCriticalImages();
-      await waitForFonts();
+        if (!cancelled && import.meta.env.DEV && import.meta.env.VITE_DEV_VALIDATE_CHEAT === "true") {
+          const { unlockAllDevContent } = await import("@/dev/devContent");
+          await unlockAllDevContent();
+        }
+
+        return nextLocale;
+      };
+
+      const [nextLocale] = await Promise.all([
+        applyLocale(),
+        preloadCriticalImages(),
+        waitForFonts()
+      ]);
       if (cancelled) return;
 
       setBootstrapped(true);
@@ -163,6 +179,20 @@ export function App() {
       cancelled = true;
     };
   }, [hydrate, i18n, setAutoLocale]);
+
+  // Once the home screen is visible, warm the map card previews, map
+  // backgrounds and likely next level scenes in the background, so opening a
+  // campaign shows already-cached images. Idle-scheduled and non-blocking.
+  useEffect(() => {
+    if (!bootstrapped) return;
+    const start = () => void prefetchHomeIdleAssets(useGameStore.getState().saveData);
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(start, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(start, 1000);
+    return () => window.clearTimeout(id);
+  }, [bootstrapped]);
 
   useEffect(() => {
     if (!bootstrapped) return;
@@ -198,9 +228,17 @@ export function App() {
           />
         );
       case "daily":
-        return <DailyScreen />;
+        return (
+          <Suspense fallback={<BootstrapScreen />}>
+            <DailyScreen />
+          </Suspense>
+        );
       case "collection":
-        return <CollectionScreen />;
+        return (
+          <Suspense fallback={<BootstrapScreen />}>
+            <CollectionScreen />
+          </Suspense>
+        );
     }
   }, [openSettings, screen]);
 
@@ -236,10 +274,14 @@ export function App() {
           <SettingsGearIcon />
         </button>
       )}
-      <SettingsModal
-        isOpen={settingsOpen}
-        onClose={closeSettings}
-      />
+      {settingsMounted && (
+        <Suspense fallback={null}>
+          <SettingsModal
+            isOpen={settingsOpen}
+            onClose={closeSettings}
+          />
+        </Suspense>
+      )}
       <OrientationGate />
     </main>
   );

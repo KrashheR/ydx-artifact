@@ -21,7 +21,9 @@ async function removeSceneMarkupReferences(dir: string): Promise<number> {
     entries.map(async (entry) => {
       const path = join(dir, entry.name);
       if (entry.isDirectory()) return removeSceneMarkupReferences(path);
-      if (entry.isFile() && entry.name === "3.webp") {
+      // 3.webp is the markup reference; preview.webp is the full-size source
+      // for the generated preview-sm.webp. Neither is used at runtime.
+      if (entry.isFile() && (entry.name === "3.webp" || entry.name === "preview.webp")) {
         await rm(path);
         return 1;
       }

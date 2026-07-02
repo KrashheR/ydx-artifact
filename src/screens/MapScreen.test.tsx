@@ -23,9 +23,9 @@ describe("MapScreen", () => {
   });
 
   it("builds campaign card preview paths from the configured runtime format for each chapter", () => {
-    expect(getCampaignCardPreviewAsset("northern-route", 3)).toBe("/assets/scenes/northern-route/3/1.webp");
-    expect(getCampaignCardPreviewAsset("sand-meridian", 7)).toBe("/assets/scenes/sand-meredian/7/1.webp");
-    expect(getCampaignCardPreviewAsset("emerald-meridian", 12)).toBe("/assets/scenes/emerald-meridian/12/1.webp");
+    expect(getCampaignCardPreviewAsset("northern-route", 3)).toBe("/assets/scenes/northern-route/3/card.webp");
+    expect(getCampaignCardPreviewAsset("sand-meridian", 7)).toBe("/assets/scenes/sand-meredian/7/card.webp");
+    expect(getCampaignCardPreviewAsset("emerald-meridian", 12)).toBe("/assets/scenes/emerald-meridian/12/card.webp");
   });
 
   it("keeps the mounted chapter stable while the map exits to home", () => {

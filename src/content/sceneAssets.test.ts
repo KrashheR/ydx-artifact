@@ -9,8 +9,8 @@ describe("sceneAssets", () => {
   });
 
   it("maps chapter ids to campaign menu preview assets", () => {
-    expect(getChapterPreviewAsset("northern-route")).toBe("/assets/scenes/northern-route/preview.webp");
-    expect(getChapterPreviewAsset("sand-meridian")).toBe("/assets/scenes/sand-meredian/preview.webp");
-    expect(getChapterPreviewAsset("emerald-meridian")).toBe("/assets/scenes/emerald-meridian/preview.webp");
+    expect(getChapterPreviewAsset("northern-route")).toBe("/assets/scenes/northern-route/preview-sm.webp");
+    expect(getChapterPreviewAsset("sand-meridian")).toBe("/assets/scenes/sand-meredian/preview-sm.webp");
+    expect(getChapterPreviewAsset("emerald-meridian")).toBe("/assets/scenes/emerald-meridian/preview-sm.webp");
   });
 });

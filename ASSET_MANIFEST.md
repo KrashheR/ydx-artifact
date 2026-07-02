@@ -24,6 +24,13 @@ Production level intake stores converted runtime scene images under `public/asse
 
 Campaign selection screen previews are stored beside each chapter package as `public/assets/scenes/<chapter-folder>/preview.webp` and are resolved through `src/content/sceneAssets.ts`.
 
+Compressed preview derivatives are generated from the full-size assets by `pnpm assets:previews` (`scripts/generate-level-previews.ts`) and are the only preview files referenced at runtime:
+
+- `<chapter-folder>/preview-sm.webp` (960px wide, q70): home campaign card preview, generated from `preview.webp`.
+- `<chapter-folder>/<level-order>/card.webp` (720px wide, q70): map level card preview, generated from `<level-order>/1.webp`.
+
+Re-run `pnpm assets:previews` after adding or replacing scene images. The production build excludes the full-size `preview.webp` sources and `3.webp` markup references from `dist/` (see `vite.config.ts`).
+
 | id | path | kind | status | source |
 |---|---|---|---|---|
 | placeholder-a | `public/assets/scenes/northern-route/placeholder/a.svg` | scene A | placeholder | local SVG generated for scaffold |

@@ -13,6 +13,14 @@ Playable campaign content is chapter-driven:
 - `src/content/chapters.ts` is the catalog layer used by Home, Map, progression and validation; each chapter provides level list, map background, native map aspect ratio and normalized map nodes.
 - `src/content/sceneAssets.ts` centralizes campaign card preview paths, including the configurable scene filename used by the campaign journal cards.
 
+Loading performance:
+
+- App bootstrap in `src/app/App.tsx` runs save hydration/locale resolution, campaign preview warmup and font readiness in parallel (`Promise.all`) before revealing the UI.
+- Home and map cards use generated compressed previews (`preview-sm.webp`, `card.webp`, see `scripts/generate-level-previews.ts`) instead of full-size scene images; map card `<img>` tags are `loading="lazy"`.
+- `src/screens/GameScreen.tsx` preloads both scene images (`imageA`/`imageB`) via `src/shared/lib/imagePreload.ts` when a level opens, and prefetches the next level's pair while the completion overlay is shown.
+- After bootstrap, an idle-scheduled background prefetch (`src/shared/lib/scenePrefetch.ts`) warms map backgrounds and level card previews of unlocked chapters plus the likely next levels' scene pairs, one image at a time; it is skipped under data-saver.
+- Secondary surfaces (`CollectionScreen`, `DailyScreen`, `SettingsModal`) are `React.lazy` chunks; the settings modal mounts on first open. Home, map and gameplay stay in the entry chunk.
+
 Platform calls are routed through service modules under `src/services`. The platform adapter keeps Yandex SDK access out of React components for review prompts, fullscreen interstitials, rewarded hint ads and cloud/local save storage.
 
 Review prompt flow stays inside the same architecture seams:
