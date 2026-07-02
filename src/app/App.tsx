@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CollectionScreen } from "@/screens/CollectionScreen";
 import { DailyScreen } from "@/screens/DailyScreen";
@@ -9,6 +9,7 @@ import { MapScreen } from "@/screens/MapScreen";
 import { SettingsModal } from "@/screens/SettingsScreen";
 import { campaignManifestList } from "@/content/campaignManifest";
 import { getChapterPreviewAsset } from "@/content/sceneAssets";
+import { trackAnalyticsEvent } from "@/services/analytics/analytics";
 import { mockPlatform } from "@/services/platform/mockPlatform";
 import { notifyGameReady } from "@/services/platform/platformLifecycle";
 import { resolveInitialLocale } from "@/shared/lib/locale";
@@ -105,10 +106,23 @@ export function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [bootstrapped, setBootstrapped] = useState(false);
 
+  const openSettings = useCallback((source: string) => {
+    trackAnalyticsEvent("settings_opened", { source, screen: screen.kind });
+    setSettingsOpen(true);
+  }, [screen.kind]);
+
+  const closeSettings = useCallback(() => {
+    trackAnalyticsEvent("settings_closed", { screen: screen.kind });
+    setSettingsOpen(false);
+  }, [screen.kind]);
+
   useEffect(() => {
     let cancelled = false;
 
     async function bootstrap() {
+      trackAnalyticsEvent("game_open", {
+        language: i18n.resolvedLanguage ?? i18n.language
+      });
       await hydrate();
       const sdkLanguage = await mockPlatform.getEnvironmentLanguage();
       if (cancelled) return;
@@ -136,6 +150,10 @@ export function App() {
       await nextFrame();
       if (!cancelled) {
         await notifyGameReady();
+        trackAnalyticsEvent("game_ready", {
+          language: nextLocale
+        });
+        trackAnalyticsEvent("screen_view", { screen: "home" });
       }
     }
 
@@ -168,15 +186,15 @@ export function App() {
   const current = useMemo(() => {
     switch (screen.kind) {
       case "home":
-        return <HomeScreen onOpenSettings={() => setSettingsOpen(true)} />;
+        return <HomeScreen onOpenSettings={() => openSettings("home_topbar")} />;
       case "map":
-        return <MapScreen onOpenSettings={() => setSettingsOpen(true)} />;
+        return <MapScreen onOpenSettings={() => openSettings("map_topbar")} />;
       case "game":
         return (
           <GameScreen
             levelId={screen.levelId}
             mode={screen.mode}
-            onOpenSettings={() => setSettingsOpen(true)}
+            onOpenSettings={() => openSettings("game_hud")}
           />
         );
       case "daily":
@@ -184,7 +202,7 @@ export function App() {
       case "collection":
         return <CollectionScreen />;
     }
-  }, [screen]);
+  }, [openSettings, screen]);
 
   if (!bootstrapped) {
     return <BootstrapScreen />;
@@ -207,7 +225,7 @@ export function App() {
       {screen.kind !== "game" && screen.kind !== "map" && screen.kind !== "home" && (
         <button
           type="button"
-          onClick={() => setSettingsOpen(true)}
+          onClick={() => openSettings(`${screen.kind}_floating`)}
           aria-label={t("actions.settings")}
           className={`app-settings-button app-settings-button--${screen.kind} fixed z-[90] flex items-center justify-center text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass`}
           style={{
@@ -220,7 +238,7 @@ export function App() {
       )}
       <SettingsModal
         isOpen={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
+        onClose={closeSettings}
       />
       <OrientationGate />
     </main>

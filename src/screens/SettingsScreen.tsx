@@ -13,7 +13,15 @@ type Props = { isOpen: boolean; onClose: () => void };
 
 function GlobeIcon() {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#879087" strokeWidth="1.6" aria-hidden="true">
+    <svg
+      width="15"
+      height="15"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#879087"
+      strokeWidth="1.6"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="12" r="9.3" />
       <path d="M3 12h18M12 2.7c2.6 2.5 4 5.8 4 9.3s-1.4 6.8-4 9.3c-2.6-2.5-4-5.8-4-9.3s1.4-6.8 4-9.3Z" />
     </svg>
@@ -22,7 +30,17 @@ function GlobeIcon() {
 
 function GearIcon() {
   return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="26"
+      height="26"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#2a1d0c"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="12" r="3.2" />
       <path d="M12 2.5v2.4M12 19.1v2.4M21.5 12h-2.4M4.9 12H2.5M18.7 5.3l-1.7 1.7M7 17l-1.7 1.7M18.7 18.7L17 17M7 7L5.3 5.3" />
     </svg>
@@ -31,7 +49,17 @@ function GearIcon() {
 
 function CheckmarkIcon() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1a130a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#1a130a"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M5 12l5 5L20 6" />
     </svg>
   );
@@ -39,7 +67,16 @@ function CheckmarkIcon() {
 
 function CloseIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
       <path d="M6 6l12 12M18 6L6 18" />
     </svg>
   );
@@ -59,7 +96,9 @@ export function SettingsModal({ isOpen, onClose }: Props) {
   useEffect(() => {
     if (!isOpen) return;
     previousFocusRef.current =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
     const timer = window.setTimeout(() => closeButtonRef.current?.focus(), 0);
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -71,14 +110,17 @@ export function SettingsModal({ isOpen, onClose }: Props) {
       if (e.key !== "Tab" || !dialogRef.current) return;
       const els = Array.from(
         dialogRef.current.querySelectorAll<HTMLElement>(
-          "button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex=\"-1\"])"
-        )
+          'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
       );
       if (!els.length) return;
       if (e.shiftKey && document.activeElement === els[0]) {
         e.preventDefault();
         els[els.length - 1].focus();
-      } else if (!e.shiftKey && document.activeElement === els[els.length - 1]) {
+      } else if (
+        !e.shiftKey &&
+        document.activeElement === els[els.length - 1]
+      ) {
         e.preventDefault();
         els[0].focus();
       }
@@ -106,7 +148,7 @@ export function SettingsModal({ isOpen, onClose }: Props) {
             paddingTop: "max(8px, env(safe-area-inset-top))",
             paddingRight: "max(8px, env(safe-area-inset-right))",
             paddingBottom: "max(8px, env(safe-area-inset-bottom))",
-            paddingLeft: "max(8px, env(safe-area-inset-left))"
+            paddingLeft: "max(8px, env(safe-area-inset-left))",
           }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -132,7 +174,10 @@ export function SettingsModal({ isOpen, onClose }: Props) {
             initial={prefersReducedMotion ? { opacity: 0 } : { y: "100%" }}
             animate={{ y: 0, opacity: 1 }}
             exit={prefersReducedMotion ? { opacity: 0 } : { y: "100%" }}
-            transition={{ duration: prefersReducedMotion ? 0 : 0.32, ease: [0.2, 0.8, 0.3, 1.05] }}
+            transition={{
+              duration: prefersReducedMotion ? 0 : 0.32,
+              ease: [0.2, 0.8, 0.3, 1.05],
+            }}
             onClick={(e) => e.stopPropagation()}
             style={{
               background: "linear-gradient(180deg, #27302b, #1d251f)",
@@ -148,7 +193,8 @@ export function SettingsModal({ isOpen, onClose }: Props) {
               className="pointer-events-none absolute left-0 right-0 top-0 h-[3px]"
               aria-hidden="true"
               style={{
-                background: "linear-gradient(90deg, transparent, #d8af63, transparent)",
+                background:
+                  "linear-gradient(90deg, transparent, #d8af63, transparent)",
               }}
             />
 
@@ -223,7 +269,7 @@ export function SettingsModal({ isOpen, onClose }: Props) {
 
             {/* Language list */}
             <div
-              className="settings-language-list flex-1 overflow-y-auto px-[22px] pb-1.5 pt-2 sm:max-h-[368px] sm:flex-none"
+              className="settings-language-list flex-1 overflow-y-auto px-[22px] pb-1.5 pt-2 sm:max-h-[368px] sm:flex-none md:flex-col"
               style={{
                 scrollbarWidth: "thin",
                 scrollbarColor: "rgba(184,138,69,.4) rgba(213,195,154,.05)",
@@ -252,13 +298,16 @@ export function SettingsModal({ isOpen, onClose }: Props) {
                           className="pointer-events-none absolute bottom-3.5 left-0 top-3.5 w-[3px] rounded-r-[3px]"
                           aria-hidden="true"
                           style={{
-                            background: "linear-gradient(180deg, #d8af63, #a9762f)",
+                            background:
+                              "linear-gradient(180deg, #d8af63, #a9762f)",
                           }}
                         />
                         <div
                           className="pointer-events-none absolute inset-0 rounded-[10px]"
                           aria-hidden="true"
-                          style={{ boxShadow: "0 0 0 1px rgba(184,138,69,.12)" }}
+                          style={{
+                            boxShadow: "0 0 0 1px rgba(184,138,69,.12)",
+                          }}
                         />
                       </>
                     )}
@@ -341,6 +390,6 @@ export function SettingsModal({ isOpen, onClose }: Props) {
         </motion.div>
       )}
     </AnimatePresence>,
-    document.body
+    document.body,
   );
 }

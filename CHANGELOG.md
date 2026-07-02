@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+- Fixed the mobile landscape campaign card overlapping the right carousel arrow: the card's right edge now sits left of the arrow (shell narrowed, `home-content` right padding increased, arrow offsets adjusted so both arrows stay fully outside the card).
+
+- Restored campaign-card texts in mobile landscape (description clamped to two lines, progress counter and locked-campaign info box are visible again; the title selector now targets the redesigned `h2`), and widened mobile map level cards from 210px to 240px.
+
+- Redesigned the mobile landscape hint control after the "Кнопка подсказки - варианты" design (variants 2a/2b): with hints left the FAB shows a glowing ring plus three charge pips and an "N left" caption; with no hints left it shows a rotating dashed ring with a text-only "Watch ad" badge. Hints (magnifiers) are now capped at 3 total — level rewards, daily rewards and loaded saves clamp to `MAX_MAGNIFIERS`.
+
+- Added a `durationBucket` field to `level_complete` analytics so Yandex Metrica can segment level completion speed alongside the exact `durationSeconds` value.
+
+- Added privacy-safe gameplay analytics coverage for Yandex publication: optional Yandex Metrica `reachGoal` transport via `VITE_YANDEX_METRICA_ID`, local QA buffering in `window.__artifactAnalyticsEvents`, events across app readiness, campaign selection, level flow, differences, hints, ads, daily rewards and review prompts, plus `docs/YANDEX_METRICS_SETUP_GUIDE.md`.
+
+- Added `pnpm metrika:goals` to dry-run and create missing Yandex Metrica JavaScript-event goals from the documented analytics goal list.
+
+- Added a `--cheat` flag to `pnpm dev` (via the new `scripts/dev.ts` wrapper) that runs the plain dev server with the all-content dev unlock applied, without the hitbox layout-debug overlay. Use `pnpm dev --cheat` (or `npm run dev -- --cheat`).
+
+- Updated the desktop v3 UI pass from `docs/new_desk`: campaign selection hides locked progress counts and darkens locked previews, the route journal adds a labeled segmented progress tracker plus clearer current/completed/locked cards, gameplay uses a single top differences tracker with elapsed-time display and a streak footer, and the rewarded hint modal now uses a blurred scene backdrop with a free-hint value chip and skip action.
+
+- Replaced the zero-magnifier rewarded hint browser prompt with an in-game modal that explains the ad reward, uses a top-right close button, and shows ad-unavailable errors inside the modal.
+
+- Polished mobile landscape gameplay controls: the hint FAB now has its label in the right rail, the found counter is vertically aligned, and the before/after slider handle can be dragged directly on the scene.
+
+- Reworked phone landscape layouts against `docs/mobile-redesign`: gameplay now uses a single 16:10 before/after slider instead of the A/B flip card, with side rails for level status and hint/settings controls; campaign selection, campaign map and settings spacing now track the 896x414 mobile mockups more closely while settings keeps only the language option.
+
 - Removed two extra upper-right hitboxes (`bird-glyph`, `incense-sticks`) from `emerald-meridian` level 8, reducing the level to 9 required differences.
 
 - Removed two extra upper-right hitboxes (`top-foliage`, `stone-step`) from `emerald-meridian` level 5, reducing the level to 5 required differences.

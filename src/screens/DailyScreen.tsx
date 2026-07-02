@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { dailyLevels } from "@/content/levels";
+import { trackAnalyticsEvent } from "@/services/analytics/analytics";
 import { useGameStore } from "@/shared/store/gameStore";
 import { Button } from "@/shared/ui/Button";
 import { Panel } from "@/shared/ui/Panel";
@@ -17,6 +18,15 @@ export function DailyScreen() {
   const daily = useGameStore((state) => state.saveData.daily);
   const entry = dailyLevels[todaysDailyIndex()];
 
+  const handleStartDaily = () => {
+    trackAnalyticsEvent("daily_start_clicked", {
+      levelId: entry.levelId,
+      streak: daily.streak,
+      lastClaimDate: daily.lastClaimDate
+    });
+    startLevel(entry.levelId, "daily");
+  };
+
   return (
     <Panel className="max-w-3xl">
       <div className="flex items-center justify-between gap-3">
@@ -26,7 +36,7 @@ export function DailyScreen() {
       <p className="mt-4 text-graphite/70">
         {t("daily.sceneInfo", { title: t(entry.titleKey), streak: daily.streak })}
       </p>
-      <Button className="mt-6" onClick={() => startLevel(entry.levelId, "daily")}>{t("actions.start")}</Button>
+      <Button className="mt-6" onClick={handleStartDaily}>{t("actions.start")}</Button>
     </Panel>
   );
 }

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 127.0.0.1",
+    "dev": "tsx scripts/dev.ts",
     "dev:validate": "tsx scripts/dev-validate.ts",
     "dev:validate:cheat": "tsx scripts/dev-validate.ts --cheat",
     "validate:final": "tsx scripts/dev-validate.ts --final --cheat",
@@ -20,7 +20,8 @@
     "release:validate": "pnpm validate:content && pnpm build",
     "release:manifest": "tsx scripts/release-manifest.ts",
     "release:zip": "tsx scripts/release-zip.ts",
-    "release:checksum": "tsx scripts/release-checksum.ts"
+    "release:checksum": "tsx scripts/release-checksum.ts",
+    "metrika:goals": "tsx scripts/sync-metrica-goals.ts"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",

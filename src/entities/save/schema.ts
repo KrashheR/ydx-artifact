@@ -2,6 +2,8 @@ import { z } from "zod";
 
 export const SAVE_VERSION = 2;
 
+export const MAX_MAGNIFIERS = 3;
+
 export const reviewUnavailableReasonSchema = z.enum([
   "NO_AUTH",
   "GAME_RATED",
@@ -133,7 +135,9 @@ function normalizeBestResults(value: unknown): SaveData["bestResults"] {
 
 export function migrateSaveData(value: unknown): SaveData {
   const v2 = saveSchema.safeParse(value);
-  if (v2.success) return v2.data;
+  if (v2.success) {
+    return { ...v2.data, magnifiers: Math.min(v2.data.magnifiers, MAX_MAGNIFIERS) };
+  }
 
   const v1 = saveV1Schema.safeParse(value);
   if (!v1.success) return createDefaultSave();
@@ -161,7 +165,10 @@ export function migrateSaveData(value: unknown): SaveData {
           mistakes: clampNonNegativeInteger(source.inProgress.mistakes, 0)
         }
       : null,
-    magnifiers: clampNonNegativeInteger(source.magnifiers, fallback.magnifiers),
+    magnifiers: Math.min(
+      clampNonNegativeInteger(source.magnifiers, fallback.magnifiers),
+      MAX_MAGNIFIERS
+    ),
     artifacts: { ...fallback.artifacts, ...(source.artifacts ?? {}) },
     daily: {
       lastClaimDate: source.daily?.lastClaimDate ?? null,
@@ -188,7 +195,7 @@ export function createDefaultSave(): SaveData {
     completedLevels: [],
     bestResults: {},
     inProgress: null,
-    magnifiers: 3,
+    magnifiers: MAX_MAGNIFIERS,
     artifacts: {
       "brass-compass": "locked",
       "field-radio": "locked",

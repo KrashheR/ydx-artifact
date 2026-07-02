@@ -3,5 +3,6 @@
 /build
 /.idea
 .idea
+.env*.local
 .chrome-screens-profile-locales
 /artifacts/playtests

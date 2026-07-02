@@ -18,6 +18,8 @@ vi.mock("@/services/storage/localSaveService", () => ({
 }));
 
 function resetStore() {
+  window.sessionStorage.clear();
+  window.__artifactAnalyticsEvents = [];
   useGameStore.setState({
     screen: { kind: "home" },
     saveData: createDefaultSave(),
@@ -84,5 +86,30 @@ describe("gameStore best results", () => {
     expect(starsForAccuracy(bestResult.accuracy)).toBe(3);
     expect(bestResult.mistakes).toBe(0);
     expect(bestResult.durationSeconds).toBe(80);
+  });
+});
+
+describe("gameStore analytics", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    resetStore();
+  });
+
+  it("tracks level completion duration in seconds and a stable bucket", () => {
+    const level = getChapterLevels("northern-route")[0];
+
+    completeAttempt(level.id, 1, 130);
+
+    const completionEvent = window.__artifactAnalyticsEvents?.find(
+      (event) => event.event === "level_complete"
+    );
+    expect(completionEvent?.goal).toBe("aa_level_complete");
+    expect(completionEvent?.payload).toEqual(
+      expect.objectContaining({
+        levelId: level.id,
+        durationSeconds: 130,
+        durationBucket: "120_179s"
+      })
+    );
   });
 });

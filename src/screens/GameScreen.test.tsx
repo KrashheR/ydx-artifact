@@ -20,7 +20,11 @@ vi.mock("@/features/gameplay/PhotoComparator", () => ({
     <div>
       {hintId ? <div data-testid="active-hint">{hintId}</div> : null}
       {level.differences.map((difference) => (
-        <button key={difference.id} type="button" onClick={() => onDifference(difference.id)}>
+        <button
+          key={difference.id}
+          type="button"
+          onClick={() => onDifference(difference.id)}
+        >
           find {difference.id}
         </button>
       ))}
@@ -32,8 +36,6 @@ describe("GameScreen", () => {
   beforeEach(() => {
     vi.useRealTimers();
     vi.restoreAllMocks();
-    vi.spyOn(window, "confirm").mockReturnValue(true);
-    vi.spyOn(window, "alert").mockImplementation(() => undefined);
     mockPlatform.setRewardedGatewayOverride(null);
     useGameStore.setState({
       screen: { kind: "home" },
@@ -59,13 +61,19 @@ describe("GameScreen", () => {
     render(<GameScreen levelId={level.id} mode="campaign" />);
 
     for (const difference of level.differences) {
-      fireEvent.click(screen.getByRole("button", { name: `find ${difference.id}` }));
+      fireEvent.click(
+        screen.getByRole("button", { name: `find ${difference.id}` }),
+      );
       await waitFor(() => {
-        expect(useGameStore.getState().saveData.inProgress?.foundDifferenceIds).toContain(difference.id);
+        expect(
+          useGameStore.getState().saveData.inProgress?.foundDifferenceIds,
+        ).toContain(difference.id);
       });
     }
 
-    const levelSelectButton = await screen.findByRole("button", { name: /К выбору уровней|Level Select/ });
+    const levelSelectButton = await screen.findByRole("button", {
+      name: /К выбору уровней|Level Select/,
+    });
     fireEvent.click(levelSelectButton);
 
     await waitFor(() => {
@@ -87,7 +95,9 @@ describe("GameScreen", () => {
     fireEvent.click(hintButton);
 
     await screen.findByTestId("active-hint");
-    expect(screen.getByTestId("active-hint")).toHaveTextContent(hintedDifference.id);
+    expect(screen.getByTestId("active-hint")).toHaveTextContent(
+      hintedDifference.id,
+    );
     expect(useGameStore.getState().saveData.magnifiers).toBe(2);
 
     fireEvent.click(hintButton);
@@ -95,7 +105,9 @@ describe("GameScreen", () => {
     expect(useGameStore.getState().saveData.magnifiers).toBe(2);
     expect(hintButton).toBeDisabled();
 
-    fireEvent.click(screen.getByRole("button", { name: `find ${hintedDifference.id}` }));
+    fireEvent.click(
+      screen.getByRole("button", { name: `find ${hintedDifference.id}` }),
+    );
 
     await waitFor(() => {
       expect(screen.queryByTestId("active-hint")).not.toBeInTheDocument();
@@ -114,11 +126,43 @@ describe("GameScreen", () => {
     render(<GameScreen levelId={level.id} mode="campaign" />);
 
     fireEvent.click(screen.getByRole("button", { name: /рекламу|ad/i }));
+    expect(
+      screen.getByRole("dialog", { name: /подсказку|hint/i }),
+    ).toBeInTheDocument();
+    expect(showRewarded).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: /Посмотреть|Watch/i }));
 
     await screen.findByTestId("active-hint");
     expect(showRewarded).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId("active-hint")).toHaveTextContent(level.differences[0].id);
+    expect(screen.getByTestId("active-hint")).toHaveTextContent(
+      level.differences[0].id,
+    );
     expect(useGameStore.getState().saveData.magnifiers).toBe(0);
+  });
+
+  it("closes the rewarded hint modal from the top-right close button", async () => {
+    const level = getChapterLevels("northern-route")[0];
+    const showRewarded = vi.fn(async () => "rewarded" as const);
+    mockPlatform.setRewardedGatewayOverride({ showRewarded });
+    useGameStore.setState((state) => ({
+      saveData: { ...state.saveData, magnifiers: 0 },
+    }));
+    useGameStore.getState().startLevel(level.id, "campaign");
+
+    render(<GameScreen levelId={level.id} mode="campaign" />);
+
+    fireEvent.click(screen.getByRole("button", { name: /рекламу|ad/i }));
+    expect(
+      screen.getByRole("dialog", { name: /подсказку|hint/i }),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /Закрыть|Close/i }));
+
+    expect(
+      screen.queryByRole("dialog", { name: /подсказку|hint/i }),
+    ).not.toBeInTheDocument();
+    expect(showRewarded).not.toHaveBeenCalled();
   });
 
   it("allows watching another rewarded ad for another area hint while the previous ad hint is still active", async () => {
@@ -134,16 +178,22 @@ describe("GameScreen", () => {
 
     const hintButton = screen.getByRole("button", { name: /рекламу|ad/i });
     fireEvent.click(hintButton);
+    fireEvent.click(screen.getByRole("button", { name: /Посмотреть|Watch/i }));
 
     await screen.findByTestId("active-hint");
-    expect(screen.getByTestId("active-hint")).toHaveTextContent(level.differences[0].id);
+    expect(screen.getByTestId("active-hint")).toHaveTextContent(
+      level.differences[0].id,
+    );
 
     await waitFor(() => expect(hintButton).not.toBeDisabled());
     fireEvent.click(hintButton);
+    fireEvent.click(screen.getByRole("button", { name: /Посмотреть|Watch/i }));
 
     await waitFor(() => {
       expect(showRewarded).toHaveBeenCalledTimes(2);
-      expect(screen.getByTestId("active-hint")).toHaveTextContent(level.differences[1].id);
+      expect(screen.getByTestId("active-hint")).toHaveTextContent(
+        level.differences[1].id,
+      );
     });
     expect(useGameStore.getState().saveData.magnifiers).toBe(0);
   });
@@ -160,9 +210,32 @@ describe("GameScreen", () => {
     render(<GameScreen levelId={level.id} mode="campaign" />);
 
     fireEvent.click(screen.getByRole("button", { name: /рекламу|ad/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Посмотреть|Watch/i }));
 
     await waitFor(() => expect(showRewarded).toHaveBeenCalledTimes(1));
     expect(screen.queryByTestId("active-hint")).not.toBeInTheDocument();
     expect(useGameStore.getState().saveData.magnifiers).toBe(0);
+  });
+
+  it("shows rewarded hint failures inside the modal instead of a native alert", async () => {
+    const level = getChapterLevels("northern-route")[0];
+    const showRewarded = vi.fn(async () => "failed" as const);
+    const alertSpy = vi
+      .spyOn(window, "alert")
+      .mockImplementation(() => undefined);
+    mockPlatform.setRewardedGatewayOverride({ showRewarded });
+    useGameStore.setState((state) => ({
+      saveData: { ...state.saveData, magnifiers: 0 },
+    }));
+    useGameStore.getState().startLevel(level.id, "campaign");
+
+    render(<GameScreen levelId={level.id} mode="campaign" />);
+
+    fireEvent.click(screen.getByRole("button", { name: /рекламу|ad/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Посмотреть|Watch/i }));
+
+    await screen.findByText(/недоступна|unavailable/i);
+    expect(alertSpy).not.toHaveBeenCalled();
+    expect(screen.queryByTestId("active-hint")).not.toBeInTheDocument();
   });
 });

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import {
   createDefaultSave,
+  MAX_MAGNIFIERS,
   type ReviewUnavailableReason,
   type SaveData
 } from "@/entities/save/schema";
@@ -10,6 +11,10 @@ import {
   loadPersistentSave,
   savePersistentSave
 } from "@/services/storage/localSaveService";
+import {
+  trackAnalyticsEvent,
+  type AnalyticsPayload
+} from "@/services/analytics/analytics";
 import { isBetterLevelResult, unlockedArtifactsForCompleted } from "@/shared/lib/progression";
 
 type Screen =
@@ -31,6 +36,10 @@ type InterstitialRuntimeState = {
   pendingMapCheckCompletedLevels: number | null;
   lastResolvedCompletedLevels: number;
   nativeRequestInFlight: boolean;
+};
+
+type LevelCompletionAnalyticsPayload = AnalyticsPayload & {
+  isReplay: boolean;
 };
 
 type GameStore = {
@@ -92,6 +101,35 @@ function applyArtifactUnlocks(saveData: SaveData): SaveData {
   return { ...saveData, artifacts };
 }
 
+function getScreenAnalyticsPayload(screen: Screen) {
+  if (screen.kind === "map") return { screen: screen.kind, campaignId: screen.chapterId };
+  if (screen.kind === "game") return { screen: screen.kind, levelId: screen.levelId, mode: screen.mode };
+  return { screen: screen.kind };
+}
+
+function getLevelAnalyticsPayload(levelId: string) {
+  const level = getLevelById(levelId);
+  if (!level) return { levelId };
+
+  return {
+    levelId,
+    campaignId: level.chapterId,
+    levelOrder: level.order,
+    requiredDifferences: level.requiredDifferences
+  };
+}
+
+function getDurationBucket(durationSeconds: number) {
+  const seconds = Math.floor(durationSeconds);
+  if (seconds < 30) return "under_30s";
+  if (seconds < 60) return "30_59s";
+  if (seconds < 120) return "60_119s";
+  if (seconds < 180) return "120_179s";
+  if (seconds < 240) return "180_239s";
+  if (seconds < 300) return "240_299s";
+  return "300s_plus";
+}
+
 export const useGameStore = create<GameStore>((set, get) => ({
   screen: { kind: "home" },
   saveData: createDefaultSave(),
@@ -113,6 +151,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       saveData: result.saveData,
       saveStatus: result.cloudAvailable ? "saved" : result.source === "default" ? "idle" : "local-only"
     });
+    trackAnalyticsEvent("save_loaded", {
+      source: result.source,
+      cloudAvailable: result.cloudAvailable,
+      completedLevels: result.saveData.completedLevels.length,
+      language: result.saveData.settings.locale
+    });
   },
   async save(options) {
     const saveData = get().saveData;
@@ -129,21 +173,43 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   navigate(screen) {
     set({ screen });
+    trackAnalyticsEvent("screen_view", getScreenAnalyticsPayload(screen));
   },
   startLevel(levelId, mode = "campaign") {
     const level = getLevelById(levelId);
     if (!level) return;
+    const state = get();
+    const isReplay = state.saveData.completedLevels.includes(levelId);
+    const previousProgress =
+      state.saveData.inProgress?.levelId === levelId
+        ? state.saveData.inProgress.foundDifferenceIds.length
+        : 0;
     set((state) => ({
       screen: { kind: "game", levelId, mode },
       saveData: ensureInProgress(state.saveData, levelId)
     }));
+    trackAnalyticsEvent("level_start", {
+      ...getLevelAnalyticsPayload(levelId),
+      mode,
+      isReplay,
+      resumedFoundDifferences: previousProgress
+    });
+    trackAnalyticsEvent("screen_view", { screen: "game", ...getLevelAnalyticsPayload(levelId), mode });
     void get().save();
   },
   recordDifference(levelId, differenceId) {
+    let analyticsPayload: AnalyticsPayload | null = null;
     set((state) => {
       const saveData = ensureInProgress(state.saveData, levelId);
       const inProgress = saveData.inProgress!;
       if (inProgress.foundDifferenceIds.includes(differenceId)) return state;
+      analyticsPayload = {
+        ...getLevelAnalyticsPayload(levelId),
+        differenceId,
+        findOrder: inProgress.foundDifferenceIds.length + 1,
+        elapsedActiveSeconds: Math.floor(inProgress.elapsedActiveSeconds),
+        mistakes: inProgress.mistakes
+      };
       return {
         saveData: {
           ...saveData,
@@ -154,12 +220,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       };
     });
+    if (analyticsPayload) {
+      trackAnalyticsEvent("difference_found", analyticsPayload);
+    }
     void get().save();
   },
   recordMisclick(levelId) {
+    let analyticsPayload: AnalyticsPayload | null = null;
     set((state) => {
       const saveData = ensureInProgress(state.saveData, levelId);
       const inProgress = saveData.inProgress!;
+      analyticsPayload = {
+        ...getLevelAnalyticsPayload(levelId),
+        misclicks: inProgress.mistakes + 1,
+        foundDifferences: inProgress.foundDifferenceIds.length,
+        elapsedActiveSeconds: Math.floor(inProgress.elapsedActiveSeconds)
+      };
       return {
         saveData: {
           ...saveData,
@@ -170,9 +246,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       };
     });
+    if (analyticsPayload) {
+      trackAnalyticsEvent("level_misclick", analyticsPayload);
+    }
     void get().save();
   },
   completeLevel(levelId, durationSeconds, mode = "campaign") {
+    const completionEvents: LevelCompletionAnalyticsPayload[] = [];
+    let artifactUnlockCount = 0;
     set((state) => {
       const level = getLevelById(levelId);
       if (!level) return state;
@@ -200,16 +281,41 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const completedLevels = wasAlreadyCompleted
         ? state.saveData.completedLevels
         : [...state.saveData.completedLevels, levelId];
-      const nextSave = applyArtifactUnlocks({
+      const saveBeforeArtifactUnlocks = {
         ...state.saveData,
         completedLevels,
         inProgress: null,
-        magnifiers: state.saveData.magnifiers + (level.reward.magnifiers ?? 0),
+        magnifiers: Math.min(
+          state.saveData.magnifiers + (level.reward.magnifiers ?? 0),
+          MAX_MAGNIFIERS
+        ),
         bestResults
-      });
+      };
+      const nextSave = applyArtifactUnlocks(saveBeforeArtifactUnlocks);
+      artifactUnlockCount = Object.entries(nextSave.artifacts).filter(
+        ([artifactId, state]) =>
+          state === "newly-unlocked" && saveBeforeArtifactUnlocks.artifacts[artifactId] === "locked"
+      ).length;
       const shouldQueueReviewCheck = mode === "campaign" && !wasAlreadyCompleted;
       const shouldQueueInterstitialCheck =
         shouldQueueReviewCheck && completedLevels.length > 0 && completedLevels.length % 3 === 0;
+
+      completionEvents.push({
+        ...getLevelAnalyticsPayload(levelId),
+        mode,
+        durationSeconds: Math.floor(durationSeconds),
+        durationBucket: getDurationBucket(durationSeconds),
+        foundDifferences: foundCount,
+        mistakes,
+        accuracy: Number(accuracy.toFixed(4)),
+        isReplay: wasAlreadyCompleted,
+        completedLevels: completedLevels.length,
+        rewardMagnifiers: level.reward.magnifiers ?? 0,
+        magnifiersAfterReward: nextSave.magnifiers,
+        artifactUnlockCount,
+        queuedReviewCheck: shouldQueueReviewCheck,
+        queuedInterstitialCheck: shouldQueueInterstitialCheck
+      });
 
       return {
         saveData: nextSave,
@@ -228,19 +334,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
           : state.interstitialRuntime
       };
     });
+    const completionPayload = completionEvents[0];
+    if (completionPayload) {
+      trackAnalyticsEvent("level_complete", completionPayload);
+      if (mode === "campaign" && !completionPayload.isReplay) {
+        trackAnalyticsEvent("campaign_progress", completionPayload);
+      }
+    }
     void get().save({ flush: true });
   },
   spendMagnifiers(amount) {
     const current = get().saveData.magnifiers;
     if (current < amount) return false;
     set((state) => ({ saveData: { ...state.saveData, magnifiers: current - amount } }));
+    trackAnalyticsEvent("magnifiers_spent", {
+      amount,
+      magnifiersBefore: current,
+      magnifiersAfter: current - amount
+    });
     void get().save({ flush: true });
     return true;
   },
   setLocale(locale) {
+    const previousLocale = get().saveData.settings.locale;
     set((state) => ({
       saveData: { ...state.saveData, settings: { ...state.saveData.settings, locale, localeSource: "manual" } }
     }));
+    trackAnalyticsEvent("settings_language_changed", {
+      previousLanguage: previousLocale,
+      language: locale
+    });
     void get().save({ flush: true });
   },
   setAutoLocale(locale) {
@@ -279,15 +402,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
   claimDailyReward(date) {
+    const previousDaily = get().saveData.daily;
+    if (previousDaily.lastClaimDate === date) return;
     set((state) => {
-      if (state.saveData.daily.lastClaimDate === date) return state;
       return {
         saveData: {
           ...state.saveData,
-          magnifiers: state.saveData.magnifiers + 1,
+          magnifiers: Math.min(state.saveData.magnifiers + 1, MAX_MAGNIFIERS),
           daily: { lastClaimDate: date, streak: state.saveData.daily.streak + 1 }
         }
       };
+    });
+    trackAnalyticsEvent("daily_reward_claimed", {
+      date,
+      previousClaimDate: previousDaily.lastClaimDate,
+      streak: previousDaily.streak + 1
     });
     void get().save({ flush: true });
   },
@@ -396,10 +525,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().save();
   },
   resetLevelProgress(levelId) {
+    const inProgress = get().saveData.inProgress;
     set((state) => {
       if (state.saveData.inProgress?.levelId !== levelId) return state;
       return { saveData: { ...state.saveData, inProgress: null } };
     });
+    if (inProgress?.levelId === levelId) {
+      trackAnalyticsEvent("level_retry", {
+        ...getLevelAnalyticsPayload(levelId),
+        foundDifferences: inProgress.foundDifferenceIds.length,
+        mistakes: inProgress.mistakes,
+        elapsedActiveSeconds: Math.floor(inProgress.elapsedActiveSeconds)
+      });
+    }
     void get().save();
   },
   async resetSave() {

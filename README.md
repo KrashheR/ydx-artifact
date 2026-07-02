@@ -49,9 +49,12 @@ pnpm test:e2e
 For broad agent edits, `pnpm agent:check` runs lint, typecheck and content validation. For pre-release agent validation, use `pnpm agent:release-check`.
 `pnpm dev:validate` starts the Vite dev server with gameplay scenes swapped to each level's `3.*` markup reference and all difference hitboxes visible for live alignment checks.
 `pnpm dev:validate:cheat` starts the same validation server and automatically unlocks all currently implemented campaigns and levels in the local dev save.
+`pnpm dev --cheat` starts the plain dev server (no hitbox debug overlay) with that same all-content unlock applied to the local dev save.
 `pnpm validate:final` starts the same hitbox editor over the final gameplay `1.*` and `2.*` scene images instead of the `3.*` markup reference, so A/B hitboxes can be moved, resized, copied and applied against the real pair.
 Production builds exclude scene markup reference files named `3.webp` from `dist/assets/scenes/**`; the source files stay in `public` for `pnpm validate:content`, `pnpm dev:validate`, and local hitbox review.
 Production builds also exclude unused scene placeholder SVGs and keep the Yandex Games SDK as the platform-provided `/sdk.js` script in `index.html`.
+Custom gameplay analytics can be enabled for production builds by setting `VITE_YANDEX_METRICA_ID=<counter id>` before `pnpm build`; setup steps and the Metrica goal list are documented in `docs/YANDEX_METRICS_SETUP_GUIDE.md`.
+Use `pnpm metrika:goals` to dry-run Yandex Metrica goal setup, then `pnpm metrika:goals -- --apply` to create missing JavaScript-event goals through the Metrica Management API.
 Production builds do not emit sourcemaps by default to keep the Yandex upload smaller. Use `BUILD_SOURCEMAP=true pnpm build` when a diagnostic build needs `.map` files.
 `pnpm release:zip` packages the contents of `dist/` into `dist-yandex.zip` with the Node-based release packager, verifies root `index.html`, and excludes macOS/system junk plus sourcemaps. It does not require system `zip` / `unzip` binaries.
 
@@ -75,6 +78,7 @@ Production builds do not emit sourcemaps by default to keep the Yandex upload sm
 - First-run locale auto-detection through `ysdk.environment.i18n.lang`, with persisted manual RU/EN override.
 - Mock platform adapter and diagnostics copy.
 - Campaign journal review pre-prompt wired to the Yandex Games feedback API seam with local dev mocks.
+- Privacy-safe product analytics events for app readiness, campaign/map navigation, gameplay, hints, ads, daily rewards and review prompts, with optional Yandex Metrica `reachGoal` transport.
 
 ## Agent Workflow
 

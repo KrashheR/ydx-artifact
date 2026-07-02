@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { chapters, getChapterLevels } from "@/content/chapters";
 import { getChapterPreviewAsset } from "@/content/sceneAssets";
+import { trackAnalyticsEvent } from "@/services/analytics/analytics";
 import { useGameStore } from "@/shared/store/gameStore";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -484,11 +485,16 @@ function TopBar({
       <div className="flex items-center gap-3 md:gap-4">
         {/* Overall progress (desktop only) */}
         <div className="hidden flex-col items-end gap-1 md:flex">
-          <p className="text-[11px] text-exp-muted">
-            {t("campaigns.totalProgress", { done: totalDone, total: totalAll })}
-          </p>
+          <div className="flex items-center gap-2.5">
+            <span className="text-[10px] font-semibold uppercase tracking-[.2em] text-exp-muted">
+              {t("campaigns.totalDone")}
+            </span>
+            <span className="font-jetbrains text-[13px] font-semibold text-exp-brass2">
+              {t("campaigns.totalProgress", { done: totalDone, total: totalAll })}
+            </span>
+          </div>
           <div
-            className="h-[5px] w-24 overflow-hidden rounded-full"
+            className="h-[5px] w-40 overflow-hidden rounded-full"
             style={{ background: "rgba(213,195,154,0.12)" }}
           >
             <div
@@ -542,28 +548,41 @@ function RouteSequence({
         <div key={i} className="flex items-center">
           {i > 0 && (
             <div
-              className="w-[110px]"
-              style={{ borderTop: "1px dashed rgba(213,195,154,0.22)" }}
+              className="mb-[22px] h-[2px] w-[120px]"
+              style={{
+                background:
+                  isActive(statuses[i - 1]) && isActive(status)
+                    ? "linear-gradient(90deg,#B3812F,#D8AF63)"
+                    : isActive(statuses[i - 1])
+                      ? "linear-gradient(90deg,#B3812F,rgba(213,195,154,.14))"
+                      : "rgba(213,195,154,.14)",
+              }}
             />
           )}
-          <div className="flex flex-col items-center gap-1.5">
+          <div className="flex flex-col items-center gap-2">
             <div
-              className="flex h-[18px] w-[18px] items-center justify-center rounded-full"
+              className="flex h-[34px] w-[34px] items-center justify-center rounded-full font-manrope text-[13px] font-bold"
               style={
                 isActive(status)
-                  ? { background: "#B88A45", border: "1px solid #B88A45" }
+                  ? {
+                      background: "linear-gradient(180deg,#D8AF63,#B3812F)",
+                      border: "1px solid rgba(216,175,99,.45)",
+                      boxShadow: "0 0 14px rgba(216,175,99,.35)",
+                      color: "#1A130A",
+                    }
                   : {
-                      background: "transparent",
-                      border: "1px solid rgba(213,195,154,0.28)",
+                      background: "rgba(213,195,154,.06)",
+                      border: "1px solid rgba(213,195,154,.16)",
+                      color: "#879087",
                     }
               }
             >
               {status === "completed" ? (
-                <CheckIcon size={10} color="#151B18" />
+                <CheckIcon size={14} color="#151B18" />
               ) : status === "locked" ? (
-                <LockIcon size={10} color="rgba(213,195,154,0.35)" />
+                <LockIcon size={14} color="#879087" />
               ) : (
-                <div className="h-[6px] w-[6px] rounded-full bg-exp-bg" />
+                i + 1
               )}
             </div>
             <span className="text-[9px] font-bold uppercase tracking-[.12em] text-exp-muted">
@@ -602,10 +621,10 @@ function DesktopCard({
           : "home-campaign-card--landscape-inactive"
       }`}
       style={{
-        background: "#222A25",
+        background: locked ? "#171D1A" : "#1C2420",
         border: isHighlighted
           ? "1px solid rgba(184,138,69,0.28)"
-          : "1px solid rgba(213,195,154,0.10)",
+          : "1px solid rgba(213,195,154,0.08)",
         boxShadow: isHighlighted
           ? "0 22px 50px rgba(0,0,0,.42)"
           : "0 16px 38px rgba(0,0,0,.32)",
@@ -619,7 +638,9 @@ function DesktopCard({
         <img
           src={PREVIEW_IMAGE[campaign.id]}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover"
+          className={`absolute inset-0 h-full w-full object-cover ${
+            locked ? "home-campaign-preview-image--locked" : ""
+          }`}
           draggable={false}
         />
         <div
@@ -679,19 +700,26 @@ function DesktopCard({
           <h2 className="font-cormorant text-[27px] font-semibold leading-tight text-exp-parch md:text-[20px]">
             {t(`campaigns.${campaign.id}.title`)}
           </h2>
-          <span
-            className="home-campaign-progress flex-shrink-0 font-bold text-exp-brass"
-            style={{ fontSize: 18 }}
-          >
-            {String(campaign.done).padStart(2, "0")}{" "}
-            <span className="text-[13px] font-medium text-exp-muted">
-              / {String(campaign.total).padStart(2, "0")}
+          {!locked && (
+            <span
+              className="home-campaign-progress flex-shrink-0 font-jetbrains font-semibold text-exp-brass2"
+              style={{ fontSize: 15 }}
+            >
+              {String(campaign.done).padStart(2, "0")}
+              <span className="text-[13px] font-medium text-exp-muted">
+                {" "}
+                / {String(campaign.total).padStart(2, "0")}
+              </span>
             </span>
-          </span>
+          )}
         </div>
 
         {/* Description */}
-        <p className="mt-2 min-h-[39px] text-[12.5px] leading-[1.55] text-exp-muted">
+        <p
+          className={`mt-2 min-h-[39px] text-[13.5px] leading-[1.55] ${
+            locked ? "text-[#7F887F]" : "text-[#9AA39A]"
+          }`}
+        >
           {t(`campaigns.${campaign.id}.description`)}
         </p>
 
@@ -1044,6 +1072,14 @@ export function HomeScreen({
   };
 
   const handleOpenCampaign = (campaignId: CampaignId) => {
+    const selectedCampaign = campaigns.find((campaign) => campaign.id === campaignId);
+    trackAnalyticsEvent("campaign_selected", {
+      campaignCardId: campaignId,
+      campaignStatus: selectedCampaign?.status,
+      completedInCampaign: selectedCampaign?.done,
+      totalInCampaign: selectedCampaign?.total
+    });
+
     if (campaignId === "white") {
       navigate({ kind: "map", chapterId: chapters["northern-route"].id });
       return;
@@ -1054,7 +1090,15 @@ export function HomeScreen({
     }
     if (campaignId === "emerald" && emeraldUnlocked) {
       navigate({ kind: "map", chapterId: chapters["emerald-meridian"].id });
+      return;
     }
+
+    trackAnalyticsEvent("locked_campaign_clicked", {
+      campaignCardId: campaignId,
+      campaignStatus: selectedCampaign?.status,
+      completedInCampaign: selectedCampaign?.done,
+      totalInCampaign: selectedCampaign?.total
+    });
   };
   return (
     <div className="home-screen min-h-screen bg-exp-bg font-manrope text-exp-parch">

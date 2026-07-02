@@ -4,6 +4,7 @@ import { getChapter, getLevelById } from "@/content/chapters";
 import { PhotoComparator } from "@/features/gameplay/PhotoComparator";
 import { LevelCompleteOverlay } from "@/features/gameplay/LevelCompleteOverlay";
 import { LevelFailedOverlay } from "@/features/gameplay/LevelFailedOverlay";
+import { trackAnalyticsEvent } from "@/services/analytics/analytics";
 import { mockPlatform } from "@/services/platform/mockPlatform";
 import {
   getIsPlatformPaused,
@@ -11,6 +12,7 @@ import {
   subscribePlatformPause,
 } from "@/services/platform/platformLifecycle";
 import { useGameStore } from "@/shared/store/gameStore";
+import { MAX_MAGNIFIERS } from "@/entities/save/schema";
 
 const TIME_LIMIT = 300; // 5 minutes
 const COMPLETE_OVERLAY_DELAY_MS = 200;
@@ -38,6 +40,195 @@ function SettingsGearIcon() {
       <circle cx="12" cy="12" r="3.2" />
       <path d="M19.4 13a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
     </svg>
+  );
+}
+
+function RewardedHintModal({
+  failed,
+  loading,
+  backgroundSrc,
+  onClose,
+  onWatch,
+}: {
+  failed: boolean;
+  loading: boolean;
+  backgroundSrc: string;
+  onClose: () => void;
+  onWatch: () => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="absolute inset-0 z-50 flex items-center justify-center p-3">
+      <img
+        src={backgroundSrc}
+        alt=""
+        className="rewarded-hint-backdrop-image absolute inset-0 h-full w-full object-cover"
+        draggable={false}
+      />
+      <button
+        type="button"
+        className="absolute inset-0 cursor-default"
+        style={{
+          background:
+            "radial-gradient(80% 80% at 50% 42%, rgba(13,18,15,.58), rgba(13,18,15,.9))",
+        }}
+        aria-label={t("actions.back")}
+        onClick={loading ? undefined : onClose}
+      />
+
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="rewarded-hint-title"
+        className="modal-panel result-dialog rewarded-hint-dialog relative z-10 w-[496px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[22px] font-manrope"
+        style={{
+          background: "linear-gradient(180deg, #27302b, #1c241e)",
+          border: "1px solid rgba(184,138,69,.35)",
+          boxShadow:
+            "0 50px 120px rgba(0,0,0,.7), inset 0 1px 0 rgba(213,195,154,.08)",
+          animation: "game-pop .5s cubic-bezier(.2,.8,.3,1.2)",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "3px",
+            background:
+              "linear-gradient(90deg, transparent, #d8af63, transparent)",
+          }}
+        />
+
+        <button
+          type="button"
+          onClick={onClose}
+          disabled={loading}
+          className="absolute right-3 top-3 z-20 flex h-11 w-11 items-center justify-center rounded-[10px] text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass disabled:opacity-45"
+          style={{
+            border: "1px solid rgba(213,195,154,.14)",
+            background: "rgba(213,195,154,.05)",
+          }}
+          aria-label={t("settings.closeLabel")}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
+            <path d="M6 6l12 12M18 6 6 18" />
+          </svg>
+        </button>
+
+        <div className="relative z-0 px-8 pb-8 pt-11 text-center sm:px-[46px]">
+          <div
+            className="mx-auto mb-[18px] flex h-[76px] w-[76px] items-center justify-center rounded-full"
+            style={{
+              background:
+                "radial-gradient(circle at 40% 34%, #d8af63, #8e642c 72%)",
+              border: "2px dashed rgba(255,236,196,.5)",
+              boxShadow:
+                "0 14px 36px rgba(0,0,0,.5), 0 0 30px rgba(184,138,69,.32)",
+            }}
+          >
+            <svg
+              width="34"
+              height="34"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#1a130a"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 18h6M10 21h4" />
+              <path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z" />
+            </svg>
+          </div>
+
+          <div className="text-[11px] font-semibold tracking-[.28em] text-exp-brass">
+            {t("game.rewardedHintEyebrow")}
+          </div>
+          <h2
+            id="rewarded-hint-title"
+            className="mt-2 font-cormorant text-[34px] font-semibold leading-tight text-exp-parch"
+          >
+            {t("game.rewardedHintTitle")}
+          </h2>
+          {!failed && (
+            <div className="mt-4 inline-flex h-[38px] items-center gap-2 rounded-[11px] border border-[#B88A45]/35 bg-[#B88A45]/10 px-4">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#D8AF63"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 18h6M10 21h4" />
+                <path d="M12 2a7 7 0 0 0-4 12.7c.7.6 1 1.5 1 2.3h6c0-.8.3-1.7 1-2.3A7 7 0 0 0 12 2Z" />
+              </svg>
+              <span className="text-[14px] font-bold text-exp-brass2">
+                {t("game.rewardedHintValue")}
+              </span>
+              <span className="text-[12px] font-semibold text-exp-muted">
+                {t("game.rewardedHintValueScope")}
+              </span>
+            </div>
+          )}
+          <p className="mx-auto mt-2.5 max-w-[320px] text-[14px] leading-[1.55] text-exp-muted">
+            {failed ? t("game.rewardedHintFailed") : t("game.rewardedHintBody")}
+          </p>
+
+          <button
+            type="button"
+            onClick={onWatch}
+            disabled={loading}
+            className="mt-7 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[10px] border-none px-5 text-[15px] font-bold text-[#1a130a] disabled:opacity-60"
+            style={{
+              background: "linear-gradient(180deg, #d8af63, #b3812f)",
+              boxShadow:
+                "0 12px 28px rgba(184,138,69,.32), inset 0 1px 0 rgba(255,255,255,.3)",
+            }}
+          >
+            {loading
+              ? t("game.rewardedHintLoading")
+              : t("game.rewardedHintWatch")}
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#1a130a"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="6" width="18" height="12" rx="2" />
+              <path d="m10 9 5 3-5 3V9Z" fill="#1a130a" stroke="none" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={loading}
+            className="mt-2.5 flex min-h-11 w-full items-center justify-center rounded-[11px] bg-transparent px-5 text-[13.5px] font-semibold text-exp-muted transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass disabled:opacity-45"
+          >
+            {t("game.rewardedHintSkip")}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -69,6 +260,9 @@ export function GameScreen({
   const [pageVisible, setPageVisible] = useState(() => !document.hidden);
   const [hintId, setHintId] = useState<string | undefined>();
   const [rewardedHintInFlight, setRewardedHintInFlight] = useState(false);
+  const [rewardedHintModal, setRewardedHintModal] = useState<
+    "offer" | "failed" | null
+  >(null);
   const [pendingFinalStats, setPendingFinalStats] = useState<{
     found: number;
     mistakes: number;
@@ -81,6 +275,7 @@ export function GameScreen({
   } | null>(null);
   const completeOverlayDelayRef = useRef<number | null>(null);
   const activeTimerSaveCounterRef = useRef(0);
+  const timeoutTrackedRef = useRef(false);
 
   const level = getLevelById(levelId);
   const chapter = level ? getChapter(level.chapterId) : null;
@@ -98,10 +293,12 @@ export function GameScreen({
   const timeLeft = Math.max(0, TIME_LIMIT - liveElapsedActiveSeconds);
   const completionPending = pendingFinalStats !== null;
   const showComplete = finalStats !== null;
-  const showOverlay = showComplete || timedOut;
+  const showRewardedHintModal = rewardedHintModal !== null;
+  const showOverlay = showComplete || timedOut || showRewardedHintModal;
   const gameplayBlocked =
     platformPaused ||
     !pageVisible ||
+    showRewardedHintModal ||
     rewardedHintInFlight ||
     showComplete ||
     completionPending ||
@@ -147,9 +344,31 @@ export function GameScreen({
 
   // Detect timeout
   useEffect(() => {
-    if (timeLeft === 0 && !showComplete && !completionPending)
+    if (timeLeft === 0 && !showComplete && !completionPending) {
       setTimedOut(true);
-  }, [timeLeft, showComplete, completionPending]);
+      if (!timeoutTrackedRef.current) {
+        timeoutTrackedRef.current = true;
+        trackAnalyticsEvent("level_failed_timeout", {
+          levelId,
+          campaignId: level?.chapterId,
+          mode,
+          foundDifferences: liveFoundIds.length,
+          mistakes: liveMistakes,
+          elapsedActiveSeconds: liveElapsedActiveSeconds,
+        });
+      }
+    }
+  }, [
+    completionPending,
+    level?.chapterId,
+    levelId,
+    liveElapsedActiveSeconds,
+    liveFoundIds.length,
+    liveMistakes,
+    mode,
+    showComplete,
+    timeLeft,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -169,10 +388,6 @@ export function GameScreen({
     : liveFoundIds;
   const activeHintIsUnfound =
     hintId !== undefined && !liveFoundIds.includes(hintId);
-  const accuracyPct = Math.round(
-    (liveFoundIds.length / Math.max(liveFoundIds.length + liveMistakes, 1)) *
-      100,
-  );
   const chapterId = level.chapterId;
 
   function handleDifference(differenceId: string) {
@@ -198,19 +413,33 @@ export function GameScreen({
   function revealNextAreaHint({
     spendMagnifier,
     skipActiveHint,
+    source,
   }: {
     spendMagnifier: boolean;
     skipActiveHint: boolean;
+    source: "magnifier" | "rewarded";
   }) {
-    if (showComplete || completionPending) return;
-    if (activeHintIsUnfound && !skipActiveHint) return;
+    if (showComplete || completionPending) return undefined;
+    if (activeHintIsUnfound && !skipActiveHint) return undefined;
     const next = level!.differences.find(
       (d) =>
         !liveFoundIds.includes(d.id) && (!skipActiveHint || d.id !== hintId),
     );
-    if (!next) return;
-    if (spendMagnifier && !spendMagnifiers(1)) return;
+    if (!next) return undefined;
+    if (spendMagnifier && !spendMagnifiers(1)) return undefined;
     setHintId(next.id);
+    trackAnalyticsEvent("hint_revealed", {
+      levelId,
+      campaignId: level!.chapterId,
+      levelOrder: level!.order,
+      mode,
+      differenceId: next.id,
+      source,
+      foundDifferences: liveFoundIds.length,
+      mistakes: liveMistakes,
+      elapsedActiveSeconds: liveElapsedActiveSeconds,
+    });
+    return next.id;
   }
 
   async function handleAreaHint() {
@@ -222,21 +451,71 @@ export function GameScreen({
     )
       return;
     if (magnifiers > 0) {
-      revealNextAreaHint({ spendMagnifier: true, skipActiveHint: false });
+      revealNextAreaHint({
+        spendMagnifier: true,
+        skipActiveHint: false,
+        source: "magnifier",
+      });
       return;
     }
 
-    const confirmed = window.confirm(t("game.rewardedHintConfirm"));
-    if (!confirmed) return;
+    setRewardedHintModal("offer");
+    trackAnalyticsEvent("rewarded_hint_offer_opened", {
+      levelId,
+      campaignId: level!.chapterId,
+      levelOrder: level!.order,
+      mode,
+      foundDifferences: liveFoundIds.length,
+      mistakes: liveMistakes,
+      elapsedActiveSeconds: liveElapsedActiveSeconds,
+    });
+  }
+
+  async function handleRewardedHintWatch() {
+    if (
+      showComplete ||
+      completionPending ||
+      rewardedHintInFlight ||
+      platformPaused ||
+      magnifiers > 0 ||
+      !hasRewardedAreaHintTarget
+    )
+      return;
     void save({ flush: true });
     setRewardedHintInFlight(true);
+    setRewardedHintModal("offer");
+    trackAnalyticsEvent("rewarded_hint_requested", {
+      levelId,
+      campaignId: level!.chapterId,
+      levelOrder: level!.order,
+      mode,
+      foundDifferences: liveFoundIds.length,
+      mistakes: liveMistakes,
+      elapsedActiveSeconds: liveElapsedActiveSeconds,
+    });
     try {
       const result = await mockPlatform.showRewarded();
       if (result === "rewarded") {
-        revealNextAreaHint({ spendMagnifier: false, skipActiveHint: true });
+        revealNextAreaHint({
+          spendMagnifier: false,
+          skipActiveHint: true,
+          source: "rewarded",
+        });
+        setRewardedHintModal(null);
+      } else if (result === "closed") {
+        setRewardedHintModal(null);
       } else if (result === "failed") {
-        window.alert(t("game.rewardedHintFailed"));
+        setRewardedHintModal("failed");
       }
+      trackAnalyticsEvent(`rewarded_hint_${result}`, {
+        levelId,
+        campaignId: level!.chapterId,
+        levelOrder: level!.order,
+        mode,
+        foundDifferences: liveFoundIds.length,
+        mistakes: liveMistakes,
+        elapsedActiveSeconds: liveElapsedActiveSeconds,
+      });
     } finally {
       setRewardedHintInFlight(false);
     }
@@ -255,19 +534,44 @@ export function GameScreen({
   }
 
   function handleNext() {
-    if (nextLevel) startLevel(nextLevel.id, "campaign");
+    if (!nextLevel) return;
+    trackAnalyticsEvent("level_next_clicked", {
+      levelId,
+      nextLevelId: nextLevel.id,
+      campaignId: chapterId,
+      mode,
+    });
+    startLevel(nextLevel.id, "campaign");
   }
 
   function handleMap() {
     if (completionPending) return;
     void save({ flush: true });
+    trackAnalyticsEvent("level_exit_to_map", {
+      levelId,
+      campaignId: chapterId,
+      mode,
+      foundDifferences: liveFoundIds.length,
+      mistakes: liveMistakes,
+      elapsedActiveSeconds: liveElapsedActiveSeconds,
+      completed: showComplete,
+    });
     navigate({ kind: "map", chapterId });
   }
 
   function handleExtendTime() {
     if (!spendMagnifiers(2)) return;
     setTimedOut(false);
+    timeoutTrackedRef.current = false;
     addActiveLevelTime(levelId, -30, { save: true, flush: true });
+    trackAnalyticsEvent("level_time_extended", {
+      levelId,
+      campaignId: chapterId,
+      mode,
+      foundDifferences: liveFoundIds.length,
+      mistakes: liveMistakes,
+      elapsedActiveSeconds: liveElapsedActiveSeconds,
+    });
   }
 
   const campaignTitle = t(chapter.titleKey).toUpperCase();
@@ -280,6 +584,7 @@ export function GameScreen({
     !rewardedHintInFlight &&
     liveFoundIds.length < level.requiredDifferences &&
     (magnifiers > 0 ? !activeHintIsUnfound : hasRewardedAreaHintTarget);
+  const displayStreak = Math.max(0, liveFoundIds.length - liveMistakes);
 
   return (
     <div className="game-screen fixed inset-0 flex flex-col overflow-hidden bg-exp-bg font-manrope text-exp-parch">
@@ -344,7 +649,7 @@ export function GameScreen({
                   total: chapter.levels.length,
                 })}
               </div>
-              <div className="font-cormorant text-[22px] font-semibold leading-tight tracking-[.01em] text-exp-parch">
+              <div className="text-[22px] font-semibold leading-tight tracking-[.01em] text-exp-parch">
                 {t(level.titleKey)}
               </div>
             </div>
@@ -374,48 +679,84 @@ export function GameScreen({
               </svg>
               <span
                 className="font-jetbrains text-[16px] font-semibold tracking-[.04em] sm:text-[22px]"
-                style={{ color: timeLeft <= 30 ? "#e08a78" : "#D5C39A" }}
+                style={{ color: "#D5C39A" }}
               >
-                {formatTime(timeLeft)}
+                {formatTime(liveElapsedActiveSeconds)}
+              </span>
+              <span className="hidden text-[9.5px] font-semibold uppercase tracking-[.14em] text-exp-muted lg:inline">
+                {t("game.timeLabel")}
               </span>
             </div>
 
             {/* Found counter */}
             <div
-              className="flex h-[48px] items-center gap-[11px] rounded-[11px] px-5"
+              className="flex h-[48px] items-center rounded-[11px] gap-2 flex-col px-5 md:flex-row justify-center"
               style={{
                 border: "1px solid rgba(184,138,69,.4)",
                 background:
                   "linear-gradient(180deg, rgba(184,138,69,.16), rgba(184,138,69,.05))",
               }}
             >
-              <svg
-                width="19"
-                height="19"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#d8af63"
-                strokeWidth="1.7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="11" cy="11" r="7" />
-                <path d="m21 21-4.3-4.3" />
-              </svg>
-              <div className="flex items-baseline gap-0.5">
-                <span className="font-manrope text-[24px] font-bold text-exp-brass2 md:text-[17px]">
-                  {liveFoundIds.length}
-                </span>
-                <span
-                  className="font-manrope text-[15px] font-semibold"
-                  style={{ color: "rgba(213,195,154,.5)" }}
+              <div className="flex items-center gap-[6px] rounded-[11px]">
+                <svg
+                  width="19"
+                  height="19"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#d8af63"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ flexShrink: 0 }}
                 >
-                  / {level.requiredDifferences}
-                </span>
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+                <div className="flex shrink-0 items-center gap-1 whitespace-nowrap leading-none">
+                  <span className="font-manrope text-[24px] font-bold text-exp-brass2 md:text-[17px]">
+                    {liveFoundIds.length}
+                  </span>
+                  <span
+                    className="whitespace-nowrap font-manrope text-[15px] font-semibold"
+                    style={{ color: "rgba(213,195,154,.5)" }}
+                  >
+                    / {level.requiredDifferences}
+                  </span>
+                </div>
               </div>
               <span className="hidden font-manrope text-[10.5px] font-semibold tracking-[.12em] text-exp-muted sm:block md:text-[12px]">
                 {t("game.diffCount")}
               </span>
+              <div className="hidden gap-[5px] xl:flex">
+                {Array.from({ length: level.requiredDifferences }).map(
+                  (_, i) => (
+                    <span
+                      key={i}
+                      className="flex h-5 w-5 items-center justify-center rounded-[6px]"
+                      style={
+                        i < liveFoundIds.length
+                          ? { background: "#D8AF63" }
+                          : { border: "1px dashed rgba(213,195,154,.3)" }
+                      }
+                    >
+                      {i < liveFoundIds.length && (
+                        <svg
+                          width="11"
+                          height="11"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#1A130A"
+                          strokeWidth="3.4"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M20 6L9 17l-5-5" />
+                        </svg>
+                      )}
+                    </span>
+                  ),
+                )}
+              </div>
             </div>
           </div>
 
@@ -424,7 +765,7 @@ export function GameScreen({
             <button
               onClick={handleAreaHint}
               disabled={!canUseAreaHint}
-              className="flex min-h-[44px] items-center gap-2 rounded-[9px] px-4 font-manrope text-[13px] font-bold text-exp-brass2 disabled:opacity-40"
+              className="game-hint-button flex min-h-[44px] items-center gap-2 rounded-[9px] px-4 font-manrope text-[13px] font-bold text-exp-brass2 disabled:opacity-40"
               style={{
                 border: "1px solid rgba(184,138,69,.45)",
                 background: "rgba(184,138,69,.08)",
@@ -441,57 +782,117 @@ export function GameScreen({
                   : t("game.rewardedHintLabel")
               }
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M9 18h6M10 21h4" />
-                <path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z" />
-              </svg>
-              <span className="hidden sm:inline">
-                {magnifiers > 0
-                  ? t("game.hintLabel")
-                  : t("game.rewardedHintShort")}
-              </span>
-              {magnifiers > 0 ? (
-                <span
-                  className="inline-flex min-w-[20px] items-center justify-center rounded-[6px] px-[5px] font-manrope text-[11px] font-bold text-[#1a130a]"
-                  style={{ height: "20px", background: "#d8af63" }}
+              <span className="game-hint-button-desktop flex items-center gap-2">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  {magnifiers}
-                </span>
-              ) : (
-                <span
-                  className="inline-flex h-[20px] w-[24px] items-center justify-center rounded-[6px] text-[#1a130a]"
-                  style={{ background: "#d8af63" }}
-                  aria-hidden="true"
-                >
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                  <path d="M9 18h6M10 21h4" />
+                  <path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z" />
+                </svg>
+                <span className="hidden sm:inline">{t("game.hintLabel")}</span>
+                {magnifiers > 0 ? (
+                  <span
+                    className="inline-flex min-w-[20px] items-center justify-center rounded-[6px] px-[5px] font-manrope text-[11px] font-bold text-[#1a130a]"
+                    style={{ height: "20px", background: "#d8af63" }}
                   >
-                    <rect x="3" y="6" width="18" height="12" rx="2" />
-                    <path
-                      d="m10 9 5 3-5 3V9Z"
-                      fill="currentColor"
-                      stroke="none"
-                    />
-                  </svg>
-                </span>
-              )}
+                    {magnifiers}
+                  </span>
+                ) : (
+                  <>
+                    <span
+                      className="inline-flex min-w-[20px] items-center justify-center rounded-[6px] px-[5px] font-manrope text-[11px] font-bold text-[#1a130a]"
+                      style={{ height: "20px", background: "#d8af63" }}
+                    >
+                      0
+                    </span>
+                    <span className="h-[18px] w-px bg-[#D8AF63]/30" />
+                    <span
+                      className="inline-flex h-[20px] w-[24px] items-center justify-center rounded-[6px] text-[#1a130a]"
+                      style={{ background: "#d8af63" }}
+                      aria-hidden="true"
+                    >
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <rect x="3" y="6" width="18" height="12" rx="2" />
+                        <path
+                          d="m10 9 5 3-5 3V9Z"
+                          fill="currentColor"
+                          stroke="none"
+                        />
+                      </svg>
+                    </span>
+                  </>
+                )}
+              </span>
+              <span
+                className={
+                  magnifiers > 0
+                    ? "game-hint-fab-ring game-hint-fab-ring--charged"
+                    : "game-hint-fab-ring game-hint-fab-ring--ad"
+                }
+                aria-hidden="true"
+              />
+              <span className="game-hint-fab-core" aria-hidden="true">
+                <svg
+                  width="23"
+                  height="23"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.9"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M9 18h6M10 21h4" />
+                  <path d="M12 3a6 6 0 0 0-4 10.5c.6.5 1 1.3 1 2.1v.4h6v-.4c0-.8.4-1.6 1-2.1A6 6 0 0 0 12 3Z" />
+                </svg>
+              </span>
             </button>
+            <div className="game-hint-rail-meta hidden">
+              {magnifiers > 0 ? (
+                <>
+                  <span className="game-hint-pips" aria-hidden="true">
+                    {Array.from({ length: MAX_MAGNIFIERS }).map((_, i) => (
+                      <span
+                        key={i}
+                        className={
+                          i < magnifiers
+                            ? "game-hint-pip game-hint-pip--lit"
+                            : "game-hint-pip"
+                        }
+                      />
+                    ))}
+                  </span>
+                  <span className="game-hint-rail-caption">
+                    {t("game.hintChargesLeft", { value: magnifiers })}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="game-hint-ad-badge">
+                    {t("game.rewardedHintBadge")}
+                  </span>
+                  <span className="game-hint-rail-caption">
+                    {t("game.hintLabel")}
+                  </span>
+                </>
+              )}
+            </div>
 
             <button
               type="button"
@@ -506,7 +907,6 @@ export function GameScreen({
             >
               <SettingsGearIcon />
             </button>
-
           </div>
         </header>
 
@@ -572,7 +972,7 @@ export function GameScreen({
         </div>
 
         {/* ── PLAY AREA ──────────────────────────────────────────────── */}
-        <div className="game-play-area flex flex-1 overflow-hidden px-4 pb-0 pt-3 sm:px-[30px] sm:pt-[26px]">
+        <div className="game-play-area flex flex-1 overflow-hidden px-4 pb-0 pt-3 sm:px-[34px] sm:pt-[22px]">
           <PhotoComparator
             level={level}
             foundIds={displayFoundIds}
@@ -593,91 +993,53 @@ export function GameScreen({
         <footer
           className="game-footer hidden shrink-0 items-center justify-between px-[30px] sm:flex"
           style={{
-            height: "74px",
+            height: "64px",
             borderTop: "1px solid rgba(213,195,154,.12)",
             background:
               "linear-gradient(0deg, rgba(34,42,37,.9), rgba(21,27,24,.3))",
           }}
         >
-          {/* Found squares */}
-          <div className="flex items-center gap-[14px]">
-            <span className="font-manrope text-[10.5px] font-semibold tracking-[.16em] text-exp-muted">
-              {t("game.foundLabel")}
+          <div className="flex items-center gap-2.5 text-exp-muted">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M3 3l7.5 18 2.5-7.5L20.5 11z" />
+            </svg>
+            <span className="font-manrope text-[13.5px] font-medium">
+              {t("game.gameplayInstruction")}
             </span>
-            <div className="flex gap-2">
-              {Array.from({ length: level.requiredDifferences }).map((_, i) => (
-                <span
-                  key={i}
-                  className="flex h-[26px] w-[26px] items-center justify-center rounded-[7px]"
-                  style={
-                    i < liveFoundIds.length
-                      ? { background: "#d8af63" }
-                      : {
-                          border: "1px dashed rgba(213,195,154,.25)",
-                          background: "rgba(213,195,154,.04)",
-                        }
-                  }
-                >
-                  {i < liveFoundIds.length && (
-                    <svg
-                      width="13"
-                      height="13"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#1a130a"
-                      strokeWidth="3.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M20 6L9 17l-5-5" />
-                    </svg>
-                  )}
-                </span>
-              ))}
-            </div>
           </div>
 
-          {/* Accuracy + mistakes */}
-          <div className="flex items-center gap-[22px]">
-            <div className="flex items-center gap-[9px]">
-              <span className="font-manrope text-[10.5px] font-semibold tracking-[.14em] text-exp-muted">
-                {t("game.accuracyLabel")}
+          <div className="flex h-10 items-center gap-2.5 rounded-[11px] border border-[#B88A45]/35 bg-[#B88A45]/10 px-4">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="#D8AF63"
+              stroke="#D8AF63"
+              strokeWidth="1"
+              aria-hidden="true"
+            >
+              <path d="M13 2L3 14h7l-1 8 10-12h-7z" />
+            </svg>
+            <span className="text-[12px] font-bold uppercase tracking-[.06em] text-exp-muted">
+              {t("game.streakLabel")}
+            </span>
+            <span className="text-[16px] font-bold text-exp-brass2">
+              ×{displayStreak}
+            </span>
+            {liveMistakes === 0 && displayStreak > 0 && (
+              <span className="ml-0.5 text-[12px] font-semibold text-exp-success">
+                {t("game.streakClean")}
               </span>
-              <div
-                className="h-[6px] w-[120px] overflow-hidden rounded-[3px]"
-                style={{ background: "rgba(213,195,154,.12)" }}
-              >
-                <div
-                  className="h-full"
-                  style={{
-                    width: `${accuracyPct}%`,
-                    background: "linear-gradient(90deg, #6fc69e, #2F6A57)",
-                    transition: "width .3s",
-                  }}
-                />
-              </div>
-              <span className="font-manrope text-[12px] font-bold text-exp-success">
-                {accuracyPct}%
-              </span>
-            </div>
-            {liveMistakes > 0 && (
-              <div className="flex items-center gap-[7px]">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#e08a78"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                >
-                  <path d="M6 6l12 12M18 6L6 18" />
-                </svg>
-                <span className="font-manrope text-[12px] text-exp-muted">
-                  {liveMistakes}{" "}
-                  {t("game.mistakes", { count: liveMistakes }).toLowerCase()}
-                </span>
-              </div>
             )}
           </div>
         </footer>
@@ -709,6 +1071,16 @@ export function GameScreen({
           onRetry={handleRetry}
           onExtend={handleExtendTime}
           onMap={handleMap}
+        />
+      )}
+
+      {showRewardedHintModal && (
+        <RewardedHintModal
+          failed={rewardedHintModal === "failed"}
+          loading={rewardedHintInFlight}
+          backgroundSrc={level.imageA}
+          onClose={() => setRewardedHintModal(null)}
+          onWatch={handleRewardedHintWatch}
         />
       )}
     </div>

@@ -514,3 +514,20 @@ Repository должен содержать:
 - все production assets имеют provenance;
 - RU/EN catalog materials готовы;
 - release checklist проходит полностью.
+
+---
+
+# 19. 2026-07-02 implementation note
+
+Custom product analytics are now implemented through `src/services/analytics/analytics.ts`.
+
+- Local/dev events are buffered in `window.__artifactAnalyticsEvents`.
+- Production network transport is opt-in through `VITE_YANDEX_METRICA_ID`.
+- When the counter id is present, events are sent to Yandex Metrica as JavaScript goals with the `aa_` prefix.
+- The canonical event contract is `ANALYTICS_EVENTS.md`.
+- The Yandex setup guide is `docs/YANDEX_METRICS_SETUP_GUIDE.md`.
+
+The Yandex Games SDK lifecycle metrics remain separate from product analytics:
+
+- `LoadingAPI.ready()` and `GameplayAPI.start()/stop()` feed platform/gameplay markup.
+- Metrica goals feed custom product funnel analysis.

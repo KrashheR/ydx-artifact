@@ -79,6 +79,7 @@ export function PhotoComparator({
 }: PhotoComparatorProps) {
   const { t } = useTranslation();
   const [version, setVersion] = useState<"A" | "B">("A");
+  const [comparePosition, setComparePosition] = useState(50);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [imageAspectRatio, setImageAspectRatio] = useState(1586 / 992);
@@ -87,6 +88,7 @@ export function PhotoComparator({
   >(() => cloneDifferences(level.differences));
   const pointer = useRef<PointerState | null>(null);
   const hitboxEdit = useRef<HitboxEdit | null>(null);
+  const sliderFrameRef = useRef<HTMLDivElement | null>(null);
   const [wrongClicksA, setWrongClicksA] = useState<WrongClick[]>([]);
   const [wrongClicksB, setWrongClicksB] = useState<WrongClick[]>([]);
   const [applyStatus, setApplyStatus] = useState<ApplyStatus>("idle");
@@ -193,10 +195,7 @@ export function PhotoComparator({
   }
 
   function renderPhoto(side: "A" | "B", mobile = false) {
-    const baseSrc = side === "A" ? level.imageA : level.imageB;
-    const src = debugUseMarkupReference
-      ? getSceneMarkupAsset(baseSrc)
-      : baseSrc;
+    const src = getSceneSource(level, side, debugUseMarkupReference);
     const label = side === "A" ? labelA : labelB;
     const wrongClicks = side === "A" ? wrongClicksA : wrongClicksB;
     const displaySide = side;
@@ -268,6 +267,50 @@ export function PhotoComparator({
     );
   }
 
+  function renderSliderLayer(side: "A" | "B") {
+    const src = getSceneSource(level, side, debugUseMarkupReference);
+    const wrongClicks = side === "A" ? wrongClicksA : wrongClicksB;
+
+    return (
+      <PhotoCanvas
+        levelId={level.id}
+        side={side}
+        mobile={false}
+        version={side}
+        src={src}
+        zoom={zoom}
+        pan={pan}
+        imageAspectRatio={imageAspectRatio}
+        pointer={pointer}
+        visibleMarkers={visibleMarkers}
+        foundIds={foundIds}
+        hintDifference={
+          hintId ? level.differences.find((d) => d.id === hintId) : undefined
+        }
+        wrongClicks={wrongClicks}
+        debugShowAllDifferences={debugShowAllDifferences}
+        hitboxEditorEnabled={hitboxEditorEnabled}
+        hitboxEdit={hitboxEdit}
+        onImageAspectRatio={setImageAspectRatio}
+        onZoom={setZoom}
+        onPan={setPan}
+        onPointerPick={handlePointerUp}
+        onHitboxMove={handleHitboxMove}
+        onHitboxResize={handleHitboxResize}
+        compareLabel={
+          side === "A" ? t("game.labelOriginal") : t("game.labelCopy")
+        }
+      />
+    );
+  }
+
+  function updateComparePositionFromPointer(clientX: number) {
+    const rect = sliderFrameRef.current?.getBoundingClientRect();
+    if (!rect || rect.width <= 0) return;
+    const next = ((clientX - rect.left) / rect.width) * 100;
+    setComparePosition(Math.max(0, Math.min(100, Math.round(next))));
+  }
+
   return (
     <div className="photo-comparator relative flex flex-1 flex-col">
       {/* Desktop: side by side */}
@@ -321,56 +364,100 @@ export function PhotoComparator({
         {renderPhoto("B")}
       </div>
 
-      {/* Mobile landscape: one full-screen flip card */}
-      <div className="comparator-landscape-flip hidden flex-1 flex-col">
-        <div className="comparator-flip-stage relative flex-1">
+      {/* Mobile landscape: one full 16:10 frame with before/after slider */}
+      <div className="comparator-landscape-slider hidden flex-1 flex-col items-center justify-center gap-[11px]">
+        <SceneAspectFrame aspectRatio={imageAspectRatio}>
           <div
-            className="comparator-flip-card absolute inset-0"
-            style={{
-              transform: version === "B" ? "rotateY(180deg)" : "rotateY(0deg)",
-            }}
+            ref={sliderFrameRef}
+            className="comparator-slider-frame relative h-full w-full overflow-hidden rounded-[14px]"
           >
-            <div className="comparator-flip-face comparator-flip-front absolute inset-0">
-              {renderPhoto("A", true)}
+            <div className="absolute inset-0 flex">
+              {renderSliderLayer("B")}
             </div>
-            <div className="comparator-flip-face comparator-flip-back absolute inset-0">
-              {renderPhoto("B", true)}
+            <div
+              className="absolute inset-0 flex overflow-hidden"
+              style={{ clipPath: `inset(0 ${100 - comparePosition}% 0 0)` }}
+            >
+              {renderSliderLayer("A")}
             </div>
-          </div>
-          <div
-            className="comparator-ab-segments pointer-events-none absolute left-1/2 top-3 z-20 flex -translate-x-1/2 items-center rounded-[9px] p-1"
-            aria-hidden="true"
-          >
-            {(["A", "B"] as const).map((segment) => (
-              <span
-                key={segment}
-                className="flex h-7 min-w-9 items-center justify-center rounded-[7px] font-jetbrains text-[12px] font-bold"
-                style={
-                  version === segment
-                    ? {
-                        background: "linear-gradient(180deg,#D8AF63,#B3812F)",
-                        color: "#1A130A",
-                        boxShadow: "0 0 14px rgba(216,175,99,.42)",
-                      }
-                    : { color: "rgba(213,195,154,.68)" }
+            <div
+              className="pointer-events-none absolute bottom-0 top-0 z-30 w-[2px] -translate-x-1/2 bg-[#d8af63] shadow-[0_0_14px_rgba(216,175,99,.7)]"
+              style={{ left: `${comparePosition}%` }}
+              aria-hidden="true"
+            />
+            <div
+              className="absolute top-1/2 z-30 flex h-[34px] w-[34px] -translate-x-1/2 -translate-y-1/2 cursor-ew-resize touch-none items-center justify-center rounded-full bg-[#d8af63] text-[#1a130a] shadow-[0_6px_16px_rgba(0,0,0,.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+              style={{ left: `${comparePosition}%` }}
+              role="slider"
+              tabIndex={0}
+              aria-label={t("actions.compare")}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={comparePosition}
+              onPointerDown={(event) => {
+                event.stopPropagation();
+                event.currentTarget.setPointerCapture(event.pointerId);
+                updateComparePositionFromPointer(event.clientX);
+              }}
+              onPointerMove={(event) => {
+                if (!event.currentTarget.hasPointerCapture(event.pointerId))
+                  return;
+                event.stopPropagation();
+                updateComparePositionFromPointer(event.clientX);
+              }}
+              onPointerUp={(event) => {
+                event.stopPropagation();
+                if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+                  event.currentTarget.releasePointerCapture(event.pointerId);
                 }
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+                  event.preventDefault();
+                  setComparePosition((value) => Math.max(0, value - 5));
+                }
+                if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+                  event.preventDefault();
+                  setComparePosition((value) => Math.min(100, value + 5));
+                }
+              }}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                {segment}
+                <path d="M8 7l-4 5 4 5M16 7l4 5-4 5" />
+              </svg>
+            </div>
+            <div className="pointer-events-none absolute left-3 top-3 z-40 flex h-6 items-center gap-1.5 rounded-[7px] bg-[rgba(12,16,14,.75)] px-2.5">
+              <span className="text-[10px] font-bold text-[#e7c074]">A</span>
+              <span className="text-[8.5px] font-semibold tracking-[.1em] text-exp-muted">
+                {labelA}
               </span>
-            ))}
+            </div>
+            <div className="pointer-events-none absolute right-3 top-3 z-40 flex h-6 items-center gap-1.5 rounded-[7px] bg-[rgba(12,16,14,.75)] px-2.5">
+              <span className="text-[10px] font-bold text-[#d8af63]">B</span>
+              <span className="text-[8.5px] font-semibold tracking-[.1em] text-exp-muted">
+                {labelB}
+              </span>
+            </div>
           </div>
-        </div>
-        <button
-          className="comparator-flip-button absolute left-1/2 z-30 flex min-h-[46px] -translate-x-1/2 items-center justify-center gap-2 rounded-[10px] px-5 font-manrope text-[13px] font-bold text-[#1A130A]"
-          style={{
-            background: "linear-gradient(180deg,#D8AF63,#B3812F)",
-            boxShadow:
-              "0 10px 24px rgba(184,138,69,.36), inset 0 1px 0 rgba(255,255,255,.3)",
-          }}
-          onClick={() => setVersion((v) => (v === "A" ? "B" : "A"))}
-        >
-          {t("actions.compare")}
-        </button>
+        </SceneAspectFrame>
+        <input
+          className="comparator-slider-range"
+          type="range"
+          min="0"
+          max="100"
+          value={comparePosition}
+          aria-label={t("actions.compare")}
+          onChange={(event) => setComparePosition(Number(event.target.value))}
+        />
       </div>
 
       {/* Mobile: single image + toggle */}
@@ -416,6 +503,15 @@ export function PhotoComparator({
       ) : null}
     </div>
   );
+}
+
+function getSceneSource(
+  level: LevelDefinition,
+  side: "A" | "B",
+  debugUseMarkupReference: boolean,
+) {
+  const baseSrc = side === "A" ? level.imageA : level.imageB;
+  return debugUseMarkupReference ? getSceneMarkupAsset(baseSrc) : baseSrc;
 }
 
 function SceneAspectFrame({

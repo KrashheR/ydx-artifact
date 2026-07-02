@@ -121,11 +121,30 @@ function PlayIcon({
   );
 }
 
-function StarIcon({ filled }: { filled: boolean }) {
+function ReplayIcon() {
   return (
     <svg
       width="14"
       height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+      <path d="M3 3v5h5" />
+    </svg>
+  );
+}
+
+function StarIcon({ filled, size = 14 }: { filled: boolean; size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
       viewBox="0 0 24 24"
       fill={filled ? "#D8AF63" : "rgba(213,195,154,0.16)"}
       aria-hidden="true"
@@ -147,11 +166,7 @@ type LevelCardState = {
   starCount: 0 | 1 | 2 | 3;
 };
 
-export function MapScreen({
-  onOpenSettings,
-}: {
-  onOpenSettings: () => void;
-}) {
+export function MapScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
   const { t } = useTranslation();
   const screen = useGameStore((state) => state.screen);
   const saveData = useGameStore((state) => state.saveData);
@@ -265,6 +280,20 @@ export function MapScreen({
     levelCards.find((level) => level.current) ??
     levelCards[levelCards.length - 1];
   const chapterCompleted = levelCards.filter((level) => level.completed).length;
+  const routeProgressText = `${String(chapterCompleted).padStart(2, "0")} / ${String(chapter.levels.length).padStart(2, "0")}`;
+
+  function handleStartLevelFromCard(level: LevelCardState, source: string) {
+    trackAnalyticsEvent("level_card_clicked", {
+      levelId: level.id,
+      campaignId: chapter.id,
+      levelOrder: level.order,
+      source,
+      completed: level.completed,
+      current: level.current,
+      starCount: level.starCount
+    });
+    startLevel(level.id);
+  }
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -533,11 +562,16 @@ export function MapScreen({
               {t(chapter.titleKey)}
             </h1>
           </div>
-          <div className="hidden min-w-[110px] flex-col items-end gap-1 md:flex">
-            <span className="text-[12px] font-bold text-[#D8AF63]">
-              {chapterCompleted} / {chapter.levels.length}
-            </span>
-            <div className="flex w-[110px] gap-[3px]">
+          <div className="map-route-progress hidden min-w-[300px] flex-col items-end gap-[7px] md:flex">
+            <div className="flex items-center gap-2.5">
+              <span className="text-[10px] font-semibold uppercase tracking-[.2em] text-[#879087]">
+                {t("campaigns.routeProgress")}
+              </span>
+              <span className="font-jetbrains text-[13px] font-semibold text-[#D8AF63]">
+                {routeProgressText}
+              </span>
+            </div>
+            <div className="flex w-[308px] gap-1">
               {levelCards.map((level) => (
                 <span
                   key={level.id}
@@ -586,7 +620,7 @@ export function MapScreen({
                     key={level.id}
                     type="button"
                     disabled={level.locked}
-                    onClick={() => startLevel(level.id)}
+                    onClick={() => handleStartLevelFromCard(level, "map_desktop_card")}
                     aria-label={`${t("campaigns.levelCode", { order: level.order })} ${level.title}`}
                     className={`map-level-card group flex h-[338px] flex-col overflow-hidden rounded-[14px] bg-[#222A25] text-left transition-all duration-300 hover:-translate-y-0.5 ${
                       level.current
@@ -600,7 +634,9 @@ export function MapScreen({
                       <img
                         src={level.previewSrc}
                         alt=""
-                        className="h-full w-full object-cover"
+                        className={`h-full w-full object-cover ${
+                          level.locked ? "map-level-preview-image--locked" : ""
+                        }`}
                         draggable={false}
                       />
                       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.58))]" />
@@ -615,7 +651,10 @@ export function MapScreen({
                         </div>
                       )}
                       {level.current && (
-                        <div className="absolute right-3 top-3 h-3 w-3 rounded-full bg-[#D8AF63] shadow-[0_0_10px_#D8AF63]" />
+                        <div className="map-current-badge absolute right-3 top-3 inline-flex h-[26px] items-center gap-1.5 rounded-[8px] bg-[linear-gradient(180deg,#D8AF63,#B3812F)] px-3 text-[10px] font-bold uppercase tracking-[.12em] text-[#1A130A] shadow-[0_4px_12px_rgba(184,138,69,.4)]">
+                          <span className="map-current-pulse h-1.5 w-1.5 rounded-full bg-[#1A130A]" />
+                          {t("campaigns.now")}
+                        </div>
                       )}
                       {level.locked && (
                         <>
@@ -654,12 +693,30 @@ export function MapScreen({
                       <div className="mt-auto">
                         {level.completed && (
                           <div className="flex items-center justify-between">
-                            <div className="flex gap-[3px]">
-                              <StarIcon filled={level.starCount >= 1} />
-                              <StarIcon filled={level.starCount >= 2} />
-                              <StarIcon filled={level.starCount >= 3} />
+                            <div className="flex items-center gap-1 md:flex-col md:items-start">
+                              <div className="flex items-center gap-1">
+                                <StarIcon
+                                  filled={level.starCount >= 1}
+                                  size={21}
+                                />
+                                <StarIcon
+                                  filled={level.starCount >= 2}
+                                  size={21}
+                                />
+                                <StarIcon
+                                  filled={level.starCount >= 3}
+                                  size={21}
+                                />
+                              </div>
+                              <span className="ml-1.5 text-[12px] font-semibold text-[#879087]">
+                                {t("campaigns.stars", {
+                                  count: level.starCount,
+                                  total: 3,
+                                })}
+                              </span>
                             </div>
-                            <span className="text-[10.5px] font-semibold text-[#879087]">
+                            <span className="inline-flex h-9 items-center gap-1.5 rounded-[9px] border border-[#B88A45]/40 bg-[#B88A45]/10 px-3.5 text-[12.5px] font-bold text-[#D8AF63]">
+                              <ReplayIcon />
                               {t("campaigns.replay")}
                             </span>
                           </div>
@@ -699,7 +756,7 @@ export function MapScreen({
                 key={level.id}
                 type="button"
                 disabled={level.locked}
-                onClick={() => startLevel(level.id)}
+                onClick={() => handleStartLevelFromCard(level, "map_mobile_card")}
                 aria-label={`${t("campaigns.levelCode", { order: level.order })} ${level.title}`}
                 className={`flex h-[152px] flex-col overflow-hidden rounded-[12px] bg-[#222A25] text-left transition-all duration-300 hover:-translate-y-0.5 ${
                   level.current
@@ -801,7 +858,7 @@ export function MapScreen({
                 </p>
               </div>
               <button
-                onClick={() => startLevel(currentLevel.id)}
+                onClick={() => handleStartLevelFromCard(currentLevel, "map_mobile_sticky_cta")}
                 className="flex h-[50px] flex-shrink-0 items-center justify-center gap-2 rounded-[11px] bg-[linear-gradient(180deg,#D8AF63,#B3812F)] px-5 text-[14px] font-bold text-[#1A130A] shadow-[0_8px_20px_rgba(184,138,69,.32)]"
               >
                 {t("actions.play")}
@@ -828,7 +885,7 @@ export function MapScreen({
                 />
               </svg>
               {t("campaigns.autoSave")} ·{" "}
-              {t("campaigns.levelsDone", { done: chapterCompleted })}
+              {t("campaigns.levelsDone", { count: chapterCompleted })}
             </footer>
           </div>
         </div>

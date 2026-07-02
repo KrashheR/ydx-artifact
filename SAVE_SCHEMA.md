@@ -15,6 +15,7 @@ Storage flow:
 - Version `2` stores in-progress timer state as `inProgress.elapsedActiveSeconds`; it increments only during active gameplay and is used to restore remaining time after reload.
 - Version `1` saves are migrated safely. Old `inProgress.elapsedSeconds` is treated as active elapsed time when present; missing or invalid values fall back to `0`.
 - `settings.localeSource` records whether locale came from SDK auto-detection or a manual settings choice. SDK language can update only auto-sourced locale.
+- `magnifiers` (hints) are capped at `MAX_MAGNIFIERS = 3`. The cap applies when granting level/daily rewards and when loading or migrating a save, so older saves with a larger stock clamp down to 3.
 
 Persisted review prompt fields:
 

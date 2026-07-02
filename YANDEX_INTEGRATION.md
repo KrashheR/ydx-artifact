@@ -3,6 +3,7 @@
 `src/services/platform/mockPlatform.ts` is the current adapter seam. It now wraps the Yandex review API, rewarded advertising API and fullscreen advertising API:
 
 - Production `index.html` loads the Yandex Games SDK from `/sdk.js`; local/dev runs still fall back safely when `window.YaGames` is absent.
+- `src/services/analytics/analytics.ts` also supports optional Yandex Metrica custom gameplay analytics. If `VITE_YANDEX_METRICA_ID` is set during build, the analytics adapter loads the Metrica tag on first event and sends `ym(counterId, "reachGoal", "aa_<event>", payload)` events. If the env var is absent, no external analytics script is loaded and events remain in the local debug buffer.
 - `src/services/platform/platformLifecycle.ts` initializes the SDK lifecycle early, subscribes to `game_api_pause` / `game_api_resume`, sends `ysdk.features.LoadingAPI.ready()` once after the bootstrap gate has hydrated save data, applied the final locale/title, preloaded first-screen campaign previews, waited for fonts and rendered the interactive home screen, and centralizes `ysdk.features.GameplayAPI.start()` / `stop()`.
 - `GameScreen` routes active gameplay through that lifecycle controller: the timer, scene input and GameplayAPI are stopped while the game is paused, a rewarded/interstitial/native dialog is active, the level is completed/failed, or the platform sends `game_api_pause`.
 - `mockPlatform.canReview()` safely returns `{ value: false, reason: "UNKNOWN" }` when Yandex SDK or `ysdk.feedback` is unavailable.
@@ -44,3 +45,4 @@ Local development remains safe:
 - direct `pnpm` may be unavailable in some managed shells; the equivalent local binaries (`./node_modules/.bin/eslint`, `./node_modules/.bin/tsc`, `./node_modules/.bin/vite`, `./node_modules/.bin/tsx`) can validate the same code without reinstalling dependencies;
 - `window.__artifactDev?.setReviewMock("sent" | "closed" | "unavailable" | "error")` overrides the review gateway in Vite dev mode;
 - `window.__artifactDev?.triggerReviewPromptDemo()` seeds the third-level map scenario and queues the review check for manual verification.
+- `window.__artifactAnalyticsEvents` stores the last 100 product analytics events locally for QA. Use `VITE_ANALYTICS_DEBUG=true pnpm dev` to print them while testing.

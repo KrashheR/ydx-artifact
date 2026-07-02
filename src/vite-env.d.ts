@@ -5,6 +5,10 @@ declare global {
     readonly VITE_LAYOUT_DEBUG?: string;
     readonly VITE_FINAL_VALIDATE?: string;
     readonly VITE_DEV_VALIDATE_CHEAT?: string;
+    readonly VITE_YANDEX_METRICA_ID?: string;
+    readonly VITE_ANALYTICS_DEBUG?: string;
+    readonly VITE_PLATFORM_MODE?: string;
+    readonly VITE_APP_VERSION?: string;
   }
 
   interface Window {
