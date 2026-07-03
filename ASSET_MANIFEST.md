@@ -2,7 +2,7 @@
 
 All runtime scene assets in this scaffold are local placeholders. They preserve the expected path discipline and allow gameplay, validation and build checks without external hotlinks.
 
-WebP assets under `public/assets/scenes/` were recompressed in place on 2026-06-29 and again on 2026-06-30 to reduce download/package size while preserving pixel dimensions and existing paths. The latest WebP pass reduced the scene WebP set from 43.2 MB to 25.5 MB. Project SVG images were whitespace-minified without geometry changes.
+WebP assets under `public/assets/scenes/` were recompressed in place on 2026-06-29 and again on 2026-06-30 to reduce download/package size while preserving pixel dimensions and existing paths. On 2026-07-03, gameplay scene pairs named `1.webp` and `2.webp` were restored to each file's first committed runtime WebP blob (`361c921`, `61b1f77`, or `78d3b0d`) because later passes overcompressed gameplay images. Later on 2026-07-03, `scripts/optimize-scene-assets.ts --apply` was run with q97 and pixel metric gates, replacing only six oversized runtime scene pairs while preserving 1586x992 dimensions and existing paths. The `3.webp` markup references, campaign previews and generated card previews remain in their compressed derivative state. Project SVG images were whitespace-minified without geometry changes.
 
 Production level intake stores converted runtime scene images under `public/assets/scenes/northern-route/<level-order>/`:
 
@@ -30,6 +30,8 @@ Compressed preview derivatives are generated from the full-size assets by `pnpm 
 - `<chapter-folder>/<level-order>/card.webp` (720px wide, q70): map level card preview, generated from `<level-order>/1.webp`.
 
 Re-run `pnpm assets:previews` after adding or replacing scene images. The production build excludes the full-size `preview.webp` sources and `3.webp` markup references from `dist/` (see `vite.config.ts`).
+
+Use `pnpm assets:optimize` for a dry-run gated recompression report on runtime `1.webp` / `2.webp` gameplay scene pairs. Use `pnpm assets:optimize -- --apply` only after reviewing the accepted candidates; the script keeps dimensions unchanged and rejects files that do not meet the size and pixel-difference gates.
 
 | id | path | kind | status | source |
 |---|---|---|---|---|

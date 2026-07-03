@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added `pnpm assets:optimize` for dry-run gated WebP recompression of runtime gameplay scene pairs and applied the q97 pass to six oversized scene files, reducing gameplay scene weight from 52.0 MB to 44.4 MB while preserving dimensions and paths.
+
+- Restored gameplay scene pairs (`public/assets/scenes/*/*/1.webp` and `2.webp`) to each file's first committed runtime WebP blob (`361c921`, `61b1f77`, or `78d3b0d`); gameplay images keep the same 1586x992 dimensions but use the original higher-quality runtime files again.
+
 - Fixed Yandex ZIP startup by building production with relative Vite asset links (`./assets/...`) and deriving runtime scene paths from `import.meta.env.BASE_URL`; `pnpm release:zip` now rejects root-relative `/assets` script/style references.
 
 - Removed obsolete campaign-folder map background assets (`bg.webp` / `background.webp`) from runtime wiring, content validation, prefetch and asset provenance; campaign maps now rely on card previews and configured route aspect ratios only.

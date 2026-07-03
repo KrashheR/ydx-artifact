@@ -32,7 +32,7 @@
       "id": "sand-meridian-package",
       "path": "public/assets/scenes/sand-meredian",
       "status": "production-intake",
-      "source": "content owner sand-meridian scene package provided in workspace; includes level folders 1-13 with 1.webp/2.webp runtime pairs and 3.webp markup references",
+      "source": "content owner sand-meridian scene package provided in workspace; includes level folders 1-13 with 1.webp/2.webp runtime pairs and 3.webp markup references; selected oversized runtime WebP files were q97 optimized on 2026-07-03 with scripted pixel metric gates and unchanged dimensions",
       "approval": "pending-owner-license-confirmation"
     },
     {
@@ -46,7 +46,7 @@
       "id": "emerald-meridian-package",
       "path": "public/assets/scenes/emerald-meridian",
       "status": "production-intake",
-      "source": "content owner emerald-meridian scene package provided in workspace; includes level folders 1-13 with 1.webp/2.webp runtime pairs and 3.webp markup references",
+      "source": "content owner emerald-meridian scene package provided in workspace; includes level folders 1-13 with 1.webp/2.webp runtime pairs and 3.webp markup references; selected oversized runtime WebP files were q97 optimized on 2026-07-03 with scripted pixel metric gates and unchanged dimensions",
       "approval": "pending-owner-license-confirmation"
     },
     {

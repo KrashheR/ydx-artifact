@@ -15,6 +15,7 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "validate:content": "tsx scripts/validate-content.ts",
+    "assets:optimize": "tsx scripts/optimize-scene-assets.ts",
     "assets:previews": "tsx scripts/generate-level-previews.ts",
     "agent:check": "pnpm lint && pnpm typecheck && pnpm validate:content",
     "agent:release-check": "pnpm validate:content && pnpm build && pnpm test:e2e",

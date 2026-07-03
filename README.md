@@ -37,6 +37,7 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm validate:content
+pnpm assets:optimize
 pnpm agent:check
 pnpm build
 pnpm release:zip
@@ -48,6 +49,7 @@ pnpm test:e2e
 
 For broad agent edits, `pnpm agent:check` runs lint, typecheck and content validation. For pre-release agent validation, use `pnpm agent:release-check`.
 `pnpm dev:validate` starts the Vite dev server with gameplay scenes swapped to each level's `3.*` markup reference and all difference hitboxes visible for live alignment checks.
+`pnpm assets:optimize` dry-runs conservative WebP recompression for runtime gameplay scene pairs; pass `-- --apply` to replace only candidates that keep dimensions and pass the pixel-difference gates.
 `pnpm dev:validate:cheat` starts the same validation server and automatically unlocks all currently implemented campaigns and levels in the local dev save.
 `pnpm dev --cheat` starts the plain dev server (no hitbox debug overlay) with that same all-content unlock applied to the local dev save.
 `pnpm validate:final` starts the same hitbox editor over the final gameplay `1.*` and `2.*` scene images instead of the `3.*` markup reference, so A/B hitboxes can be moved, resized, copied and applied against the real pair.
