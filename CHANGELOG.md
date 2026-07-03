@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fixed Yandex ZIP startup by building production with relative Vite asset links (`./assets/...`) and deriving runtime scene paths from `import.meta.env.BASE_URL`; `pnpm release:zip` now rejects root-relative `/assets` script/style references.
+
 - Removed obsolete campaign-folder map background assets (`bg.webp` / `background.webp`) from runtime wiring, content validation, prefetch and asset provenance; campaign maps now rely on card previews and configured route aspect ratios only.
 
 - Vite command wrappers now load production-local `VITE_*` env from `.env.production.local` for `pnpm dev`, `pnpm dev:validate` and `pnpm build`, so `VITE_YANDEX_METRICA_ID` is included consistently in local, build and release validation flows. `pnpm metrika:goals` also reads the counter ID from `.env.production.local`.

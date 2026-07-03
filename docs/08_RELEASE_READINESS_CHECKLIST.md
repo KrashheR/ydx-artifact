@@ -163,6 +163,7 @@
 - [ ] Semver + build number.
 - [ ] `index.html` at ZIP root.
 - [ ] One `index.html`.
+- [ ] Vite JS/CSS bundle links are relative (`./assets/...`), not root-relative (`/assets/...`).
 - [ ] Uncompressed size ≤ 100 MB.
 - [ ] ASCII filenames.
 - [ ] No spaces in paths.

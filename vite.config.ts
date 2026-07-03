@@ -111,7 +111,8 @@ function readRequestBody(req: import("node:http").IncomingMessage) {
   });
 }
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  base: command === "build" ? "./" : "/",
   plugins: [
     react(),
     legacy({
@@ -129,4 +130,4 @@ export default defineConfig({
   build: {
     sourcemap: process.env.BUILD_SOURCEMAP === "true"
   }
-});
+}));

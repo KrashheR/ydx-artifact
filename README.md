@@ -52,11 +52,11 @@ For broad agent edits, `pnpm agent:check` runs lint, typecheck and content valid
 `pnpm dev --cheat` starts the plain dev server (no hitbox debug overlay) with that same all-content unlock applied to the local dev save.
 `pnpm validate:final` starts the same hitbox editor over the final gameplay `1.*` and `2.*` scene images instead of the `3.*` markup reference, so A/B hitboxes can be moved, resized, copied and applied against the real pair.
 Production builds exclude scene markup reference files named `3.webp` from `dist/assets/scenes/**`; the source files stay in `public` for `pnpm validate:content`, `pnpm dev:validate`, and local hitbox review.
-Production builds also exclude unused scene placeholder SVGs and keep the Yandex Games SDK as the platform-provided `/sdk.js` script in `index.html`.
+Production builds also exclude unused scene placeholder SVGs, emit relative Vite asset links for Yandex ZIP hosting, and keep the Yandex Games SDK as the platform-provided `/sdk.js` script in `index.html`.
 Custom gameplay analytics can be enabled by adding `VITE_YANDEX_METRICA_ID=<counter id>` to `.env.production.local`; `pnpm dev`, `pnpm dev:validate`, `pnpm build` and release validation load that production-local Vite env automatically. Setup steps and the Metrica goal list are documented in `docs/YANDEX_METRICS_SETUP_GUIDE.md`.
 Use `pnpm metrika:goals` to dry-run Yandex Metrica goal setup, then `pnpm metrika:goals -- --apply` to create missing JavaScript-event goals through the Metrica Management API. The goals script reads the counter ID from `.env.metrica.local`, `.env.production.local` or `.env.local`.
 Production builds do not emit sourcemaps by default to keep the Yandex upload smaller. Use `BUILD_SOURCEMAP=true pnpm build` when a diagnostic build needs `.map` files.
-`pnpm release:zip` packages the contents of `dist/` into `dist-yandex.zip` with the Node-based release packager, verifies root `index.html`, and excludes macOS/system junk plus sourcemaps. It does not require system `zip` / `unzip` binaries.
+`pnpm release:zip` packages the contents of `dist/` into `dist-yandex.zip` with the Node-based release packager, verifies root `index.html`, rejects root-relative `/assets` script/style links, and excludes macOS/system junk plus sourcemaps. It does not require system `zip` / `unzip` binaries.
 
 ## Scope Implemented
 

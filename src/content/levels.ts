@@ -1,13 +1,14 @@
 import { levelSchema, type LevelDefinition } from "../entities/level/schema";
+import { getLevelSceneAsset } from "./sceneAssets";
 
 const firstLevel = levelSchema.parse({
   id: "nr-01-scene01",
   chapterId: "northern-route",
   order: 1,
   titleKey: "levels.nr01.title",
-  imageA: "/assets/scenes/northern-route/1/1.webp",
-  imageB: "/assets/scenes/northern-route/1/2.webp",
-  thumbnail: "/assets/scenes/northern-route/1/1.webp",
+  imageA: getLevelSceneAsset("northern-route", 1, "1.webp"),
+  imageB: getLevelSceneAsset("northern-route", 1, "2.webp"),
+  thumbnail: getLevelSceneAsset("northern-route", 1, "1.webp"),
   differences: [
     {
       id: "compass-removed-1",
@@ -50,9 +51,9 @@ const secondLevel = levelSchema.parse({
   chapterId: "northern-route",
   order: 2,
   titleKey: "levels.nr02.title",
-  imageA: "/assets/scenes/northern-route/2/1.webp",
-  imageB: "/assets/scenes/northern-route/2/2.webp",
-  thumbnail: "/assets/scenes/northern-route/2/1.webp",
+  imageA: getLevelSceneAsset("northern-route", 2, "1.webp"),
+  imageB: getLevelSceneAsset("northern-route", 2, "2.webp"),
+  thumbnail: getLevelSceneAsset("northern-route", 2, "1.webp"),
   differences: [
     {
       id: "rolled-bedding-count-2",
@@ -102,9 +103,9 @@ const thirdLevel = levelSchema.parse({
   chapterId: "northern-route",
   order: 3,
   titleKey: "levels.nr03.title",
-  imageA: "/assets/scenes/northern-route/3/1.webp",
-  imageB: "/assets/scenes/northern-route/3/2.webp",
-  thumbnail: "/assets/scenes/northern-route/3/1.webp",
+  imageA: getLevelSceneAsset("northern-route", 3, "1.webp"),
+  imageB: getLevelSceneAsset("northern-route", 3, "2.webp"),
+  thumbnail: getLevelSceneAsset("northern-route", 3, "1.webp"),
   differences: [
       {
         id: "lens-rotation-3",
@@ -155,9 +156,9 @@ const fourthLevel = levelSchema.parse({
   chapterId: "northern-route",
   order: 4,
   titleKey: "levels.nr04.title",
-  imageA: "/assets/scenes/northern-route/4/1.webp",
-  imageB: "/assets/scenes/northern-route/4/2.webp",
-  thumbnail: "/assets/scenes/northern-route/4/1.webp",
+  imageA: getLevelSceneAsset("northern-route", 4, "1.webp"),
+  imageB: getLevelSceneAsset("northern-route", 4, "2.webp"),
+  thumbnail: getLevelSceneAsset("northern-route", 4, "1.webp"),
   differences: [
       {
         id: "switch-position-4",
@@ -214,9 +215,9 @@ const fifthLevel = levelSchema.parse({
   chapterId: "northern-route",
   order: 5,
   titleKey: "levels.nr05.title",
-  imageA: "/assets/scenes/northern-route/5/1.webp",
-  imageB: "/assets/scenes/northern-route/5/2.webp",
-  thumbnail: "/assets/scenes/northern-route/5/1.webp",
+  imageA: getLevelSceneAsset("northern-route", 5, "1.webp"),
+  imageB: getLevelSceneAsset("northern-route", 5, "2.webp"),
+  thumbnail: getLevelSceneAsset("northern-route", 5, "1.webp"),
   differences: [
       {
         id: "thermometer-dial-5",
@@ -273,9 +274,9 @@ const sixthLevel = levelSchema.parse({
   chapterId: "northern-route",
   order: 6,
   titleKey: "levels.nr06.title",
-  imageA: "/assets/scenes/northern-route/6/1.webp",
-  imageB: "/assets/scenes/northern-route/6/2.webp",
-  thumbnail: "/assets/scenes/northern-route/6/1.webp",
+  imageA: getLevelSceneAsset("northern-route", 6, "1.webp"),
+  imageB: getLevelSceneAsset("northern-route", 6, "2.webp"),
+  thumbnail: getLevelSceneAsset("northern-route", 6, "1.webp"),
   differences: [
       {
         id: "field-radio-6",
@@ -333,9 +334,9 @@ const seventhLevel = levelSchema.parse({
   chapterId: "northern-route",
   order: 7,
   titleKey: "levels.nr07.title",
-  imageA: "/assets/scenes/northern-route/7/1.webp",
-  imageB: "/assets/scenes/northern-route/7/2.webp",
-  thumbnail: "/assets/scenes/northern-route/7/1.webp",
+  imageA: getLevelSceneAsset("northern-route", 7, "1.webp"),
+  imageB: getLevelSceneAsset("northern-route", 7, "2.webp"),
+  thumbnail: getLevelSceneAsset("northern-route", 7, "1.webp"),
   differences: [
       {
         id: "shutter-7",
@@ -399,9 +400,9 @@ const eighthLevel = levelSchema.parse({
   chapterId: "northern-route",
   order: 8,
   titleKey: "levels.nr08.title",
-  imageA: "/assets/scenes/northern-route/8/1.webp",
-  imageB: "/assets/scenes/northern-route/8/2.webp",
-  thumbnail: "/assets/scenes/northern-route/8/1.webp",
+  imageA: getLevelSceneAsset("northern-route", 8, "1.webp"),
+  imageB: getLevelSceneAsset("northern-route", 8, "2.webp"),
+  thumbnail: getLevelSceneAsset("northern-route", 8, "1.webp"),
   differences: [
       {
         id: "wall-chart-8",
@@ -465,9 +466,9 @@ const ninthLevel = levelSchema.parse({
   chapterId: "northern-route",
   order: 9,
   titleKey: "levels.nr09.title",
-  imageA: "/assets/scenes/northern-route/9/1.webp",
-  imageB: "/assets/scenes/northern-route/9/2.webp",
-  thumbnail: "/assets/scenes/northern-route/9/1.webp",
+  imageA: getLevelSceneAsset("northern-route", 9, "1.webp"),
+  imageB: getLevelSceneAsset("northern-route", 9, "2.webp"),
+  thumbnail: getLevelSceneAsset("northern-route", 9, "1.webp"),
   differences: [
       {
         id: "ceiling-lamp-9",
@@ -532,9 +533,9 @@ const tenthLevel = levelSchema.parse({
   chapterId: "northern-route",
   order: 10,
   titleKey: "levels.nr10.title",
-  imageA: "/assets/scenes/northern-route/10/1.webp",
-  imageB: "/assets/scenes/northern-route/10/2.webp",
-  thumbnail: "/assets/scenes/northern-route/10/1.webp",
+  imageA: getLevelSceneAsset("northern-route", 10, "1.webp"),
+  imageB: getLevelSceneAsset("northern-route", 10, "2.webp"),
+  thumbnail: getLevelSceneAsset("northern-route", 10, "1.webp"),
   differences: [
       {
         id: "signal-port-10",
@@ -598,9 +599,9 @@ const eleventhLevel = levelSchema.parse({
   chapterId: "northern-route",
   order: 11,
   titleKey: "levels.nr11.title",
-  imageA: "/assets/scenes/northern-route/11/1.webp",
-  imageB: "/assets/scenes/northern-route/11/2.webp",
-  thumbnail: "/assets/scenes/northern-route/11/1.webp",
+  imageA: getLevelSceneAsset("northern-route", 11, "1.webp"),
+  imageB: getLevelSceneAsset("northern-route", 11, "2.webp"),
+  thumbnail: getLevelSceneAsset("northern-route", 11, "1.webp"),
   differences: [
       {
         id: "upper-bedding-11",
@@ -664,9 +665,9 @@ const twelfthLevel = levelSchema.parse({
   chapterId: "northern-route",
   order: 12,
   titleKey: "levels.nr12.title",
-  imageA: "/assets/scenes/northern-route/12/1.webp",
-  imageB: "/assets/scenes/northern-route/12/2.webp",
-  thumbnail: "/assets/scenes/northern-route/12/1.webp",
+  imageA: getLevelSceneAsset("northern-route", 12, "1.webp"),
+  imageB: getLevelSceneAsset("northern-route", 12, "2.webp"),
+  thumbnail: getLevelSceneAsset("northern-route", 12, "1.webp"),
   differences: [
       {
         id: "desk-radio-12",
@@ -731,9 +732,9 @@ const thirteenthLevel = levelSchema.parse({
   chapterId: "northern-route",
   order: 13,
   titleKey: "levels.nr13.title",
-  imageA: "/assets/scenes/northern-route/13/1.webp",
-  imageB: "/assets/scenes/northern-route/13/2.webp",
-  thumbnail: "/assets/scenes/northern-route/13/1.webp",
+  imageA: getLevelSceneAsset("northern-route", 13, "1.webp"),
+  imageB: getLevelSceneAsset("northern-route", 13, "2.webp"),
+  thumbnail: getLevelSceneAsset("northern-route", 13, "1.webp"),
   differences: [
       {
         id: "tent-opening-13",

@@ -222,6 +222,15 @@ if (!existsSync(join(distDir, "index.html"))) {
   throw new Error("dist/index.html is missing. Run pnpm build before pnpm release:zip.");
 }
 
+const indexHtml = readFileSync(join(distDir, "index.html"), "utf8");
+const absoluteAssetReferences = indexHtml.match(/\b(?:src|href|data-src)="\/assets\//g) ?? [];
+
+if (absoluteAssetReferences.length > 0) {
+  throw new Error(
+    "dist/index.html contains root-relative /assets references. Use a relative Vite base for Yandex ZIP uploads."
+  );
+}
+
 if (existsSync(archivePath)) {
   rmSync(archivePath);
 }

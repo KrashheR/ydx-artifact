@@ -1,4 +1,5 @@
 import { levelSchema, type LevelDefinition } from "../entities/level/schema";
+import { getLevelSceneAsset } from "./sceneAssets";
 import sandMeridianMapLayout from "../../docs/plot/sand_meridian/map-handoff/sand-meridian-map-layout.json";
 
 const sandMeridianDifferenceOverrides = {
@@ -187,9 +188,9 @@ function makeLevel(level: SandMeridianLayoutLevel): LevelDefinition {
     chapterId: "sand-meridian",
     order: level.order,
     titleKey: getTitleKey(level),
-    imageA: `/assets/scenes/sand-meredian/${level.order}/1.webp`,
-    imageB: `/assets/scenes/sand-meredian/${level.order}/2.webp`,
-    thumbnail: `/assets/scenes/sand-meredian/${level.order}/1.webp`,
+    imageA: getLevelSceneAsset("sand-meredian", level.order, "1.webp"),
+    imageB: getLevelSceneAsset("sand-meredian", level.order, "2.webp"),
+    thumbnail: getLevelSceneAsset("sand-meredian", level.order, "1.webp"),
     differences: makeDifferences(level.order),
     requiredDifferences: sandMeridianDifferenceOverrides[level.order as keyof typeof sandMeridianDifferenceOverrides].length,
     reward: {

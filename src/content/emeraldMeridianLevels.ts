@@ -1,4 +1,5 @@
 import { levelSchema, type LevelDefinition } from "../entities/level/schema";
+import { getLevelSceneAsset } from "./sceneAssets";
 
 const emeraldLevelIds = [
   "em-01-river-landing",
@@ -205,9 +206,9 @@ function makeLevel(levelId: (typeof emeraldLevelIds)[number], order: number): Le
     chapterId: "emerald-meridian",
     order,
     titleKey: getTitleKey(levelId),
-    imageA: `/assets/scenes/emerald-meridian/${order}/1.webp`,
-    imageB: `/assets/scenes/emerald-meridian/${order}/2.webp`,
-    thumbnail: `/assets/scenes/emerald-meridian/${order}/1.webp`,
+    imageA: getLevelSceneAsset("emerald-meridian", order, "1.webp"),
+    imageB: getLevelSceneAsset("emerald-meridian", order, "2.webp"),
+    thumbnail: getLevelSceneAsset("emerald-meridian", order, "1.webp"),
     differences,
     requiredDifferences: perLevelDiffs[order - 1].length,
     reward: {
