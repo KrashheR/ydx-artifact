@@ -219,7 +219,9 @@ function writeZip() {
 }
 
 if (!existsSync(join(distDir, "index.html"))) {
-  throw new Error("dist/index.html is missing. Run pnpm build before pnpm release:zip.");
+  throw new Error(
+    "dist/index.html is missing. Run pnpm release:zip, or run pnpm build before invoking this script directly."
+  );
 }
 
 const indexHtml = readFileSync(join(distDir, "index.html"), "utf8");

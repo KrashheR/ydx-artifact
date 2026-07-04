@@ -7,5 +7,5 @@
 - [ ] Verify production `dist/index.html` contains modern module scripts, legacy `nomodule` scripts and legacy polyfills.
 - [ ] Verify production `dist/index.html` uses relative `./assets/...` Vite bundle links; keep only the Yandex SDK as root `/sdk.js`.
 - [ ] Confirm the Yandex draft has no in-app purchase products enabled for this first publication build.
-- [ ] Run `pnpm release:zip` after `pnpm build`; verify `dist-yandex.zip` has `index.html` at the archive root and no `dist/`, `.DS_Store`, `__MACOSX`, `._*` or sourcemap entries.
+- [ ] Run `pnpm release:zip`; it creates a fresh production build and verifies `dist-yandex.zip` has `index.html` at the archive root and no `dist/`, `.DS_Store`, `__MACOSX`, `._*` or sourcemap entries.
 - [ ] Generate final checksum.

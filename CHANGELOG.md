@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Made `pnpm release:zip` a one-command release archive pipeline: it now creates a fresh production build before validating and writing `dist-yandex.zip`.
+
 - Added `pnpm assets:optimize` for dry-run gated WebP recompression of runtime gameplay scene pairs and applied the q97 pass to six oversized scene files, reducing gameplay scene weight from 52.0 MB to 44.4 MB while preserving dimensions and paths.
 
 - Restored gameplay scene pairs (`public/assets/scenes/*/*/1.webp` and `2.webp`) to each file's first committed runtime WebP blob (`361c921`, `61b1f77`, or `78d3b0d`); gameplay images keep the same 1586x992 dimensions but use the original higher-quality runtime files again.

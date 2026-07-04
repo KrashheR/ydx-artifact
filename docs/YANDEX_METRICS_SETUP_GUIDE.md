@@ -67,7 +67,6 @@ pnpm build
 После того как ID счетчика задан в `.env.production.local`:
 
 ```powershell
-pnpm build
 pnpm release:zip
 ```
 
@@ -459,7 +458,6 @@ VITE_YANDEX_METRICA_ID=12345678
 Затем собери архив:
 
 ```powershell
-pnpm build
 pnpm release:zip
 ```
 

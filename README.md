@@ -58,7 +58,7 @@ Production builds also exclude unused scene placeholder SVGs, emit relative Vite
 Custom gameplay analytics can be enabled by adding `VITE_YANDEX_METRICA_ID=<counter id>` to `.env.production.local`; `pnpm dev`, `pnpm dev:validate`, `pnpm build` and release validation load that production-local Vite env automatically. Setup steps and the Metrica goal list are documented in `docs/YANDEX_METRICS_SETUP_GUIDE.md`.
 Use `pnpm metrika:goals` to dry-run Yandex Metrica goal setup, then `pnpm metrika:goals -- --apply` to create missing JavaScript-event goals through the Metrica Management API. The goals script reads the counter ID from `.env.metrica.local`, `.env.production.local` or `.env.local`.
 Production builds do not emit sourcemaps by default to keep the Yandex upload smaller. Use `BUILD_SOURCEMAP=true pnpm build` when a diagnostic build needs `.map` files.
-`pnpm release:zip` packages the contents of `dist/` into `dist-yandex.zip` with the Node-based release packager, verifies root `index.html`, rejects root-relative `/assets` script/style links, and excludes macOS/system junk plus sourcemaps. It does not require system `zip` / `unzip` binaries.
+`pnpm release:zip` creates a fresh production build, then packages the contents of `dist/` into `dist-yandex.zip` with the Node-based release packager, verifies root `index.html`, rejects root-relative `/assets` script/style links, and excludes macOS/system junk plus sourcemaps. It does not require system `zip` / `unzip` binaries.
 
 ## Scope Implemented
 

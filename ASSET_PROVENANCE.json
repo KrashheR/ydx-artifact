@@ -1,6 +1,13 @@
 {
   "assets": [
     {
+      "id": "runtime-scene-pair-recompression-2026-07-04",
+      "path": "public/assets/scenes",
+      "status": "generated-derivative",
+      "source": "all runtime gameplay scene pairs named 1.webp and 2.webp were recompressed in place on 2026-07-04 with a 13% minimum file-size reduction target; original content-owner source and approval are inherited from each package entry",
+      "approval": "inherits-source-asset-approval"
+    },
+    {
       "id": "placeholder-a",
       "path": "public/assets/scenes/northern-route/placeholder/a.svg",
       "status": "placeholder",

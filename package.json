@@ -21,7 +21,7 @@
     "agent:release-check": "pnpm validate:content && pnpm build && pnpm test:e2e",
     "release:validate": "pnpm validate:content && pnpm build",
     "release:manifest": "tsx scripts/release-manifest.ts",
-    "release:zip": "tsx scripts/release-zip.ts",
+    "release:zip": "pnpm build && tsx scripts/release-zip.ts",
     "release:checksum": "tsx scripts/release-checksum.ts",
     "metrika:goals": "tsx scripts/sync-metrica-goals.ts"
   },
