@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Converted the new artifact state images under `public/assets/artifacts/` from PNG to lossless WebP and downscaled them by 20%.
+
 - Restored `public/assets/scenes/northern-route/13/1.webp` from the historical updated A-scene blob so White Meridian level 13 uses distinct A/B gameplay images again.
 
 - Changed startup routing so first launch opens White Meridian level 01 directly with an onboarding overlay, returning saves resume in-progress or next campaign gameplay, and fully completed saves open the collection/case screen instead of the home menu.

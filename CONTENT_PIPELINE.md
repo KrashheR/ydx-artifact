@@ -2,6 +2,8 @@
 
 Runtime placeholder assets live in `public/assets/scenes/northern-route/placeholder/`.
 
+Runtime artifact state images live under `public/assets/artifacts/<campaign-folder>/<level-order>/` as WebP derivatives. Convert owner-provided PNG exports to lossless WebP, downscale to the target runtime size, and keep master/source PNG files outside `public/assets/` when they need to be preserved.
+
 Chapter 1 map point titles in `src/i18n/*/common.json` are sourced from `docs/plot/meridian/10_STORY_AND_SCENE_PROMPTS.md`.
 
 Playable chapter wiring now goes through `src/content/campaignManifest.ts`, campaign builder modules, and `src/content/chapters.ts`. To connect a new campaign quickly:

@@ -8,6 +8,13 @@
       "approval": "inherits-source-asset-approval"
     },
     {
+      "id": "artifact-state-images-2026-07-05",
+      "path": "public/assets/artifacts",
+      "status": "generated-derivative",
+      "source": "owner-provided artifact PNG exports in public/assets/artifacts were converted on 2026-07-05 to lossless WebP and downscaled from 1254x1254 to 1003x1003; source approval is inherited from the artifact intake package",
+      "approval": "pending-owner-license-confirmation"
+    },
+    {
       "id": "placeholder-a",
       "path": "public/assets/scenes/northern-route/placeholder/a.svg",
       "status": "placeholder",
