@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Converted the new artifact state images under `public/assets/artifacts/` from PNG to lossless WebP and downscaled them by 20%.
+- Converted the new artifact state images under `public/assets/artifacts/` from PNG to 512x512 lossless WebP.
 
 - Restored `public/assets/scenes/northern-route/13/1.webp` from the historical updated A-scene blob so White Meridian level 13 uses distinct A/B gameplay images again.
 

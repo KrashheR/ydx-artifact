@@ -11,7 +11,7 @@
       "id": "artifact-state-images-2026-07-05",
       "path": "public/assets/artifacts",
       "status": "generated-derivative",
-      "source": "owner-provided artifact PNG exports in public/assets/artifacts were converted on 2026-07-05 to lossless WebP and downscaled from 1254x1254 to 1003x1003; source approval is inherited from the artifact intake package",
+      "source": "owner-provided artifact PNG exports in public/assets/artifacts were converted on 2026-07-05 to lossless WebP and downscaled from 1254x1254 to 512x512; source approval is inherited from the artifact intake package",
       "approval": "pending-owner-license-confirmation"
     },
     {
