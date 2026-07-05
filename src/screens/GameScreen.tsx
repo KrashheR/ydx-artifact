@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getChapter, getLevelById } from "@/content/chapters";
 import { PhotoComparator } from "@/features/gameplay/PhotoComparator";
 import { LevelCompleteOverlay } from "@/features/gameplay/LevelCompleteOverlay";
 import { LevelFailedOverlay } from "@/features/gameplay/LevelFailedOverlay";
+import { GameReviewPrePromptModal } from "@/features/review/GameReviewPrePromptModal";
+import { runNativeReviewFlow } from "@/features/review/reviewFlow";
+import { isReviewPrePromptLocallyEligible } from "@/features/review/reviewPrompt";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
 import { mockPlatform } from "@/services/platform/mockPlatform";
 import {
@@ -20,6 +23,13 @@ const COMPLETE_OVERLAY_DELAY_MS = 200;
 const DEBUG_LAYOUT_MODE = import.meta.env.VITE_LAYOUT_DEBUG === "true";
 const FINAL_VALIDATE_MODE = import.meta.env.VITE_FINAL_VALIDATE === "true";
 const noop = () => undefined;
+
+function getDeviceType() {
+  if (typeof window === "undefined") return "desktop";
+  if (window.innerWidth < 768) return "mobile";
+  if (window.innerWidth < 1280) return "tablet";
+  return "desktop";
+}
 
 function formatTime(s: number) {
   return `${Math.floor(s / 60)
@@ -255,6 +265,27 @@ export function GameScreen({
   const save = useGameStore((s) => s.save);
   const claimDailyReward = useGameStore((s) => s.claimDailyReward);
   const resetLevelProgress = useGameStore((s) => s.resetLevelProgress);
+  const reviewPromptRuntime = useGameStore((s) => s.reviewPromptRuntime);
+  const interstitialRuntime = useGameStore((s) => s.interstitialRuntime);
+  const clearPendingReviewPromptCheck = useGameStore(
+    (s) => s.clearPendingReviewPromptCheck,
+  );
+  const clearPendingInterstitialCheck = useGameStore(
+    (s) => s.clearPendingInterstitialCheck,
+  );
+  const setInterstitialNativeRequestInFlight = useGameStore(
+    (s) => s.setInterstitialNativeRequestInFlight,
+  );
+  const setInterstitialResolved = useGameStore((s) => s.setInterstitialResolved);
+  const markReviewPromptShown = useGameStore((s) => s.markReviewPromptShown);
+  const dismissReviewPrompt = useGameStore((s) => s.dismissReviewPrompt);
+  const setReviewNativeRequestInFlight = useGameStore(
+    (s) => s.setReviewNativeRequestInFlight,
+  );
+  const setReviewNativeResolved = useGameStore((s) => s.setReviewNativeResolved);
+  const setReviewUnavailableReason = useGameStore(
+    (s) => s.setReviewUnavailableReason,
+  );
 
   const [timedOut, setTimedOut] = useState(false);
   const [platformPaused, setPlatformPaused] = useState(getIsPlatformPaused);
@@ -274,9 +305,16 @@ export function GameScreen({
     mistakes: number;
     elapsed: number;
   } | null>(null);
+  const [isReviewPromptOpen, setIsReviewPromptOpen] = useState(false);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [isInterstitialActive, setIsInterstitialActive] = useState(false);
+  const [postLevelActionInFlight, setPostLevelActionInFlight] = useState(false);
   const completeOverlayDelayRef = useRef<number | null>(null);
   const activeTimerSaveCounterRef = useRef(0);
   const timeoutTrackedRef = useRef(false);
+  const reviewCheckRunRef = useRef(0);
+  const reviewSubmitGuardRef = useRef(false);
+  const postLevelActionGuardRef = useRef(false);
 
   const level = getLevelById(levelId);
   const chapter = level ? getChapter(level.chapterId) : null;
@@ -295,15 +333,35 @@ export function GameScreen({
   const completionPending = pendingFinalStats !== null;
   const showComplete = finalStats !== null;
   const showRewardedHintModal = rewardedHintModal !== null;
-  const showOverlay = showComplete || timedOut || showRewardedHintModal;
+  const showOverlay =
+    showComplete || timedOut || showRewardedHintModal || isReviewPromptOpen;
   const gameplayBlocked =
     platformPaused ||
     !pageVisible ||
     showRewardedHintModal ||
     rewardedHintInFlight ||
+    isReviewPromptOpen ||
+    isSubmittingReview ||
+    isInterstitialActive ||
+    postLevelActionInFlight ||
     showComplete ||
     completionPending ||
     timedOut;
+  const completedLevelsCount = saveData.completedLevels.length;
+  const promptOrdinal = Math.min(
+    saveData.reviewPrompt.prePromptShownCount + 1,
+    2,
+  ) as 1 | 2;
+  const postLevelPromptPayload = useMemo(
+    () => ({
+      completedLevels: completedLevelsCount,
+      campaignId: level?.chapterId,
+      deviceType: getDeviceType(),
+      language: saveData.settings.locale,
+      promptOrdinal,
+    }),
+    [completedLevelsCount, level?.chapterId, promptOrdinal, saveData.settings.locale],
+  );
 
   useEffect(() => subscribePlatformPause(setPlatformPaused), []);
 
@@ -393,6 +451,81 @@ export function GameScreen({
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!showComplete || mode !== "campaign" || !level) return;
+    if (reviewPromptRuntime.pendingMapCheckCompletedLevels === null) return;
+
+    const checkId = reviewCheckRunRef.current + 1;
+    reviewCheckRunRef.current = checkId;
+    const timeoutId = window.setTimeout(() => {
+      void (async () => {
+        const locallyEligible = isReviewPrePromptLocallyEligible({
+          completedLevels: completedLevelsCount,
+          reviewState: saveData.reviewPrompt,
+          isCampaignMapActive: false,
+          isPostLevelVictoryActive: true,
+          isDocumentVisible: pageVisible && document.visibilityState === "visible",
+          hasBlockingOverlay: isReviewPromptOpen,
+          isAdActive:
+            isInterstitialActive ||
+            interstitialRuntime.nativeRequestInFlight ||
+            postLevelActionInFlight,
+          isPurchaseFlowActive: false,
+          isTutorialActive: false,
+          nativeRequestInFlight: reviewPromptRuntime.nativeRequestInFlight,
+        });
+
+        if (!locallyEligible) return;
+
+        const availability = await mockPlatform.canReview();
+        const currentScreen = useGameStore.getState().screen;
+
+        if (
+          reviewCheckRunRef.current !== checkId ||
+          currentScreen.kind !== "game" ||
+          currentScreen.levelId !== levelId
+        ) {
+          return;
+        }
+
+        if (!availability.value) {
+          setReviewUnavailableReason(availability.reason);
+          clearPendingReviewPromptCheck();
+          trackAnalyticsEvent("review_native_unavailable", {
+            ...postLevelPromptPayload,
+            unavailableReason: availability.reason,
+          });
+          return;
+        }
+
+        trackAnalyticsEvent("review_prompt_eligible", postLevelPromptPayload);
+        markReviewPromptShown();
+        setIsReviewPromptOpen(true);
+        trackAnalyticsEvent("review_prompt_shown", postLevelPromptPayload);
+      })();
+    }, 500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [
+    clearPendingReviewPromptCheck,
+    completedLevelsCount,
+    interstitialRuntime.nativeRequestInFlight,
+    isInterstitialActive,
+    isReviewPromptOpen,
+    level,
+    levelId,
+    markReviewPromptShown,
+    mode,
+    pageVisible,
+    postLevelActionInFlight,
+    postLevelPromptPayload,
+    reviewPromptRuntime.nativeRequestInFlight,
+    reviewPromptRuntime.pendingMapCheckCompletedLevels,
+    saveData.reviewPrompt,
+    setReviewUnavailableReason,
+    showComplete,
+  ]);
 
   if (!level || !chapter) return null;
 
@@ -549,20 +682,99 @@ export function GameScreen({
     setHintId(undefined);
   }
 
-  function handleNext() {
-    if (!nextLevel) return;
+  async function showQueuedInterstitialBeforeNextLevel() {
+    const runtime = useGameStore.getState().interstitialRuntime;
+    const completedLevels = runtime.pendingMapCheckCompletedLevels;
+    if (completedLevels === null) return;
+
+    if (saveData.purchases.noForcedInterstitials) {
+      clearPendingInterstitialCheck();
+      return;
+    }
+
+    if (
+      completedLevels % 3 !== 0 ||
+      completedLevels <= runtime.lastResolvedCompletedLevels
+    ) {
+      clearPendingInterstitialCheck();
+      return;
+    }
+
+    trackAnalyticsEvent("interstitial_eligible", {
+      ...postLevelPromptPayload,
+      completedLevels,
+    });
+    trackAnalyticsEvent("interstitial_request", {
+      ...postLevelPromptPayload,
+      completedLevels,
+    });
+    setInterstitialNativeRequestInFlight(true);
+
+    const result = await mockPlatform.showInterstitial({
+      onOpen: () => {
+        setIsInterstitialActive(true);
+        trackAnalyticsEvent("interstitial_open", {
+          ...postLevelPromptPayload,
+          completedLevels,
+        });
+      },
+      onClose: () => {
+        setIsInterstitialActive(false);
+        trackAnalyticsEvent("interstitial_close", {
+          ...postLevelPromptPayload,
+          completedLevels,
+        });
+      },
+      onError: () => {
+        setIsInterstitialActive(false);
+        trackAnalyticsEvent("interstitial_error", {
+          ...postLevelPromptPayload,
+          completedLevels,
+        });
+      },
+    });
+
+    if (result === "failed") {
+      setIsInterstitialActive(false);
+    }
+    setInterstitialResolved(completedLevels);
+  }
+
+  async function handleNext() {
+    if (
+      !nextLevel ||
+      postLevelActionGuardRef.current ||
+      isReviewPromptOpen ||
+      isSubmittingReview ||
+      interstitialRuntime.nativeRequestInFlight
+    )
+      return;
+
+    postLevelActionGuardRef.current = true;
+    setPostLevelActionInFlight(true);
     trackAnalyticsEvent("level_next_clicked", {
       levelId,
       nextLevelId: nextLevel.id,
       campaignId: chapterId,
       mode,
     });
+    void save({ flush: true });
+
+    try {
+      await showQueuedInterstitialBeforeNextLevel();
+    } finally {
+      postLevelActionGuardRef.current = false;
+      setPostLevelActionInFlight(false);
+    }
+
     startLevel(nextLevel.id, "campaign");
   }
 
   function handleMap() {
     if (completionPending) return;
     void save({ flush: true });
+    clearPendingInterstitialCheck();
+    clearPendingReviewPromptCheck();
     trackAnalyticsEvent("level_exit_to_map", {
       levelId,
       campaignId: chapterId,
@@ -573,6 +785,72 @@ export function GameScreen({
       completed: showComplete,
     });
     navigate({ kind: "map", chapterId });
+  }
+
+  function handleReviewLater() {
+    dismissReviewPrompt();
+    setIsReviewPromptOpen(false);
+    trackAnalyticsEvent("review_prompt_later_clicked", postLevelPromptPayload);
+  }
+
+  function handleReviewClose() {
+    dismissReviewPrompt();
+    setIsReviewPromptOpen(false);
+    trackAnalyticsEvent("review_prompt_closed", postLevelPromptPayload);
+  }
+
+  async function handleReview() {
+    if (
+      reviewSubmitGuardRef.current ||
+      isSubmittingReview ||
+      reviewPromptRuntime.nativeRequestInFlight
+    )
+      return;
+
+    reviewSubmitGuardRef.current = true;
+    setIsSubmittingReview(true);
+    setReviewNativeRequestInFlight(true);
+    trackAnalyticsEvent("review_prompt_review_clicked", postLevelPromptPayload);
+
+    const availability = await mockPlatform.canReview();
+
+    if (!availability.value) {
+      setReviewUnavailableReason(availability.reason);
+      setReviewNativeRequestInFlight(false);
+      setIsSubmittingReview(false);
+      setIsReviewPromptOpen(false);
+      trackAnalyticsEvent("review_native_unavailable", {
+        ...postLevelPromptPayload,
+        unavailableReason: availability.reason,
+      });
+      reviewSubmitGuardRef.current = false;
+      return;
+    }
+
+    setIsReviewPromptOpen(false);
+    trackAnalyticsEvent("review_native_requested", postLevelPromptPayload);
+
+    const result = await runNativeReviewFlow(mockPlatform);
+
+    if (result.status === "sent") {
+      setReviewNativeResolved(true);
+      trackAnalyticsEvent("review_native_sent", postLevelPromptPayload);
+    } else if (result.status === "closed") {
+      setReviewNativeResolved(true);
+      trackAnalyticsEvent("review_native_closed", postLevelPromptPayload);
+    } else if (result.status === "unavailable") {
+      setReviewUnavailableReason(result.reason);
+      trackAnalyticsEvent("review_native_unavailable", {
+        ...postLevelPromptPayload,
+        unavailableReason: result.reason,
+      });
+    } else {
+      trackAnalyticsEvent("review_native_error", postLevelPromptPayload);
+    }
+
+    setReviewNativeRequestInFlight(false);
+    setIsSubmittingReview(false);
+    reviewSubmitGuardRef.current = false;
   }
 
   function handleExtendTime() {
@@ -1099,6 +1377,14 @@ export function GameScreen({
           onWatch={handleRewardedHintWatch}
         />
       )}
+
+      <GameReviewPrePromptModal
+        isOpen={isReviewPromptOpen && pageVisible}
+        isSubmitting={isSubmittingReview}
+        onReview={() => void handleReview()}
+        onLater={handleReviewLater}
+        onClose={handleReviewClose}
+      />
     </div>
   );
 }

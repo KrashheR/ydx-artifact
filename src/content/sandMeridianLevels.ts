@@ -147,7 +147,7 @@ type SandMeridianCircleSpec = { id: string; x: number; y: number; radius: number
 type SandMeridianShapeSpec =
   | SandMeridianCircleSpec
   | { id: string; shape: { kind: "circle"; cx: number; cy: number; r: number } }
-  | { id: string; shape: { kind: "ellipse"; cx: number; cy: number; rx: number; ry: number } };
+  | { id: string; shape: { kind: "ellipse"; cx: number; cy: number; rx: number; ry: number; rotation?: number } };
 
 function getSandMeridianShape(difference: SandMeridianShapeSpec) {
   if ("shape" in difference) return difference.shape;
@@ -162,11 +162,25 @@ function makeDifferences(order: number) {
     const hitArea =
       shape.kind === "circle"
         ? { kind: "circle" as const, cx: shape.cx, cy: shape.cy, radius: shape.r }
-        : { kind: "ellipse" as const, cx: shape.cx, cy: shape.cy, rx: shape.rx, ry: shape.ry };
+        : {
+            kind: "ellipse" as const,
+            cx: shape.cx,
+            cy: shape.cy,
+            rx: shape.rx,
+            ry: shape.ry,
+            ...(shape.rotation !== undefined ? { rotation: shape.rotation } : {})
+          };
     const hintArea =
       shape.kind === "circle"
         ? { kind: "circle" as const, cx: shape.cx, cy: shape.cy, radius: shape.r + 0.05 }
-        : { kind: "ellipse" as const, cx: shape.cx, cy: shape.cy, rx: shape.rx + 0.05, ry: shape.ry + 0.05 };
+        : {
+            kind: "ellipse" as const,
+            cx: shape.cx,
+            cy: shape.cy,
+            rx: shape.rx + 0.05,
+            ry: shape.ry + 0.05,
+            ...(shape.rotation !== undefined ? { rotation: shape.rotation } : {})
+          };
 
     return {
       id: `${difference.id}-${order}`,

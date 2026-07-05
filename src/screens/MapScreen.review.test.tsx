@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import "@/i18n";
 import { getChapterLevels } from "@/content/chapters";
@@ -9,18 +9,18 @@ import { useGameStore } from "@/shared/store/gameStore";
 
 describe("MapScreen review prompt flow", () => {
   beforeEach(() => {
-    const firstThreeLevels = getChapterLevels("northern-route").slice(0, 3).map((level) => level.id);
+    const firstFourLevels = getChapterLevels("northern-route").slice(0, 4).map((level) => level.id);
     const saveData = createDefaultSave();
 
     useGameStore.setState({
       screen: { kind: "map", chapterId: "northern-route" },
       saveData: {
         ...saveData,
-        completedLevels: firstThreeLevels
+        completedLevels: firstFourLevels
       },
       reviewPromptRuntime: {
         pendingMapCheckToken: 1,
-        pendingMapCheckCompletedLevels: 3,
+        pendingMapCheckCompletedLevels: 4,
         nativeRequestInFlight: false
       }
     });
@@ -30,29 +30,7 @@ describe("MapScreen review prompt flow", () => {
     mockPlatform.setReviewGatewayOverride(null);
   });
 
-  it("shows the pre-prompt on the map and reschedules after Later", async () => {
-    mockPlatform.setReviewGatewayOverride({
-      canReview: vi.fn(async () => ({ value: true })),
-      requestReview: vi.fn(async () => ({ feedbackSent: true }))
-    });
-
-    render(<MapScreen onOpenSettings={() => undefined} />);
-
-    await act(async () => {
-      await new Promise((resolve) => window.setTimeout(resolve, 650));
-    });
-
-    await waitFor(() => expect(screen.getByRole("dialog")).toBeInTheDocument());
-    fireEvent.click(screen.getByRole("button", { name: "Позже" }));
-
-    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
-
-    const { reviewPrompt } = useGameStore.getState().saveData;
-    expect(reviewPrompt.prePromptShownCount).toBe(1);
-    expect(reviewPrompt.nextEligibleCompletedLevel).toBe(8);
-  });
-
-  it("requests the native review flow only once on rapid double click and resolves the scenario", async () => {
+  it("does not show the pre-prompt on the map while a post-level check is pending", async () => {
     const gateway = {
       canReview: vi.fn(async () => ({ value: true })),
       requestReview: vi.fn(async () => ({ feedbackSent: false }))
@@ -65,11 +43,7 @@ describe("MapScreen review prompt flow", () => {
       await new Promise((resolve) => window.setTimeout(resolve, 650));
     });
 
-    const button = await screen.findByRole("button", { name: "Оценить игру" });
-    fireEvent.click(button);
-    fireEvent.click(button);
-
-    await waitFor(() => expect(gateway.requestReview).toHaveBeenCalledTimes(1));
-    expect(useGameStore.getState().saveData.reviewPrompt.nativeReviewResolved).toBe(true);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(gateway.canReview).not.toHaveBeenCalled();
   });
 });

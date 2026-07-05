@@ -4,6 +4,7 @@ export interface ReviewPromptEligibilityInput {
   completedLevels: number;
   reviewState: ReviewPromptState;
   isCampaignMapActive: boolean;
+  isPostLevelVictoryActive?: boolean;
   isDocumentVisible: boolean;
   hasBlockingOverlay: boolean;
   isAdActive: boolean;
@@ -19,6 +20,7 @@ export function isReviewPrePromptLocallyEligible(
     completedLevels,
     reviewState,
     isCampaignMapActive,
+    isPostLevelVictoryActive,
     isDocumentVisible,
     hasBlockingOverlay,
     isAdActive,
@@ -27,14 +29,20 @@ export function isReviewPrePromptLocallyEligible(
     nativeRequestInFlight
   } = input;
 
-  if (!isCampaignMapActive || !isDocumentVisible) return false;
+  if (!(isCampaignMapActive || isPostLevelVictoryActive) || !isDocumentVisible) return false;
   if (hasBlockingOverlay || isAdActive) return false;
   if (isPurchaseFlowActive || isTutorialActive) return false;
   if (reviewState.nativeReviewResolved) return false;
   if (nativeRequestInFlight) return false;
   if (reviewState.prePromptShownCount >= 2) return false;
 
-  return completedLevels >= reviewState.nextEligibleCompletedLevel;
+  const firstPromptCompletedLevel = Math.max(reviewState.nextEligibleCompletedLevel, 4);
+  const nextEligibleCompletedLevel =
+    reviewState.prePromptShownCount === 0
+      ? firstPromptCompletedLevel
+      : reviewState.nextEligibleCompletedLevel;
+
+  return completedLevels >= nextEligibleCompletedLevel;
 }
 
 export function getNextReviewPromptStateAfterLater(

@@ -71,6 +71,13 @@ function shapeBounds(shape: { kind: string; [key: string]: unknown }) {
     const cy = Number(shape.cy);
     const rx = Number(shape.rx);
     const ry = Number(shape.ry);
+    const rotation = Number(shape.rotation ?? 0);
+    if (rotation !== 0) {
+      const angle = (rotation * Math.PI) / 180;
+      const rotatedRadiusX = Math.hypot(rx * Math.cos(angle), ry * Math.sin(angle));
+      const rotatedRadiusY = Math.hypot(rx * Math.sin(angle), ry * Math.cos(angle));
+      return { left: cx - rotatedRadiusX, top: cy - rotatedRadiusY, right: cx + rotatedRadiusX, bottom: cy + rotatedRadiusY };
+    }
     return { left: cx - rx, top: cy - ry, right: cx + rx, bottom: cy + ry };
   }
   const points = shape.points as Array<{ x: number; y: number }>;
@@ -103,8 +110,12 @@ function validateShape(owner: string, shape: { kind: string; [key: string]: unkn
     const cy = Number(shape.cy);
     const rx = Number(shape.rx);
     const ry = Number(shape.ry);
+    const rotation = Number(shape.rotation ?? 0);
     if (cx < 0 || cx > 1 || cy < 0 || cy > 1 || rx <= 0 || ry <= 0) {
       errors.push(`${owner}: ellipse hotspot center is outside 0..1 or radius is not positive`);
+    }
+    if (!Number.isFinite(rotation) || rotation < -180 || rotation > 180) {
+      errors.push(`${owner}: ellipse rotation must be a finite degree value from -180 to 180`);
     }
     return;
   }

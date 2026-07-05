@@ -37,6 +37,8 @@ describe("GameScreen", () => {
     vi.useRealTimers();
     vi.restoreAllMocks();
     mockPlatform.setRewardedGatewayOverride(null);
+    mockPlatform.setInterstitialGatewayOverride(null);
+    mockPlatform.setReviewGatewayOverride(null);
     useGameStore.setState({
       screen: { kind: "home" },
       saveData: createDefaultSave(),
@@ -54,22 +56,31 @@ describe("GameScreen", () => {
     });
   });
 
-  it("returns to the current campaign level select from the completion overlay", async () => {
-    const level = getChapterLevels("northern-route")[0];
-    useGameStore.getState().startLevel(level.id, "campaign");
-
-    render(<GameScreen levelId={level.id} mode="campaign" />);
-
+  async function completeRenderedLevel(level: ReturnType<typeof getChapterLevels>[number]) {
     for (const difference of level.differences) {
       fireEvent.click(
         screen.getByRole("button", { name: `find ${difference.id}` }),
       );
       await waitFor(() => {
         expect(
-          useGameStore.getState().saveData.inProgress?.foundDifferenceIds,
+          useGameStore.getState().saveData.inProgress?.foundDifferenceIds ??
+            useGameStore.getState().saveData.completedLevels,
         ).toContain(difference.id);
       });
     }
+
+    await waitFor(() => {
+      expect(useGameStore.getState().saveData.completedLevels).toContain(level.id);
+    });
+  }
+
+  it("returns to the current campaign level select from the completion overlay", async () => {
+    const level = getChapterLevels("northern-route")[0];
+    useGameStore.getState().startLevel(level.id, "campaign");
+
+    render(<GameScreen levelId={level.id} mode="campaign" />);
+
+    await completeRenderedLevel(level);
 
     const levelSelectButton = await screen.findByRole("button", {
       name: /К выбору уровней|Level Select/,
@@ -81,6 +92,74 @@ describe("GameScreen", () => {
         kind: "map",
         chapterId: "northern-route",
       });
+    });
+  });
+
+  it("shows a queued interstitial only when the player clicks next level", async () => {
+    const levels = getChapterLevels("northern-route");
+    const level = levels[2];
+    const showInterstitial = vi.fn(async () => "closed" as const);
+    mockPlatform.setInterstitialGatewayOverride({ showInterstitial });
+    useGameStore.setState((state) => ({
+      saveData: {
+        ...state.saveData,
+        completedLevels: [levels[0].id, levels[1].id],
+      },
+    }));
+    useGameStore.getState().startLevel(level.id, "campaign");
+
+    render(<GameScreen levelId={level.id} mode="campaign" />);
+
+    await completeRenderedLevel(level);
+
+    expect(useGameStore.getState().interstitialRuntime.pendingMapCheckCompletedLevels).toBe(3);
+    expect(showInterstitial).not.toHaveBeenCalled();
+
+    fireEvent.click(await screen.findByRole("button", { name: /4/ }));
+
+    await waitFor(() => expect(showInterstitial).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      expect(useGameStore.getState().screen).toEqual({
+        kind: "game",
+        levelId: levels[3].id,
+        mode: "campaign",
+      });
+    });
+    expect(useGameStore.getState().interstitialRuntime).toMatchObject({
+      pendingMapCheckCompletedLevels: null,
+      lastResolvedCompletedLevels: 3,
+      nativeRequestInFlight: false,
+    });
+  });
+
+  it("shows the review pre-prompt after the fourth campaign victory and keeps its buttons clickable", async () => {
+    const levels = getChapterLevels("northern-route");
+    const level = levels[3];
+    mockPlatform.setReviewGatewayOverride({
+      canReview: vi.fn(async () => ({ value: true })),
+      requestReview: vi.fn(async () => ({ feedbackSent: true })),
+    });
+    useGameStore.setState((state) => ({
+      saveData: {
+        ...state.saveData,
+        completedLevels: [levels[0].id, levels[1].id, levels[2].id],
+      },
+    }));
+    useGameStore.getState().startLevel(level.id, "campaign");
+
+    render(<GameScreen levelId={level.id} mode="campaign" />);
+
+    await completeRenderedLevel(level);
+
+    await waitFor(() => expect(screen.getByRole("dialog")).toBeInTheDocument(), {
+      timeout: 1200,
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Позже|Later/ }));
+
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(useGameStore.getState().saveData.reviewPrompt).toMatchObject({
+      prePromptShownCount: 1,
+      nextEligibleCompletedLevel: 9,
     });
   });
 

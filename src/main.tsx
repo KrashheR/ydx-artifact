@@ -50,27 +50,27 @@ if (import.meta.env.DEV) {
       });
     },
     triggerReviewPromptDemo: async () => {
-      const firstThreeLevels = getChapterLevels("northern-route").slice(0, 3).map((level) => level.id);
+      const demoLevels = getChapterLevels("northern-route").slice(0, 4);
+      const firstThreeLevels = demoLevels.slice(0, 3).map((level) => level.id);
       useGameStore.setState((state) => ({
-        screen: { kind: "map", chapterId: "northern-route" },
         saveData: {
           ...state.saveData,
           completedLevels: firstThreeLevels,
           reviewPrompt: {
             ...state.saveData.reviewPrompt,
             prePromptShownCount: 0,
-            nextEligibleCompletedLevel: 3,
+            nextEligibleCompletedLevel: 4,
             nativeReviewResolved: false,
             lastUnavailableReason: undefined
           }
         },
         reviewPromptRuntime: {
           ...state.reviewPromptRuntime,
-          pendingMapCheckToken: state.reviewPromptRuntime.pendingMapCheckToken + 1,
-          pendingMapCheckCompletedLevels: 3,
+          pendingMapCheckCompletedLevels: null,
           nativeRequestInFlight: false
         }
       }));
+      useGameStore.getState().startLevel(demoLevels[3].id, "campaign");
       await useGameStore.getState().save({ flush: true });
     }
   };

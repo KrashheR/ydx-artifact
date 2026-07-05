@@ -1,6 +1,6 @@
 # Level Editor
 
-The production dev-only level editor is not implemented in this scaffold. Hitbox data is currently authored in `src/content/levels.ts`.
+The local dev-only hitbox editor is available through `pnpm dev:validate` for markup-reference review and `pnpm validate:final` for final A/B scene review. Hitbox data is authored in `src/content/*` and can be written back with the editor's Apply action.
 
 Until an editor exists, new level markup uses the three-image intake documented in `CONTENT_PIPELINE.md`:
 
@@ -9,6 +9,8 @@ Until an editor exists, new level markup uses the three-image intake documented 
 - `3.webp` is a reference-only markup image with visible circles around differences.
 
 Do not implement gameplay by overlaying transparent buttons from the markup image. Use the markup image to read coordinates, then store normalized hitboxes in `src/content/levels.ts` so existing hit testing in `src/shared/lib/hitTesting.ts` remains the single source of interaction behavior.
+
+Visible markers in the editor can be dragged, resized from the right/bottom/corner handles, and rotated for ellipse hitboxes from the top round handle. Ellipse rotation is stored as optional `rotation` degrees from `-180` to `180` and is preserved by the Apply endpoint for all campaign content modules.
 
 Current authored intake:
 

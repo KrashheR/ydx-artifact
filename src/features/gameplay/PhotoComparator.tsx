@@ -6,7 +6,7 @@ import type {
   HitShape,
   LevelDefinition,
 } from "@/entities/level/schema";
-import { hitTest } from "@/shared/lib/hitTesting";
+import { hitTest, shapeCenter } from "@/shared/lib/hitTesting";
 
 type PhotoComparatorProps = {
   level: LevelDefinition;
@@ -47,10 +47,13 @@ type ResizeAxis = "x" | "y" | "both";
 type HitboxEdit = {
   differenceId: string;
   side: "A" | "B";
-  mode: "move" | "resize";
+  mode: "move" | "resize" | "rotate";
   resizeAxis?: ResizeAxis;
   clientX: number;
   clientY: number;
+  centerClientX?: number;
+  centerClientY?: number;
+  lastAngle?: number;
 };
 type ApplyStatus = "idle" | "saving" | "saved" | "error";
 
@@ -188,6 +191,19 @@ export function PhotoComparator({
     );
   }
 
+  function handleHitboxRotate(
+    differenceId: string,
+    side: "A" | "B",
+    deltaDegrees: number,
+  ) {
+    updateEditableDifferences((differences) =>
+      differences.map((difference) => {
+        if (difference.id !== differenceId) return difference;
+        return rotateDifferenceHitboxPair(difference, side, deltaDegrees);
+      }),
+    );
+  }
+
   function resetEditedDifferences() {
     window.localStorage.removeItem(editorStorageKey);
     setEditableDifferences(cloneDifferences(level.differences));
@@ -258,6 +274,7 @@ export function PhotoComparator({
             onPointerPick={handlePointerUp}
             onHitboxMove={handleHitboxMove}
             onHitboxResize={handleHitboxResize}
+            onHitboxRotate={handleHitboxRotate}
             compareLabel={
               version === "A" ? t("game.labelOriginal") : t("game.labelCopy")
             }
@@ -297,6 +314,7 @@ export function PhotoComparator({
         onPointerPick={handlePointerUp}
         onHitboxMove={handleHitboxMove}
         onHitboxResize={handleHitboxResize}
+        onHitboxRotate={handleHitboxRotate}
         compareLabel={
           side === "A" ? t("game.labelOriginal") : t("game.labelCopy")
         }
@@ -584,6 +602,7 @@ function PhotoCanvas({
   onPointerPick,
   onHitboxMove,
   onHitboxResize,
+  onHitboxRotate,
   compareLabel,
 }: {
   levelId: string;
@@ -618,6 +637,11 @@ function PhotoCanvas({
     dx: number,
     dy: number,
     axis: ResizeAxis,
+  ) => void;
+  onHitboxRotate: (
+    differenceId: string,
+    side: "A" | "B",
+    deltaDegrees: number,
   ) => void;
   compareLabel: string;
 }) {
@@ -707,6 +731,28 @@ function PhotoCanvas({
         if (hitboxEdit.current) {
           if (imageRect.width <= 0 || imageRect.height <= 0) return;
           const active = hitboxEdit.current;
+          if (
+            active.mode === "rotate" &&
+            active.centerClientX !== undefined &&
+            active.centerClientY !== undefined &&
+            active.lastAngle !== undefined
+          ) {
+            const nextAngle = pointerAngleDegrees(
+              e.clientX,
+              e.clientY,
+              active.centerClientX,
+              active.centerClientY,
+            );
+            const deltaDegrees = normalizeDegrees(nextAngle - active.lastAngle);
+            hitboxEdit.current = {
+              ...active,
+              clientX: e.clientX,
+              clientY: e.clientY,
+              lastAngle: nextAngle,
+            };
+            onHitboxRotate(active.differenceId, active.side, deltaDegrees);
+            return;
+          }
           const dx = (e.clientX - active.clientX) / zoom / imageRect.width;
           const dy = (e.clientY - active.clientY) / zoom / imageRect.height;
           hitboxEdit.current = {
@@ -842,6 +888,35 @@ function PhotoCanvas({
                     clientY: event.clientY,
                   };
                 }}
+                onRotateStart={(event, center) => {
+                  event.stopPropagation();
+                  event.currentTarget.setPointerCapture(event.pointerId);
+                  const frameBox = frameRef.current?.getBoundingClientRect();
+                  if (!frameBox) return;
+                  const centerClientX =
+                    frameBox.left +
+                    pan.x +
+                    (imageRect.left + center.x * imageRect.width) * zoom;
+                  const centerClientY =
+                    frameBox.top +
+                    pan.y +
+                    (imageRect.top + center.y * imageRect.height) * zoom;
+                  hitboxEdit.current = {
+                    differenceId: d.id,
+                    side,
+                    mode: "rotate",
+                    clientX: event.clientX,
+                    clientY: event.clientY,
+                    centerClientX,
+                    centerClientY,
+                    lastAngle: pointerAngleDegrees(
+                      event.clientX,
+                      event.clientY,
+                      centerClientX,
+                      centerClientY,
+                    ),
+                  };
+                }}
               />
             );
           })}
@@ -888,6 +963,7 @@ function FoundMarker({
   editable = false,
   onEditStart,
   onResizeStart,
+  onRotateStart,
 }: {
   difference: DifferenceDefinition;
   side: "A" | "B";
@@ -899,9 +975,16 @@ function FoundMarker({
     event: React.PointerEvent<HTMLSpanElement>,
     axis: ResizeAxis,
   ) => void;
+  onRotateStart?: (
+    event: React.PointerEvent<HTMLSpanElement>,
+    center: { x: number; y: number },
+  ) => void;
 }) {
   const shape = side === "A" ? difference.hitAreaA : difference.hitAreaB;
   const box = shapeBounds(shape, aspectRatio);
+  const center = shapeCenter(shape);
+  const shapeFrame = shapeFrameInBox(shape, box);
+  const rotation = shapeRotation(shape);
   return (
     <span
       className="absolute"
@@ -919,8 +1002,12 @@ function FoundMarker({
     >
       {/* Outer ring */}
       <span
-        className="absolute inset-0 rounded-full"
+        className="absolute rounded-full"
         style={{
+          left: `${shapeFrame.left * 100}%`,
+          top: `${shapeFrame.top * 100}%`,
+          width: `${shapeFrame.width * 100}%`,
+          height: `${shapeFrame.height * 100}%`,
           border: debug
             ? "2px dashed rgba(111,198,158,.95)"
             : "2.5px solid #d8af63",
@@ -934,6 +1021,7 @@ function FoundMarker({
               : undefined,
           clipPath:
             shape.kind === "polygon" ? polygonClipPath(shape) : undefined,
+          transform: rotation ? `rotate(${rotation}deg)` : undefined,
         }}
       />
       {debug ? (
@@ -995,6 +1083,14 @@ function FoundMarker({
           onPointerDown={(event) => onResizeStart?.(event, "y")}
         />
       ) : null}
+      {editable && shape.kind === "ellipse" ? (
+        <span
+          className="absolute left-1/2 top-0 h-[14px] w-[14px] -translate-x-1/2 -translate-y-[175%] rounded-full"
+          style={resizeHandleStyle("grab")}
+          title={`Rotate ${Math.round(rotation)} deg`}
+          onPointerDown={(event) => onRotateStart?.(event, center)}
+        />
+      ) : null}
     </span>
   );
 }
@@ -1008,6 +1104,8 @@ function HintMarker({
 }) {
   if (!difference) return null;
   const box = shapeBounds(difference.hintArea, aspectRatio);
+  const shapeFrame = shapeFrameInBox(difference.hintArea, box);
+  const rotation = shapeRotation(difference.hintArea);
   return (
     <span
       className="pointer-events-none absolute"
@@ -1029,8 +1127,12 @@ function HintMarker({
       aria-hidden
     >
       <span
-        className="absolute inset-0"
+        className="absolute"
         style={{
+          left: `${shapeFrame.left * 100}%`,
+          top: `${shapeFrame.top * 100}%`,
+          width: `${shapeFrame.width * 100}%`,
+          height: `${shapeFrame.height * 100}%`,
           borderRadius: "inherit",
           border: "3px dashed rgba(216,175,99,.9)",
           background:
@@ -1038,6 +1140,7 @@ function HintMarker({
           boxShadow:
             "0 0 22px rgba(216,175,99,.5), inset 0 0 18px rgba(216,175,99,.18)",
           animation: "game-pulse 2.2s ease-in-out infinite",
+          transform: rotation ? `rotate(${rotation}deg)` : undefined,
         }}
       />
     </span>
@@ -1107,6 +1210,27 @@ function shapeBounds(shape: HitShape, aspectRatio: number) {
     };
   }
   if (shape.kind === "ellipse") {
+    const rotation = shapeRotation(shape);
+    if (rotation !== 0) {
+      const angle = degreesToRadians(rotation);
+      const radiusXInYUnits = shape.rx * aspectRatio;
+      const radiusY = shape.ry;
+      const rotatedRadiusXInYUnits = Math.hypot(
+        radiusXInYUnits * Math.cos(angle),
+        radiusY * Math.sin(angle),
+      );
+      const rotatedRadiusY = Math.hypot(
+        radiusXInYUnits * Math.sin(angle),
+        radiusY * Math.cos(angle),
+      );
+      const rotatedRadiusX = rotatedRadiusXInYUnits / aspectRatio;
+      return {
+        left: shape.cx - rotatedRadiusX,
+        top: shape.cy - rotatedRadiusY,
+        width: rotatedRadiusX * 2,
+        height: rotatedRadiusY * 2,
+      };
+    }
     return {
       left: shape.cx - shape.rx,
       top: shape.cy - shape.ry,
@@ -1128,6 +1252,27 @@ function shapeBounds(shape: HitShape, aspectRatio: number) {
     width: maxX - minX,
     height: maxY - minY,
   };
+}
+
+function shapeFrameInBox(shape: HitShape, box: ContainedRect) {
+  if (shape.kind === "circle" || shape.kind === "polygon") {
+    return { left: 0, top: 0, width: 1, height: 1 };
+  }
+
+  const centerX = box.width > 0 ? (shape.cx - box.left) / box.width : 0.5;
+  const centerY = box.height > 0 ? (shape.cy - box.top) / box.height : 0.5;
+  const width = box.width > 0 ? (shape.rx * 2) / box.width : 1;
+  const height = box.height > 0 ? (shape.ry * 2) / box.height : 1;
+  return {
+    left: centerX - width / 2,
+    top: centerY - height / 2,
+    width,
+    height,
+  };
+}
+
+function shapeRotation(shape: HitShape) {
+  return shape.kind === "ellipse" ? (shape.rotation ?? 0) : 0;
 }
 
 function polygonClipPath(shape: Extract<HitShape, { kind: "polygon" }>) {
@@ -1214,6 +1359,29 @@ function clamp01(value: number) {
   return Math.max(0, Math.min(1, value));
 }
 
+function degreesToRadians(degrees: number) {
+  return (degrees * Math.PI) / 180;
+}
+
+function pointerAngleDegrees(
+  clientX: number,
+  clientY: number,
+  centerClientX: number,
+  centerClientY: number,
+) {
+  return (
+    (Math.atan2(clientY - centerClientY, clientX - centerClientX) * 180) /
+    Math.PI
+  );
+}
+
+function normalizeDegrees(value: number) {
+  let next = value;
+  while (next > 180) next -= 360;
+  while (next < -180) next += 360;
+  return next;
+}
+
 function cloneDifferences(differences: DifferenceDefinition[]) {
   return JSON.parse(JSON.stringify(differences)) as DifferenceDefinition[];
 }
@@ -1285,6 +1453,30 @@ function resizeDifferenceHitboxPair(
   };
 }
 
+function rotateDifferenceHitboxPair(
+  difference: DifferenceDefinition,
+  side: "A" | "B",
+  deltaDegrees: number,
+) {
+  const activeShape = side === "A" ? difference.hitAreaA : difference.hitAreaB;
+  const rotatedActiveShape = rotateShape(activeShape, deltaDegrees);
+  const nextHitAreaA =
+    side === "A"
+      ? rotatedActiveShape
+      : rotateShape(difference.hitAreaA, deltaDegrees);
+  const nextHitAreaB =
+    side === "B"
+      ? rotatedActiveShape
+      : rotateShape(difference.hitAreaB, deltaDegrees);
+
+  return {
+    ...difference,
+    hitAreaA: nextHitAreaA,
+    hitAreaB: nextHitAreaB,
+    hintArea: rotateShape(difference.hintArea, deltaDegrees),
+  };
+}
+
 function moveShape(shape: HitShape, dx: number, dy: number): HitShape {
   if (shape.kind === "circle") {
     return { ...shape, cx: clamp01(shape.cx + dx), cy: clamp01(shape.cy + dy) };
@@ -1299,6 +1491,21 @@ function moveShape(shape: HitShape, dx: number, dy: number): HitShape {
       y: clamp01(point.y + dy),
     })),
   };
+}
+
+function rotateShape(shape: HitShape, deltaDegrees: number): HitShape {
+  if (shape.kind !== "ellipse") return shape;
+  const rotation = normalizeDegrees((shape.rotation ?? 0) + deltaDegrees);
+  if (Math.abs(rotation) < 0.05) {
+    return {
+      kind: "ellipse",
+      cx: shape.cx,
+      cy: shape.cy,
+      rx: shape.rx,
+      ry: shape.ry,
+    };
+  }
+  return { ...shape, rotation };
 }
 
 function resizeShape(

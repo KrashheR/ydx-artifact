@@ -88,7 +88,7 @@ Only use letters, numbers and underscores in event names.
 | `rewarded_hint_rewarded` | Rewarded video grants the hint. | same as above |
 | `rewarded_hint_closed` | Rewarded video closes without reward. | same as above |
 | `rewarded_hint_failed` | Rewarded video fails/unavailable. | same as above |
-| `interstitial_eligible` | Campaign-map interstitial cadence is eligible. | `completedLevels`, `campaignId`, `language`, `promptOrdinal` |
+| `interstitial_eligible` | Post-victory next-level interstitial cadence is eligible. | `completedLevels`, `campaignId`, `language`, `promptOrdinal` |
 | `interstitial_request` | Fullscreen ad request starts. | same as above |
 | `interstitial_open` | Fullscreen ad opens. | same as above |
 | `interstitial_close` | Fullscreen ad closes. | same as above |
@@ -98,8 +98,8 @@ Only use letters, numbers and underscores in event names.
 
 | Event | When |
 |---|---|
-| `review_prompt_eligible` | In-game review pre-prompt can be shown. |
-| `review_prompt_shown` | Pre-prompt is displayed. |
+| `review_prompt_eligible` | In-game review pre-prompt can be shown after a post-victory result. |
+| `review_prompt_shown` | Pre-prompt is displayed over the post-victory result. |
 | `review_prompt_review_clicked` | Player chooses review/rate action. |
 | `review_prompt_later_clicked` | Player chooses later. |
 | `review_prompt_closed` | Player closes the pre-prompt. |

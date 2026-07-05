@@ -5,9 +5,21 @@ export function hitTest(shape: HitShape, x: number, y: number, aspectRatio = 1):
     return Math.hypot(x - shape.cx, (y - shape.cy) / aspectRatio) <= shape.radius;
   }
   if (shape.kind === "ellipse") {
-    const dx = (x - shape.cx) / shape.rx;
-    const dy = (y - shape.cy) / shape.ry;
-    return dx * dx + dy * dy <= 1;
+    const rotation = shape.rotation ?? 0;
+    if (rotation === 0) {
+      const dx = (x - shape.cx) / shape.rx;
+      const dy = (y - shape.cy) / shape.ry;
+      return dx * dx + dy * dy <= 1;
+    }
+
+    const angle = degreesToRadians(-rotation);
+    const dx = (x - shape.cx) * aspectRatio;
+    const dy = y - shape.cy;
+    const localX = dx * Math.cos(angle) - dy * Math.sin(angle);
+    const localY = dx * Math.sin(angle) + dy * Math.cos(angle);
+    const radiusX = shape.rx * aspectRatio;
+    const radiusY = shape.ry;
+    return (localX / radiusX) ** 2 + (localY / radiusY) ** 2 <= 1;
   }
 
   let inside = false;
@@ -19,6 +31,10 @@ export function hitTest(shape: HitShape, x: number, y: number, aspectRatio = 1):
     if (intersects) inside = !inside;
   }
   return inside;
+}
+
+function degreesToRadians(degrees: number) {
+  return (degrees * Math.PI) / 180;
 }
 
 export function shapeCenter(shape: HitShape): { x: number; y: number } {

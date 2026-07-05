@@ -17,7 +17,8 @@ export const hitShapeSchema = z.discriminatedUnion("kind", [
     cx: z.number().min(0).max(1),
     cy: z.number().min(0).max(1),
     rx: z.number().min(0.005).max(1),
-    ry: z.number().min(0.005).max(1)
+    ry: z.number().min(0.005).max(1),
+    rotation: z.number().min(-180).max(180).optional()
   }),
   z.object({
     kind: z.literal("polygon"),

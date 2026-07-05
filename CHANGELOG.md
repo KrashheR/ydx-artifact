@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Added rotated ellipse hitbox support to gameplay and the local hitbox editor. `pnpm dev:validate` and `pnpm validate:final` now expose a top rotate handle for ellipse markers, persist `rotation` degrees in content, and keep Apply support for northern, sand and emerald campaign modules.
+
+- Added a temporary `pending-hitbox-12` authoring placeholder to `northern-route` level 12 and raised the level to 8 required differences so it can be positioned through the hitbox editor.
+
+- Moved forced fullscreen interstitials from campaign-map entry to the post-victory next-level CTA: the cadence still queues on every third new campaign completion, but the ad shows only before starting the next level and is cleared when the player exits to the map.
+
+- Moved the review pre-prompt from the campaign map to the post-victory result flow, changed the first eligibility threshold to four newly completed campaign levels, and fixed the review modal's decorative layer so "Rate the game" / "Later" buttons remain clickable.
+
 - Made `pnpm release:zip` a one-command release archive pipeline: it now creates a fresh production build before validating and writing `dist-yandex.zip`.
 
 - Added `pnpm assets:optimize` for dry-run gated WebP recompression of runtime gameplay scene pairs and applied the q97 pass to six oversized scene files, reducing gameplay scene weight from 52.0 MB to 44.4 MB while preserving dimensions and paths.

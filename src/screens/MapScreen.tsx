@@ -1,12 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { getChapter, type ChapterId } from "@/content/chapters";
 import { getCampaignCardPreviewAsset } from "@/content/sceneAssets";
-import { GameReviewPrePromptModal } from "@/features/review/GameReviewPrePromptModal";
-import { runNativeReviewFlow } from "@/features/review/reviewFlow";
-import { isReviewPrePromptLocallyEligible } from "@/features/review/reviewPrompt";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
-import { mockPlatform } from "@/services/platform/mockPlatform";
 import { isLevelUnlocked, starsForAccuracy } from "@/shared/lib/progression";
 import { useGameStore } from "@/shared/store/gameStore";
 
@@ -172,75 +168,12 @@ export function MapScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
   const saveData = useGameStore((state) => state.saveData);
   const startLevel = useGameStore((state) => state.startLevel);
   const navigate = useGameStore((state) => state.navigate);
-  const reviewPromptRuntime = useGameStore(
-    (state) => state.reviewPromptRuntime,
-  );
-  const interstitialRuntime = useGameStore(
-    (state) => state.interstitialRuntime,
-  );
-  const clearPendingReviewPromptCheck = useGameStore(
-    (state) => state.clearPendingReviewPromptCheck,
-  );
-  const clearPendingInterstitialCheck = useGameStore(
-    (state) => state.clearPendingInterstitialCheck,
-  );
-  const setInterstitialNativeRequestInFlight = useGameStore(
-    (state) => state.setInterstitialNativeRequestInFlight,
-  );
-  const setInterstitialResolved = useGameStore(
-    (state) => state.setInterstitialResolved,
-  );
-  const markReviewPromptShown = useGameStore(
-    (state) => state.markReviewPromptShown,
-  );
-  const dismissReviewPrompt = useGameStore(
-    (state) => state.dismissReviewPrompt,
-  );
-  const setReviewNativeRequestInFlight = useGameStore(
-    (state) => state.setReviewNativeRequestInFlight,
-  );
-  const setReviewNativeResolved = useGameStore(
-    (state) => state.setReviewNativeResolved,
-  );
-  const setReviewUnavailableReason = useGameStore(
-    (state) => state.setReviewUnavailableReason,
-  );
   const mountedChapterIdRef = useRef<ChapterId>(
     screen.kind === "map" ? screen.chapterId : "northern-route",
   );
   const chapterId =
     screen.kind === "map" ? screen.chapterId : mountedChapterIdRef.current;
   const chapter = getChapter(chapterId);
-  const [isReviewPromptOpen, setIsReviewPromptOpen] = useState(false);
-  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
-  const [isInterstitialActive, setIsInterstitialActive] = useState(false);
-  const [isDocumentVisible, setIsDocumentVisible] = useState(
-    () =>
-      typeof document === "undefined" || document.visibilityState === "visible",
-  );
-  const checkRunRef = useRef(0);
-  const reviewSubmitGuardRef = useRef(false);
-  const interstitialGuardRef = useRef(false);
-  const completedLevelsCount = saveData.completedLevels.length;
-  const promptOrdinal = Math.min(
-    saveData.reviewPrompt.prePromptShownCount + 1,
-    2,
-  ) as 1 | 2;
-  const analyticsPayload = useMemo(
-    () => ({
-      completedLevels: completedLevelsCount,
-      campaignId: chapter.id,
-      deviceType:
-        window.innerWidth < 768
-          ? "mobile"
-          : window.innerWidth < 1280
-            ? "tablet"
-            : "desktop",
-      language: saveData.settings.locale,
-      promptOrdinal,
-    }),
-    [chapter.id, completedLevelsCount, promptOrdinal, saveData.settings.locale],
-  );
 
   const levelCards = useMemo<LevelCardState[]>(
     () =>
@@ -293,254 +226,6 @@ export function MapScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
       starCount: level.starCount
     });
     startLevel(level.id);
-  }
-
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      setIsDocumentVisible(document.visibilityState === "visible");
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () =>
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, []);
-
-  useEffect(() => {
-    if (screen.kind !== "map") return;
-
-    const completedLevels = interstitialRuntime.pendingMapCheckCompletedLevels;
-    if (completedLevels === null) return;
-
-    if (saveData.purchases.noForcedInterstitials) {
-      clearPendingInterstitialCheck();
-      return;
-    }
-
-    if (
-      completedLevels % 3 !== 0 ||
-      completedLevels <= interstitialRuntime.lastResolvedCompletedLevels
-    ) {
-      clearPendingInterstitialCheck();
-      return;
-    }
-
-    if (
-      !isDocumentVisible ||
-      isReviewPromptOpen ||
-      reviewPromptRuntime.nativeRequestInFlight ||
-      interstitialRuntime.nativeRequestInFlight ||
-      interstitialGuardRef.current
-    ) {
-      return;
-    }
-
-    interstitialGuardRef.current = true;
-    let cancelled = false;
-    let requestStarted = false;
-
-    const timeoutId = window.setTimeout(() => {
-      void (async () => {
-        requestStarted = true;
-        trackAnalyticsEvent("interstitial_eligible", {
-          ...analyticsPayload,
-          completedLevels,
-        });
-        trackAnalyticsEvent("interstitial_request", {
-          ...analyticsPayload,
-          completedLevels,
-        });
-        setInterstitialNativeRequestInFlight(true);
-
-        const result = await mockPlatform.showInterstitial({
-          onOpen: () => {
-            if (cancelled) return;
-            setIsInterstitialActive(true);
-            trackAnalyticsEvent("interstitial_open", {
-              ...analyticsPayload,
-              completedLevels,
-            });
-          },
-          onClose: () => {
-            if (cancelled) return;
-            setIsInterstitialActive(false);
-            trackAnalyticsEvent("interstitial_close", {
-              ...analyticsPayload,
-              completedLevels,
-            });
-          },
-          onError: () => {
-            if (cancelled) return;
-            setIsInterstitialActive(false);
-            trackAnalyticsEvent("interstitial_error", {
-              ...analyticsPayload,
-              completedLevels,
-            });
-          },
-        });
-
-        if (!cancelled) {
-          if (result === "failed") {
-            setIsInterstitialActive(false);
-          }
-          setInterstitialResolved(completedLevels);
-        }
-
-        interstitialGuardRef.current = false;
-      })();
-    }, 250);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-      if (!requestStarted) {
-        cancelled = true;
-        interstitialGuardRef.current = false;
-      }
-    };
-  }, [
-    analyticsPayload,
-    clearPendingInterstitialCheck,
-    interstitialRuntime.lastResolvedCompletedLevels,
-    interstitialRuntime.nativeRequestInFlight,
-    interstitialRuntime.pendingMapCheckCompletedLevels,
-    isDocumentVisible,
-    isReviewPromptOpen,
-    reviewPromptRuntime.nativeRequestInFlight,
-    saveData.purchases.noForcedInterstitials,
-    screen,
-    setInterstitialNativeRequestInFlight,
-    setInterstitialResolved,
-  ]);
-
-  useEffect(() => {
-    if (screen.kind !== "map") return;
-    if (reviewPromptRuntime.pendingMapCheckCompletedLevels === null) return;
-
-    const checkId = checkRunRef.current + 1;
-    checkRunRef.current = checkId;
-    const timeoutId = window.setTimeout(() => {
-      void (async () => {
-        const locallyEligible = isReviewPrePromptLocallyEligible({
-          completedLevels: completedLevelsCount,
-          reviewState: saveData.reviewPrompt,
-          isCampaignMapActive: screen.kind === "map",
-          isDocumentVisible: document.visibilityState === "visible",
-          hasBlockingOverlay: isReviewPromptOpen,
-          isAdActive:
-            isInterstitialActive || interstitialRuntime.nativeRequestInFlight,
-          isPurchaseFlowActive: false,
-          isTutorialActive: false,
-          nativeRequestInFlight: reviewPromptRuntime.nativeRequestInFlight,
-        });
-
-        if (!locallyEligible) return;
-
-        const availability = await mockPlatform.canReview();
-
-        if (
-          checkRunRef.current !== checkId ||
-          useGameStore.getState().screen.kind !== "map"
-        ) {
-          return;
-        }
-
-        if (!availability.value) {
-          setReviewUnavailableReason(availability.reason);
-          clearPendingReviewPromptCheck();
-          trackAnalyticsEvent("review_native_unavailable", {
-            ...analyticsPayload,
-            unavailableReason: availability.reason,
-          });
-          return;
-        }
-
-        trackAnalyticsEvent("review_prompt_eligible", analyticsPayload);
-        markReviewPromptShown();
-        setIsReviewPromptOpen(true);
-        trackAnalyticsEvent("review_prompt_shown", analyticsPayload);
-      })();
-    }, 500);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [
-    analyticsPayload,
-    clearPendingReviewPromptCheck,
-    completedLevelsCount,
-    isDocumentVisible,
-    isInterstitialActive,
-    isReviewPromptOpen,
-    markReviewPromptShown,
-    interstitialRuntime.nativeRequestInFlight,
-    reviewPromptRuntime.nativeRequestInFlight,
-    reviewPromptRuntime.pendingMapCheckCompletedLevels,
-    saveData.reviewPrompt,
-    screen,
-    setReviewUnavailableReason,
-  ]);
-
-  function handleLater() {
-    dismissReviewPrompt();
-    setIsReviewPromptOpen(false);
-    trackAnalyticsEvent("review_prompt_later_clicked", analyticsPayload);
-  }
-
-  function handleClose() {
-    dismissReviewPrompt();
-    setIsReviewPromptOpen(false);
-    trackAnalyticsEvent("review_prompt_closed", analyticsPayload);
-  }
-
-  async function handleReview() {
-    if (
-      reviewSubmitGuardRef.current ||
-      isSubmittingReview ||
-      reviewPromptRuntime.nativeRequestInFlight
-    )
-      return;
-
-    reviewSubmitGuardRef.current = true;
-    setIsSubmittingReview(true);
-    setReviewNativeRequestInFlight(true);
-    trackAnalyticsEvent("review_prompt_review_clicked", analyticsPayload);
-
-    const availability = await mockPlatform.canReview();
-
-    if (!availability.value) {
-      setReviewUnavailableReason(availability.reason);
-      setReviewNativeRequestInFlight(false);
-      setIsSubmittingReview(false);
-      setIsReviewPromptOpen(false);
-      trackAnalyticsEvent("review_native_unavailable", {
-        ...analyticsPayload,
-        unavailableReason: availability.reason,
-      });
-      reviewSubmitGuardRef.current = false;
-      return;
-    }
-
-    setIsReviewPromptOpen(false);
-    trackAnalyticsEvent("review_native_requested", analyticsPayload);
-
-    const result = await runNativeReviewFlow(mockPlatform);
-
-    if (result.status === "sent") {
-      setReviewNativeResolved(true);
-      trackAnalyticsEvent("review_native_sent", analyticsPayload);
-    } else if (result.status === "closed") {
-      setReviewNativeResolved(true);
-      trackAnalyticsEvent("review_native_closed", analyticsPayload);
-    } else if (result.status === "unavailable") {
-      setReviewUnavailableReason(result.reason);
-      trackAnalyticsEvent("review_native_unavailable", {
-        ...analyticsPayload,
-        unavailableReason: result.reason,
-      });
-    } else {
-      trackAnalyticsEvent("review_native_error", analyticsPayload);
-    }
-
-    setReviewNativeRequestInFlight(false);
-    setIsSubmittingReview(false);
-    reviewSubmitGuardRef.current = false;
   }
 
   return (
@@ -895,13 +580,6 @@ export function MapScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
         </div>
       </div>
 
-      <GameReviewPrePromptModal
-        isOpen={isReviewPromptOpen && isDocumentVisible}
-        isSubmitting={isSubmittingReview}
-        onReview={() => void handleReview()}
-        onLater={handleLater}
-        onClose={handleClose}
-      />
     </div>
   );
 }

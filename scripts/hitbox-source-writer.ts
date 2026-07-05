@@ -6,7 +6,7 @@ type ChapterId = "northern-route" | "sand-meridian" | "emerald-meridian";
 
 type HitShape =
   | { kind: "circle"; cx: number; cy: number; radius: number }
-  | { kind: "ellipse"; cx: number; cy: number; rx: number; ry: number }
+  | { kind: "ellipse"; cx: number; cy: number; rx: number; ry: number; rotation?: number }
   | { kind: "polygon"; points: Array<{ x: number; y: number }> };
 
 type DifferenceDefinition = {
@@ -273,7 +273,7 @@ function formatSandShape(shape: Exclude<HitShape, { kind: "polygon" }>) {
   if (shape.kind === "circle") {
     return `{ kind: "circle", cx: ${numberLiteral(shape.cx)}, cy: ${numberLiteral(shape.cy)}, r: ${numberLiteral(shape.radius)} }`;
   }
-  return `{ kind: "ellipse", cx: ${numberLiteral(shape.cx)}, cy: ${numberLiteral(shape.cy)}, rx: ${numberLiteral(shape.rx)}, ry: ${numberLiteral(shape.ry)} }`;
+  return `{ kind: "ellipse", cx: ${numberLiteral(shape.cx)}, cy: ${numberLiteral(shape.cy)}, rx: ${numberLiteral(shape.rx)}, ry: ${numberLiteral(shape.ry)}${formatRotation(shape)} }`;
 }
 
 function formatEmeraldShape(shape: HitShape) {
@@ -281,7 +281,7 @@ function formatEmeraldShape(shape: HitShape) {
     return `{ kind: "circle", cx: ${numberLiteral(shape.cx)}, cy: ${numberLiteral(shape.cy)}, r: ${numberLiteral(shape.radius)} }`;
   }
   if (shape.kind === "ellipse") {
-    return `{ kind: "ellipse", cx: ${numberLiteral(shape.cx)}, cy: ${numberLiteral(shape.cy)}, rx: ${numberLiteral(shape.rx)}, ry: ${numberLiteral(shape.ry)} }`;
+    return `{ kind: "ellipse", cx: ${numberLiteral(shape.cx)}, cy: ${numberLiteral(shape.cy)}, rx: ${numberLiteral(shape.rx)}, ry: ${numberLiteral(shape.ry)}${formatRotation(shape)} }`;
   }
   throw new Error("Emerald Meridian compact specs do not support polygon hitboxes");
 }
@@ -291,7 +291,7 @@ function formatShape(shape: HitShape): string {
     return `{ kind: "circle", cx: ${numberLiteral(shape.cx)}, cy: ${numberLiteral(shape.cy)}, radius: ${numberLiteral(shape.radius)} }`;
   }
   if (shape.kind === "ellipse") {
-    return `{ kind: "ellipse", cx: ${numberLiteral(shape.cx)}, cy: ${numberLiteral(shape.cy)}, rx: ${numberLiteral(shape.rx)}, ry: ${numberLiteral(shape.ry)} }`;
+    return `{ kind: "ellipse", cx: ${numberLiteral(shape.cx)}, cy: ${numberLiteral(shape.cy)}, rx: ${numberLiteral(shape.rx)}, ry: ${numberLiteral(shape.ry)}${formatRotation(shape)} }`;
   }
   return `{ kind: "polygon", points: [${shape.points
     .map((point) => `{ x: ${numberLiteral(point.x)}, y: ${numberLiteral(point.y)} }`)
@@ -300,6 +300,10 @@ function formatShape(shape: HitShape): string {
 
 function numberLiteral(value: number) {
   return Number(value.toFixed(4)).toString();
+}
+
+function formatRotation(shape: Extract<HitShape, { kind: "ellipse" }>) {
+  return shape.rotation === undefined ? "" : `, rotation: ${numberLiteral(shape.rotation)}`;
 }
 
 function quote(value: string) {

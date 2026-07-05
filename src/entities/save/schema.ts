@@ -26,7 +26,7 @@ export type ReviewPromptState = z.infer<typeof reviewPromptStateSchema>;
 export const initialReviewPromptState: ReviewPromptState = {
   schemaVersion: 1,
   prePromptShownCount: 0,
-  nextEligibleCompletedLevel: 3,
+  nextEligibleCompletedLevel: 4,
   nativeReviewResolved: false
 };
 

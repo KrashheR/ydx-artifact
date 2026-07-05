@@ -12,6 +12,12 @@ describe("hitTest", () => {
     expect(hitTest({ kind: "ellipse", cx: 0.5, cy: 0.5, rx: 0.2, ry: 0.08 }, 0.5, 0.6)).toBe(false);
   });
 
+  it("detects rotated ellipse hits in image pixel space", () => {
+    const ellipse = { kind: "ellipse" as const, cx: 0.5, cy: 0.5, rx: 0.16, ry: 0.04, rotation: 45 };
+    expect(hitTest(ellipse, 0.54, 0.58, 1)).toBe(true);
+    expect(hitTest(ellipse, 0.58, 0.46, 1)).toBe(false);
+  });
+
   it("detects polygon hits", () => {
     const square = {
       kind: "polygon" as const,

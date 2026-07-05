@@ -18,7 +18,7 @@ const emeraldLevelIds = [
 ] as const;
 
 type CircleSpec  = { kind: "circle";  cx: number; cy: number; r: number };
-type EllipseSpec = { kind: "ellipse"; cx: number; cy: number; rx: number; ry: number };
+type EllipseSpec = { kind: "ellipse"; cx: number; cy: number; rx: number; ry: number; rotation?: number };
 type ShapeSpec   = CircleSpec | EllipseSpec;
 
 interface DiffSpec { id: string; shape: ShapeSpec }
@@ -28,11 +28,25 @@ function makeDiff(spec: DiffSpec, difficulty: 1 | 2 | 3) {
   const hitArea =
     shape.kind === "circle"
       ? { kind: "circle"  as const, cx: shape.cx, cy: shape.cy, radius: shape.r }
-      : { kind: "ellipse" as const, cx: shape.cx, cy: shape.cy, rx: shape.rx, ry: shape.ry };
+      : {
+          kind: "ellipse" as const,
+          cx: shape.cx,
+          cy: shape.cy,
+          rx: shape.rx,
+          ry: shape.ry,
+          ...(shape.rotation !== undefined ? { rotation: shape.rotation } : {})
+        };
   const hintArea =
     shape.kind === "circle"
       ? { kind: "circle"  as const, cx: shape.cx, cy: shape.cy, radius: shape.r + 0.04 }
-      : { kind: "ellipse" as const, cx: shape.cx, cy: shape.cy, rx: shape.rx + 0.035, ry: shape.ry + 0.035 };
+      : {
+          kind: "ellipse" as const,
+          cx: shape.cx,
+          cy: shape.cy,
+          rx: shape.rx + 0.035,
+          ry: shape.ry + 0.035,
+          ...(shape.rotation !== undefined ? { rotation: shape.rotation } : {})
+        };
   return { id: spec.id, hitAreaA: hitArea, hitAreaB: hitArea, hintArea, difficulty };
 }
 

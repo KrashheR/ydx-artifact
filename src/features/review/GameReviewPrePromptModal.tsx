@@ -143,7 +143,7 @@ export function GameReviewPrePromptModal({
           >
             <div
               aria-hidden="true"
-              className="absolute inset-0 opacity-5"
+              className="pointer-events-none absolute inset-0 opacity-5"
               style={{
                 backgroundImage:
                   "radial-gradient(circle at 20% 20%, rgba(255,255,255,.35) 0, transparent 18%), radial-gradient(circle at 80% 30%, rgba(255,255,255,.2) 0, transparent 16%)",
@@ -174,7 +174,7 @@ export function GameReviewPrePromptModal({
               </svg>
             </button>
 
-            <div className="review-dialog-content px-6 pb-[26px] pt-[30px] text-center sm:px-[46px] sm:pb-[34px] sm:pt-[42px]">
+            <div className="review-dialog-content relative z-[1] px-6 pb-[26px] pt-[30px] text-center sm:px-[46px] sm:pb-[34px] sm:pt-[42px]">
               <CompassMedallion />
 
               <div

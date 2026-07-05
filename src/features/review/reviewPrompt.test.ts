@@ -7,7 +7,7 @@ import {
 
 function makeEligibilityInput(overrides: Partial<Parameters<typeof isReviewPrePromptLocallyEligible>[0]> = {}) {
   return {
-    completedLevels: 3,
+    completedLevels: 4,
     reviewState: initialReviewPromptState,
     isCampaignMapActive: true,
     isDocumentVisible: true,
@@ -21,15 +21,29 @@ function makeEligibilityInput(overrides: Partial<Parameters<typeof isReviewPrePr
 }
 
 describe("review prompt eligibility", () => {
-  it("does not show before the third completed level", () => {
-    expect(isReviewPrePromptLocallyEligible(makeEligibilityInput({ completedLevels: 2 }))).toBe(false);
+  it("does not show before the fourth completed level", () => {
+    expect(isReviewPrePromptLocallyEligible(makeEligibilityInput({ completedLevels: 3 }))).toBe(false);
   });
 
-  it("becomes eligible after the third completed level", () => {
-    expect(isReviewPrePromptLocallyEligible(makeEligibilityInput({ completedLevels: 3 }))).toBe(true);
+  it("becomes eligible after the fourth completed level", () => {
+    expect(isReviewPrePromptLocallyEligible(makeEligibilityInput({ completedLevels: 4 }))).toBe(true);
   });
 
-  it("does not show outside the campaign map", () => {
+  it("keeps old saves with a level-three threshold from showing before level four", () => {
+    expect(isReviewPrePromptLocallyEligible(makeEligibilityInput({
+      completedLevels: 3,
+      reviewState: { ...initialReviewPromptState, nextEligibleCompletedLevel: 3 }
+    }))).toBe(false);
+  });
+
+  it("can show from the post-level victory surface", () => {
+    expect(isReviewPrePromptLocallyEligible(makeEligibilityInput({
+      isCampaignMapActive: false,
+      isPostLevelVictoryActive: true
+    }))).toBe(true);
+  });
+
+  it("does not show outside eligible surfaces", () => {
     expect(isReviewPrePromptLocallyEligible(makeEligibilityInput({ isCampaignMapActive: false }))).toBe(false);
   });
 

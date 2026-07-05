@@ -1,6 +1,6 @@
 # Architecture
 
-React owns screens and UI state. Gameplay hit testing is isolated in `src/shared/lib/hitTesting.ts`; level hit shapes support circles, ellipses and polygons through `src/entities/level/schema.ts`.
+React owns screens and UI state. Gameplay hit testing is isolated in `src/shared/lib/hitTesting.ts`; level hit shapes support circles, axis-aligned or rotated ellipses, and polygons through `src/entities/level/schema.ts`.
 
 `src/features/gameplay/PhotoComparator.tsx` displays scene images with `object-fit: contain`. The comparator measures the contained image plane inside each photo panel and converts pointer, found-marker, hint-marker and wrong-click coordinates through that plane, so normalized hitboxes stay aligned when the panel aspect ratio adds letterbox space.
 

@@ -56,7 +56,7 @@ export function HitboxEditorControls({
         HITBOX EDITOR
       </span>
       <span className="hidden font-manrope text-[10px] font-semibold text-exp-muted sm:inline">
-        Drag/resize either side to update both hitboxes
+        Drag, resize or rotate ellipses on either side
       </span>
       <button
         type="button"

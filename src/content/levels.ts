@@ -308,9 +308,9 @@ const sixthLevel = levelSchema.parse({
       },
       {
         id: "ice-tracks-6",
-        hitAreaA: { kind: "ellipse", cx: 0.716, cy: 0.6363, rx: 0.077, ry: 0.2804 },
-        hitAreaB: { kind: "ellipse", cx: 0.7161, cy: 0.6243, rx: 0.077, ry: 0.2885 },
-        hintArea: { kind: "ellipse", cx: 0.7283, cy: 0.5797, rx: 0.11, ry: 0.4986 },
+        hitAreaA: { kind: "ellipse", cx: 0.6391, cy: 0.712, rx: 0.0448, ry: 0.4033, rotation: 45.3247 },
+        hitAreaB: { kind: "ellipse", cx: 0.6392, cy: 0.7, rx: 0.0448, ry: 0.4114, rotation: 45.3247 },
+        hintArea: { kind: "ellipse", cx: 0.6514, cy: 0.6554, rx: 0.0778, ry: 0.6215, rotation: 45.3247 },
         difficulty: 2,
       },
       {
@@ -717,9 +717,16 @@ const twelfthLevel = levelSchema.parse({
         hitAreaB: { kind: "ellipse", cx: 0.2734, cy: 0.8968, rx: 0.0358, ry: 0.052 },
         hintArea: { kind: "ellipse", cx: 0.2734, cy: 0.8968, rx: 0.0618, ry: 0.078 },
         difficulty: 3,
+      },
+      {
+        id: "pending-hitbox-12",
+        hitAreaA: { kind: "circle", cx: 0.4661, cy: 0.6758, radius: 0.04 },
+        hitAreaB: { kind: "circle", cx: 0.4661, cy: 0.6758, radius: 0.04 },
+        hintArea: { kind: "circle", cx: 0.4661, cy: 0.6758, radius: 0.07 },
+        difficulty: 3,
       }
     ],
-  requiredDifferences: 7,
+  requiredDifferences: 8,
   reward: {
     archivePoints: 220,
     magnifiers: 1,

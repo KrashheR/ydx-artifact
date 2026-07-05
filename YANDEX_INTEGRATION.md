@@ -25,10 +25,18 @@ Rewarded hint behavior:
 Forced interstitial cadence:
 
 - only after a newly completed campaign level;
-- only on the campaign map after returning from gameplay;
+- shown from the post-victory "next level" CTA, before the next campaign level starts;
+- returning to the campaign map does not show the queued fullscreen ad and clears that pending post-level opportunity;
 - queued at total completed campaign levels `3, 6, 9, ...`;
 - skipped for replay completions, daily levels and saves with `purchases.noForcedInterstitials`;
 - the runtime queue is not persisted in the save schema.
+
+Review pre-prompt cadence:
+
+- first eligible after the fourth newly completed campaign level;
+- checked from the post-victory result surface instead of the campaign map;
+- soft dismissal reschedules the next prompt no earlier than five more completed levels, with the existing minimum of level 8 for old saves;
+- the pre-prompt uses the same Yandex feedback seam and native request guard as before.
 
 Cloud save is wired through `src/services/storage/localSaveService.ts`:
 
@@ -44,5 +52,5 @@ Local development remains safe:
 - the app does not crash without Yandex SDK;
 - direct `pnpm` may be unavailable in some managed shells; the equivalent local binaries (`./node_modules/.bin/eslint`, `./node_modules/.bin/tsc`, `./node_modules/.bin/vite`, `./node_modules/.bin/tsx`) can validate the same code without reinstalling dependencies;
 - `window.__artifactDev?.setReviewMock("sent" | "closed" | "unavailable" | "error")` overrides the review gateway in Vite dev mode;
-- `window.__artifactDev?.triggerReviewPromptDemo()` seeds the third-level map scenario and queues the review check for manual verification.
+- `window.__artifactDev?.triggerReviewPromptDemo()` seeds the first three campaign completions and starts level 4 so completing that level opens the post-victory review pre-prompt.
 - `window.__artifactAnalyticsEvents` stores the last 100 product analytics events locally for QA. Use `VITE_ANALYTICS_DEBUG=true pnpm dev` to print them while testing.

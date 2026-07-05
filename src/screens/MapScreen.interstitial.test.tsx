@@ -1,9 +1,9 @@
-import { act, render, waitFor } from "@testing-library/react";
+import { act, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import "@/i18n";
 import { getChapterLevels } from "@/content/chapters";
 import { createDefaultSave } from "@/entities/save/schema";
-import { mockPlatform, type InterstitialCallbacks } from "@/services/platform/mockPlatform";
+import { mockPlatform } from "@/services/platform/mockPlatform";
 import { MapScreen } from "@/screens/MapScreen";
 import { useGameStore } from "@/shared/store/gameStore";
 
@@ -35,12 +35,8 @@ describe("MapScreen interstitial flow", () => {
     mockPlatform.setInterstitialGatewayOverride(null);
   });
 
-  it("shows a forced interstitial on the map after each third newly completed campaign level", async () => {
-    const showInterstitial = vi.fn(async (callbacks?: InterstitialCallbacks) => {
-      callbacks?.onOpen?.();
-      callbacks?.onClose?.();
-      return "closed" as const;
-    });
+  it("does not show a queued interstitial on the map", async () => {
+    const showInterstitial = vi.fn(async () => "closed" as const);
     mockPlatform.setInterstitialGatewayOverride({ showInterstitial });
 
     render(<MapScreen onOpenSettings={() => undefined} />);
@@ -49,36 +45,11 @@ describe("MapScreen interstitial flow", () => {
       await new Promise((resolve) => window.setTimeout(resolve, 300));
     });
 
-    await waitFor(() => expect(showInterstitial).toHaveBeenCalledTimes(1));
-    expect(useGameStore.getState().interstitialRuntime).toMatchObject({
-      pendingMapCheckCompletedLevels: null,
-      lastResolvedCompletedLevels: 3,
-      nativeRequestInFlight: false
-    });
-  });
-
-  it("skips forced interstitials when the no-ads entitlement is active", async () => {
-    const showInterstitial = vi.fn(async () => "closed" as const);
-    mockPlatform.setInterstitialGatewayOverride({ showInterstitial });
-    useGameStore.setState((state) => ({
-      saveData: {
-        ...state.saveData,
-        purchases: {
-          ...state.saveData.purchases,
-          noForcedInterstitials: true
-        }
-      }
-    }));
-
-    render(<MapScreen onOpenSettings={() => undefined} />);
-
-    await waitFor(() => {
-      expect(useGameStore.getState().interstitialRuntime.pendingMapCheckCompletedLevels).toBeNull();
-    });
     expect(showInterstitial).not.toHaveBeenCalled();
+    expect(useGameStore.getState().interstitialRuntime.pendingMapCheckCompletedLevels).toBe(3);
   });
 
-  it("queues the map interstitial check on each third new campaign completion", () => {
+  it("queues the next interstitial check on each third new campaign completion", () => {
     const campaignLevels = getChapterLevels("northern-route").slice(0, 3);
     useGameStore.setState({
       screen: { kind: "map", chapterId: "northern-route" },
@@ -102,4 +73,5 @@ describe("MapScreen interstitial flow", () => {
     useGameStore.getState().completeLevel(campaignLevels[2].id, 45, "campaign");
     expect(useGameStore.getState().interstitialRuntime.pendingMapCheckCompletedLevels).toBe(3);
   });
+
 });

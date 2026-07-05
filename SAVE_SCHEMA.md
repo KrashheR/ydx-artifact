@@ -21,10 +21,11 @@ Persisted review prompt fields:
 
 - `reviewPrompt.schemaVersion`
 - `reviewPrompt.prePromptShownCount`
-- `reviewPrompt.nextEligibleCompletedLevel`
+- `reviewPrompt.nextEligibleCompletedLevel` (defaults to `4`; old saves with a lower first-prompt threshold are still clamped by runtime eligibility so the first pre-prompt cannot show before the fourth completed campaign level)
 - `reviewPrompt.nativeReviewResolved`
 - `reviewPrompt.lastUnavailableReason`
 
 `nativeRequestInFlight` is intentionally runtime-only and lives in Zustand state so a crashed session cannot permanently block future review attempts.
+Interstitial post-level checks are also runtime-only: the save records purchases/no-ads, but queued fullscreen ad opportunities are not persisted.
 
 Local development still exposes browser-console cheat hooks only in Vite dev mode. Dev unlock code is dynamically imported from `src/dev/*` and must not appear in production chunks.
