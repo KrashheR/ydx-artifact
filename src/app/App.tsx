@@ -102,6 +102,7 @@ export function App() {
   const { i18n, t } = useTranslation();
   const screen = useGameStore((state) => state.screen);
   const hydrate = useGameStore((state) => state.hydrate);
+  const openStartupScreen = useGameStore((state) => state.openStartupScreen);
   const save = useGameStore((state) => state.save);
   const setAutoLocale = useGameStore((state) => state.setAutoLocale);
   const locale = useGameStore((state) => state.saveData.settings.locale);
@@ -151,6 +152,10 @@ export function App() {
           await unlockAllDevContent();
         }
 
+        if (!cancelled && useGameStore.getState().screen.kind === "home") {
+          openStartupScreen();
+        }
+
         return nextLocale;
       };
 
@@ -169,7 +174,6 @@ export function App() {
         trackAnalyticsEvent("game_ready", {
           language: nextLocale
         });
-        trackAnalyticsEvent("screen_view", { screen: "home" });
       }
     }
 
@@ -178,7 +182,7 @@ export function App() {
     return () => {
       cancelled = true;
     };
-  }, [hydrate, i18n, setAutoLocale]);
+  }, [hydrate, i18n, openStartupScreen, setAutoLocale]);
 
   // Once the home screen is visible, warm the map card previews and likely
   // next level scenes in the background, so opening a campaign shows
@@ -224,6 +228,7 @@ export function App() {
           <GameScreen
             levelId={screen.levelId}
             mode={screen.mode}
+            showOnboarding={screen.showOnboarding ?? false}
             onOpenSettings={() => openSettings("game_hud")}
           />
         );

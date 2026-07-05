@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Restored `public/assets/scenes/northern-route/13/1.webp` from the historical updated A-scene blob so White Meridian level 13 uses distinct A/B gameplay images again.
+
+- Changed startup routing so first launch opens White Meridian level 01 directly with an onboarding overlay, returning saves resume in-progress or next campaign gameplay, and fully completed saves open the collection/case screen instead of the home menu.
+
 - Added rotated ellipse hitbox support to gameplay and the local hitbox editor. `pnpm dev:validate` and `pnpm validate:final` now expose a top rotate handle for ellipse markers, persist `rotation` degrees in content, and keep Apply support for northern, sand and emerald campaign modules.
 
 - Added a temporary `pending-hitbox-12` authoring placeholder to `northern-route` level 12 and raised the level to 8 required differences so it can be positioned through the hitbox editor.

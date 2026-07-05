@@ -243,13 +243,73 @@ function RewardedHintModal({
   );
 }
 
+function FirstRunOnboardingOverlay({
+  title,
+  backgroundSrc,
+  differencesCount,
+  onStart,
+}: {
+  title: string;
+  backgroundSrc: string;
+  differencesCount: number;
+  onStart: () => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="absolute inset-0 z-50 flex items-center justify-center p-3">
+      <img
+        src={backgroundSrc}
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover opacity-35"
+        draggable={false}
+      />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(70% 80% at 50% 38%, rgba(13,18,15,.62), rgba(13,18,15,.94))",
+        }}
+      />
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="first-run-onboarding-title"
+        className="relative z-10 w-[520px] max-w-[calc(100vw-32px)] rounded-[18px] border border-[#D5C39A]/18 bg-[#151B18]/92 px-7 py-7 text-center shadow-[0_38px_90px_rgba(0,0,0,.58)] sm:px-9 sm:py-8"
+      >
+        <p className="text-[10px] font-bold uppercase tracking-[.26em] text-exp-brass">
+          {t("game.onboardingEyebrow")}
+        </p>
+        <h2
+          id="first-run-onboarding-title"
+          className="mt-2 font-cormorant text-[34px] font-semibold leading-tight text-exp-parch sm:text-[42px]"
+        >
+          {title}
+        </h2>
+        <p className="mx-auto mt-4 max-w-[360px] text-[16px] leading-[1.55] text-exp-muted">
+          {t("game.onboardingDescription", { count: differencesCount })}
+        </p>
+        <button
+          type="button"
+          onClick={onStart}
+          className="mt-7 inline-flex min-h-[50px] w-full items-center justify-center rounded-[10px] bg-[linear-gradient(180deg,#D8AF63,#B3812F)] px-5 text-[15px] font-bold text-[#1A130A] shadow-[0_12px_28px_rgba(184,138,69,.32)] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass sm:w-auto sm:min-w-[240px]"
+        >
+          {t("game.onboardingStart")}
+        </button>
+      </section>
+    </div>
+  );
+}
+
 export function GameScreen({
   levelId,
   mode,
+  showOnboarding = false,
   onOpenSettings = noop,
 }: {
   levelId: string;
   mode: "campaign" | "daily";
+  showOnboarding?: boolean;
   onOpenSettings?: () => void;
 }) {
   const { t } = useTranslation();
@@ -309,6 +369,7 @@ export function GameScreen({
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [isInterstitialActive, setIsInterstitialActive] = useState(false);
   const [postLevelActionInFlight, setPostLevelActionInFlight] = useState(false);
+  const [startupOnboardingOpen, setStartupOnboardingOpen] = useState(showOnboarding);
   const completeOverlayDelayRef = useRef<number | null>(null);
   const activeTimerSaveCounterRef = useRef(0);
   const timeoutTrackedRef = useRef(false);
@@ -333,11 +394,13 @@ export function GameScreen({
   const completionPending = pendingFinalStats !== null;
   const showComplete = finalStats !== null;
   const showRewardedHintModal = rewardedHintModal !== null;
+  const showStartupOnboarding = mode === "campaign" && startupOnboardingOpen && !showComplete && !timedOut;
   const showOverlay =
-    showComplete || timedOut || showRewardedHintModal || isReviewPromptOpen;
+    showComplete || timedOut || showRewardedHintModal || isReviewPromptOpen || showStartupOnboarding;
   const gameplayBlocked =
     platformPaused ||
     !pageVisible ||
+    showStartupOnboarding ||
     showRewardedHintModal ||
     rewardedHintInFlight ||
     isReviewPromptOpen ||
@@ -364,6 +427,10 @@ export function GameScreen({
   );
 
   useEffect(() => subscribePlatformPause(setPlatformPaused), []);
+
+  useEffect(() => {
+    setStartupOnboardingOpen(showOnboarding);
+  }, [levelId, showOnboarding]);
 
   useEffect(() => {
     const syncVisibility = () => {
@@ -540,7 +607,7 @@ export function GameScreen({
   const chapterId = level.chapterId;
 
   function handleDifference(differenceId: string) {
-    if (completionPending || showComplete || timedOut || platformPaused) return;
+    if (completionPending || showComplete || timedOut || platformPaused || showStartupOnboarding) return;
     if (hintId === differenceId) setHintId(undefined);
     recordDiff(levelId, differenceId);
     const nextFound = liveFoundIds.length + 1;
@@ -594,6 +661,7 @@ export function GameScreen({
   async function handleAreaHint() {
     if (
       showComplete ||
+      showStartupOnboarding ||
       completionPending ||
       rewardedHintInFlight ||
       platformPaused
@@ -623,6 +691,7 @@ export function GameScreen({
   async function handleRewardedHintWatch() {
     if (
       showComplete ||
+      showStartupOnboarding ||
       completionPending ||
       rewardedHintInFlight ||
       platformPaused ||
@@ -865,6 +934,16 @@ export function GameScreen({
       foundDifferences: liveFoundIds.length,
       mistakes: liveMistakes,
       elapsedActiveSeconds: liveElapsedActiveSeconds,
+    });
+  }
+
+  function handleStartOnboarding() {
+    setStartupOnboardingOpen(false);
+    trackAnalyticsEvent("first_run_onboarding_started", {
+      levelId,
+      campaignId: chapterId,
+      mode,
+      requiredDifferences: level!.requiredDifferences
     });
   }
 
@@ -1354,6 +1433,15 @@ export function GameScreen({
           onNext={nextLevel ? handleNext : null}
           onRetry={handleRetry}
           onMap={handleMap}
+        />
+      )}
+
+      {showStartupOnboarding && (
+        <FirstRunOnboardingOverlay
+          title={t(level.titleKey)}
+          backgroundSrc={level.imageA}
+          differencesCount={level.requiredDifferences}
+          onStart={handleStartOnboarding}
         />
       )}
 

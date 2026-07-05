@@ -15,12 +15,16 @@ import {
   trackAnalyticsEvent,
   type AnalyticsPayload
 } from "@/services/analytics/analytics";
-import { isBetterLevelResult, unlockedArtifactsForCompleted } from "@/shared/lib/progression";
+import {
+  isBetterLevelResult,
+  resolveStartupDestination,
+  unlockedArtifactsForCompleted
+} from "@/shared/lib/progression";
 
-type Screen =
+export type Screen =
   | { kind: "home" }
   | { kind: "map"; chapterId: ChapterId }
-  | { kind: "game"; levelId: string; mode: "campaign" | "daily" }
+  | { kind: "game"; levelId: string; mode: "campaign" | "daily"; showOnboarding?: boolean }
   | { kind: "daily" }
   | { kind: "collection" };
 
@@ -52,6 +56,7 @@ type GameStore = {
   hydrate: () => Promise<void>;
   save: (options?: { flush?: boolean }) => Promise<void>;
   navigate: (screen: Screen) => void;
+  openStartupScreen: () => void;
   startLevel: (levelId: string, mode?: "campaign" | "daily") => void;
   recordDifference: (levelId: string, differenceId: string) => void;
   recordMisclick: (levelId: string) => void;
@@ -174,6 +179,51 @@ export const useGameStore = create<GameStore>((set, get) => ({
   navigate(screen) {
     set({ screen });
     trackAnalyticsEvent("screen_view", getScreenAnalyticsPayload(screen));
+  },
+  openStartupScreen() {
+    const destination = resolveStartupDestination(get().saveData);
+    if (destination.kind === "collection") {
+      const screen: Screen = { kind: "collection" };
+      set({ screen });
+      trackAnalyticsEvent("screen_view", getScreenAnalyticsPayload(screen));
+      return;
+    }
+
+    const level = getLevelById(destination.levelId);
+    if (!level) {
+      const screen: Screen = { kind: "home" };
+      set({ screen });
+      trackAnalyticsEvent("screen_view", getScreenAnalyticsPayload(screen));
+      return;
+    }
+
+    const currentSave = get().saveData;
+    const previousProgress =
+      currentSave.inProgress?.levelId === level.id
+        ? currentSave.inProgress.foundDifferenceIds.length
+        : 0;
+    const isReplay = currentSave.completedLevels.includes(level.id);
+    const screen: Screen = {
+      kind: "game",
+      levelId: level.id,
+      mode: "campaign",
+      showOnboarding: destination.showOnboarding
+    };
+
+    set((state) => ({
+      screen,
+      saveData: ensureInProgress(state.saveData, level.id)
+    }));
+    trackAnalyticsEvent("level_start", {
+      ...getLevelAnalyticsPayload(level.id),
+      mode: "campaign",
+      isReplay,
+      resumedFoundDifferences: previousProgress,
+      source: "startup",
+      onboardingShown: destination.showOnboarding
+    });
+    trackAnalyticsEvent("screen_view", { screen: "game", ...getLevelAnalyticsPayload(level.id), mode: "campaign" });
+    void get().save();
   },
   startLevel(levelId, mode = "campaign") {
     const level = getLevelById(levelId);

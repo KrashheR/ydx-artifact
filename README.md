@@ -83,6 +83,7 @@ Production builds do not emit sourcemaps by default to keep the Yandex upload sm
 - Mock platform adapter and diagnostics copy.
 - Post-victory review pre-prompt wired to the Yandex Games feedback API seam with local dev mocks; the first prompt is eligible after the fourth newly completed campaign level.
 - Forced fullscreen interstitials are queued every third newly completed campaign level and shown only from the victory screen's next-level CTA, not when returning to the campaign map.
+- Startup routing now skips the home menu for normal play: new players open White Meridian level 01 with a soft investigation onboarding overlay, returning players resume in-progress or next campaign levels, and fully completed saves open the collection/case screen.
 - Privacy-safe product analytics events for app readiness, campaign/map navigation, gameplay, hints, ads, daily rewards and review prompts, with optional Yandex Metrica `reachGoal` transport.
 
 ## Agent Workflow

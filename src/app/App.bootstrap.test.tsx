@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import i18n from "i18next";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@/app/App";
@@ -66,10 +66,13 @@ describe("App bootstrap", () => {
     const ready = vi.fn(() => {
       expect(document.documentElement.lang).toBe("en");
       expect(document.title).toBe("Spot the Differences: Expedition Mysteries");
-      expect(document.body).toHaveTextContent("Choose Your Expedition");
+      expect(document.body).toHaveTextContent("Boreas Pier");
+      expect(document.body).toHaveTextContent("Start investigation");
       expect(document.body).not.toHaveTextContent("Выберите экспедицию");
-      expect(LoadedImage.instances).toHaveLength(3);
-      expect(LoadedImage.instances.every((image) => image.complete && image.naturalWidth > 0)).toBe(true);
+      expect(LoadedImage.instances.length).toBeGreaterThanOrEqual(3);
+      expect(
+        LoadedImage.instances.slice(0, 3).every((image) => image.complete && image.naturalWidth > 0)
+      ).toBe(true);
     });
 
     window.ysdk = {
@@ -86,7 +89,8 @@ describe("App bootstrap", () => {
 
     expect(screen.queryByText("Выберите экспедицию")).not.toBeInTheDocument();
 
-    await expect(screen.findByRole("heading", { name: "Choose Your Expedition" })).resolves.toBeVisible();
+    await expect(screen.findByRole("heading", { name: "Boreas Pier" })).resolves.toBeVisible();
+    await expect(screen.findByRole("button", { name: "Start investigation" })).resolves.toBeVisible();
     await waitFor(() => expect(ready).toHaveBeenCalledTimes(1));
     expect(screen.queryByLabelText("Loading")).not.toBeInTheDocument();
   });
@@ -143,17 +147,23 @@ describe("App bootstrap", () => {
 
   it("keeps the settings button inside the campaign selection topbar", async () => {
     useGameStore.setState({
-      screen: { kind: "home" },
+      screen: { kind: "map", chapterId: "northern-route" },
       saveData: createDefaultSave()
     });
 
     render(<App />);
 
-    const settingsButton = await screen.findByRole("button", {
+    fireEvent.click(await screen.findByRole("button", { name: /Назад|Back/ }));
+
+    const homeTopbar = await waitFor(() => {
+      const topbar = document.querySelector(".home-topbar");
+      expect(topbar).not.toBeNull();
+      return topbar as HTMLElement;
+    });
+    const settingsButton = within(homeTopbar).getByRole("button", {
       name: /Настройки|Settings/
     });
     expect(settingsButton).not.toHaveClass("fixed");
-    expect(settingsButton.closest(".home-topbar")).not.toBeNull();
     fireEvent.click(settingsButton);
 
     const dialog = await screen.findByRole("dialog", {
@@ -161,5 +171,4 @@ describe("App bootstrap", () => {
     });
     await waitFor(() => expect(dialog).toBeVisible());
   });
-
 });

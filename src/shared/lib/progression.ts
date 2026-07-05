@@ -1,7 +1,11 @@
 import type { SaveData } from "@/entities/save/schema";
-import { getChapterLevels, getLevelById } from "@/content/chapters";
+import { chapterList, getChapterLevels, getLevelById } from "@/content/chapters";
 
 type BestResult = SaveData["bestResults"][string];
+
+export type StartupDestination =
+  | { kind: "game"; levelId: string; showOnboarding: boolean }
+  | { kind: "collection" };
 
 export function isLevelUnlocked(levelId: string, save: SaveData): boolean {
   const level = getLevelById(levelId);
@@ -24,6 +28,39 @@ export function unlockedArtifactsForCompleted(completedLevelIds: string[]) {
     { level: 9, id: "blue-flower" },
     { level: 12, id: "torn-map" }
   ].filter((artifact) => completedOrders.has(artifact.level));
+}
+
+export function getFirstCampaignLevelId() {
+  return getChapterLevels("northern-route")[0]?.id ?? null;
+}
+
+export function getNextCampaignLevelId(save: SaveData) {
+  for (const chapter of chapterList) {
+    const nextLevel = chapter.levels.find((level) => !save.completedLevels.includes(level.id));
+    if (nextLevel) return nextLevel.id;
+  }
+
+  return null;
+}
+
+export function resolveStartupDestination(save: SaveData): StartupDestination {
+  const inProgressLevel = save.inProgress ? getLevelById(save.inProgress.levelId) : null;
+  if (inProgressLevel) {
+    return {
+      kind: "game",
+      levelId: inProgressLevel.id,
+      showOnboarding: false
+    };
+  }
+
+  const nextLevelId = getNextCampaignLevelId(save);
+  if (!nextLevelId) return { kind: "collection" };
+
+  return {
+    kind: "game",
+    levelId: nextLevelId,
+    showOnboarding: nextLevelId === getFirstCampaignLevelId() && save.completedLevels.length === 0
+  };
 }
 
 export function starsForAccuracy(accuracy: number): 1 | 2 | 3 {

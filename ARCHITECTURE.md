@@ -16,6 +16,7 @@ Playable campaign content is chapter-driven:
 Loading performance:
 
 - App bootstrap in `src/app/App.tsx` runs save hydration/locale resolution, campaign preview warmup and font readiness in parallel (`Promise.all`) before revealing the UI.
+- After hydration, `src/shared/store/gameStore.ts` resolves the startup destination from save state: in-progress campaign levels resume first, otherwise the next uncompleted campaign level opens directly, a new player starts on White Meridian level 01 with an onboarding overlay, and a fully completed archive opens the collection/case screen.
 - Home and map cards use generated compressed previews (`preview-sm.webp`, `card.webp`, see `scripts/generate-level-previews.ts`) instead of full-size scene images; map card `<img>` tags are `loading="lazy"`.
 - `src/screens/GameScreen.tsx` preloads both scene images (`imageA`/`imageB`) via `src/shared/lib/imagePreload.ts` when a level opens, and prefetches the next level's pair while the completion overlay is shown.
 - After bootstrap, an idle-scheduled background prefetch (`src/shared/lib/scenePrefetch.ts`) warms map backgrounds and level card previews of unlocked chapters plus the likely next levels' scene pairs, one image at a time; it is skipped under data-saver.
