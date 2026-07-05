@@ -11,7 +11,16 @@ Playable campaign content is chapter-driven:
 - `src/content/sandMeridianLevels.ts` builds `sand-meridian` gameplay levels from the plot handoff package plus shared scaffold hitboxes.
 - `src/content/emeraldMeridianLevels.ts` builds `emerald-meridian` gameplay levels from the local jungle scene package plus shared scaffold hitboxes.
 - `src/content/chapters.ts` is the catalog layer used by Home, Map, progression and validation; each chapter provides level list, map background, native map aspect ratio and normalized map nodes.
-- `src/content/sceneAssets.ts` centralizes campaign card preview paths, including the configurable scene filename used by the campaign journal cards.
+- `src/content/sceneAssets.ts` centralizes campaign card preview paths, including the configurable scene filename used by the campaign journal cards, and artifact state image paths (`getArtifactAsset`).
+- `src/content/artifacts.ts` defines the 15 collectible artifacts (5 per campaign, milestone levels 3/6/8/10/13) with their `open`/`closed` images and the optional in-level difference id used for the gameplay toast. Texts live in i18n under `artifacts.<id>.*`; narrative source is `docs/expedition_narrative_collection_ru.json`.
+
+Artifact collection flow ("Коллекция находок"):
+
+- Unlock rule: completing a milestone level unlocks its artifact (the game is find-ALL, so the artifact difference is always tapped before completion). `unlockedArtifactsForCompleted` / `getArtifactForLevel` in `src/shared/lib/progression.ts` derive this from level data.
+- `completeLevel` in `src/shared/store/gameStore.ts` flips the save state `locked → newly-unlocked` and queues the completed level's own artifact into the runtime `artifactRevealQueue`; retroactive unlocks (old saves) reconcile silently on `hydrate`.
+- `src/screens/GameScreen.tsx` shows `ArtifactFoundToast` (non-blocking, ~2.6s) when the artifact-linked difference is tapped, and mounts `src/features/collection/ArtifactRevealOverlay.tsx` on top of the victory overlay (sealed-→-revealed ceremony, respects `settings.reducedMotion`, blocks the review pre-prompt while open).
+- `src/screens/CollectionScreen.tsx` renders the archive: header progress `X / 15`, campaign filter tabs, per-campaign card grids using `open.webp`/`closed.webp`, a detail modal with description/clue, and an optional replay CTA. Opening the detail flips `newly-unlocked → viewed` (`markArtifactViewed`), which clears the "НОВОЕ" badge permanently.
+- Entry points: Home topbar collection button with `X / 15` counter and red "new" dot; on landscape phones (where the home topbar is hidden) a floating `.home-collection-fab` button appears top-right; the reveal modal's "Открыть коллекцию" navigates directly.
 
 Loading performance:
 

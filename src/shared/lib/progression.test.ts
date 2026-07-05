@@ -2,10 +2,14 @@ import { describe, expect, it } from "vitest";
 import { getChapterLevels } from "@/content/chapters";
 import { createDefaultSave } from "@/entities/save/schema";
 import { levels } from "@/content/levels";
+import { artifactList } from "@/content/artifacts";
 import {
+  getArtifactForLevel,
+  getArtifactLevel,
   getNextCampaignLevelId,
   isLevelUnlocked,
-  resolveStartupDestination
+  resolveStartupDestination,
+  unlockedArtifactsForCompleted
 } from "@/shared/lib/progression";
 
 describe("progression", () => {
@@ -65,6 +69,36 @@ describe("progression", () => {
       levelId: levels[1].id,
       showOnboarding: false
     });
+  });
+
+  it("maps every artifact to an existing milestone level and its differences", () => {
+    for (const artifact of artifactList) {
+      const level = getArtifactLevel(artifact);
+      expect(level, artifact.id).not.toBeNull();
+      expect(level?.order).toBe(artifact.unlockLevelOrder);
+      expect(getArtifactForLevel(level!.id)?.id).toBe(artifact.id);
+      if (artifact.differenceId) {
+        expect(
+          level!.differences.some((difference) => difference.id === artifact.differenceId),
+          `${artifact.id} → ${artifact.differenceId}`
+        ).toBe(true);
+      }
+    }
+  });
+
+  it("unlocks artifacts only for completed milestone levels", () => {
+    expect(unlockedArtifactsForCompleted([])).toEqual([]);
+
+    const northernLevels = getChapterLevels("northern-route");
+    const milestoneLevel = northernLevels.find((level) => level.order === 3)!;
+    const regularLevel = northernLevels.find((level) => level.order === 4)!;
+
+    expect(
+      unlockedArtifactsForCompleted([regularLevel.id]).map((artifact) => artifact.id)
+    ).toEqual([]);
+    expect(
+      unlockedArtifactsForCompleted([milestoneLevel.id]).map((artifact) => artifact.id)
+    ).toEqual(["white-compass"]);
   });
 
   it("opens the expedition case after all campaign levels are completed", () => {

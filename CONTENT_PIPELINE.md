@@ -2,7 +2,7 @@
 
 Runtime placeholder assets live in `public/assets/scenes/northern-route/placeholder/`.
 
-Runtime artifact state images live under `public/assets/artifacts/<campaign-folder>/<level-order>/` as WebP derivatives. Convert owner-provided PNG exports to lossless WebP, downscale to the target runtime size, and keep master/source PNG files outside `public/assets/` when they need to be preserved.
+Runtime artifact state images live under `public/assets/artifacts/<campaign-folder>/<level-order>/` as WebP derivatives named exactly `open.webp` (unlocked) and `closed.webp` (locked); `<campaign-folder>` matches `campaignManifest.assetFolder`. Convert owner-provided PNG exports to lossless WebP, downscale to the target runtime size, and keep master/source PNG files outside `public/assets/` when they need to be preserved. The collectible catalog itself is data-driven in `src/content/artifacts.ts` (artifact id, campaign, milestone level order 3/6/8/10/13, optional toast `differenceId`); artifact display texts live in both locales under `artifacts.<id>.*` in `src/i18n/*/common.json`, with the RU narrative source in `docs/expedition_narrative_collection_ru.json`.
 
 Chapter 1 map point titles in `src/i18n/*/common.json` are sourced from `docs/plot/meridian/10_STORY_AND_SCENE_PROMPTS.md`.
 

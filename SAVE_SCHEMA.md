@@ -16,6 +16,7 @@ Storage flow:
 - Version `1` saves are migrated safely. Old `inProgress.elapsedSeconds` is treated as active elapsed time when present; missing or invalid values fall back to `0`.
 - `settings.localeSource` records whether locale came from SDK auto-detection or a manual settings choice. SDK language can update only auto-sourced locale.
 - `magnifiers` (hints) are capped at `MAX_MAGNIFIERS = 3`. The cap applies when granting level/daily rewards and when loading or migrating a save, so older saves with a larger stock clamp down to 3.
+- `artifacts` is a record of `artifactId -> "locked" | "newly-unlocked" | "viewed"`. The canonical id set (15 ids, 5 per campaign) comes from `src/content/artifacts.ts`; `createDefaultSave` and `migrateSaveData` merge missing ids in as `locked`. Legacy ids from older saves (`brass-compass`, `field-radio`, `blue-flower`, `torn-map`) are kept but unused. On `hydrate`, artifacts are reconciled against `completedLevels` (milestone levels 3/6/8/10/13 per campaign), so saves that predate the collection unlock their artifacts as `newly-unlocked`. Opening an artifact's detail panel in the collection persists `viewed` and permanently clears its "new" badge. The post-level reveal queue is runtime-only and is not persisted.
 
 Persisted review prompt fields:
 

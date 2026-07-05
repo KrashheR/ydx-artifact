@@ -12,6 +12,12 @@ function getRuntimeBaseUrl() {
 }
 
 export const SCENE_ASSET_ROOT = `${getRuntimeBaseUrl()}/assets/scenes`;
+export const ARTIFACT_ASSET_ROOT = `${getRuntimeBaseUrl()}/assets/artifacts`;
+
+export function getArtifactAsset(chapterId: ChapterId, levelOrder: number, state: "open" | "closed") {
+  const campaign = campaignManifest[chapterId];
+  return `${ARTIFACT_ASSET_ROOT}/${campaign.assetFolder}/${levelOrder}/${state}.webp`;
+}
 
 export function getLevelSceneAsset(assetFolder: string, levelOrder: number, filename: string) {
   return `${SCENE_ASSET_ROOT}/${assetFolder}/${levelOrder}/${filename}`;

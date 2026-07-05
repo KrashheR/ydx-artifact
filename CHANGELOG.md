@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added the artifact collection flow ("Коллекция находок") from the design handoff: a data-driven catalog of 15 collectible artifacts (`src/content/artifacts.ts`, milestone levels 3/6/8/10/13 per campaign), an in-gameplay discovery toast, a post-victory reveal ceremony modal (`ArtifactRevealOverlay`), a fully redesigned `CollectionScreen` (progress header, campaign filter tabs, card grids with `open`/`closed` artifact images, detail modal with clue text and level replay), Home topbar / landscape-phone entry points, RU+EN texts sourced from `docs/expedition_narrative_collection_ru.json`, save reconciliation for pre-collection saves, and normalized artifact asset filenames (`closed.webp`).
+
 - Converted the new artifact state images under `public/assets/artifacts/` from PNG to 512x512 lossless WebP.
 
 - Restored `public/assets/scenes/northern-route/13/1.webp` from the historical updated A-scene blob so White Meridian level 13 uses distinct A/B gameplay images again.

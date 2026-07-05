@@ -16,6 +16,7 @@ import {
   type AnalyticsPayload
 } from "@/services/analytics/analytics";
 import {
+  getArtifactForLevel,
   isBetterLevelResult,
   resolveStartupDestination,
   unlockedArtifactsForCompleted
@@ -52,6 +53,10 @@ type GameStore = {
   saveStatus: SaveStatus;
   reviewPromptRuntime: ReviewPromptRuntimeState;
   interstitialRuntime: InterstitialRuntimeState;
+  // Artifact ids unlocked by the last level completion, waiting for the
+  // post-level reveal ceremony. Runtime-only: a reload skips the ceremony but
+  // the collection still shows the artifact with its "new" badge.
+  artifactRevealQueue: string[];
   startedAt: number;
   hydrate: () => Promise<void>;
   save: (options?: { flush?: boolean }) => Promise<void>;
@@ -79,6 +84,8 @@ type GameStore = {
   setReviewNativeRequestInFlight: (value: boolean) => void;
   setReviewNativeResolved: (value: boolean) => void;
   setReviewUnavailableReason: (reason?: ReviewUnavailableReason) => void;
+  dismissArtifactReveal: (artifactId: string) => void;
+  markArtifactViewed: (artifactId: string) => void;
   resetLevelProgress: (levelId: string) => void;
   resetSave: () => Promise<void>;
 };
@@ -149,11 +156,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     lastResolvedCompletedLevels: 0,
     nativeRequestInFlight: false
   },
+  artifactRevealQueue: [],
   startedAt: Date.now(),
   async hydrate() {
     const result = await loadPersistentSave();
     set({
-      saveData: result.saveData,
+      // Reconcile artifacts with completed levels so saves made before the
+      // collection existed still unlock their milestone artifacts.
+      saveData: applyArtifactUnlocks(result.saveData),
       saveStatus: result.cloudAvailable ? "saved" : result.source === "default" ? "idle" : "local-only"
     });
     trackAnalyticsEvent("save_loaded", {
@@ -304,6 +314,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   completeLevel(levelId, durationSeconds, mode = "campaign") {
     const completionEvents: LevelCompletionAnalyticsPayload[] = [];
     let artifactUnlockCount = 0;
+    let newlyUnlockedArtifactIds: string[] = [];
     set((state) => {
       const level = getLevelById(levelId);
       if (!level) return state;
@@ -342,10 +353,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         bestResults
       };
       const nextSave = applyArtifactUnlocks(saveBeforeArtifactUnlocks);
-      artifactUnlockCount = Object.entries(nextSave.artifacts).filter(
-        ([artifactId, state]) =>
-          state === "newly-unlocked" && saveBeforeArtifactUnlocks.artifacts[artifactId] === "locked"
-      ).length;
+      newlyUnlockedArtifactIds = Object.entries(nextSave.artifacts)
+        .filter(
+          ([artifactId, state]) =>
+            state === "newly-unlocked" &&
+            (saveBeforeArtifactUnlocks.artifacts[artifactId] ?? "locked") === "locked"
+        )
+        .map(([artifactId]) => artifactId);
+      artifactUnlockCount = newlyUnlockedArtifactIds.length;
       const shouldQueueReviewCheck = mode === "campaign" && !wasAlreadyCompleted;
       const shouldQueueInterstitialCheck =
         shouldQueueReviewCheck && completedLevels.length > 0 && completedLevels.length % 3 === 0;
@@ -367,8 +382,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         queuedInterstitialCheck: shouldQueueInterstitialCheck
       });
 
+      // The reveal ceremony is reserved for the artifact of the level that was
+      // just completed; artifacts reconciled retroactively (e.g. after a save
+      // migration) unlock silently and surface via the collection "new" badge.
+      const levelArtifactId = getArtifactForLevel(levelId)?.id ?? null;
+      const queuedArtifactIds = newlyUnlockedArtifactIds.filter(
+        (artifactId) => artifactId === levelArtifactId
+      );
+
       return {
         saveData: nextSave,
+        artifactRevealQueue:
+          queuedArtifactIds.length > 0
+            ? [...state.artifactRevealQueue, ...queuedArtifactIds]
+            : state.artifactRevealQueue,
         reviewPromptRuntime: shouldQueueReviewCheck
           ? {
               ...state.reviewPromptRuntime,
@@ -390,6 +417,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (mode === "campaign" && !completionPayload.isReplay) {
         trackAnalyticsEvent("campaign_progress", completionPayload);
       }
+    }
+    for (const artifactId of newlyUnlockedArtifactIds) {
+      trackAnalyticsEvent("artifact_unlock_queued", {
+        ...getLevelAnalyticsPayload(levelId),
+        artifactId
+      });
     }
     void get().save({ flush: true });
   },
@@ -574,6 +607,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }));
     void get().save();
   },
+  dismissArtifactReveal(artifactId) {
+    set((state) => ({
+      artifactRevealQueue: state.artifactRevealQueue.filter((queued) => queued !== artifactId)
+    }));
+  },
+  markArtifactViewed(artifactId) {
+    const currentState = get().saveData.artifacts[artifactId];
+    if (currentState !== "newly-unlocked") return;
+    set((state) => ({
+      saveData: {
+        ...state.saveData,
+        artifacts: { ...state.saveData.artifacts, [artifactId]: "viewed" }
+      }
+    }));
+    trackAnalyticsEvent("collection_artifact_viewed", { artifactId });
+    void get().save();
+  },
   resetLevelProgress(levelId) {
     const inProgress = get().saveData.inProgress;
     set((state) => {
@@ -605,7 +655,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         pendingMapCheckCompletedLevels: null,
         lastResolvedCompletedLevels: 0,
         nativeRequestInFlight: false
-      }
+      },
+      artifactRevealQueue: []
     });
   },
 }));

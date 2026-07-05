@@ -243,11 +243,163 @@
       "title": "Evacuation Airstrip"
     }
   },
+  "collection": {
+    "eyebrow": "EXPEDITION SOCIETY ARCHIVE",
+    "title": "Collection of Finds",
+    "subtitle": "Restore the expedition photos to unlock every meridian artifact.",
+    "progress": "Unlocked {{done}} / {{total}}",
+    "filterAll": "All",
+    "campaignProgress": "{{done}} / {{total}}",
+    "campaignComplete": "ALL FINDS COLLECTED · {{done}} / {{total}}",
+    "newBadge": "NEW",
+    "levelLabel": "LEVEL {{order}}",
+    "cardUnlockedHint": "Entered into the archive",
+    "cardLockedHint": "Carry on the expedition's work",
+    "detailStatusUnlocked": "Entered into the archive",
+    "detailStatusLocked": "Not found yet",
+    "detailLockedTitle": "Unknown find",
+    "detailLockedBody": "This item is still hidden in the archive photos. Continue the expedition to restore it.",
+    "detailLockedHint": "Unlocks in {{campaign}} · Level {{order}}",
+    "detailMeta": "{{campaign}} · Level {{order}}",
+    "detailBack": "Back to collection",
+    "detailReplay": "Go to level",
+    "closeLabel": "Close"
+  },
+  "artifactReveal": {
+    "eyebrow": "NEW FIND",
+    "eyebrowFinal": "FINAL FIND OF THE CASE",
+    "title": "Artifact entered into the archive",
+    "sealing": "The seal is opening…",
+    "collectedTag": "FILED",
+    "footer": "{{campaign}} collection: {{done}} / {{total}}",
+    "continueCta": "Continue",
+    "collectionCta": "Open collection",
+    "toastTitle": "Archive find discovered",
+    "toastSubtitle": "Details unlock once the photo is restored",
+    "toastReplayTitle": "Artifact already in the archive",
+    "toastReplaySubtitle": "Level replay — no new discovery"
+  },
   "artifacts": {
-    "brass-compass": "Brass compass",
-    "field-radio": "Field radio",
-    "blue-flower": "Pressed blue flower",
-    "torn-map": "Torn route map"
+    "white-compass": {
+      "name": "White Gull Compass",
+      "body": "The compass was found at the lighthouse where the expedition last followed its official route. The needle was fixed in a strange position: it pointed not north but toward the glacier.",
+      "reveal": "It seems the group never got lost. Someone — or something — was guiding them along the old meridian line.",
+      "description": "A brass compass from the lighthouse archive. The inner ring shows traces of the needle being fixed by hand. Judging by its position, the expedition deliberately turned onto the closed ice route.",
+      "clue": "Matches the red sign on the desert marker stone.",
+      "foundAt": "Found at the White Gull lighthouse."
+    },
+    "white-field-radio": {
+      "name": "Polarnaya-7 Field Radio",
+      "body": "The radio stood in the glacier camp. The dial is knocked out of line, but a frequency mark remains on the casing. The group sent a short message on it before the descent.",
+      "reveal": "The message was no distress call. It was a note: “Route confirmed. Going below the ice.”",
+      "description": "An old portable radio with a worn dial. The frequency mark on the casing matches a later record from the radio relay tower.",
+      "clue": "Proves the expedition went under the glacier by plan.",
+      "foundAt": "Found in the glacier camp."
+    },
+    "white-red-diary": {
+      "name": "Red Expedition Journal",
+      "body": "A red field journal was found in the observatory. Most pages are damaged, but the final entry is almost fully legible.",
+      "reveal": "“We no longer check the map. The compass leads us along a line that was known here long before us.”",
+      "description": "A thick red journal with no title on the cover. The entries grow shorter as the hidden valley draws near. The last pages describe the old meridian line as an already existing path.",
+      "clue": "Links the compass, the observatory and the hidden valley.",
+      "foundAt": "Found in the observatory dome."
+    },
+    "white-echo-recorder": {
+      "name": "Echo Recorder M-10",
+      "body": "The device by the radio tower looks like a comms unit, but its dials are tuned to low oscillations. It recorded a signal reflected from beneath the ice.",
+      "reveal": "The signal repeats at even intervals, as if a chain of nodes works underground. The northern route is only the first part of the system.",
+      "description": "A heavy field unit with several dials and a reel. It did not transmit messages — it recorded a low-frequency echo. The same rhythm was later found on the salt flat of the desert route.",
+      "clue": "First proof that the meridians are linked by an underground signal.",
+      "foundAt": "Found by the radio relay tower."
+    },
+    "white-descent-rope": {
+      "name": "Descent Rope at the Ice Cliff",
+      "body": "The rope lay at the edge of the ice cliff, its end worn by salt rather than snow. Below was not an abyss but a way down to the water.",
+      "reveal": "Polarnaya-7 did not perish. The group descended to a hidden cove, left by sea and stored the coordinates of the next case in the archive: Sand Meridian.",
+      "description": "A rough descent rope with salt traces in its fibers. It explains why search parties never found a camp below the cliff: Polarnaya-7 left through a hidden cove.",
+      "clue": "Opens the way to the Sand Meridian case.",
+      "foundAt": "Found at the final ice camp."
+    },
+    "sand-rune-marker": {
+      "name": "Aster-9 Rune Marker",
+      "body": "A stone marker was found in the dune basin. A red sign resembling an arrow or an ancient direction mark is roughly carved on it.",
+      "reveal": "The sign matches the direction of the White Gull compass needle. But in the desert it points not to the horizon — it points down.",
+      "description": "A small stone slab with a red direction sign. Aster-9 apparently used it to confirm that Polarnaya-7's coordinates had led to the right place.",
+      "clue": "Links the northern compass and the desert descent.",
+      "foundAt": "Found in the dune basin."
+    },
+    "sand-descent-helmets": {
+      "name": "Descent Team Helmets",
+      "body": "The helmets stood by the canyon pass, as if the group had removed them before returning. But the straps are covered in dust that never occurs on the surface.",
+      "reveal": "The expedition really did descend into the lower halls. The desert route runs underground, not between the dunes.",
+      "description": "A row of metal helmets used during the descent under the plateau. Traces on the inside match rock from the abandoned dig site.",
+      "clue": "Confirms that Aster-9 found an entrance to the ancient water network.",
+      "foundAt": "Found in the canyon pass."
+    },
+    "sand-hydraulic-pump": {
+      "name": "Iram Hydraulic Pump",
+      "body": "The device by the oasis only looks modern at first glance. It was connected to ancient pipes running deep beneath the plateau.",
+      "reveal": "The oasis was not natural. Water rose through the old network that Aster-9 set in motion once again.",
+      "description": "An intricate pump with brass cylinders, pipes and a pressure gauge. Mineral traces show it worked with water that had traveled far through an underground channel.",
+      "clue": "Proves the desert meridian is tied to water, not only to ruins.",
+      "foundAt": "Found by the Iram oasis."
+    },
+    "sand-bronze-lamp": {
+      "name": "Bronze Observatory Lamp",
+      "body": "Local legends called it a djinn's lamp, yet inside there is no oil and no soot. A pale mineral film remains on the walls.",
+      "reveal": "The lamp was not a magical object but a marker vessel: it was placed where water from the network reached the surface.",
+      "description": "A small bronze lamp from the ruined observatory. Folklore tied it to djinns, but archive data points to a practical purpose: marking a water outlet and the direction to the next node.",
+      "clue": "The mineral residue inside resembles water traces from the tropical reservoir.",
+      "foundAt": "Found in the ruined observatory."
+    },
+    "sand-buried-map": {
+      "name": "Map of the Buried Riverbed",
+      "body": "The map was found in the final archive of the desert line. It marks dry riverbeds, wells and a single route leading beyond the desert.",
+      "reveal": "The desert's underground water is linked to the tropical river system. The next case begins where the map calls the riverbed alive: Emerald Meridian.",
+      "description": "An old map with lines of dry riverbeds and underground passages. Unlike ordinary archaeological charts, it continues beyond the desert and points to the tropical valley.",
+      "clue": "Opens the way to the Emerald Meridian case.",
+      "foundAt": "Found in the final archive of the desert line."
+    },
+    "emerald-botanical-vials": {
+      "name": "Verde-12 Herbarium Vials",
+      "body": "Vials with plant samples survived in the botanical camp. Among them are leaves with a rare blue pigment.",
+      "reveal": "The same pigment was found in the polar greenhouse. The northern anomaly and the tropical valley feed from one system.",
+      "description": "A set of glass vials with leaves, mosses and rare plants. Archive notes link some of the samples to the blue flower from the northern greenhouse.",
+      "clue": "Proves the biological link between the White and Emerald meridians.",
+      "foundAt": "Found in the botanical camp."
+    },
+    "emerald-tropical-map": {
+      "name": "Map of the Green Riverbed",
+      "body": "The map from the stilt village looks local, but its lines repeat the coordinates from the desert archive far too precisely.",
+      "reveal": "People lived above the system for generations without ever calling it a meridian. To them these were simply rivers that must not be woken without reason.",
+      "description": "A worn map with rivers, trails and colored routes. The red line matches the desert map's bearing, while the green one leads to the Temple of Roots.",
+      "clue": "Shows the tropics are not the end but the central node of the system.",
+      "foundAt": "Found in the stilt village."
+    },
+    "emerald-stone-plaque": {
+      "name": "Plaque of Three Streams",
+      "body": "The stone plaque from the Temple of Roots looks like a decorative relief. Compared with the maps, however, it is clearly a diagram of the network.",
+      "reveal": "Three streams — northern, desert and green. Along the edges several empty nodes remain, as if the archive is not fully restored.",
+      "description": "A heavy stone plaque with a relief of mountains, channels and nodes. The three central streams match the three restored expeditions, while the side points remain unnamed.",
+      "clue": "Leaves room for future campaigns and new meridians.",
+      "foundAt": "Found in the Temple of Roots."
+    },
+    "emerald-brass-spyglass": {
+      "name": "Brass Spyglass",
+      "body": "The spyglass is aimed not at the stars but at distant peaks and ruins. Its position matches the lines on the Plaque of Three Streams.",
+      "reveal": "The observatory was not a research site but the calibration point of the entire network. This is how the expeditions found the next sector.",
+      "description": "An antique brass spyglass on a tripod. The optics point to a distant water node that appears on no modern map.",
+      "clue": "Confirms the network can grow through new sectors.",
+      "foundAt": "Found in the canopy observatory."
+    },
+    "emerald-evacuation-aircraft": {
+      "name": "Verde-12 Evacuation Aircraft",
+      "body": "The plane stood on the wet strip, ready for takeoff. In the cockpit was not a distress signal but a neatly folded archive sheet.",
+      "reveal": "Verde-12 evacuated in time. Before takeoff the group left a map of the network: three meridians restored, yet several sectors on it still empty.",
+      "description": "A small expedition aircraft with mud-stained wings and traces of a hurried departure. It proves the third group did not vanish — it left the valley after grasping the scale of the system.",
+      "clue": "The final key to continuing the global meridian line.",
+      "foundAt": "Found at the evacuation airstrip."
+    }
   },
   "language": {
     "ru": "Русский",

@@ -1,5 +1,6 @@
 import type { SaveData } from "@/entities/save/schema";
 import { chapterList, getChapterLevels, getLevelById } from "@/content/chapters";
+import { artifactList, type ArtifactDefinition } from "@/content/artifacts";
 
 type BestResult = SaveData["bestResults"][string];
 
@@ -16,18 +17,30 @@ export function isLevelUnlocked(levelId: string, save: SaveData): boolean {
   return previous ? save.completedLevels.includes(previous.id) : false;
 }
 
-export function unlockedArtifactsForCompleted(completedLevelIds: string[]) {
-  const completedOrders = new Set(
-    getChapterLevels("northern-route")
-      .filter((level) => completedLevelIds.includes(level.id))
-      .map((level) => level.order)
+export function getArtifactLevel(artifact: ArtifactDefinition) {
+  return (
+    getChapterLevels(artifact.chapterId).find(
+      (level) => level.order === artifact.unlockLevelOrder
+    ) ?? null
   );
-  return [
-    { level: 3, id: "brass-compass" },
-    { level: 6, id: "field-radio" },
-    { level: 9, id: "blue-flower" },
-    { level: 12, id: "torn-map" }
-  ].filter((artifact) => completedOrders.has(artifact.level));
+}
+
+export function getArtifactForLevel(levelId: string) {
+  const level = getLevelById(levelId);
+  if (!level) return null;
+  return (
+    artifactList.find(
+      (artifact) =>
+        artifact.chapterId === level.chapterId && artifact.unlockLevelOrder === level.order
+    ) ?? null
+  );
+}
+
+export function unlockedArtifactsForCompleted(completedLevelIds: string[]) {
+  return artifactList.filter((artifact) => {
+    const level = getArtifactLevel(artifact);
+    return level !== null && completedLevelIds.includes(level.id);
+  });
 }
 
 export function getFirstCampaignLevelId() {

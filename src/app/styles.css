@@ -557,6 +557,16 @@ select {
     display: none !important;
   }
 
+  /* The landscape-phone home hides the topbar, so the collection entry moves
+     into a floating button pinned to the free top-right corner. */
+  .home-collection-fab {
+    display: flex !important;
+    position: fixed;
+    z-index: 40;
+    right: max(12px, env(safe-area-inset-right));
+    top: max(7px, env(safe-area-inset-top));
+  }
+
   .map-topbar {
     height: 66px !important;
     padding: 0 24px !important;

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ARTIFACT_IDS } from "@/content/artifacts";
 
 export const SAVE_VERSION = 2;
 
@@ -136,7 +137,14 @@ function normalizeBestResults(value: unknown): SaveData["bestResults"] {
 export function migrateSaveData(value: unknown): SaveData {
   const v2 = saveSchema.safeParse(value);
   if (v2.success) {
-    return { ...v2.data, magnifiers: Math.min(v2.data.magnifiers, MAX_MAGNIFIERS) };
+    return {
+      ...v2.data,
+      magnifiers: Math.min(v2.data.magnifiers, MAX_MAGNIFIERS),
+      artifacts: {
+        ...Object.fromEntries(ARTIFACT_IDS.map((artifactId) => [artifactId, "locked" as const])),
+        ...v2.data.artifacts
+      }
+    };
   }
 
   const v1 = saveV1Schema.safeParse(value);
@@ -196,12 +204,7 @@ export function createDefaultSave(): SaveData {
     bestResults: {},
     inProgress: null,
     magnifiers: MAX_MAGNIFIERS,
-    artifacts: {
-      "brass-compass": "locked",
-      "field-radio": "locked",
-      "blue-flower": "locked",
-      "torn-map": "locked"
-    },
+    artifacts: Object.fromEntries(ARTIFACT_IDS.map((artifactId) => [artifactId, "locked"])),
     daily: {
       lastClaimDate: null,
       streak: 0

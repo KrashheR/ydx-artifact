@@ -53,6 +53,7 @@ describe("GameScreen", () => {
         lastResolvedCompletedLevels: 0,
         nativeRequestInFlight: false,
       },
+      artifactRevealQueue: [],
     });
   });
 

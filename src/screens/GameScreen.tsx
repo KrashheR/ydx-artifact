@@ -2,8 +2,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getChapter, getLevelById } from "@/content/chapters";
 import { PhotoComparator } from "@/features/gameplay/PhotoComparator";
+import { ArtifactFoundToast, type ArtifactToastVariant } from "@/features/gameplay/ArtifactFoundToast";
+import { ArtifactRevealOverlay } from "@/features/collection/ArtifactRevealOverlay";
 import { LevelCompleteOverlay } from "@/features/gameplay/LevelCompleteOverlay";
 import { LevelFailedOverlay } from "@/features/gameplay/LevelFailedOverlay";
+import { getArtifactById } from "@/content/artifacts";
+import { getArtifactForLevel } from "@/shared/lib/progression";
 import { GameReviewPrePromptModal } from "@/features/review/GameReviewPrePromptModal";
 import { runNativeReviewFlow } from "@/features/review/reviewFlow";
 import { isReviewPrePromptLocallyEligible } from "@/features/review/reviewPrompt";
@@ -346,6 +350,8 @@ export function GameScreen({
   const setReviewUnavailableReason = useGameStore(
     (s) => s.setReviewUnavailableReason,
   );
+  const artifactRevealQueue = useGameStore((s) => s.artifactRevealQueue);
+  const dismissArtifactReveal = useGameStore((s) => s.dismissArtifactReveal);
 
   const [timedOut, setTimedOut] = useState(false);
   const [platformPaused, setPlatformPaused] = useState(getIsPlatformPaused);
@@ -370,6 +376,8 @@ export function GameScreen({
   const [isInterstitialActive, setIsInterstitialActive] = useState(false);
   const [postLevelActionInFlight, setPostLevelActionInFlight] = useState(false);
   const [startupOnboardingOpen, setStartupOnboardingOpen] = useState(showOnboarding);
+  const [artifactToast, setArtifactToast] = useState<ArtifactToastVariant | null>(null);
+  const artifactToastTimerRef = useRef<number | null>(null);
   const completeOverlayDelayRef = useRef<number | null>(null);
   const activeTimerSaveCounterRef = useRef(0);
   const timeoutTrackedRef = useRef(false);
@@ -393,6 +401,9 @@ export function GameScreen({
   const timeLeft = Math.max(0, TIME_LIMIT - liveElapsedActiveSeconds);
   const completionPending = pendingFinalStats !== null;
   const showComplete = finalStats !== null;
+  const pendingRevealArtifact =
+    artifactRevealQueue.length > 0 ? getArtifactById(artifactRevealQueue[0]) ?? null : null;
+  const showArtifactReveal = showComplete && pendingRevealArtifact !== null;
   const showRewardedHintModal = rewardedHintModal !== null;
   const showStartupOnboarding = mode === "campaign" && startupOnboardingOpen && !showComplete && !timedOut;
   const showOverlay =
@@ -533,7 +544,7 @@ export function GameScreen({
           isCampaignMapActive: false,
           isPostLevelVictoryActive: true,
           isDocumentVisible: pageVisible && document.visibilityState === "visible",
-          hasBlockingOverlay: isReviewPromptOpen,
+          hasBlockingOverlay: isReviewPromptOpen || showArtifactReveal,
           isAdActive:
             isInterstitialActive ||
             interstitialRuntime.nativeRequestInFlight ||
@@ -591,8 +602,30 @@ export function GameScreen({
     reviewPromptRuntime.pendingMapCheckCompletedLevels,
     saveData.reviewPrompt,
     setReviewUnavailableReason,
+    showArtifactReveal,
     showComplete,
   ]);
+
+  // Reveal ceremony analytics: once per queued artifact.
+  const revealShownRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!showArtifactReveal || !pendingRevealArtifact) return;
+    if (revealShownRef.current === pendingRevealArtifact.id) return;
+    revealShownRef.current = pendingRevealArtifact.id;
+    trackAnalyticsEvent("artifact_unlock_modal_shown", {
+      artifactId: pendingRevealArtifact.id,
+      levelId,
+      campaignId: pendingRevealArtifact.chapterId,
+    });
+  }, [levelId, pendingRevealArtifact, showArtifactReveal]);
+
+  useEffect(() => {
+    return () => {
+      if (artifactToastTimerRef.current !== null) {
+        window.clearTimeout(artifactToastTimerRef.current);
+      }
+    };
+  }, []);
 
   if (!level || !chapter) return null;
 
@@ -606,9 +639,32 @@ export function GameScreen({
     hintId !== undefined && !liveFoundIds.includes(hintId);
   const chapterId = level.chapterId;
 
+  const levelArtifact = getArtifactForLevel(levelId);
+
+  function showArtifactToast(differenceId: string) {
+    if (levelArtifact?.differenceId !== differenceId) return;
+    const artifactState = saveData.artifacts[levelArtifact.id] ?? "locked";
+    const variant: ArtifactToastVariant = artifactState === "locked" ? "new" : "replay";
+    setArtifactToast(variant);
+    if (artifactToastTimerRef.current !== null) {
+      window.clearTimeout(artifactToastTimerRef.current);
+    }
+    artifactToastTimerRef.current = window.setTimeout(() => {
+      setArtifactToast(null);
+      artifactToastTimerRef.current = null;
+    }, 2600);
+    trackAnalyticsEvent("artifact_toast_shown", {
+      artifactId: levelArtifact.id,
+      levelId,
+      campaignId: levelArtifact.chapterId,
+      variant,
+    });
+  }
+
   function handleDifference(differenceId: string) {
     if (completionPending || showComplete || timedOut || platformPaused || showStartupOnboarding) return;
     if (hintId === differenceId) setHintId(undefined);
+    showArtifactToast(differenceId);
     recordDiff(levelId, differenceId);
     const nextFound = liveFoundIds.length + 1;
     if (nextFound >= level!.requiredDifferences && !finalStats) {
@@ -837,6 +893,30 @@ export function GameScreen({
     }
 
     startLevel(nextLevel.id, "campaign");
+  }
+
+  function handleArtifactRevealContinue() {
+    if (!pendingRevealArtifact) return;
+    trackAnalyticsEvent("artifact_unlock_continue_clicked", {
+      artifactId: pendingRevealArtifact.id,
+      levelId,
+      campaignId: pendingRevealArtifact.chapterId,
+    });
+    dismissArtifactReveal(pendingRevealArtifact.id);
+  }
+
+  function handleArtifactRevealCollection() {
+    if (!pendingRevealArtifact) return;
+    trackAnalyticsEvent("artifact_unlock_collection_clicked", {
+      artifactId: pendingRevealArtifact.id,
+      levelId,
+      campaignId: pendingRevealArtifact.chapterId,
+    });
+    dismissArtifactReveal(pendingRevealArtifact.id);
+    void save({ flush: true });
+    clearPendingInterstitialCheck();
+    clearPendingReviewPromptCheck();
+    navigate({ kind: "collection" });
   }
 
   function handleMap() {
@@ -1362,6 +1442,10 @@ export function GameScreen({
           />
         </div>
 
+        {artifactToast && !showComplete && !timedOut && (
+          <ArtifactFoundToast variant={artifactToast} />
+        )}
+
         {/* ── BOTTOM TRACKER ─────────────────────────────────────────── */}
         <footer
           className="game-footer hidden shrink-0 items-center justify-between px-[30px] sm:flex"
@@ -1433,6 +1517,15 @@ export function GameScreen({
           onNext={nextLevel ? handleNext : null}
           onRetry={handleRetry}
           onMap={handleMap}
+        />
+      )}
+
+      {showArtifactReveal && pendingRevealArtifact && (
+        <ArtifactRevealOverlay
+          artifact={pendingRevealArtifact}
+          backgroundSrc={level.imageB}
+          onContinue={handleArtifactRevealContinue}
+          onOpenCollection={handleArtifactRevealCollection}
         />
       )}
 

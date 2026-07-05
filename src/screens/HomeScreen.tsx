@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { ARTIFACT_IDS, TOTAL_ARTIFACTS } from "@/content/artifacts";
 import { chapters, getChapterLevels } from "@/content/chapters";
 import { getChapterPreviewAsset } from "@/content/sceneAssets";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
@@ -449,13 +450,40 @@ function CarouselArrow({
   );
 }
 
+function CollectionChestIcon() {
+  return (
+    <svg
+      width="19"
+      height="19"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M4 7h6l2 2h8v10H4z" />
+      <circle cx="12" cy="14" r="1.6" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 function TopBar({
   totalDone,
   totalAll,
+  collectionDone,
+  collectionTotal,
+  collectionHasNew,
+  onOpenCollection,
   onOpenSettings,
 }: {
   totalDone: number;
   totalAll: number;
+  collectionDone: number;
+  collectionTotal: number;
+  collectionHasNew: boolean;
+  onOpenCollection: () => void;
   onOpenSettings: () => void;
 }) {
   const { t } = useTranslation();
@@ -512,6 +540,29 @@ function TopBar({
           className="hidden h-6 w-px md:block"
           style={{ background: "rgba(213,195,154,0.15)" }}
         />
+        <button
+          type="button"
+          onClick={onOpenCollection}
+          aria-label={t("actions.collection")}
+          title={t("actions.collection")}
+          className="relative flex h-11 shrink-0 items-center gap-2 rounded-[9px] px-3 text-exp-brass2 transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+          style={{
+            border: "1px solid rgba(184,138,69,.4)",
+            background: "rgba(184,138,69,.08)",
+          }}
+        >
+          <CollectionChestIcon />
+          <span className="hidden font-jetbrains text-[12px] font-semibold sm:inline">
+            {collectionDone} / {collectionTotal}
+          </span>
+          {collectionHasNew && (
+            <span
+              className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full"
+              style={{ background: "#c0533a", boxShadow: "0 0 0 2px #151B18" }}
+              aria-hidden="true"
+            />
+          )}
+        </button>
         <button
           type="button"
           onClick={onOpenSettings}
@@ -979,6 +1030,7 @@ export function HomeScreen({
   const { t } = useTranslation();
   const navigate = useGameStore((s) => s.navigate);
   const completedLevels = useGameStore((s) => s.saveData.completedLevels);
+  const artifactStates = useGameStore((s) => s.saveData.artifacts);
 
   const northernRouteLevels = getChapterLevels("northern-route");
   const sandMeridianLevels = getChapterLevels("sand-meridian");
@@ -1071,6 +1123,22 @@ export function HomeScreen({
     setMobileCampaignIndex((index) => (index + 1) % campaigns.length);
   };
 
+  const collectionDone = ARTIFACT_IDS.filter(
+    (artifactId) => (artifactStates[artifactId] ?? "locked") !== "locked",
+  ).length;
+  const collectionHasNew = ARTIFACT_IDS.some(
+    (artifactId) => artifactStates[artifactId] === "newly-unlocked",
+  );
+
+  const handleOpenCollection = () => {
+    trackAnalyticsEvent("collection_opened", {
+      source: "home_topbar",
+      unlockedArtifacts: collectionDone,
+      hasNew: collectionHasNew,
+    });
+    navigate({ kind: "collection" });
+  };
+
   const handleOpenCampaign = (campaignId: CampaignId) => {
     const selectedCampaign = campaigns.find((campaign) => campaign.id === campaignId);
     trackAnalyticsEvent("campaign_selected", {
@@ -1106,8 +1174,36 @@ export function HomeScreen({
       <TopBar
         totalDone={completedLevels.length}
         totalAll={totalAll}
+        collectionDone={collectionDone}
+        collectionTotal={TOTAL_ARTIFACTS}
+        collectionHasNew={collectionHasNew}
+        onOpenCollection={handleOpenCollection}
         onOpenSettings={onOpenSettings}
       />
+
+      {/* Collection entry for landscape phones where the topbar is hidden;
+          visibility is controlled by .home-collection-fab in styles.css */}
+      <button
+        type="button"
+        onClick={handleOpenCollection}
+        aria-label={t("actions.collection")}
+        title={t("actions.collection")}
+        className="home-collection-fab hidden h-11 w-11 items-center justify-center rounded-full text-exp-brass2"
+        style={{
+          border: "1px solid rgba(184,138,69,.4)",
+          background: "rgba(21,27,24,.78)",
+          boxShadow: "0 10px 24px rgba(0,0,0,.34)",
+        }}
+      >
+        <CollectionChestIcon />
+        {collectionHasNew && (
+          <span
+            className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full"
+            style={{ background: "#c0533a", boxShadow: "0 0 0 2px #151B18" }}
+            aria-hidden="true"
+          />
+        )}
+      </button>
 
       {/* Page header */}
       <section className="home-hero px-5 pb-2 pt-[34px] text-center md:px-10 md:pb-0">
