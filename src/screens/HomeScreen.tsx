@@ -6,7 +6,10 @@ import {
   artifactList
 } from "@/content/artifacts";
 import { chapters, getChapterLevels, type ChapterId } from "@/content/chapters";
-import { dailyLevels } from "@/content/levels";
+import {
+  getDailyArchiveDateKey,
+  getDailyArchiveEntryForDate
+} from "@/content/dailyArchive";
 import { getChapterPreviewAsset } from "@/content/sceneAssets";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
 import { useGameStore } from "@/shared/store/gameStore";
@@ -29,17 +32,6 @@ const CAMPAIGN_BY_ID: Record<CampaignId, ChapterId> = {
   sand: "sand-meridian",
   emerald: "emerald-meridian"
 };
-
-function todaysDailyIndex() {
-  const today = new Date();
-  const seed =
-    today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-  return seed % dailyLevels.length;
-}
-
-function todayKey() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 function CompassIcon({ size = 36 }: { size?: number }) {
   return (
@@ -419,7 +411,7 @@ function DailyArchiveCard({
         {claimed ? t("homeHub.daily.claimed") : t("homeHub.daily.reward")}
       </p>
       <div className="mt-auto pt-4">
-        <PrimaryButton onClick={onOpen} disabled={claimed} className="w-full min-h-[40px] text-[12px]">
+        <PrimaryButton onClick={onOpen} className="w-full min-h-[40px] text-[12px]">
           {claimed ? <CheckIcon size={13} color="#1A130A" /> : <LightbulbIcon size={14} />}
           {claimed ? t("homeHub.daily.claimedCta") : t("homeHub.daily.open")}
         </PrimaryButton>
@@ -722,8 +714,8 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
   const collectionHasNew = ARTIFACT_IDS.some(
     (artifactId) => artifactStates[artifactId] === "newly-unlocked"
   );
-  const dailyEntry = dailyLevels[todaysDailyIndex()];
-  const dailyClaimed = daily.lastClaimDate === todayKey();
+  const dailyEntry = getDailyArchiveEntryForDate();
+  const dailyClaimed = daily.lastClaimDate === getDailyArchiveDateKey();
 
   const openCollection = (source: string) => {
     trackAnalyticsEvent("collection_opened", {

@@ -8,12 +8,13 @@ type Props = {
   onRetry: () => void;
   onExtend: () => void;
   onMap: () => void;
+  mapLabel?: string;
 };
 
 const statCard = "result-stat-card flex flex-1 flex-col items-center rounded-xl border border-exp-parch/[.12] py-4";
 const statLabel = "mt-[5px] text-[9.5px] font-semibold tracking-[.14em] text-exp-muted";
 
-export function LevelFailedOverlay({ level, found, canExtend, onRetry, onExtend, onMap }: Props) {
+export function LevelFailedOverlay({ level, found, canExtend, onRetry, onExtend, onMap, mapLabel }: Props) {
   const { t } = useTranslation();
   const remaining = level.requiredDifferences - found;
 
@@ -146,7 +147,7 @@ export function LevelFailedOverlay({ level, found, canExtend, onRetry, onExtend,
               onClick={onMap}
               className="flex-1 rounded-[10px] border border-exp-parch/[.14] bg-transparent py-3 text-[13.5px] font-semibold text-exp-parch"
             >
-              {t("game.toMap")}
+              {mapLabel ?? t("game.toMap")}
             </button>
           </div>
           </div>

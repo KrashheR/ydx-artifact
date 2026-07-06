@@ -58,7 +58,10 @@ export function getNextCampaignLevelId(save: SaveData) {
 
 export function resolveStartupDestination(save: SaveData): StartupDestination {
   const inProgressLevel = save.inProgress ? getLevelById(save.inProgress.levelId) : null;
-  if (inProgressLevel) {
+  const inProgressCampaignLevel =
+    inProgressLevel &&
+    chapterList.some((chapter) => chapter.levels.some((level) => level.id === inProgressLevel.id));
+  if (inProgressLevel && inProgressCampaignLevel) {
     return {
       kind: "game",
       levelId: inProgressLevel.id,

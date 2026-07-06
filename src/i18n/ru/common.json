@@ -79,6 +79,7 @@
     "nextLevelCta": "Уровень {{order}} · {{title}}",
     "retry": "Повторить",
     "toMap": "К выбору уровней",
+    "toArchiveHub": "В главное меню",
     "timeoutBadge": "ВРЕМЯ ВЫШЛО",
     "timeoutTitle": "Не все отличия найдены",
     "timeoutDesc": "Вернитесь к снимкам и попробуйте пройти уровень ещё раз.",
@@ -96,14 +97,26 @@
   },
   "daily": {
     "sceneInfo": "Сцена дня: {{title}}. Серия: {{streak}}",
-    "icebreakerCabin": {
-      "title": "Каюта ледокола"
+    "archiveCase01": {
+      "title": "Дело дня: запечатанный конверт"
     },
-    "cartographerRoom": {
-      "title": "Комната картографа"
+    "archiveCase02": {
+      "title": "Дело дня: фотолаборатория"
     },
-    "weatherPlatform": {
-      "title": "Метеоплатформа"
+    "archiveCase03": {
+      "title": "Дело дня: картотека"
+    },
+    "archiveCase04": {
+      "title": "Дело дня: красная комната"
+    },
+    "archiveCase05": {
+      "title": "Дело дня: карта маршрутов"
+    },
+    "archiveCase06": {
+      "title": "Дело дня: полка экспедиции"
+    },
+    "archiveCase07": {
+      "title": "Дело дня: сейф архивариуса"
     }
   },
   "settings": {

@@ -350,8 +350,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             [levelId]: completedResult
           }
         : state.saveData.bestResults;
-      const wasAlreadyCompleted = state.saveData.completedLevels.includes(levelId);
-      const completedLevels = wasAlreadyCompleted
+      const isCampaignCompletion = mode === "campaign";
+      const wasAlreadyCompleted =
+        isCampaignCompletion && state.saveData.completedLevels.includes(levelId);
+      const completedLevels = !isCampaignCompletion || wasAlreadyCompleted
         ? state.saveData.completedLevels
         : [...state.saveData.completedLevels, levelId];
       const saveBeforeArtifactUnlocks = {
@@ -359,7 +361,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         completedLevels,
         inProgress: null,
         magnifiers: Math.min(
-          state.saveData.magnifiers + (level.reward.magnifiers ?? 0),
+          state.saveData.magnifiers +
+            (isCampaignCompletion ? level.reward.magnifiers ?? 0 : 0),
           MAX_MAGNIFIERS
         ),
         bestResults
@@ -387,7 +390,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         accuracy: Number(accuracy.toFixed(4)),
         isReplay: wasAlreadyCompleted,
         completedLevels: completedLevels.length,
-        rewardMagnifiers: level.reward.magnifiers ?? 0,
+        rewardMagnifiers: isCampaignCompletion ? level.reward.magnifiers ?? 0 : 0,
         magnifiersAfterReward: nextSave.magnifiers,
         artifactUnlockCount,
         queuedReviewCheck: shouldQueueReviewCheck,

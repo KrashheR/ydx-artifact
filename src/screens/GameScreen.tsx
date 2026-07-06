@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getChapter, getLevelById } from "@/content/chapters";
+import { getDailyArchiveDateKey } from "@/content/dailyArchive";
 import { PhotoComparator } from "@/features/gameplay/PhotoComparator";
 import { ArtifactFoundToast, type ArtifactToastVariant } from "@/features/gameplay/ArtifactFoundToast";
 import { ArtifactRevealOverlay } from "@/features/collection/ArtifactRevealOverlay";
@@ -527,10 +528,10 @@ export function GameScreen({
   // While the completion overlay is open, prefetch the next level's pair so
   // "next level" starts with warm images.
   useEffect(() => {
-    if (!showComplete || !level || !chapter) return;
+    if (mode !== "campaign" || !showComplete || !level || !chapter) return;
     const upcoming = chapter.levels.find((l) => l.order === level.order + 1);
     if (upcoming) void preloadImages([upcoming.imageA, upcoming.imageB]);
-  }, [showComplete, level, chapter]);
+  }, [mode, showComplete, level, chapter]);
 
   // Active gameplay timer.
   useEffect(() => {
@@ -707,7 +708,9 @@ export function GameScreen({
   if (!level || !chapter) return null;
 
   const nextLevel =
-    chapter.levels.find((l) => l.order === level.order + 1) ?? null;
+    mode === "campaign"
+      ? chapter.levels.find((l) => l.order === level.order + 1) ?? null
+      : null;
   const magnifiers = saveData.magnifiers;
   const displayFoundIds = showComplete
     ? level.differences.map((d) => d.id)
@@ -753,7 +756,7 @@ export function GameScreen({
         setFinalStats(stats);
         completeLevel(levelId, elapsed, mode);
         if (mode === "daily")
-          claimDailyReward(new Date().toISOString().slice(0, 10));
+          claimDailyReward(getDailyArchiveDateKey());
         completeOverlayDelayRef.current = null;
       }, COMPLETE_OVERLAY_DELAY_MS);
     }
@@ -1046,7 +1049,7 @@ export function GameScreen({
       elapsedActiveSeconds: liveElapsedActiveSeconds,
       completed: showComplete,
     });
-    navigate({ kind: "map", chapterId });
+    navigate(mode === "daily" ? { kind: "home" } : { kind: "map", chapterId });
   }
 
   function handleReviewLater() {
@@ -1140,7 +1143,9 @@ export function GameScreen({
     });
   }
 
-  const campaignTitle = t(chapter.titleKey).toUpperCase();
+  const campaignTitle =
+    mode === "daily" ? t("actions.daily").toUpperCase() : t(chapter.titleKey).toUpperCase();
+  const levelBadgeTotal = mode === "daily" ? 7 : chapter.levels.length;
   const hasRewardedAreaHintTarget = level.differences.some(
     (d) => !liveFoundIds.includes(d.id) && d.id !== hintId,
   );
@@ -1212,7 +1217,7 @@ export function GameScreen({
                 {t("game.levelBadge", {
                   campaign: campaignTitle,
                   current: level.order,
-                  total: chapter.levels.length,
+                  total: levelBadgeTotal,
                 })}
               </div>
               <div className="text-[22px] font-semibold leading-tight tracking-[.01em] text-exp-parch">
@@ -1483,7 +1488,8 @@ export function GameScreen({
         >
           <div className="min-w-0 flex-1 text-center">
             <div className="font-manrope text-[8.5px] font-bold tracking-[.16em] text-exp-brass">
-              {t(chapter.titleKey)} · {t("actions.map")} {level.order}
+              {mode === "daily" ? t("actions.daily") : t(chapter.titleKey)} ·{" "}
+              {t("actions.map")} {level.order}
             </div>
             <div className="overflow-hidden text-ellipsis whitespace-nowrap font-cormorant text-[16px] font-semibold text-exp-parch">
               {t(level.titleKey)}
@@ -1628,8 +1634,10 @@ export function GameScreen({
           nextLevelOrder={nextLevel?.order}
           nextLevelTitle={nextLevel ? t(nextLevel.titleKey) : undefined}
           onNext={nextLevel ? handleNext : null}
-          onRetry={handleRetry}
+          onRetry={mode === "daily" ? null : handleRetry}
           onMap={handleMap}
+          isDaily={mode === "daily"}
+          returnLabel={mode === "daily" ? t("game.toArchiveHub") : undefined}
         />
       )}
 
@@ -1673,6 +1681,7 @@ export function GameScreen({
           onRetry={handleRetry}
           onExtend={handleExtendTime}
           onMap={handleMap}
+          mapLabel={mode === "daily" ? t("game.toArchiveHub") : undefined}
         />
       )}
 

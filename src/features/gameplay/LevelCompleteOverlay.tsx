@@ -14,8 +14,10 @@ type Props = {
   nextLevelOrder?: number;
   nextLevelTitle?: string;
   onNext: (() => void) | null;
-  onRetry: () => void;
+  onRetry: (() => void) | null;
   onMap: () => void;
+  isDaily?: boolean;
+  returnLabel?: string;
 };
 
 function formatTime(s: number) {
@@ -44,12 +46,17 @@ const secondaryBtn = "flex-1 rounded-[10px] border border-exp-parch/[.14] bg-tra
 
 export function LevelCompleteOverlay({
   level, chapter, found, required, mistakes, elapsedSeconds,
-  completedLevelIds, nextLevelOrder, nextLevelTitle, onNext, onRetry, onMap
+  completedLevelIds, nextLevelOrder, nextLevelTitle, onNext, onRetry, onMap,
+  isDaily = false, returnLabel
 }: Props) {
   const { t } = useTranslation();
   const accuracy = found / Math.max(found + mistakes, 1);
   const stars = starsForAccuracy(accuracy);
-  const chapterDone = completedLevelIds.filter((id) => chapter.levels.some((l) => l.id === id)).length;
+  const chapterDone = isDaily
+    ? 1
+    : completedLevelIds.filter((id) => chapter.levels.some((l) => l.id === id)).length;
+  const progressTotal = isDaily ? 1 : chapter.levels.length;
+  const progressLabel = isDaily ? t("actions.daily").toUpperCase() : t(chapter.titleKey).toUpperCase();
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center p-3">
@@ -113,13 +120,13 @@ export function LevelCompleteOverlay({
 
           <div className="result-progress mb-6 mt-3 rounded-xl border border-exp-parch/[.12] px-[18px] py-[15px]" style={{ background: "rgba(21,27,24,.4)" }}>
             <div className="mb-[9px] flex justify-between">
-              <span className="text-[11px] font-semibold tracking-[.08em] text-exp-muted">{t(chapter.titleKey).toUpperCase()}</span>
-              <span className="text-[12px] font-bold text-exp-brass2">{chapterDone} / {chapter.levels.length}</span>
+              <span className="text-[11px] font-semibold tracking-[.08em] text-exp-muted">{progressLabel}</span>
+              <span className="text-[12px] font-bold text-exp-brass2">{chapterDone} / {progressTotal}</span>
             </div>
             <div className="flex gap-[3px]">
-              {chapter.levels.map((l) => {
-                const isDone = completedLevelIds.includes(l.id);
-                const isCurrent = l.id === level.id;
+              {(isDaily ? [level] : chapter.levels).map((l) => {
+                const isDone = isDaily || completedLevelIds.includes(l.id);
+                const isCurrent = isDaily || l.id === level.id;
                 return (
                   <span
                     key={l.id}
@@ -148,7 +155,7 @@ export function LevelCompleteOverlay({
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
             </button>
-          ) : (
+          ) : onRetry ? (
             <button
               onClick={onRetry}
               className="result-primary w-full rounded-[10px] border-none py-[17px] text-[16px] font-bold text-[#1a130a]"
@@ -159,18 +166,31 @@ export function LevelCompleteOverlay({
             >
               {t("game.retry")}
             </button>
+          ) : (
+            <button
+              onClick={onMap}
+              className="result-primary w-full rounded-[10px] border-none py-[17px] text-[16px] font-bold text-[#1a130a]"
+              style={{
+                background: "linear-gradient(180deg, #d8af63, #b3812f)",
+                boxShadow: "0 12px 28px rgba(184,138,69,.32), inset 0 1px 0 rgba(255,255,255,.3)"
+              }}
+            >
+              {returnLabel ?? t("game.toMap")}
+            </button>
           )}
 
+          {(onNext || onRetry) && (
           <div className="result-actions mt-[11px] flex gap-[11px]">
-            {onNext && (
+            {onNext && onRetry && (
               <button onClick={onRetry} className={secondaryBtn}>
                 {t("game.retry")}
               </button>
             )}
             <button onClick={onMap} className={secondaryBtn}>
-              {t("game.toMap")}
+              {returnLabel ?? t("game.toMap")}
             </button>
           </div>
+          )}
           </div>
         </div>
       </div>

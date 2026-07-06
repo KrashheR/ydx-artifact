@@ -829,21 +829,3 @@ export const levels: LevelDefinition[] = [
   twelfthLevel,
   thirteenthLevel,
 ];
-
-export const dailyLevels = [
-  {
-    id: "daily-icebreaker-cabin",
-    titleKey: "daily.icebreakerCabin.title",
-    levelId: levels[2].id,
-  },
-  {
-    id: "daily-cartographer-room",
-    titleKey: "daily.cartographerRoom.title",
-    levelId: levels[5].id,
-  },
-  {
-    id: "daily-weather-platform",
-    titleKey: "daily.weatherPlatform.title",
-    levelId: levels[9].id,
-  },
-];

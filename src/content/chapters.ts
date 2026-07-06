@@ -1,6 +1,7 @@
 import { levels as northernRouteLevels } from "./levels";
 import { sandMeridianLevels } from "./sandMeridianLevels";
 import { emeraldMeridianLevels } from "./emeraldMeridianLevels";
+import { dailyArchiveLevels } from "./dailyArchive";
 import type { LevelDefinition } from "../entities/level/schema";
 import sandMeridianMapLayout from "../../docs/plot/sand_meridian/map-handoff/sand-meridian-map-layout.json";
 import { campaignManifest } from "./campaignManifest";
@@ -97,6 +98,7 @@ export const chapters: Record<ChapterId, ChapterDefinition> = {
 
 export const chapterList = Object.values(chapters);
 export const allLevels = chapterList.flatMap((chapter) => chapter.levels);
+export const allPlayableLevels = [...allLevels, ...dailyArchiveLevels];
 
 export function getChapter(chapterId: ChapterId) {
   return chapters[chapterId];
@@ -107,5 +109,5 @@ export function getChapterLevels(chapterId: ChapterId) {
 }
 
 export function getLevelById(levelId: string) {
-  return allLevels.find((level) => level.id === levelId);
+  return allPlayableLevels.find((level) => level.id === levelId);
 }

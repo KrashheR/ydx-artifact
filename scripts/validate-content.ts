@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { campaignManifestList } from "../src/content/campaignManifest";
+import { DAILY_ARCHIVE_ASSET_FOLDER, dailyArchiveLevels } from "../src/content/dailyArchive";
 import { allLevels, chapterList } from "../src/content/chapters";
 import { getChapterPreviewAsset, getSceneMarkupAsset } from "../src/content/sceneAssets";
 
@@ -9,6 +10,7 @@ const root = process.cwd();
 const errors: string[] = [];
 const ids = new Set<string>();
 const knownAssetFolders = new Set(campaignManifestList.map((campaign) => campaign.assetFolder));
+knownAssetFolders.add(DAILY_ARCHIVE_ASSET_FOLDER);
 
 type LocaleDictionary = Record<string, unknown>;
 type AssetProvenance = {
@@ -189,7 +191,7 @@ for (const chapter of chapterList) {
   if (!hasLocaleKey(enLocale, chapter.titleKey)) errors.push(`${chapter.id}: missing EN locale key ${chapter.titleKey}`);
 }
 
-for (const level of allLevels) {
+for (const level of [...allLevels, ...dailyArchiveLevels]) {
   if (ids.has(level.id)) errors.push(`Duplicate level id: ${level.id}`);
   ids.add(level.id);
   if (level.requiredDifferences !== level.differences.length) {
@@ -244,4 +246,6 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log(`Content validation passed: ${allLevels.length} levels across ${chapterList.length} chapters`);
+console.log(
+  `Content validation passed: ${allLevels.length} campaign levels across ${chapterList.length} chapters and ${dailyArchiveLevels.length} daily archive levels`
+);

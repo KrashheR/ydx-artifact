@@ -79,6 +79,7 @@
     "nextLevelCta": "Level {{order}} · {{title}}",
     "retry": "Retry",
     "toMap": "Level Select",
+    "toArchiveHub": "Main menu",
     "timeoutBadge": "TIME'S UP",
     "timeoutTitle": "Not all differences found",
     "timeoutDesc": "The trail went cold. Return to the photos and try again.",
@@ -96,14 +97,26 @@
   },
   "daily": {
     "sceneInfo": "Daily scene: {{title}}. Streak: {{streak}}",
-    "icebreakerCabin": {
-      "title": "Icebreaker cabin"
+    "archiveCase01": {
+      "title": "Daily case: sealed envelope"
     },
-    "cartographerRoom": {
-      "title": "Cartographer room"
+    "archiveCase02": {
+      "title": "Daily case: photo lab"
     },
-    "weatherPlatform": {
-      "title": "Weather platform"
+    "archiveCase03": {
+      "title": "Daily case: card catalog"
+    },
+    "archiveCase04": {
+      "title": "Daily case: red room"
+    },
+    "archiveCase05": {
+      "title": "Daily case: route map"
+    },
+    "archiveCase06": {
+      "title": "Daily case: expedition shelf"
+    },
+    "archiveCase07": {
+      "title": "Daily case: archivist safe"
     }
   },
   "settings": {

@@ -1,22 +1,16 @@
 import { useTranslation } from "react-i18next";
-import { dailyLevels } from "@/content/levels";
+import { getDailyArchiveEntryForDate } from "@/content/dailyArchive";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
 import { useGameStore } from "@/shared/store/gameStore";
 import { Button } from "@/shared/ui/Button";
 import { Panel } from "@/shared/ui/Panel";
-
-function todaysDailyIndex() {
-  const today = new Date();
-  const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-  return seed % dailyLevels.length;
-}
 
 export function DailyScreen() {
   const { t } = useTranslation();
   const startLevel = useGameStore((state) => state.startLevel);
   const navigate = useGameStore((state) => state.navigate);
   const daily = useGameStore((state) => state.saveData.daily);
-  const entry = dailyLevels[todaysDailyIndex()];
+  const entry = getDailyArchiveEntryForDate();
 
   const handleStartDaily = () => {
     trackAnalyticsEvent("daily_start_clicked", {

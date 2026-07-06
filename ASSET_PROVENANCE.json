@@ -17,8 +17,8 @@
     {
       "id": "archive-scene-package-2026-07-06",
       "path": "public/assets/scenes/archive",
-      "status": "production-intake",
-      "source": "content owner archive scene package provided in workspace; level folders 1-7 include PNG sources converted on 2026-07-06 to lossless WebP files named 1.webp, 2.webp and 3.webp with unchanged 1586x992 dimensions; source PNG files remain in place pending removal confirmation",
+      "status": "production-runtime",
+      "source": "content owner archive scene package provided in workspace; level folders 1-7 include PNG sources converted on 2026-07-06 to lossless WebP files named 1.webp, 2.webp and 3.webp with unchanged 1586x992 dimensions and wired as Daily Archive content in src/content/dailyArchive.ts; source PNG files were removed from runtime after conversion",
       "approval": "pending-owner-license-confirmation"
     },
     {

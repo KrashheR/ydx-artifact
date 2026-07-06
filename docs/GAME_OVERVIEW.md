@@ -12,7 +12,7 @@
 
 - 3 кампании по 13 уровней: White Meridian, Sand Meridian, Emerald Meridian.
 - 39 игровых уровней с локальными WebP-сценами A/B.
-- 3 daily-записи, которые переиспользуют уровни основной кампании.
+- 7 daily-записей, подключенных как отдельные архивные дела из `public/assets/scenes/archive/1-7/`.
 - 15 коллекционных находок: по 5 milestone-артефактов на каждую кампанию.
 - Линейное открытие уровней внутри кампании.
 - Линейное открытие кампаний: White -> Sand -> Emerald.
@@ -276,22 +276,27 @@ Collection screen:
 
 ### Daily
 
-Daily screen существует и выбирает одну из трех daily-записей детерминированно по локальной календарной дате.
+Daily screen существует и выбирает одну из семи standalone Daily Archive записей детерминированно по локальному календарному дню: `dayNumber % 7`.
 
 Текущие daily:
 
-| Daily ID | Название | Базовый level |
+| Daily ID | Название | Runtime folder |
 |---|---|---|
-| `daily-icebreaker-cabin` | Icebreaker cabin | White Meridian 3 |
-| `daily-cartographer-room` | Cartographer room | White Meridian 6 |
-| `daily-weather-platform` | Weather platform | White Meridian 10 |
+| `daily-archive-01` | Daily case: sealed envelope | `public/assets/scenes/archive/1` |
+| `daily-archive-02` | Daily case: photo lab | `public/assets/scenes/archive/2` |
+| `daily-archive-03` | Daily case: card catalog | `public/assets/scenes/archive/3` |
+| `daily-archive-04` | Daily case: red room | `public/assets/scenes/archive/4` |
+| `daily-archive-05` | Daily case: route map | `public/assets/scenes/archive/5` |
+| `daily-archive-06` | Daily case: expedition shelf | `public/assets/scenes/archive/6` |
+| `daily-archive-07` | Daily case: archivist safe | `public/assets/scenes/archive/7` |
 
 При completion daily:
 
 - выдается +1 magnifier, но не выше максимума;
 - сохраняется `lastClaimDate`;
 - увеличивается `streak`;
-- отправляется `daily_reward_claimed`.
+- отправляется `daily_reward_claimed`;
+- daily completion не добавляется в campaign `completedLevels`, не открывает следующие campaign levels и после победы ведет только обратно в archive hub.
 
 Daily доступен из archive hub через Daily Archive card. Route также остается отдельным lazy-loaded screen в `App`.
 
@@ -485,7 +490,7 @@ Production locales:
 - Zod-валидация контента и save schema.
 - Data-driven уровни.
 - 39 campaign levels.
-- 3 daily entries.
+- 7 standalone Daily Archive entries.
 - Local/cloud save adapter.
 - RU/EN i18n.
 - Настройки языка.

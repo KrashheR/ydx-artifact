@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { dailyArchiveLevels } from "@/content/dailyArchive";
 import { getChapterLevels } from "@/content/chapters";
 import { createDefaultSave } from "@/entities/save/schema";
 import { starsForAccuracy } from "@/shared/lib/progression";
@@ -112,6 +113,30 @@ describe("gameStore analytics", () => {
         durationBucket: "120_179s"
       })
     );
+  });
+
+  it("keeps daily completion out of campaign progression", () => {
+    const dailyLevel = dailyArchiveLevels[0];
+
+    useGameStore.getState().startLevel(dailyLevel.id, "daily");
+    useGameStore.setState((state) => ({
+      saveData: {
+        ...state.saveData,
+        inProgress: {
+          levelId: dailyLevel.id,
+          foundDifferenceIds: dailyLevel.differences.map((difference) => difference.id),
+          elapsedActiveSeconds: 75,
+          mistakes: 0
+        }
+      }
+    }));
+
+    useGameStore.getState().completeLevel(dailyLevel.id, 75, "daily");
+
+    expect(useGameStore.getState().saveData.completedLevels).toEqual([]);
+    expect(
+      window.__artifactAnalyticsEvents?.some((event) => event.event === "campaign_progress")
+    ).toBe(false);
   });
 });
 
