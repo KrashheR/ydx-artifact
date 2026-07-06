@@ -405,6 +405,57 @@
     "ru": "Русский",
     "en": "English"
   },
+  "homeHub": {
+    "eyebrow": "АРХИВНЫЙ ХАБ",
+    "title": "Архив экспедиций",
+    "subtitle": "Продолжайте текущее дело, проверяйте архив дня и сверяйте внесенные находки с одного рабочего стола.",
+    "totalProgress": "Архив восстановлен {{done}} / {{total}}",
+    "hints": "Запас подсказок",
+    "hintsShort": "подсказ.",
+    "save": {
+      "idle": "Локальный архив",
+      "saving": "Сохранение",
+      "saved": "Сохранено",
+      "localOnly": "Локально"
+    },
+    "currentCase": {
+      "eyebrow": "ТЕКУЩЕЕ ДЕЛО",
+      "completeEyebrow": "ДЕЛО ВОССТАНОВЛЕНО",
+      "caseNumber": "№ 013-Б",
+      "restored": "Восстановлено {{done}} / {{total}} снимков",
+      "nextPoint": "Следующая точка:",
+      "toFind": "До находки: {{count}} ур.",
+      "nextCaseUnlocked": "Следующее дело разблокировано",
+      "closed": "Архив дела",
+      "continue": "Продолжить экспедицию",
+      "openReport": "Открыть карту дела"
+    },
+    "daily": {
+      "eyebrow": "АРХИВ ДНЯ",
+      "streak": "{{count}} ДН.",
+      "reward": "Награда: +1 подсказка",
+      "claimed": "Архив дня уже сверен",
+      "open": "Открыть",
+      "claimedCta": "Собрано"
+    },
+    "archive": {
+      "tab": "АРХИВ",
+      "eyebrow": "ПОЛЕВОЙ АРХИВ",
+      "progress": "Внесено находок: {{done}} / {{total}}",
+      "open": "Открыть архив находок"
+    },
+    "campaigns": {
+      "eyebrow": "КАМПАНИИ",
+      "progress": "{{done}}/{{total}} · в деле",
+      "nearest": "Ближайшее дело:"
+    },
+    "campaignStatus": {
+      "in_progress": "В ПРОЦЕССЕ",
+      "available": "НОВОЕ",
+      "completed": "ГОТОВО",
+      "locked": "ЗАКРЫТО"
+    }
+  },
   "campaigns": {
     "supra": "ТАЙНЫ ЭКСПЕДИЦИЙ",
     "campaignLabel": "ЭКСПЕДИЦИЯ",

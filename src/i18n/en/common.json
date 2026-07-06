@@ -405,6 +405,57 @@
     "ru": "Русский",
     "en": "English"
   },
+  "homeHub": {
+    "eyebrow": "ARCHIVE HUB",
+    "title": "Expedition Archive",
+    "subtitle": "Continue the active case, check the daily archive and review filed finds from one desk.",
+    "totalProgress": "Archive restored {{done}} / {{total}}",
+    "hints": "Hint balance",
+    "hintsShort": "hints",
+    "save": {
+      "idle": "Local archive",
+      "saving": "Saving",
+      "saved": "Saved",
+      "localOnly": "Local only"
+    },
+    "currentCase": {
+      "eyebrow": "CURRENT CASE",
+      "completeEyebrow": "CASE RESTORED",
+      "caseNumber": "No. 013-B",
+      "restored": "Restored {{done}} / {{total}} photos",
+      "nextPoint": "Next point:",
+      "toFind": "{{count}} levels to next find",
+      "nextCaseUnlocked": "Next case unlocked",
+      "closed": "Case archive",
+      "continue": "Continue expedition",
+      "openReport": "Open case map"
+    },
+    "daily": {
+      "eyebrow": "DAILY ARCHIVE",
+      "streak": "{{count}} DAYS",
+      "reward": "Reward: +1 hint",
+      "claimed": "Daily archive already checked",
+      "open": "Open",
+      "claimedCta": "Collected"
+    },
+    "archive": {
+      "tab": "ARCHIVE",
+      "eyebrow": "FIELD ARCHIVE",
+      "progress": "Filed finds: {{done}} / {{total}}",
+      "open": "Open finds archive"
+    },
+    "campaigns": {
+      "eyebrow": "CAMPAIGNS",
+      "progress": "{{done}}/{{total}} · in file",
+      "nearest": "Nearest case:"
+    },
+    "campaignStatus": {
+      "in_progress": "IN PROGRESS",
+      "available": "NEW",
+      "completed": "DONE",
+      "locked": "LOCKED"
+    }
+  },
   "campaigns": {
     "supra": "EXPEDITION MYSTERIES",
     "campaignLabel": "EXPEDITION",

@@ -1,41 +1,52 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ARTIFACT_IDS, TOTAL_ARTIFACTS } from "@/content/artifacts";
-import { chapters, getChapterLevels } from "@/content/chapters";
-import { getChapterPreviewAsset } from "@/content/sceneAssets";
+import {
+  ARTIFACT_IDS,
+  TOTAL_ARTIFACTS,
+  artifactList
+} from "@/content/artifacts";
+import { chapters, getChapterLevels, type ChapterId } from "@/content/chapters";
+import { dailyLevels } from "@/content/levels";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
 import { useGameStore } from "@/shared/store/gameStore";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 type CampaignId = "white" | "sand" | "emerald";
 type CampaignStatus = "available" | "in_progress" | "completed" | "locked";
 
-interface Campaign {
+type Campaign = {
   id: CampaignId;
+  chapterId: ChapterId;
   status: CampaignStatus;
   done: number;
   total: number;
-  lastLevelName?: string | null;
-  nextLevelId?: string;
+  nextLevelTitle: string | null;
   lockHint?: string;
+};
+
+const CAMPAIGN_BY_ID: Record<CampaignId, ChapterId> = {
+  white: "northern-route",
+  sand: "sand-meridian",
+  emerald: "emerald-meridian"
+};
+
+function todaysDailyIndex() {
+  const today = new Date();
+  const seed =
+    today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+  return seed % dailyLevels.length;
 }
 
-// ─── Inline SVG icons ─────────────────────────────────────────────────────────
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
 
 function CompassIcon({ size = 36 }: { size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 36 36"
-      fill="none"
-      aria-hidden="true"
-    >
+    <svg width={size} height={size} viewBox="0 0 36 36" fill="none" aria-hidden="true">
       <circle cx="18" cy="18" r="16" stroke="#B88A45" strokeWidth="1.5" />
       <circle cx="18" cy="18" r="2" fill="#B88A45" />
-      <polygon points="18,6 20.5,18 18,22 15.5,18" fill="#D8AF63" />
-      <polygon points="18,30 20.5,18 18,14 15.5,18" fill="#879087" />
+      <path d="M18 5.5 21 18l-3 4.5L15 18 18 5.5Z" fill="#D8AF63" />
+      <path d="M18 30.5 21 18l-3-4.5L15 18l3 12.5Z" fill="#879087" />
       <text
         x="18"
         y="11"
@@ -52,266 +63,113 @@ function CompassIcon({ size = 36 }: { size?: number }) {
 
 function SettingsGearIcon() {
   return (
-    <svg
-      width="19"
-      height="19"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      aria-hidden="true"
-    >
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="12" cy="12" r="3.2" />
-      <path d="M19.4 13a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
+      <path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2-1.2L14.2 3h-4l-.4 2.5a7 7 0 0 0-2 1.2l-2.3-1-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2 1.2l.4 2.5h4l.4-2.5a7 7 0 0 0 2-1.2l2.3 1 2-3.4-2-1.5c.06-.4.1-.8.1-1.2Z" />
     </svg>
   );
 }
 
-function LockIcon({
-  size = 18,
-  color = "#879087",
+function LockIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="5" y="11" width="14" height="9" rx="1.6" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+    </svg>
+  );
+}
+
+function CheckIcon({ size = 14, color = "#6FC69E" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 12l5 5L20 6" />
+    </svg>
+  );
+}
+
+function LightbulbIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M9 18h6" />
+      <path d="M10 21h4" />
+      <path d="M12 3a6.5 6.5 0 0 0-3.8 11.8c.6.5 1.3 1.3 1.3 2.2h5a2.7 2.7 0 0 1 1.3-2.2A6.5 6.5 0 0 0 12 3Z" />
+    </svg>
+  );
+}
+
+function CalendarIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M7 3v4M17 3v4M4 9h16" />
+      <rect x="4" y="5" width="16" height="16" rx="2" />
+    </svg>
+  );
+}
+
+function FlameIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="#D8AF63" aria-hidden="true">
+      <path d="M12 2c1 4-3 5-3 9a3 3 0 0 0 6 0c0-2-1-3-1-5 3 2 5 5 5 8a7 7 0 0 1-14 0c0-6 6-8 7-12Z" />
+    </svg>
+  );
+}
+
+function FolderIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 7h6l2 2h8v10H4Z" />
+    </svg>
+  );
+}
+
+function PlayIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M7 4.5v15l13-7.5Z" />
+    </svg>
+  );
+}
+
+function MapIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4Z" />
+      <path d="M9 4v13M15 6.5v13" />
+    </svg>
+  );
+}
+
+function PinIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z" />
+      <circle cx="12" cy="10" r="2.4" />
+    </svg>
+  );
+}
+
+function SegmentBar({
+  done,
+  total,
+  complete = false
 }: {
-  size?: number;
-  color?: string;
+  done: number;
+  total: number;
+  complete?: boolean;
 }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 18 18"
-      fill="none"
-      aria-hidden="true"
-    >
-      <rect
-        x="3"
-        y="8"
-        width="12"
-        height="9"
-        rx="2"
-        stroke={color}
-        strokeWidth="1.6"
-      />
-      <path
-        d="M6 8V6a3 3 0 0 1 6 0v2"
-        stroke={color}
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function CheckIcon({
-  size = 14,
-  color = "#6FC69E",
-}: {
-  size?: number;
-  color?: string;
-}) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 14 14"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M2 7l3.5 3.5L12 4"
-        stroke={color}
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function SnowflakeIcon({ size = 20 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 20 20"
-      fill="none"
-      aria-hidden="true"
-    >
-      <line
-        x1="10"
-        y1="2"
-        x2="10"
-        y2="18"
-        stroke="#D5C39A"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-      />
-      <line
-        x1="2"
-        y1="10"
-        x2="18"
-        y2="10"
-        stroke="#D5C39A"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-      />
-      <line
-        x1="4"
-        y1="4"
-        x2="16"
-        y2="16"
-        stroke="#D5C39A"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-      />
-      <line
-        x1="16"
-        y1="4"
-        x2="4"
-        y2="16"
-        stroke="#D5C39A"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-      />
-      <circle cx="10" cy="10" r="2" fill="#D5C39A" />
-    </svg>
-  );
-}
-
-function SunIcon({ size = 20 }: { size?: number }) {
-  const rays = [0, 45, 90, 135, 180, 225, 270, 315];
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 20 20"
-      fill="none"
-      aria-hidden="true"
-    >
-      <circle cx="10" cy="10" r="3.5" stroke="#D5C39A" strokeWidth="1.4" />
-      {rays.map((angle) => {
-        const rad = (angle * Math.PI) / 180;
-        const x1 = 10 + 5 * Math.cos(rad);
-        const y1 = 10 + 5 * Math.sin(rad);
-        const x2 = 10 + 8 * Math.cos(rad);
-        const y2 = 10 + 8 * Math.sin(rad);
-        return (
-          <line
-            key={angle}
-            x1={x1}
-            y1={y1}
-            x2={x2}
-            y2={y2}
-            stroke="#D5C39A"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-          />
-        );
-      })}
-    </svg>
-  );
-}
-
-function LeafIcon({ size = 20 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 20 20"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M10 18C10 18 3 13 3 8C3 4.5 6.5 2 10 2C13.5 2 17 4.5 17 8C17 13 10 18 10 18Z"
-        stroke="#D5C39A"
-        strokeWidth="1.4"
-        fill="none"
-      />
-      <line
-        x1="10"
-        y1="18"
-        x2="10"
-        y2="8"
-        stroke="#D5C39A"
-        strokeWidth="1.2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-// ─── Preview backgrounds ──────────────────────────────────────────────────────
-
-const PREVIEW_BG: Record<CampaignId, string> = {
-  white:
-    "radial-gradient(ellipse at 50% -10%, #9FBAC3 0%, #274659 45%, #152431 100%)",
-  sand: "linear-gradient(180deg, #3A2C18 0%, #7A5A2F 50%, #E3C489 100%)",
-  emerald: "linear-gradient(180deg, #0E211A 0%, #1C3A2C 50%, #3C6F52 100%)",
-};
-
-const PREVIEW_IMAGE: Record<CampaignId, string> = {
-  white: getChapterPreviewAsset("northern-route"),
-  sand: getChapterPreviewAsset("sand-meridian"),
-  emerald: getChapterPreviewAsset("emerald-meridian"),
-};
-
-const CAMPAIGN_SYMBOL: Record<
-  CampaignId,
-  (props: { size?: number }) => React.ReactElement
-> = {
-  white: SnowflakeIcon,
-  sand: SunIcon,
-  emerald: LeafIcon,
-};
-
-// ─── Status badge colours ─────────────────────────────────────────────────────
-
-const STATUS_STYLE: Record<
-  CampaignStatus,
-  { accent: string; bg: string; border: string; text: string }
-> = {
-  in_progress: {
-    accent: "#D8AF63",
-    bg: "rgba(31,28,21,.72)",
-    border: "rgba(216,175,99,.44)",
-    text: "#F0D9A4",
-  },
-  available: {
-    accent: "#6FC69E",
-    bg: "rgba(23,38,32,.72)",
-    border: "rgba(111,198,158,.42)",
-    text: "#BCE7D0",
-  },
-  completed: {
-    accent: "#9BD9BB",
-    bg: "rgba(23,40,33,.72)",
-    border: "rgba(155,217,187,.42)",
-    text: "#CDEFD9",
-  },
-  locked: {
-    accent: "#879087",
-    bg: "rgba(31,35,33,.72)",
-    border: "rgba(135,144,135,.36)",
-    text: "#C8C5B8",
-  },
-};
-
-// ─── Segmented progress bar ───────────────────────────────────────────────────
-
-function SegmentBar({ done, total = 13 }: { done: number; total?: number }) {
-  const complete = done === total;
-  return (
-    <div className="flex gap-[3px]">
-      {Array.from({ length: total }, (_, i) => (
-        <div
-          key={i}
-          className="h-[7px] flex-1 rounded-[2px]"
+    <div className="flex gap-[3px]" aria-hidden="true">
+      {Array.from({ length: total }, (_, index) => (
+        <span
+          key={index}
+          className="h-[6px] flex-1 rounded-[2px]"
           style={{
             background:
-              i < done
+              index < done
                 ? complete
                   ? "linear-gradient(180deg,#6FC69E,#2F6A57)"
                   : "linear-gradient(180deg,#D8AF63,#A9762F)"
-                : "rgba(213,195,154,0.10)",
+                : "rgba(213,195,154,.1)"
           }}
         />
       ))}
@@ -319,81 +177,27 @@ function SegmentBar({ done, total = 13 }: { done: number; total?: number }) {
   );
 }
 
-// ─── Status badge ─────────────────────────────────────────────────────────────
-
-function StatusBadge({
-  status,
-  label,
-}: {
-  status: CampaignStatus;
-  label: string;
-}) {
-  const s = STATUS_STYLE[status];
-  return (
-    <span
-      className="absolute left-2 top-2 inline-flex max-w-[calc(100%-16px)] items-center gap-1.5 rounded-[5px] border py-[3px] pl-[6px] pr-[8px] text-[9px] font-bold uppercase leading-none tracking-[.07em] sm:left-2.5 sm:top-2.5 sm:py-[4px] sm:pl-[7px] sm:pr-[9px] sm:text-[10px] md:hidden"
-      style={{
-        background: s.bg,
-        borderColor: s.border,
-        backdropFilter: "blur(8px)",
-        boxShadow: "0 4px 12px rgba(0,0,0,.24)",
-        color: s.text,
-        textShadow: "0 1px 1px rgba(0,0,0,.55)",
-      }}
-    >
-      <span
-        className="h-[10px] w-[2px] flex-shrink-0 rounded-full sm:h-[11px]"
-        style={{ background: s.accent }}
-      />
-      {label}
-    </span>
-  );
-}
-
-// ─── Lock info box ────────────────────────────────────────────────────────────
-
-function LockInfoBox({ reason, hint }: { reason: string; hint: string }) {
-  return (
-    <div
-      className="home-lock-info flex items-start gap-2.5 rounded-[8px] px-3 py-2.5"
-      style={{
-        background: "rgba(135,144,135,0.08)",
-        border: "1px solid rgba(213,195,154,0.08)",
-      }}
-    >
-      <span className="mt-[1px] flex-shrink-0">
-        <LockIcon size={15} color="#879087" />
-      </span>
-      <div>
-        <p className="text-[12.5px] leading-[1.5] text-exp-parch/70">
-          {reason}
-        </p>
-        <p className="mt-0.5 text-[11px] text-exp-muted">{hint}</p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Brass primary button ─────────────────────────────────────────────────────
-
-function BrassButton({
-  onClick,
-  height = 46,
+function PrimaryButton({
   children,
+  onClick,
+  className = "",
+  disabled = false
 }: {
-  onClick?: () => void;
-  height?: number;
   children: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
+  disabled?: boolean;
 }) {
   return (
     <button
+      type="button"
       onClick={onClick}
-      className="flex w-full items-center justify-center rounded-[8px] text-[14px] font-bold text-[#1A130A] transition hover:opacity-90 active:opacity-80"
+      disabled={disabled}
+      className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[7px] px-5 text-[13.5px] font-extrabold text-[#1A130A] transition hover:brightness-105 active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass disabled:cursor-not-allowed disabled:opacity-45 ${className}`}
       style={{
-        height,
-        background: "linear-gradient(180deg,#D8AF63,#B88A45)",
+        background: "linear-gradient(180deg,#D8AF63,#B3812F)",
         boxShadow:
-          "0 8px 20px rgba(184,138,69,0.28), inset 0 1px 0 rgba(255,255,255,0.3)",
+          "0 8px 18px rgba(184,138,69,.25), inset 0 1px 0 rgba(255,255,255,.3)"
       }}
     >
       {children}
@@ -401,178 +205,76 @@ function BrassButton({
   );
 }
 
-// ─── Round icon button ────────────────────────────────────────────────────────
-
-// ─── Top bar ─────────────────────────────────────────────────────────────────
-
-function CarouselArrow({
-  direction,
-  label,
+function SecondaryButton({
+  children,
   onClick,
+  className = ""
 }: {
-  direction: "previous" | "next";
-  label: string;
-  onClick: () => void;
+  children: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
 }) {
-  const isPrevious = direction === "previous";
-
   return (
     <button
       type="button"
-      aria-label={label}
       onClick={onClick}
-      className={`absolute top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border transition active:scale-95 ${
-        isPrevious ? "left-2" : "right-2"
-      }`}
-      style={{
-        background: "rgba(21,27,24,0.78)",
-        borderColor: "rgba(213,195,154,0.2)",
-        boxShadow: "0 10px 24px rgba(0,0,0,.34)",
-      }}
+      className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[7px] border border-exp-parch/[.2] bg-exp-parch/[.05] px-4 text-[13px] font-semibold text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass ${className}`}
     >
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 20 20"
-        fill="none"
-        aria-hidden="true"
-        className={isPrevious ? "" : "rotate-180"}
-      >
-        <path
-          d="M12.5 4.5 7 10l5.5 5.5"
-          stroke="#D8AF63"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      {children}
     </button>
   );
 }
 
-function CollectionChestIcon() {
-  return (
-    <svg
-      width="19"
-      height="19"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M4 7h6l2 2h8v10H4z" />
-      <circle cx="12" cy="14" r="1.6" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
 function TopBar({
-  totalDone,
-  totalAll,
-  collectionDone,
-  collectionTotal,
-  collectionHasNew,
-  onOpenCollection,
-  onOpenSettings,
+  magnifiers,
+  saveState,
+  onOpenSettings
 }: {
-  totalDone: number;
-  totalAll: number;
-  collectionDone: number;
-  collectionTotal: number;
-  collectionHasNew: boolean;
-  onOpenCollection: () => void;
+  magnifiers: number;
+  saveState: "idle" | "saving" | "saved" | "local-only";
   onOpenSettings: () => void;
 }) {
   const { t } = useTranslation();
+  const saveKey = saveState === "local-only" ? "localOnly" : saveState;
 
   return (
-    <header
-      className="app-screen-topbar home-topbar flex items-center justify-between px-5 md:px-10"
-      style={{
-        height: 78,
-        borderBottom: "1px solid rgba(213,195,154,0.12)",
-      }}
-    >
-      {/* Logo */}
-      <div className="flex items-center gap-3">
+    <header className="home-topbar app-screen-topbar flex h-[70px] items-center justify-between px-5 md:px-10">
+      <div className="flex min-w-0 items-center gap-3">
         <CompassIcon size={34} />
-        <div className="leading-none">
-          <p className="text-[9px] font-bold uppercase tracking-[.28em] text-exp-brass2">
+        <div className="min-w-0 leading-none">
+          <p className="text-[9px] font-bold uppercase tracking-[.28em] text-exp-brass">
             {t("campaigns.supra")}
           </p>
-          <p className="mt-[3px] text-[12px] font-medium text-exp-parch/80">
+          <p className="mt-[3px] truncate text-[12px] font-medium text-exp-parch/80">
             {t("app.title")}
           </p>
         </div>
       </div>
 
-      {/* Right cluster */}
-      <div className="flex items-center gap-3 md:gap-4">
-        {/* Overall progress (desktop only) */}
-        <div className="hidden flex-col items-end gap-1 md:flex">
-          <div className="flex items-center gap-2.5">
-            <span className="text-[10px] font-semibold uppercase tracking-[.2em] text-exp-muted">
-              {t("campaigns.totalDone")}
-            </span>
-            <span className="font-jetbrains text-[13px] font-semibold text-exp-brass2">
-              {t("campaigns.totalProgress", { done: totalDone, total: totalAll })}
-            </span>
-          </div>
-          <div
-            className="h-[5px] w-40 overflow-hidden rounded-full"
-            style={{ background: "rgba(213,195,154,0.12)" }}
-          >
-            <div
-              className="h-full rounded-full transition-all duration-700"
-              style={{
-                width: `${Math.min(100, Math.round((totalDone / totalAll) * 100))}%`,
-                background: "linear-gradient(90deg,#B88A45,#D8AF63)",
-              }}
-            />
-          </div>
+      <div className="flex items-center gap-2.5 sm:gap-4">
+        <div className="hidden items-center gap-2 text-[11px] font-semibold text-exp-muted sm:flex">
+          <span
+            className={`h-2 w-2 rounded-full ${saveState === "saving" ? "animate-pulse bg-exp-brass2" : "bg-exp-success"}`}
+            aria-hidden="true"
+          />
+          <span>{t(`homeHub.save.${saveKey}`)}</span>
         </div>
-
-        {/* Vertical divider (desktop) */}
         <div
-          className="hidden h-6 w-px md:block"
-          style={{ background: "rgba(213,195,154,0.15)" }}
-        />
-        <button
-          type="button"
-          onClick={onOpenCollection}
-          aria-label={t("actions.collection")}
-          title={t("actions.collection")}
-          className="relative flex h-11 shrink-0 items-center gap-2 rounded-[9px] px-3 text-exp-brass2 transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
-          style={{
-            border: "1px solid rgba(184,138,69,.4)",
-            background: "rgba(184,138,69,.08)",
-          }}
+          className="flex h-10 items-center gap-2 rounded-[8px] border border-exp-brass/[.35] bg-exp-brass/[.08] px-3 text-exp-brass2"
+          title={t("homeHub.hints")}
         >
-          <CollectionChestIcon />
-          <span className="hidden font-jetbrains text-[12px] font-semibold sm:inline">
-            {collectionDone} / {collectionTotal}
+          <LightbulbIcon size={16} />
+          <span className="font-jetbrains text-[13px] font-bold">{magnifiers}</span>
+          <span className="hidden text-[11px] font-semibold text-exp-parch/75 sm:inline">
+            {t("homeHub.hintsShort")}
           </span>
-          {collectionHasNew && (
-            <span
-              className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full"
-              style={{ background: "#c0533a", boxShadow: "0 0 0 2px #151B18" }}
-              aria-hidden="true"
-            />
-          )}
-        </button>
+        </div>
         <button
           type="button"
           onClick={onOpenSettings}
           aria-label={t("actions.settings")}
           title={t("actions.settings")}
-          className="home-settings-button flex h-11 w-11 shrink-0 items-center justify-center rounded-[9px] text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
-          style={{
-            border: "1px solid rgba(213,195,154,.14)",
-            background: "rgba(213,195,154,.05)",
-          }}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[9px] border border-exp-parch/[.14] bg-exp-parch/[.05] text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
         >
           <SettingsGearIcon />
         </button>
@@ -581,565 +283,448 @@ function TopBar({
   );
 }
 
-// ─── Route sequence ───────────────────────────────────────────────────────────
-
-function RouteSequence({
-  statuses,
-  labels,
-}: {
-  statuses: CampaignStatus[];
-  labels: string[];
-}) {
-  const isActive = (s: CampaignStatus) =>
-    s === "available" || s === "in_progress" || s === "completed";
-
-  return (
-    <div className="flex items-center justify-center py-5">
-      {statuses.map((status, i) => (
-        <div key={i} className="flex items-center">
-          {i > 0 && (
-            <div
-              className="mb-[22px] h-[2px] w-[120px]"
-              style={{
-                background:
-                  isActive(statuses[i - 1]) && isActive(status)
-                    ? "linear-gradient(90deg,#B3812F,#D8AF63)"
-                    : isActive(statuses[i - 1])
-                      ? "linear-gradient(90deg,#B3812F,rgba(213,195,154,.14))"
-                      : "rgba(213,195,154,.14)",
-              }}
-            />
-          )}
-          <div className="flex flex-col items-center gap-2">
-            <div
-              className="flex h-[34px] w-[34px] items-center justify-center rounded-full font-manrope text-[13px] font-bold"
-              style={
-                isActive(status)
-                  ? {
-                      background: "linear-gradient(180deg,#D8AF63,#B3812F)",
-                      border: "1px solid rgba(216,175,99,.45)",
-                      boxShadow: "0 0 14px rgba(216,175,99,.35)",
-                      color: "#1A130A",
-                    }
-                  : {
-                      background: "rgba(213,195,154,.06)",
-                      border: "1px solid rgba(213,195,154,.16)",
-                      color: "#879087",
-                    }
-              }
-            >
-              {status === "completed" ? (
-                <CheckIcon size={14} color="#151B18" />
-              ) : status === "locked" ? (
-                <LockIcon size={14} color="#879087" />
-              ) : (
-                i + 1
-              )}
-            </div>
-            <span className="text-[9px] font-bold uppercase tracking-[.12em] text-exp-muted">
-              {labels[i]}
-            </span>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ─── Desktop campaign card ────────────────────────────────────────────────────
-
-function DesktopCard({
+function CurrentCaseCard({
   campaign,
   onContinue,
-  isLandscapeCarouselActive = true,
+  onOpenMap
 }: {
   campaign: Campaign;
   onContinue: () => void;
-  isLandscapeCarouselActive?: boolean;
+  onOpenMap: () => void;
 }) {
   const { t } = useTranslation();
-  const locked = campaign.status === "locked";
-  const isHighlighted =
-    campaign.status === "in_progress" || campaign.status === "available";
-  const Symbol = CAMPAIGN_SYMBOL[campaign.id];
+  const complete = campaign.status === "completed";
+  const almostComplete = campaign.total - campaign.done <= 2 && !complete;
 
   return (
-    <div
-      aria-hidden={!isLandscapeCarouselActive}
-      className={`home-campaign-card flex flex-1 flex-col overflow-hidden rounded-[12px] transition-all duration-300 hover:-translate-y-0.5 ${
-        isLandscapeCarouselActive
-          ? "home-campaign-card--landscape-active"
-          : "home-campaign-card--landscape-inactive"
-      }`}
-      style={{
-        background: locked ? "#171D1A" : "#1C2420",
-        border: isHighlighted
-          ? "1px solid rgba(184,138,69,0.28)"
-          : "1px solid rgba(213,195,154,0.08)",
-        boxShadow: isHighlighted
-          ? "0 22px 50px rgba(0,0,0,.42)"
-          : "0 16px 38px rgba(0,0,0,.32)",
-      }}
-    >
-      {/* Preview */}
-      <div
-        className="relative h-[216px] overflow-hidden flex-shrink-0"
-        style={{ background: PREVIEW_BG[campaign.id] }}
-      >
-        <img
-          src={PREVIEW_IMAGE[campaign.id]}
-          alt=""
-          className={`absolute inset-0 h-full w-full object-cover ${
-            locked ? "home-campaign-preview-image--locked" : ""
-          }`}
-          draggable={false}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg,transparent 50%,rgba(13,20,26,0.7) 100%)",
-          }}
-        />
-
-        <StatusBadge
-          status={campaign.status}
-          label={t(`campaigns.status.${campaign.status}`)}
-        />
-
-        {locked ? (
-          <>
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "radial-gradient(circle,rgba(21,27,24,.18),rgba(21,27,24,.66))",
-              }}
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div
-                className="flex h-[74px] w-[74px] items-center justify-center rounded-full"
-                style={{
-                  background:
-                    "radial-gradient(circle,rgba(40,50,45,0.88),rgba(21,27,24,0.96))",
-                  boxShadow: "0 0 0 2px rgba(213,195,154,0.12)",
-                }}
-              >
-                <LockIcon size={28} color="#879087" />
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <div
-              className="absolute right-3 top-3 flex h-[38px] w-[38px] items-center justify-center rounded-full md:hidden"
-              style={{ background: "rgba(21,27,24,.62)" }}
-            >
-              <Symbol size={20} />
-            </div>
-            <p className="absolute bottom-2.5 right-3 text-[10px] font-bold tracking-[.12em] text-exp-parch/70">
-              {t("campaigns.levelCount", { count: campaign.total })}
-            </p>
-          </>
-        )}
-      </div>
-
-      {/* Card body */}
-      <div className="flex flex-1 flex-col p-[18px_20px_20px]">
-        {/* Title row */}
-        <div className="flex items-baseline justify-between gap-2">
-          <h2 className="font-cormorant text-[27px] font-semibold leading-tight text-exp-parch md:text-[20px]">
-            {t(`campaigns.${campaign.id}.title`)}
-          </h2>
-          {!locked && (
-            <span
-              className="home-campaign-progress flex-shrink-0 font-jetbrains font-semibold text-exp-brass2"
-              style={{ fontSize: 15 }}
-            >
-              {String(campaign.done).padStart(2, "0")}
-              <span className="text-[13px] font-medium text-exp-muted">
-                {" "}
-                / {String(campaign.total).padStart(2, "0")}
-              </span>
-            </span>
-          )}
-        </div>
-
-        {/* Description */}
-        <p
-          className={`mt-2 min-h-[39px] text-[13.5px] leading-[1.55] ${
-            locked ? "text-[#7F887F]" : "text-[#9AA39A]"
-          }`}
-        >
-          {t(`campaigns.${campaign.id}.description`)}
-        </p>
-
-        {/* Footer section */}
-        <div className="flex flex-1 flex-col pt-4">
-          {!locked ? (
-            <>
-              <SegmentBar done={campaign.done} total={campaign.total} />
-              {campaign.lastLevelName && (
-                <p className="mt-2 text-[11px] text-exp-muted">
-                  {t("campaigns.lastLevel", { name: campaign.lastLevelName })}
-                </p>
-              )}
-              <div className="mt-auto pt-4">
-                <BrassButton onClick={onContinue} height={46}>
-                  {campaign.status === "in_progress"
-                    ? t("actions.continue")
-                    : t("actions.start")}
-                </BrassButton>
-              </div>
-            </>
-          ) : (
-            <>
-              <LockInfoBox
-                reason={t(`campaigns.${campaign.id}.lockReason`)}
-                hint={campaign.lockHint ?? ""}
-              />
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Mobile full card (active campaign) ──────────────────────────────────────
-
-function MobileFullCard({
-  campaign,
-  onContinue,
-}: {
-  campaign: Campaign;
-  onContinue: () => void;
-}) {
-  const { t } = useTranslation();
-  const Symbol = CAMPAIGN_SYMBOL[campaign.id];
-  const locked = campaign.status === "locked";
-
-  return (
-    <div
-      className="flex min-h-[360px] flex-col overflow-hidden rounded-[12px]"
+    <section
+      className="home-case-card relative flex min-h-[320px] flex-col overflow-hidden rounded-[12px] border p-5 sm:p-6"
       style={{
         background: "#222A25",
-        border: locked
-          ? "1px solid rgba(213,195,154,0.10)"
-          : "1px solid rgba(184,138,69,0.28)",
-        boxShadow: locked
-          ? "0 12px 30px rgba(0,0,0,.3)"
-          : "0 16px 38px rgba(0,0,0,.32)",
+        borderColor: almostComplete
+          ? "rgba(216,175,99,.5)"
+          : complete
+            ? "rgba(111,198,158,.4)"
+            : "rgba(184,138,69,.3)",
+        boxShadow: "0 14px 32px rgba(0,0,0,.32)"
       }}
     >
-      {/* Preview */}
       <div
-        className="relative h-[128px] overflow-hidden"
-        style={{ background: PREVIEW_BG[campaign.id] }}
-      >
-        <img
-          src={PREVIEW_IMAGE[campaign.id]}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover"
-          draggable={false}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg,transparent 50%,rgba(13,20,26,0.7) 100%)",
-          }}
-        />
-        <StatusBadge
-          status={campaign.status}
-          label={t(`campaigns.status.${campaign.status}`)}
-        />
-        {locked ? (
-          <>
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "radial-gradient(circle,rgba(21,27,24,.18),rgba(21,27,24,.66))",
-              }}
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div
-                className="flex h-[58px] w-[58px] items-center justify-center rounded-full"
-                style={{
-                  background:
-                    "radial-gradient(circle,rgba(40,50,45,0.88),rgba(21,27,24,0.96))",
-                  boxShadow: "0 0 0 2px rgba(213,195,154,0.12)",
-                }}
-              >
-                <LockIcon size={23} color="#879087" />
-              </div>
-            </div>
-          </>
-        ) : (
-          <div
-            className="absolute right-3 top-3 flex h-[34px] w-[34px] items-center justify-center rounded-full"
-            style={{ background: "rgba(21,27,24,.62)" }}
-          >
-            <Symbol size={18} />
-          </div>
-        )}
+        className="absolute inset-x-0 top-0 h-[3px]"
+        style={{
+          background: complete
+            ? "linear-gradient(90deg,#6FC69E,#2F6A57)"
+            : "linear-gradient(90deg,#D8AF63,#A9762F)"
+        }}
+      />
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-bold uppercase tracking-[.26em] text-exp-brass">
+          {complete ? t("homeHub.currentCase.completeEyebrow") : t("homeHub.currentCase.eyebrow")}
+        </span>
+        <span className="rounded-[4px] border border-exp-parch/[.16] px-2 py-0.5 font-jetbrains text-[10px] text-exp-muted">
+          {t("homeHub.currentCase.caseNumber")}
+        </span>
       </div>
-
-      {/* Body */}
-      <div className="flex flex-1 flex-col p-4">
-        <div className="flex items-baseline justify-between gap-2">
-          <h2 className="font-cormorant text-[22px] font-semibold text-exp-parch">
-            {t(`campaigns.${campaign.id}.title`)}
-          </h2>
-          <span className="flex-shrink-0 text-[15px] font-bold text-exp-brass">
-            {String(campaign.done).padStart(2, "0")}{" "}
-            <span className="text-[11px] font-medium text-exp-muted">
-              / {String(campaign.total).padStart(2, "0")}
+      <h1 className="mt-3 font-cormorant text-[38px] font-semibold leading-none text-exp-parch sm:text-[46px]">
+        {t(`campaigns.${campaign.id}.title`)}
+      </h1>
+      <p className="mt-2 text-[13px] font-medium leading-[1.5] text-exp-muted">
+        {t("homeHub.currentCase.restored", {
+          done: campaign.done,
+          total: campaign.total
+        })}
+      </p>
+      <div className="mt-4">
+        <SegmentBar done={campaign.done} total={campaign.total} complete={complete} />
+      </div>
+      <div className="mt-5 flex flex-col gap-2 text-[12px] font-medium text-exp-muted">
+        <div className="flex items-center gap-2">
+          <span className="text-exp-brass2">
+            <PinIcon />
+          </span>
+          <span>
+            {t("homeHub.currentCase.nextPoint")}{" "}
+            <span className="font-semibold text-exp-parch">
+              {campaign.nextLevelTitle ?? t("homeHub.currentCase.closed")}
             </span>
           </span>
         </div>
-
-        <p className="mt-2 text-[12px] leading-[1.55] text-exp-muted">
-          {t(`campaigns.${campaign.id}.description`)}
-        </p>
-
-        {!locked && (
-          <div className="mt-3">
-            <SegmentBar done={campaign.done} total={campaign.total} />
-            {campaign.lastLevelName && (
-              <p className="mt-1.5 text-[11px] text-exp-muted">
-                {t("campaigns.lastLevel", { name: campaign.lastLevelName })}
-              </p>
-            )}
-          </div>
-        )}
-
-        <div className="mt-auto pt-3">
-          {locked ? (
-            <LockInfoBox
-              reason={t(`campaigns.${campaign.id}.lockReason`)}
-              hint={campaign.lockHint ?? ""}
-            />
-          ) : (
-            <BrassButton onClick={onContinue} height={50}>
-              {campaign.status === "in_progress"
-                ? t("actions.continue")
-                : t("actions.start")}
-            </BrassButton>
-          )}
+        <div className="flex items-center gap-2">
+          <span className="text-exp-brass2">
+            <FolderIcon size={13} />
+          </span>
+          <span>
+            {complete
+              ? t("homeHub.currentCase.nextCaseUnlocked")
+              : t("homeHub.currentCase.toFind", {
+                  count: Math.max(1, campaign.total - campaign.done)
+                })}
+          </span>
         </div>
       </div>
+      <div className="mt-auto flex gap-2 pt-6">
+        <PrimaryButton onClick={onContinue} className="flex-1">
+          <PlayIcon />
+          {complete ? t("homeHub.currentCase.openReport") : t("homeHub.currentCase.continue")}
+        </PrimaryButton>
+        <SecondaryButton onClick={onOpenMap} className="w-[52px] px-0" >
+          <MapIcon />
+        </SecondaryButton>
+      </div>
+    </section>
+  );
+}
+
+function DailyArchiveCard({
+  title,
+  streak,
+  claimed,
+  onOpen
+}: {
+  title: string;
+  streak: number;
+  claimed: boolean;
+  onOpen: () => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <section className="flex min-h-[168px] flex-col rounded-[12px] border border-exp-parch/[.14] bg-exp-panel p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-exp-brass">
+          <CalendarIcon size={15} />
+          <span className="text-[10px] font-bold uppercase tracking-[.2em]">
+            {t("homeHub.daily.eyebrow")}
+          </span>
+        </div>
+        <span className="inline-flex h-[22px] items-center gap-1 rounded-[5px] border border-exp-brass/[.35] bg-exp-brass/[.14] px-2 text-[9px] font-bold text-exp-brass2">
+          <FlameIcon size={11} />
+          {t("homeHub.daily.streak", { count: streak })}
+        </span>
+      </div>
+      <h2 className="mt-3 font-cormorant text-[23px] font-semibold leading-tight text-exp-parch">
+        {title}
+      </h2>
+      <p className="mt-1 text-[12px] font-medium text-exp-muted">
+        {claimed ? t("homeHub.daily.claimed") : t("homeHub.daily.reward")}
+      </p>
+      <div className="mt-auto pt-4">
+        <PrimaryButton onClick={onOpen} disabled={claimed} className="w-full min-h-[40px] text-[12px]">
+          {claimed ? <CheckIcon size={13} color="#1A130A" /> : <LightbulbIcon size={14} />}
+          {claimed ? t("homeHub.daily.claimedCta") : t("homeHub.daily.open")}
+        </PrimaryButton>
+      </div>
+    </section>
+  );
+}
+
+function ArchiveSlot({
+  unlocked,
+  isNew,
+  image,
+  label
+}: {
+  unlocked: boolean;
+  isNew: boolean;
+  image: string;
+  label: string;
+}) {
+  return (
+    <div
+      className="relative flex aspect-square items-center justify-center overflow-hidden rounded-[4px]"
+      style={{
+        background: unlocked
+          ? "#2b2115"
+          : "repeating-linear-gradient(45deg,rgba(184,138,69,.05) 0 6px,rgba(213,195,154,.02) 6px 12px)",
+        border: unlocked
+          ? "1px solid rgba(184,138,69,.4)"
+          : "1px dashed rgba(213,195,154,.22)",
+        boxShadow: unlocked ? "0 3px 8px rgba(0,0,0,.35)" : "none",
+        transform: unlocked ? "rotate(-2deg)" : undefined
+      }}
+      aria-label={label}
+      title={label}
+    >
+      {unlocked ? (
+        <>
+          <img src={image} alt="" className="h-full w-full object-cover" draggable={false} />
+          <span className="absolute bottom-0.5 left-1/2 h-[3px] w-5 -translate-x-1/2 rounded-full bg-exp-success" />
+          {isNew && (
+            <span
+              className="absolute -right-0.5 -top-0.5 h-3.5 w-3.5 rounded-full"
+              style={{
+                background: "radial-gradient(circle at 35% 30%,#C96A44,#832F18)",
+                boxShadow: "0 2px 5px rgba(0,0,0,.5)"
+              }}
+            />
+          )}
+        </>
+      ) : (
+        <span className="flex h-6 w-6 items-center justify-center rounded-full border border-exp-parch/[.18] font-cormorant text-[13px] font-semibold text-[#5D655D]">
+          ?
+        </span>
+      )}
     </div>
   );
 }
 
-// ─── Mobile compact card (locked campaign) ────────────────────────────────────
-
-function MobileCampaignCarousel({
-  campaigns,
-  activeIndex,
-  onSelect,
-  onContinue,
+function FieldArchiveCard({
+  collectionDone,
+  collectionHasNew,
+  artifactStates,
+  onOpen
 }: {
-  campaigns: Campaign[];
-  activeIndex: number;
-  onSelect: (index: number) => void;
-  onContinue: (campaignId: CampaignId) => void;
+  collectionDone: number;
+  collectionHasNew: boolean;
+  artifactStates: Record<string, string>;
+  onOpen: () => void;
 }) {
   const { t } = useTranslation();
-  const selectPrevious = () => {
-    onSelect((activeIndex - 1 + campaigns.length) % campaigns.length);
-  };
-  const selectNext = () => {
-    onSelect((activeIndex + 1) % campaigns.length);
-  };
+  const previewArtifacts = artifactList.slice(0, 8);
 
   return (
-    <div className="px-4 pb-36 pt-5 md:hidden">
-      <div className="relative">
-        <div className="home-mobile-campaign-stage">
-          {campaigns.map((campaign, index) => {
-            const isActive = index === activeIndex;
-
-            return (
-              <div
-                key={campaign.id}
-                aria-hidden={!isActive}
-                className={`home-mobile-campaign-slide ${
-                  isActive
-                    ? "home-mobile-campaign-slide--active"
-                    : "home-mobile-campaign-slide--inactive"
-                }`}
-              >
-                <MobileFullCard
-                  campaign={campaign}
-                  onContinue={() => onContinue(campaign.id)}
-                />
-              </div>
-            );
-          })}
-        </div>
-        <CarouselArrow
-          direction="previous"
-          label={t("actions.previous")}
-          onClick={selectPrevious}
-        />
-        <CarouselArrow
-          direction="next"
-          label={t("actions.next")}
-          onClick={selectNext}
-        />
+    <section className="relative flex min-h-[168px] flex-col rounded-[3px_12px_12px_12px] border border-exp-parch/[.14] bg-exp-panel p-4 pt-5">
+      <div className="absolute -top-[11px] left-3 flex items-center gap-1.5 rounded-[3px_6px_0_0] border border-b-0 border-exp-parch/[.16] bg-[#262E28] px-2 py-[3px] pb-[6px] text-exp-brass">
+        <FolderIcon size={11} />
+        <span className="text-[9px] font-bold uppercase tracking-[.16em]">
+          {t("homeHub.archive.tab")}
+        </span>
       </div>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-[10px] font-bold uppercase tracking-[.2em] text-exp-brass">
+          {t("homeHub.archive.eyebrow")}
+        </h2>
+        <span className="font-jetbrains text-[13px] font-semibold text-exp-brass2">
+          {collectionDone}
+          <span className="text-exp-muted">/{TOTAL_ARTIFACTS}</span>
+        </span>
+      </div>
+      <p className="mt-1 text-[11.5px] font-medium text-exp-muted">
+        {t("homeHub.archive.progress", {
+          done: collectionDone,
+          total: TOTAL_ARTIFACTS
+        })}
+      </p>
+      <div className="mt-3 grid grid-cols-4 gap-2">
+        {previewArtifacts.map((artifact) => {
+          const state = artifactStates[artifact.id] ?? "locked";
+          const unlocked = state !== "locked";
+          return (
+            <ArchiveSlot
+              key={artifact.id}
+              unlocked={unlocked}
+              isNew={state === "newly-unlocked"}
+              image={unlocked ? artifact.openImage : artifact.closedImage}
+              label={t(`artifacts.${artifact.id}.name`)}
+            />
+          );
+        })}
+      </div>
+      <div className="mt-auto pt-4">
+        <SecondaryButton onClick={onOpen} className="relative w-full">
+          {collectionHasNew && (
+            <span className="absolute right-3 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full bg-[#C0533A]" />
+          )}
+          {t("homeHub.archive.open")}
+        </SecondaryButton>
+      </div>
+    </section>
+  );
+}
 
-      <div className="mt-4 flex h-11 items-center justify-center gap-2">
-        {campaigns.map((campaign, index) => (
+function CampaignStatusBadge({ status }: { status: CampaignStatus }) {
+  const { t } = useTranslation();
+  const style =
+    status === "completed"
+      ? "border-exp-success/[.35] bg-exp-success/[.1] text-exp-success"
+      : status === "locked"
+        ? "border-exp-parch/[.18] bg-exp-parch/[.06] text-exp-muted"
+        : status === "available"
+          ? "bg-[#B85C38] text-[#F5EFE0] border-transparent"
+          : "border-exp-success/[.35] bg-exp-success/[.1] text-exp-success";
+
+  return (
+    <span className={`inline-flex h-[20px] items-center rounded-[5px] border px-2 text-[8.5px] font-bold uppercase tracking-[.08em] ${style}`}>
+      {t(`homeHub.campaignStatus.${status}`)}
+    </span>
+  );
+}
+
+function CampaignMiniList({
+  campaigns,
+  onOpenCampaign
+}: {
+  campaigns: Campaign[];
+  onOpenCampaign: (id: CampaignId) => void;
+}) {
+  const { t } = useTranslation();
+  const nearest = campaigns.find((campaign) => campaign.status !== "completed");
+
+  return (
+    <section className="home-campaign-list flex min-h-[320px] flex-col gap-2.5 rounded-[12px] border border-exp-parch/[.1] bg-exp-panel/60 p-4">
+      <span className="text-[10px] font-bold uppercase tracking-[.2em] text-exp-brass">
+        {t("homeHub.campaigns.eyebrow")}
+      </span>
+      {campaigns.map((campaign) => {
+        const locked = campaign.status === "locked";
+        return (
           <button
             key={campaign.id}
             type="button"
-            aria-label={t(`campaigns.${campaign.id}.title`)}
-            aria-current={index === activeIndex ? "true" : undefined}
-            onClick={() => onSelect(index)}
-            className="flex h-11 w-11 items-center justify-center rounded-full"
+            onClick={() => onOpenCampaign(campaign.id)}
+            className="flex min-h-[56px] items-center gap-3 rounded-[9px] border px-3 py-2.5 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+            style={{
+              background: locked ? "rgba(213,195,154,.03)" : "rgba(213,195,154,.05)",
+              borderColor:
+                campaign.status === "in_progress"
+                  ? "rgba(184,138,69,.35)"
+                  : "rgba(213,195,154,.1)"
+            }}
           >
-            <span
-              className="h-2.5 w-2.5 rounded-full transition"
-              style={{
-                background:
-                  index === activeIndex ? "#D8AF63" : "rgba(213,195,154,0.22)",
-                boxShadow:
-                  index === activeIndex
-                    ? "0 0 0 4px rgba(216,175,99,0.12)"
-                    : "none",
-              }}
-            />
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center text-exp-brass2">
+              {campaign.status === "completed" ? (
+                <CheckIcon size={13} />
+              ) : locked ? (
+                <LockIcon size={14} color="#879087" />
+              ) : (
+                <span className="h-2 w-2 rounded-full bg-exp-success" />
+              )}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className={`block truncate text-[13px] font-semibold ${locked ? "text-[#9AA398]" : "text-exp-parch"}`}>
+                {t(`campaigns.${campaign.id}.title`)}
+              </span>
+              <span className={`mt-0.5 block text-[10.5px] ${locked ? "text-[#6D756C]" : "font-jetbrains text-exp-brass2"}`}>
+                {locked
+                  ? campaign.lockHint
+                  : t("homeHub.campaigns.progress", {
+                      done: campaign.done,
+                      total: campaign.total
+                    })}
+              </span>
+            </span>
+            <CampaignStatusBadge status={campaign.status} />
           </button>
-        ))}
+        );
+      })}
+      <div className="mt-auto flex items-center gap-2 pt-2 text-[11px] font-medium text-exp-muted">
+        <span className="text-exp-brass2">
+          <FolderIcon size={13} />
+        </span>
+        <span>
+          {t("homeHub.campaigns.nearest")}{" "}
+          <span className="font-semibold text-exp-brass2">
+            {nearest ? t(`campaigns.${nearest.id}.title`) : t("homeHub.currentCase.closed")}
+          </span>
+        </span>
       </div>
-    </div>
+    </section>
   );
 }
 
-// ─── Main screen ──────────────────────────────────────────────────────────────
+function getCampaignProgress(
+  chapterId: ChapterId,
+  completedLevels: string[],
+  t: ReturnType<typeof useTranslation>["t"]
+) {
+  const levels = getChapterLevels(chapterId);
+  const done = levels.filter((level) => completedLevels.includes(level.id)).length;
+  const nextLevel = levels.find((level) => !completedLevels.includes(level.id));
+  return {
+    done,
+    total: levels.length,
+    nextLevelTitle: nextLevel ? t(nextLevel.titleKey) : null
+  };
+}
 
-export function HomeScreen({
-  onOpenSettings,
-}: {
-  onOpenSettings: () => void;
-}) {
+export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
   const { t } = useTranslation();
-  const navigate = useGameStore((s) => s.navigate);
-  const completedLevels = useGameStore((s) => s.saveData.completedLevels);
-  const artifactStates = useGameStore((s) => s.saveData.artifacts);
+  const navigate = useGameStore((state) => state.navigate);
+  const completedLevels = useGameStore((state) => state.saveData.completedLevels);
+  const artifactStates = useGameStore((state) => state.saveData.artifacts);
+  const daily = useGameStore((state) => state.saveData.daily);
+  const magnifiers = useGameStore((state) => state.saveData.magnifiers);
+  const saveStatus = useGameStore((state) => state.saveStatus);
 
-  const northernRouteLevels = getChapterLevels("northern-route");
-  const sandMeridianLevels = getChapterLevels("sand-meridian");
-  const emeraldMeridianLevels = getChapterLevels("emerald-meridian");
-  const nrDone = northernRouteLevels.filter((l) =>
-    completedLevels.includes(l.id),
-  ).length;
-  const nrTotal = northernRouteLevels.length;
-  const nrStatus: CampaignStatus =
-    nrDone === 0
-      ? "available"
-      : nrDone === nrTotal
-        ? "completed"
-        : "in_progress";
-  const sandDone = sandMeridianLevels.filter((l) =>
-    completedLevels.includes(l.id),
-  ).length;
-  const sandTotal = sandMeridianLevels.length;
-  const sandUnlocked = nrDone === nrTotal;
-  const sandStatus: CampaignStatus = !sandUnlocked
-    ? "locked"
-    : sandDone === 0
-      ? "available"
-      : sandDone === sandTotal
-        ? "completed"
-        : "in_progress";
-  const emeraldDone = emeraldMeridianLevels.filter((l) =>
-    completedLevels.includes(l.id),
-  ).length;
-  const emeraldTotal = emeraldMeridianLevels.length;
-  const emeraldUnlocked = sandDone === sandTotal;
-  const emeraldStatus: CampaignStatus = !emeraldUnlocked
-    ? "locked"
-    : emeraldDone === 0
-      ? "available"
-      : emeraldDone === emeraldTotal
-        ? "completed"
-        : "in_progress";
+  const whiteProgress = getCampaignProgress("northern-route", completedLevels, t);
+  const sandProgress = getCampaignProgress("sand-meridian", completedLevels, t);
+  const emeraldProgress = getCampaignProgress("emerald-meridian", completedLevels, t);
 
-  const lastCompleted = [...northernRouteLevels]
-    .reverse()
-    .find((l) => completedLevels.includes(l.id));
-  const sandLastCompleted = [...sandMeridianLevels]
-    .reverse()
-    .find((l) => completedLevels.includes(l.id));
-  const emeraldLastCompleted = [...emeraldMeridianLevels]
-    .reverse()
-    .find((l) => completedLevels.includes(l.id));
-
-  const totalAll = nrTotal + sandTotal + emeraldTotal;
+  const sandUnlocked = whiteProgress.done === whiteProgress.total;
+  const emeraldUnlocked = sandProgress.done === sandProgress.total;
 
   const campaigns: Campaign[] = [
     {
       id: "white",
-      status: nrStatus,
-      done: nrDone,
-      total: nrTotal,
-      lastLevelName: lastCompleted ? t(lastCompleted.titleKey) : null,
+      chapterId: "northern-route",
+      status:
+        whiteProgress.done === 0
+          ? "available"
+          : whiteProgress.done === whiteProgress.total
+            ? "completed"
+            : "in_progress",
+      ...whiteProgress
     },
     {
       id: "sand",
-      status: sandStatus,
-      done: sandDone,
-      total: sandTotal,
-      lastLevelName: sandLastCompleted ? t(sandLastCompleted.titleKey) : null,
+      chapterId: "sand-meridian",
+      status: !sandUnlocked
+        ? "locked"
+        : sandProgress.done === 0
+          ? "available"
+          : sandProgress.done === sandProgress.total
+            ? "completed"
+            : "in_progress",
       lockHint: sandUnlocked
         ? undefined
-        : t("campaigns.sand.levelsLeft", { count: nrTotal - nrDone }),
+        : t("campaigns.sand.levelsLeft", {
+            count: whiteProgress.total - whiteProgress.done
+          }),
+      ...sandProgress
     },
     {
       id: "emerald",
-      status: emeraldStatus,
-      done: emeraldDone,
-      total: emeraldTotal,
-      lastLevelName: emeraldLastCompleted
-        ? t(emeraldLastCompleted.titleKey)
-        : null,
+      chapterId: "emerald-meridian",
+      status: !emeraldUnlocked
+        ? "locked"
+        : emeraldProgress.done === 0
+          ? "available"
+          : emeraldProgress.done === emeraldProgress.total
+            ? "completed"
+            : "in_progress",
       lockHint: emeraldUnlocked
         ? undefined
-        : t("campaigns.emerald.levelsLeft", { count: sandTotal - sandDone }),
-    },
+        : t("campaigns.emerald.levelsLeft", {
+            count: sandProgress.total - sandProgress.done
+          }),
+      ...emeraldProgress
+    }
   ];
-  const [mobileCampaignIndex, setMobileCampaignIndex] = React.useState(0);
-  const selectPreviousCampaign = () => {
-    setMobileCampaignIndex(
-      (index) => (index - 1 + campaigns.length) % campaigns.length,
-    );
-  };
-  const selectNextCampaign = () => {
-    setMobileCampaignIndex((index) => (index + 1) % campaigns.length);
-  };
+
+  const activeCampaign =
+    campaigns.find((campaign) => campaign.status === "in_progress") ??
+    campaigns.find((campaign) => campaign.status === "available") ??
+    campaigns[campaigns.length - 1];
 
   const collectionDone = ARTIFACT_IDS.filter(
-    (artifactId) => (artifactStates[artifactId] ?? "locked") !== "locked",
+    (artifactId) => (artifactStates[artifactId] ?? "locked") !== "locked"
   ).length;
   const collectionHasNew = ARTIFACT_IDS.some(
-    (artifactId) => artifactStates[artifactId] === "newly-unlocked",
+    (artifactId) => artifactStates[artifactId] === "newly-unlocked"
   );
+  const dailyEntry = dailyLevels[todaysDailyIndex()];
+  const dailyClaimed = daily.lastClaimDate === todayKey();
 
-  const handleOpenCollection = () => {
+  const openCollection = (source: string) => {
     trackAnalyticsEvent("collection_opened", {
-      source: "home_topbar",
+      source,
       unlockedArtifacts: collectionDone,
-      hasNew: collectionHasNew,
+      hasNew: collectionHasNew
     });
     navigate({ kind: "collection" });
   };
 
-  const handleOpenCampaign = (campaignId: CampaignId) => {
+  const openCampaign = (campaignId: CampaignId) => {
     const selectedCampaign = campaigns.find((campaign) => campaign.id === campaignId);
     trackAnalyticsEvent("campaign_selected", {
       campaignCardId: campaignId,
@@ -1148,135 +733,84 @@ export function HomeScreen({
       totalInCampaign: selectedCampaign?.total
     });
 
-    if (campaignId === "white") {
-      navigate({ kind: "map", chapterId: chapters["northern-route"].id });
-      return;
-    }
-    if (campaignId === "sand" && sandUnlocked) {
-      navigate({ kind: "map", chapterId: chapters["sand-meridian"].id });
-      return;
-    }
-    if (campaignId === "emerald" && emeraldUnlocked) {
-      navigate({ kind: "map", chapterId: chapters["emerald-meridian"].id });
+    if (!selectedCampaign || selectedCampaign.status === "locked") {
+      trackAnalyticsEvent("locked_campaign_clicked", {
+        campaignCardId: campaignId,
+        campaignStatus: selectedCampaign?.status,
+        completedInCampaign: selectedCampaign?.done,
+        totalInCampaign: selectedCampaign?.total
+      });
       return;
     }
 
-    trackAnalyticsEvent("locked_campaign_clicked", {
-      campaignCardId: campaignId,
-      campaignStatus: selectedCampaign?.status,
-      completedInCampaign: selectedCampaign?.done,
-      totalInCampaign: selectedCampaign?.total
-    });
+    navigate({ kind: "map", chapterId: chapters[CAMPAIGN_BY_ID[campaignId]].id });
   };
+
+  const openDaily = () => {
+    trackAnalyticsEvent("daily_opened", {
+      source: "home_hub",
+      streak: daily.streak,
+      claimed: dailyClaimed
+    });
+    navigate({ kind: "daily" });
+  };
+
   return (
-    <div className="home-screen min-h-screen bg-exp-bg font-manrope text-exp-parch">
-      {/* Top bar */}
+    <div className="home-screen min-h-screen overflow-hidden bg-exp-bg font-manrope text-exp-parch">
       <TopBar
-        totalDone={completedLevels.length}
-        totalAll={totalAll}
-        collectionDone={collectionDone}
-        collectionTotal={TOTAL_ARTIFACTS}
-        collectionHasNew={collectionHasNew}
-        onOpenCollection={handleOpenCollection}
+        magnifiers={magnifiers}
+        saveState={saveStatus}
         onOpenSettings={onOpenSettings}
       />
 
-      {/* Collection entry for landscape phones where the topbar is hidden;
-          visibility is controlled by .home-collection-fab in styles.css */}
-      <button
-        type="button"
-        onClick={handleOpenCollection}
-        aria-label={t("actions.collection")}
-        title={t("actions.collection")}
-        className="home-collection-fab hidden h-11 w-11 items-center justify-center rounded-full text-exp-brass2"
-        style={{
-          border: "1px solid rgba(184,138,69,.4)",
-          background: "rgba(21,27,24,.78)",
-          boxShadow: "0 10px 24px rgba(0,0,0,.34)",
-        }}
-      >
-        <CollectionChestIcon />
-        {collectionHasNew && (
-          <span
-            className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full"
-            style={{ background: "#c0533a", boxShadow: "0 0 0 2px #151B18" }}
-            aria-hidden="true"
-          />
-        )}
-      </button>
-
-      {/* Page header */}
-      <section className="home-hero px-5 pb-2 pt-[34px] text-center md:px-10 md:pb-0">
-        <p className="mb-3 text-[11px] font-bold uppercase tracking-[.34em] text-exp-brass">
-          {t("campaigns.supra")}
-        </p>
-        <h1 className="font-cormorant text-[30px] font-semibold leading-tight text-exp-parch md:text-[50px]">
-          {t("campaigns.heading")}
-        </h1>
-        <p className="mx-auto mt-3 max-w-[560px] text-[14px] leading-[1.55] text-exp-muted md:text-[14.5px]">
-          {t("campaigns.subheading")}
-        </p>
-      </section>
-
-      {/* Route sequence (desktop only) */}
-      <div className="home-content mx-auto w-full max-w-[1460px]">
-        <div className="home-route hidden md:block">
-          <RouteSequence
-            statuses={campaigns.map((c) => c.status)}
-            labels={campaigns.map((c) =>
-              t(`campaigns.${c.id}.title`).toUpperCase(),
-            )}
-          />
-        </div>
-
-        {/* ── Desktop card row ── */}
-        <div className="home-campaign-carousel-shell relative">
-          <div className="home-campaign-row hidden gap-[26px] px-10 pb-4 md:flex">
-            {campaigns.map((campaign, index) => (
-              <DesktopCard
-                key={campaign.id}
-                campaign={campaign}
-                isLandscapeCarouselActive={index === mobileCampaignIndex}
-                onContinue={() => handleOpenCampaign(campaign.id)}
-              />
-            ))}
-          </div>
-          <div className="home-campaign-landscape-controls hidden">
-            <CarouselArrow
-              direction="previous"
-              label={t("actions.previous")}
-              onClick={selectPreviousCampaign}
-            />
-            <CarouselArrow
-              direction="next"
-              label={t("actions.next")}
-              onClick={selectNextCampaign}
-            />
-          </div>
-        </div>
-
-        {/* ── Mobile card stack ── */}
-      </div>
-
-      <MobileCampaignCarousel
-        campaigns={campaigns}
-        activeIndex={mobileCampaignIndex}
-        onSelect={setMobileCampaignIndex}
-        onContinue={handleOpenCampaign}
-      />
-
-      {/* Footer (desktop) */}
-      <div className="mx-auto hidden w-full max-w-[1460px] md:block">
-        <footer
-          className="flex h-10 items-center justify-center gap-2 border-t"
-          style={{ borderColor: "rgba(213,195,154,0.09)" }}
-        >
-          <CheckIcon size={12} color="#6FC69E" />
-          <p className="text-[10.5px] text-exp-muted">
-            {t("campaigns.autoSave")}
+      <main className="home-hub-shell mx-auto flex h-[calc(100dvh-70px)] w-full max-w-[1440px] flex-col px-5 py-5 md:px-8 md:py-6">
+        <section className="home-hub-header mb-4">
+          <p className="text-[10px] font-bold uppercase tracking-[.34em] text-exp-brass">
+            {t("homeHub.eyebrow")}
           </p>
-        </footer>
-      </div>
+          <div className="mt-1 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h1 className="font-cormorant text-[34px] font-semibold leading-none text-exp-parch md:text-[44px]">
+                {t("homeHub.title")}
+              </h1>
+              <p className="mt-2 max-w-[620px] text-[13.5px] leading-[1.5] text-exp-muted">
+                {t("homeHub.subtitle")}
+              </p>
+            </div>
+            <div className="hidden rounded-[7px] border border-exp-parch/[.12] bg-exp-parch/[.04] px-3 py-2 font-jetbrains text-[11px] text-exp-muted md:block">
+              {t("homeHub.totalProgress", {
+                done: completedLevels.length,
+                total: campaigns.reduce((sum, campaign) => sum + campaign.total, 0)
+              })}
+            </div>
+          </div>
+        </section>
+
+        <div className="home-hub-grid grid min-h-0 flex-1 grid-cols-1 gap-4 md:grid-cols-[minmax(0,1.25fr)_minmax(260px,.72fr)_minmax(300px,.78fr)]">
+          <CurrentCaseCard
+            campaign={activeCampaign}
+            onContinue={() => openCampaign(activeCampaign.id)}
+            onOpenMap={() => openCampaign(activeCampaign.id)}
+          />
+
+          <div className="home-side-grid grid min-h-0 grid-rows-2 gap-4">
+            <DailyArchiveCard
+              title={t(dailyEntry.titleKey)}
+              streak={daily.streak}
+              claimed={dailyClaimed}
+              onOpen={openDaily}
+            />
+            <FieldArchiveCard
+              collectionDone={collectionDone}
+              collectionHasNew={collectionHasNew}
+              artifactStates={artifactStates}
+              onOpen={() => openCollection("home_field_archive")}
+            />
+          </div>
+
+          <CampaignMiniList campaigns={campaigns} onOpenCampaign={openCampaign} />
+        </div>
+      </main>
     </div>
   );
 }

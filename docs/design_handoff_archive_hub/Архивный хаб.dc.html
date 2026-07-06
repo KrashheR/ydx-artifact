@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+@keyframes pulse{0%,100%{opacity:.35;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+@keyframes glowbtn{0%,100%{box-shadow:0 10px 26px rgba(184,138,69,.28),inset 0 1px 0 rgba(255,255,255,.3)}50%{box-shadow:0 10px 34px rgba(216,175,99,.5),inset 0 1px 0 rgba(255,255,255,.3)}}
+*{box-sizing:border-box}
+</style>
+</helmet>
+
+<div style="min-height:100%;background:#0e120f;background-image:radial-gradient(120% 60% at 50% -5%,rgba(47,106,87,.08),transparent 55%);padding:64px 60px 90px;display:flex;flex-direction:column;gap:70px;align-items:flex-start;font-family:Manrope,sans-serif">
+
+  <!-- board heading -->
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div style="font:700 12px Manrope;letter-spacing:.34em;color:#B88A45">ГЛАВНОЕ МЕНЮ · АРХИВНЫЙ ХАБ · ТАЙНЫ ЭКСПЕДИЦИЙ</div>
+    <div style="font:600 44px 'Cormorant Garamond',serif;color:#D5C39A">Живой архивный хаб</div>
+    <div style="font:400 15px Manrope;color:#879087;max-width:960px;line-height:1.5">Хаб открывается после первого уровня. Главный акцент — «Продолжить экспедицию»; Архив дня и Полевой архив видны без скролла; кампании — вторичный уровень. Коллекция находок сделана как архивное дело — папка, внесённые экспонаты со штампом, запечатанные ещё не найденные. Ниже: два состояния desktop, мобильный landscape, состояния карточек и мини дизайн-система.</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SCREEN 1 · DESKTOP · СЕРЕДИНА КАМПАНИИ -->
+  <!-- ============================================================ -->
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="display:inline-flex;align-items:center;height:26px;padding:0 11px;border-radius:7px;background:rgba(184,138,69,.16);border:1px solid rgba(184,138,69,.4);font:700 12px Manrope;color:#d8af63">Э1</span>
+      <span style="font:600 20px 'Cormorant Garamond',serif;color:#D5C39A">Desktop · середина кампании</span>
+      <span style="font:500 13px Manrope;color:#879087">· прогресс 5/13, daily доступен, новая находка внесена в архив</span>
+    </div>
+
+    <div data-screen-label="Desktop · Хаб · середина кампании" style="position:relative;width:1440px;height:900px;background:#151B18;border-radius:10px;overflow:hidden;box-shadow:0 36px 90px rgba(0,0,0,.5);color:#D5C39A;flex-shrink:0">
+      <div style="position:absolute;inset:0;background:radial-gradient(120% 80% at 50% -20%,rgba(47,106,87,.14),transparent 55%),repeating-radial-gradient(circle at 86% 12%,transparent 0 46px,rgba(184,138,69,.03) 46px 47px);pointer-events:none"></div>
+
+      <!-- top bar -->
+      <div style="position:relative;height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 36px;border-bottom:1px solid rgba(213,195,154,.11);background:linear-gradient(180deg,rgba(34,42,37,.9),rgba(21,27,24,.35))">
+        <div style="display:flex;align-items:center;gap:13px">
+          <svg width="32" height="32" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15.2" stroke="#B88A45" stroke-width="1.4"></circle><circle cx="17" cy="17" r="10.5" stroke="#B88A45" stroke-width=".7" opacity=".5"></circle><path d="M17 6.5 L20 17 L17 27.5 L14 17 Z" fill="#B88A45"></path><path d="M17 6.5 L14 17 L17 27.5 Z" fill="#8a6730"></path><circle cx="17" cy="17" r="1.7" fill="#D5C39A"></circle></svg>
+          <div>
+            <div style="font:700 12.5px Manrope;letter-spacing:.26em;color:#B88A45">ТАЙНЫ ЭКСПЕДИЦИЙ</div>
+            <div style="font:500 10px Manrope;letter-spacing:.2em;color:#879087;margin-top:3px">АРХИВ ЭКСПЕДИЦИОННОГО ОБЩЕСТВА</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:18px">
+          <div style="display:flex;align-items:center;gap:8px;font:500 11.5px Manrope;color:#879087"><span style="width:7px;height:7px;border-radius:50%;background:#6fc69e;box-shadow:0 0 8px #6fc69e"></span>Сохранено · локально</div>
+          <div style="width:1px;height:30px;background:rgba(213,195,154,.12)"></div>
+          <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 15px;border-radius:8px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.04)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.8" stroke-linecap="round"><path d="M9 18h6"></path><path d="M10 21h4"></path><path d="M12 3a6.5 6.5 0 0 0-3.8 11.8c.6.5 1.3 1.3 1.3 2.2h5a2.7 2.7 0 0 1 1.3-2.2A6.5 6.5 0 0 0 12 3z"></path></svg>
+            <span style="font:700 14px 'JetBrains Mono',monospace;color:#D5C39A">6</span>
+            <span style="font:500 10.5px Manrope;color:#879087">подсказ.</span>
+          </div>
+          <button style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.04);color:#D5C39A;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"></circle><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2-1.2L14.2 3h-4l-.4 2.5a7 7 0 0 0-2 1.2l-2.3-1-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2 1.2l.4 2.5h4l.4-2.5a7 7 0 0 0 2-1.2l2.3 1 2-3.4-2-1.5c.06-.4.1-.8.1-1.2z"></path></svg></button>
+        </div>
+      </div>
+
+      <!-- body grid -->
+      <div style="position:relative;display:grid;grid-template-columns:1fr 372px;gap:24px;padding:26px 36px 0">
+
+        <!-- HERO · текущее дело -->
+        <div style="position:relative;background:#222A25;border:1px solid rgba(184,138,69,.3);border-radius:12px;box-shadow:0 22px 50px rgba(0,0,0,.42),inset 0 1px 0 rgba(213,195,154,.06);overflow:hidden;display:grid;grid-template-columns:1fr 380px">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#d8af63,#a9762f)"></div>
+          <!-- left: case info -->
+          <div style="padding:26px 28px 24px;display:flex;flex-direction:column">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font:700 10.5px Manrope;letter-spacing:.3em;color:#B88A45">ТЕКУЩЕЕ ДЕЛО</span>
+              <span style="font:500 10.5px 'JetBrains Mono',monospace;color:#879087;border:1px solid rgba(213,195,154,.16);border-radius:4px;padding:2px 7px">№ 013-Б</span>
+            </div>
+            <h1 style="font:600 44px 'Cormorant Garamond',serif;color:#D5C39A;margin:10px 0 0;line-height:1.05">Белый меридиан</h1>
+            <div style="font:500 13px Manrope;color:#879087;margin-top:6px">Восстановлено <span style="color:#d8af63;font-weight:700">5 / 13</span> снимков</div>
+            <div style="display:flex;gap:3px;margin:14px 0 0">
+              <span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;margin-top:18px">
+              <div style="display:flex;align-items:center;gap:9px;font:500 12.5px Manrope;color:#879087"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>Следующая точка: <span style="color:#D5C39A;font-weight:600">Метеостанция</span></div>
+              <div style="display:flex;align-items:center;gap:9px;font:500 12.5px Manrope;color:#879087"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3.4 2"></path></svg>До новой находки: <span style="color:#d8af63;font-weight:700">1 уровень</span></div>
+            </div>
+            <div style="flex:1"></div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:20px">
+              <button style="flex:1;height:54px;border:none;border-radius:8px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:800 15.5px Manrope;letter-spacing:.02em;cursor:pointer;animation:glowbtn 3.2s ease-in-out infinite;display:flex;align-items:center;justify-content:center;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#1a130a"><path d="M7 4.5v15l13-7.5z"></path></svg>Продолжить экспедицию</button>
+              <button style="height:54px;padding:0 20px;border-radius:8px;border:1px solid rgba(213,195,154,.22);background:rgba(213,195,154,.05);color:#D5C39A;font:600 13px Manrope;cursor:pointer;display:flex;align-items:center;gap:9px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4z"></path><path d="M9 4v13M15 6.5v13"></path></svg>Карта маршрута</button>
+            </div>
+          </div>
+          <!-- right: photo collage / route -->
+          <div style="position:relative;border-left:1px dashed rgba(184,138,69,.3);background:repeating-linear-gradient(45deg,rgba(213,195,154,.028) 0 14px,transparent 14px 28px)">
+            <svg width="380" height="100%" viewBox="0 0 380 360" fill="none" style="position:absolute;inset:0" preserveAspectRatio="none"><path d="M60 300 C 120 250, 90 170, 170 150 S 300 110, 320 60" stroke="#B88A45" stroke-width="1.4" stroke-dasharray="5 6" opacity=".65"></path></svg>
+            <!-- polaroids -->
+            <div style="position:absolute;left:26px;bottom:38px;width:104px;background:#2b332d;border:1px solid rgba(213,195,154,.18);padding:6px 6px 18px;transform:rotate(-5deg);box-shadow:0 10px 22px rgba(0,0,0,.45)">
+              <div style="height:70px;background:repeating-linear-gradient(45deg,rgba(213,195,154,.09) 0 8px,rgba(213,195,154,.03) 8px 16px);border:1px dashed rgba(213,195,154,.25);display:flex;align-items:center;justify-content:center"><span style="font:500 8px 'JetBrains Mono',monospace;color:#879087">фото: пирс</span></div>
+              <div style="font:500 8.5px 'JetBrains Mono',monospace;color:#879087;margin-top:5px;text-align:center">01 · Пирс Борея</div>
+              <div style="position:absolute;top:-8px;right:-10px;transform:rotate(12deg);font:700 8px Manrope;letter-spacing:.14em;color:#6fc69e;border:1.4px solid #4d8f74;border-radius:3px;padding:2px 5px;background:rgba(21,27,24,.8)">СВЕРЕНО</div>
+            </div>
+            <div style="position:absolute;left:118px;top:96px;width:104px;background:#2b332d;border:1px solid rgba(213,195,154,.18);padding:6px 6px 18px;transform:rotate(4deg);box-shadow:0 10px 22px rgba(0,0,0,.45)">
+              <div style="height:70px;background:repeating-linear-gradient(45deg,rgba(213,195,154,.09) 0 8px,rgba(213,195,154,.03) 8px 16px);border:1px dashed rgba(213,195,154,.25);display:flex;align-items:center;justify-content:center"><span style="font:500 8px 'JetBrains Mono',monospace;color:#879087">фото: лагерь</span></div>
+              <div style="font:500 8.5px 'JetBrains Mono',monospace;color:#879087;margin-top:5px;text-align:center">05 · Лагерь II</div>
+              <div style="position:absolute;top:-8px;right:-10px;transform:rotate(12deg);font:700 8px Manrope;letter-spacing:.14em;color:#6fc69e;border:1.4px solid #4d8f74;border-radius:3px;padding:2px 5px;background:rgba(21,27,24,.8)">СВЕРЕНО</div>
+            </div>
+            <div style="position:absolute;right:30px;top:26px;width:104px;background:rgba(43,51,45,.5);border:1.4px dashed rgba(216,175,99,.5);padding:6px 6px 18px;transform:rotate(-3deg)">
+              <div style="height:70px;display:flex;align-items:center;justify-content:center;background:rgba(213,195,154,.03)"><span style="font:600 22px 'Cormorant Garamond',serif;color:#d8af63">?</span></div>
+              <div style="font:500 8.5px 'JetBrains Mono',monospace;color:#d8af63;margin-top:5px;text-align:center">06 · Метеостанция</div>
+              <div style="position:absolute;top:-9px;left:-9px;width:22px;height:22px;border-radius:50%;background:#d8af63;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(216,175,99,.6)"><svg width="11" height="11" viewBox="0 0 24 24" fill="#1a130a"><path d="M7 4.5v15l13-7.5z"></path></svg></div>
+            </div>
+            <div style="position:absolute;left:20px;top:22px;font:500 9px 'JetBrains Mono',monospace;color:#879087;letter-spacing:.12em;opacity:.8">МАРШРУТ · ЛИСТ 2 ИЗ 5</div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <!-- Архив дня -->
+          <div style="position:relative;background:#222A25;border:1px solid rgba(213,195,154,.14);border-radius:12px;padding:18px 20px;box-shadow:0 14px 32px rgba(0,0,0,.32)">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:9px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 9.5h16M8 3v4M16 3v4"></path></svg><span style="font:700 11px Manrope;letter-spacing:.24em;color:#B88A45">АРХИВ ДНЯ</span></div>
+              <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:5px;background:rgba(184,138,69,.14);border:1px solid rgba(184,138,69,.35);font:700 10px Manrope;color:#d8af63"><svg width="10" height="10" viewBox="0 0 24 24" fill="#d8af63"><path d="M12 2c1 4-3 5-3 9a3 3 0 0 0 6 0c0-2-1-3-1-5 3 2 5 5 5 8a7 7 0 0 1-14 0c0-6 6-8 7-12z"></path></svg>СЕРИЯ · 2 ДНЯ</span>
+            </div>
+            <div style="font:600 19px 'Cormorant Garamond',serif;color:#D5C39A;margin-top:11px">Снимок: «Гавань в тумане»</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:7px;font:500 11.5px Manrope;color:#879087">Награда:<span style="display:inline-flex;align-items:center;gap:5px;color:#d8af63;font-weight:700"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.8" stroke-linecap="round"><path d="M9 18h6"></path><path d="M10 21h4"></path><path d="M12 3a6.5 6.5 0 0 0-3.8 11.8c.6.5 1.3 1.3 1.3 2.2h5a2.7 2.7 0 0 1 1.3-2.2A6.5 6.5 0 0 0 12 3z"></path></svg>+1 подсказка</span></div>
+            <button style="width:100%;height:42px;margin-top:13px;border:none;border-radius:7px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 13px Manrope;cursor:pointer;box-shadow:0 8px 18px rgba(184,138,69,.25),inset 0 1px 0 rgba(255,255,255,.3)">Открыть</button>
+          </div>
+
+          <!-- Полевой архив -->
+          <div style="position:relative;background:#222A25;border:1px solid rgba(213,195,154,.14);border-radius:3px 12px 12px 12px;padding:23px 20px 18px;margin-top:14px;box-shadow:0 14px 32px rgba(0,0,0,.32)">
+            <div style="position:absolute;top:-14px;left:18px;display:flex;align-items:center;gap:6px;background:#262e28;border:1px solid rgba(213,195,154,.16);border-bottom:none;border-radius:4px 8px 0 0;padding:5px 11px 9px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h6l2 2h8v10H4z"></path></svg>
+              <span style="font:700 9.5px Manrope;letter-spacing:.18em;color:#B88A45">ПОЛЕВОЙ АРХИВ</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font:500 10.5px Manrope;color:#879087">Внесено находок</span>
+              <span style="font:700 12.5px 'JetBrains Mono',monospace;color:#d8af63;border:1px solid rgba(184,138,69,.35);border-radius:4px;padding:1px 7px">4<span style="color:#879087;font-weight:500"> / 12</span></span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px">
+              <div style="position:relative;aspect-ratio:1;border-radius:3px;background:#2b2115;border:1px solid rgba(184,138,69,.4);box-shadow:0 4px 10px rgba(0,0,0,.35);transform:rotate(-3deg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"></circle><path d="M15 9l-2 4-4 2 2-4 4-2z" fill="#d8af63" stroke="none"></path></svg>
+                <span style="font:800 6px Manrope;letter-spacing:.05em;color:#6fc69e;border:1px solid rgba(111,198,158,.55);border-radius:2px;padding:0 3px;transform:rotate(-4deg);opacity:.95">ВНЕСЕНО</span>
+                <div style="position:absolute;top:-7px;right:-7px;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#c96a44,#832f18);box-shadow:0 3px 7px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center"><span style="font:700 7.5px 'Cormorant Garamond',serif;color:#f5d9c8">н</span></div>
+              </div>
+              <div style="position:relative;aspect-ratio:1;border-radius:3px;background:#26231c;border:1px solid rgba(213,195,154,.2);box-shadow:0 4px 10px rgba(0,0,0,.3);transform:rotate(2deg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#D5C39A" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="9" width="16" height="10" rx="2"></rect><circle cx="9" cy="14" r="2.2"></circle><path d="M14 12.5h3M14 15.5h3M6 9l10-5"></path></svg>
+                <span style="font:800 6px Manrope;letter-spacing:.05em;color:#6fc69e;border:1px solid rgba(111,198,158,.4);border-radius:2px;padding:0 3px;transform:rotate(3deg);opacity:.85">ВНЕСЕНО</span>
+              </div>
+              <div style="position:relative;aspect-ratio:1;border-radius:3px;background:#26231c;border:1px solid rgba(213,195,154,.2);box-shadow:0 4px 10px rgba(0,0,0,.3);transform:rotate(-1.5deg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#D5C39A" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="9" r="3"></circle><path d="M12 12v8M12 12c-2 0-4-1.4-4-3.5M12 12c2 0 4-1.4 4-3.5M9 20h6"></path></svg>
+                <span style="font:800 6px Manrope;letter-spacing:.05em;color:#6fc69e;border:1px solid rgba(111,198,158,.4);border-radius:2px;padding:0 3px;transform:rotate(-3deg);opacity:.85">ВНЕСЕНО</span>
+              </div>
+              <div style="position:relative;aspect-ratio:1;border-radius:3px;background:repeating-linear-gradient(45deg,rgba(184,138,69,.05) 0 7px,rgba(213,195,154,.02) 7px 14px);border:1px dashed rgba(213,195,154,.22);display:flex;align-items:center;justify-content:center">
+                <div style="width:21px;height:21px;border-radius:50%;border:1.3px solid rgba(213,195,154,.25);display:flex;align-items:center;justify-content:center"><span style="font:600 11px 'Cormorant Garamond',serif;color:#5d655d">?</span></div>
+              </div>
+            </div>
+            <button style="width:100%;height:40px;margin-top:14px;border-radius:7px;border:1px solid rgba(213,195,154,.2);background:rgba(213,195,154,.05);color:#D5C39A;font:600 12.5px Manrope;cursor:pointer">Открыть архив находок</button>
+          </div>
+
+          <!-- Ближайшая награда -->
+          <div style="display:flex;align-items:center;gap:14px;background:rgba(34,42,37,.6);border:1px dashed rgba(184,138,69,.4);border-radius:12px;padding:14px 18px">
+            <div style="width:44px;height:44px;border-radius:9px;background:rgba(184,138,69,.12);border:1px solid rgba(184,138,69,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"></circle><path d="M15 9l-2 4-4 2 2-4 4-2z" fill="#d8af63" stroke="none"></path></svg></div>
+            <div style="flex:1">
+              <div style="font:700 10px Manrope;letter-spacing:.22em;color:#B88A45">БЛИЖАЙШАЯ НАХОДКА</div>
+              <div style="font:600 14px Manrope;color:#D5C39A;margin-top:3px">Полевой компас · <span style="color:#d8af63">через 1 уровень</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAMPAIGNS row -->
+      <div style="position:relative;padding:22px 36px 0">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font:700 11px Manrope;letter-spacing:.28em;color:#B88A45">КАМПАНИИ</span>
+          <div style="flex:1;height:1px;background:rgba(213,195,154,.1)"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+          <!-- Белый · в процессе -->
+          <div style="display:flex;gap:14px;background:#222A25;border:1px solid rgba(184,138,69,.32);border-radius:11px;padding:13px;box-shadow:0 12px 28px rgba(0,0,0,.3)">
+            <div style="width:104px;height:104px;border-radius:8px;flex-shrink:0;background:repeating-linear-gradient(45deg,rgba(213,195,154,.07) 0 10px,rgba(213,195,154,.02) 10px 20px);border:1px dashed rgba(213,195,154,.25);display:flex;align-items:center;justify-content:center"><span style="font:500 8.5px 'JetBrains Mono',monospace;color:#879087;text-align:center">превью:<br>ледник</span></div>
+            <div style="flex:1;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:600 17px 'Cormorant Garamond',serif;color:#D5C39A">Белый меридиан</span><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:5px;background:rgba(111,198,158,.1);border:1px solid rgba(111,198,158,.35);font:700 9px Manrope;letter-spacing:.1em;color:#6fc69e"><span style="width:5px;height:5px;border-radius:50%;background:#6fc69e;animation:pulse 2.6s ease-in-out infinite"></span>В ПРОЦЕССЕ</span></div>
+              <div style="font:400 11px Manrope;color:#879087;line-height:1.45;margin-top:5px">Северная экспедиция и долина, которой нет на картах.</div>
+              <div style="flex:1"></div>
+              <div style="display:flex;align-items:center;gap:9px"><div style="flex:1;height:5px;border-radius:3px;background:rgba(213,195,154,.1);overflow:hidden"><div style="width:38%;height:100%;background:linear-gradient(90deg,#d8af63,#a9762f)"></div></div><span style="font:600 11.5px 'JetBrains Mono',monospace;color:#d8af63">5<span style="color:#879087">/13</span></span></div>
+            </div>
+          </div>
+          <!-- Песчаный · закрыт -->
+          <div style="display:flex;gap:14px;background:rgba(34,42,37,.55);border:1px solid rgba(213,195,154,.1);border-radius:11px;padding:13px">
+            <div style="position:relative;width:104px;height:104px;border-radius:8px;flex-shrink:0;background:repeating-linear-gradient(45deg,rgba(213,195,154,.04) 0 10px,transparent 10px 20px);border:1px dashed rgba(213,195,154,.15);display:flex;align-items:center;justify-content:center;filter:grayscale(1)"><span style="font:500 8.5px 'JetBrains Mono',monospace;color:#5d655d;text-align:center">превью:<br>пустыня</span>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(21,27,24,.5);border-radius:8px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></div></div>
+            <div style="flex:1;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:600 17px 'Cormorant Garamond',serif;color:#9aa398">Песчаный меридиан</span><span style="display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:5px;background:rgba(213,195,154,.06);border:1px solid rgba(213,195,154,.18);font:700 9px Manrope;letter-spacing:.1em;color:#879087">ЗАКРЫТО</span></div>
+              <div style="font:400 11px Manrope;color:#6d756c;line-height:1.45;margin-top:5px">Караван, исчезнувший между двумя оазисами.</div>
+              <div style="flex:1"></div>
+              <div style="display:flex;align-items:center;gap:7px;font:500 10.5px Manrope;color:#879087"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>Завершите «Белый меридиан»</div>
+            </div>
+          </div>
+          <!-- Изумрудный · закрыт -->
+          <div style="display:flex;gap:14px;background:rgba(34,42,37,.55);border:1px solid rgba(213,195,154,.1);border-radius:11px;padding:13px">
+            <div style="position:relative;width:104px;height:104px;border-radius:8px;flex-shrink:0;background:repeating-linear-gradient(45deg,rgba(213,195,154,.04) 0 10px,transparent 10px 20px);border:1px dashed rgba(213,195,154,.15);display:flex;align-items:center;justify-content:center;filter:grayscale(1)"><span style="font:500 8.5px 'JetBrains Mono',monospace;color:#5d655d;text-align:center">превью:<br>джунгли</span>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(21,27,24,.5);border-radius:8px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></div></div>
+            <div style="flex:1;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:600 17px 'Cormorant Garamond',serif;color:#9aa398">Изумрудный меридиан</span><span style="display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:5px;background:rgba(213,195,154,.06);border:1px solid rgba(213,195,154,.18);font:700 9px Manrope;letter-spacing:.1em;color:#879087">ЗАКРЫТО</span></div>
+              <div style="font:400 11px Manrope;color:#6d756c;line-height:1.45;margin-top:5px">Радиосигнал из сельвы спустя сорок лет тишины.</div>
+              <div style="flex:1"></div>
+              <div style="display:flex;align-items:center;gap:7px;font:500 10.5px Manrope;color:#879087"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>Завершите «Песчаный меридиан»</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SCREEN 2 · DESKTOP · КАМПАНИЯ ЗАВЕРШЕНА -->
+  <!-- ============================================================ -->
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="display:inline-flex;align-items:center;height:26px;padding:0 11px;border-radius:7px;background:rgba(184,138,69,.16);border:1px solid rgba(184,138,69,.4);font:700 12px Manrope;color:#d8af63">Э2</span>
+      <span style="font:600 20px 'Cormorant Garamond',serif;color:#D5C39A">Desktop · дело восстановлено</span>
+      <span style="font:500 13px Manrope;color:#879087">· White завершена, отчёт доступен, Песчаный разблокирован, daily получен</span>
+    </div>
+
+    <div data-screen-label="Desktop · Хаб · дело восстановлено" style="position:relative;width:1440px;height:900px;background:#151B18;border-radius:10px;overflow:hidden;box-shadow:0 36px 90px rgba(0,0,0,.5);color:#D5C39A;flex-shrink:0">
+      <div style="position:absolute;inset:0;background:radial-gradient(120% 80% at 50% -20%,rgba(47,106,87,.14),transparent 55%);pointer-events:none"></div>
+
+      <!-- top bar (same) -->
+      <div style="position:relative;height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 36px;border-bottom:1px solid rgba(213,195,154,.11);background:linear-gradient(180deg,rgba(34,42,37,.9),rgba(21,27,24,.35))">
+        <div style="display:flex;align-items:center;gap:13px">
+          <svg width="32" height="32" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15.2" stroke="#B88A45" stroke-width="1.4"></circle><path d="M17 6.5 L20 17 L17 27.5 L14 17 Z" fill="#B88A45"></path><circle cx="17" cy="17" r="1.7" fill="#D5C39A"></circle></svg>
+          <div>
+            <div style="font:700 12.5px Manrope;letter-spacing:.26em;color:#B88A45">ТАЙНЫ ЭКСПЕДИЦИЙ</div>
+            <div style="font:500 10px Manrope;letter-spacing:.2em;color:#879087;margin-top:3px">АРХИВ ЭКСПЕДИЦИОННОГО ОБЩЕСТВА</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:18px">
+          <div style="display:flex;align-items:center;gap:8px;font:500 11.5px Manrope;color:#879087"><span style="width:7px;height:7px;border-radius:50%;background:#6fc69e;box-shadow:0 0 8px #6fc69e"></span>Сохранено · локально</div>
+          <div style="width:1px;height:30px;background:rgba(213,195,154,.12)"></div>
+          <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 15px;border-radius:8px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.04)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.8" stroke-linecap="round"><path d="M9 18h6"></path><path d="M10 21h4"></path><path d="M12 3a6.5 6.5 0 0 0-3.8 11.8c.6.5 1.3 1.3 1.3 2.2h5a2.7 2.7 0 0 1 1.3-2.2A6.5 6.5 0 0 0 12 3z"></path></svg>
+            <span style="font:700 14px 'JetBrains Mono',monospace;color:#D5C39A">11</span>
+            <span style="font:500 10.5px Manrope;color:#879087">подсказ.</span>
+          </div>
+          <button style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.04);color:#D5C39A;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"></circle><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2-1.2L14.2 3h-4l-.4 2.5a7 7 0 0 0-2 1.2l-2.3-1-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2 1.2l.4 2.5h4l.4-2.5a7 7 0 0 0 2-1.2l2.3 1 2-3.4-2-1.5c.06-.4.1-.8.1-1.2z"></path></svg></button>
+        </div>
+      </div>
+
+      <div style="position:relative;display:grid;grid-template-columns:1fr 372px;gap:24px;padding:26px 36px 0">
+
+        <!-- HERO · отчёт дела -->
+        <div style="position:relative;background:#222A25;border:1px solid rgba(111,198,158,.35);border-radius:12px;box-shadow:0 22px 50px rgba(0,0,0,.42),inset 0 1px 0 rgba(213,195,154,.06);overflow:hidden;display:grid;grid-template-columns:1fr 380px">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#6fc69e,#3f7a61)"></div>
+          <div style="padding:26px 28px 24px;display:flex;flex-direction:column">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font:700 10.5px Manrope;letter-spacing:.3em;color:#6fc69e">ДЕЛО ВОССТАНОВЛЕНО</span>
+              <span style="font:500 10.5px 'JetBrains Mono',monospace;color:#879087;border:1px solid rgba(213,195,154,.16);border-radius:4px;padding:2px 7px">№ 013-Б</span>
+            </div>
+            <h1 style="font:600 44px 'Cormorant Garamond',serif;color:#D5C39A;margin:10px 0 0;line-height:1.05">Белый меридиан</h1>
+            <div style="font:500 13px Manrope;color:#879087;margin-top:6px">Восстановлено <span style="color:#6fc69e;font-weight:700">13 / 13</span> снимков · маршрут закрыт</div>
+            <div style="display:flex;gap:3px;margin:14px 0 0">
+              <span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#6fc69e,#3f7a61)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#6fc69e,#3f7a61)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#6fc69e,#3f7a61)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#6fc69e,#3f7a61)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#6fc69e,#3f7a61)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#6fc69e,#3f7a61)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#6fc69e,#3f7a61)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#6fc69e,#3f7a61)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#6fc69e,#3f7a61)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#6fc69e,#3f7a61)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#6fc69e,#3f7a61)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#6fc69e,#3f7a61)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#6fc69e,#3f7a61)"></span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;margin-top:18px">
+              <div style="display:flex;align-items:center;gap:9px;font:500 12.5px Manrope;color:#879087"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6fc69e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 6"></path></svg>Все находки маршрута собраны: <span style="color:#D5C39A;font-weight:600">5 из 5</span></div>
+              <div style="display:flex;align-items:center;gap:9px;font:500 12.5px Manrope;color:#879087"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M15 11V8a4 4 0 0 0-7-2.5"></path></svg>Следующее дело разблокировано: <span style="color:#d8af63;font-weight:700">Песчаный меридиан</span></div>
+            </div>
+            <div style="flex:1"></div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:20px">
+              <button style="flex:1;height:54px;border:none;border-radius:8px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:800 15.5px Manrope;cursor:pointer;animation:glowbtn 3.2s ease-in-out infinite;display:flex;align-items:center;justify-content:center;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="#1a130a"><path d="M7 4.5v15l13-7.5z"></path></svg>Начать «Песчаный меридиан»</button>
+              <button style="height:54px;padding:0 20px;border-radius:8px;border:1px solid rgba(111,198,158,.4);background:rgba(111,198,158,.07);color:#8fd6b4;font:600 13px Manrope;cursor:pointer;display:flex;align-items:center;gap:9px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6 3h9l4 4v14H6z"></path><path d="M15 3v4h4M9 12h6M9 16h6"></path></svg>Открыть отчёт</button>
+            </div>
+          </div>
+          <!-- right: архивный отчёт с печатью -->
+          <div style="position:relative;border-left:1px dashed rgba(184,138,69,.3);background:repeating-linear-gradient(45deg,rgba(213,195,154,.028) 0 14px,transparent 14px 28px);display:flex;align-items:center;justify-content:center">
+            <div style="position:relative;width:250px;background:#2b332d;border:1px solid rgba(213,195,154,.2);padding:20px 22px 24px;transform:rotate(-2deg);box-shadow:0 16px 34px rgba(0,0,0,.5)">
+              <div style="font:700 9px Manrope;letter-spacing:.3em;color:#B88A45;text-align:center">ЭКСПЕДИЦИОННОЕ ОБЩЕСТВО</div>
+              <div style="font:600 21px 'Cormorant Garamond',serif;color:#D5C39A;text-align:center;margin-top:8px;line-height:1.2">Отчёт по делу<br>№ 013-Б</div>
+              <div style="height:1px;background:rgba(213,195,154,.15);margin:12px 0"></div>
+              <div style="display:flex;flex-direction:column;gap:6px;font:500 9.5px 'JetBrains Mono',monospace;color:#879087">
+                <div style="display:flex;justify-content:space-between"><span>Снимки</span><span style="color:#6fc69e">13 / 13</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Находки</span><span style="color:#6fc69e">5 / 5</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Маршрут</span><span style="color:#D5C39A">закрыт</span></div>
+              </div>
+              <div style="position:absolute;bottom:14px;right:14px;width:72px;height:72px;border:2px solid rgba(111,198,158,.55);border-radius:50%;display:flex;align-items:center;justify-content:center;transform:rotate(14deg)">
+                <div style="width:58px;height:58px;border:1px solid rgba(111,198,158,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center;font:800 8px Manrope;letter-spacing:.12em;color:#6fc69e;line-height:1.35">ДЕЛО<br>ЗАКРЫТО</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <!-- Архив дня · получено -->
+          <div style="position:relative;background:rgba(34,42,37,.6);border:1px solid rgba(213,195,154,.11);border-radius:12px;padding:18px 20px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:9px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 9.5h16M8 3v4M16 3v4"></path></svg><span style="font:700 11px Manrope;letter-spacing:.24em;color:#879087">АРХИВ ДНЯ</span></div>
+              <span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 9px;border-radius:5px;background:rgba(111,198,158,.1);border:1px solid rgba(111,198,158,.35);font:700 10px Manrope;color:#6fc69e"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6fc69e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 6"></path></svg>ПОЛУЧЕНО СЕГОДНЯ</span>
+            </div>
+            <div style="font:600 19px 'Cormorant Garamond',serif;color:#9aa398;margin-top:11px">Снимок: «Гавань в тумане»</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:7px;font:500 11.5px Manrope;color:#879087">Серия сохранена: <span style="color:#d8af63;font-weight:700">3 дня</span></div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:42px;margin-top:13px;border-radius:7px;border:1px dashed rgba(213,195,154,.2);font:600 12.5px 'JetBrains Mono',monospace;color:#879087"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3.4 2"></path></svg>Новый снимок через 14:32</div>
+          </div>
+
+          <!-- Полевой архив · без свежих поступлений -->
+          <div style="position:relative;background:#222A25;border:1px solid rgba(213,195,154,.14);border-radius:3px 12px 12px 12px;padding:23px 20px 18px;margin-top:14px;box-shadow:0 14px 32px rgba(0,0,0,.32)">
+            <div style="position:absolute;top:-14px;left:18px;display:flex;align-items:center;gap:6px;background:#262e28;border:1px solid rgba(213,195,154,.16);border-bottom:none;border-radius:4px 8px 0 0;padding:5px 11px 9px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h6l2 2h8v10H4z"></path></svg>
+              <span style="font:700 9.5px Manrope;letter-spacing:.18em;color:#B88A45">ПОЛЕВОЙ АРХИВ</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font:500 10.5px Manrope;color:#879087">Внесено находок</span>
+              <span style="font:700 12.5px 'JetBrains Mono',monospace;color:#d8af63;border:1px solid rgba(184,138,69,.35);border-radius:4px;padding:1px 7px">9<span style="color:#879087;font-weight:500"> / 12</span></span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px">
+              <div style="position:relative;aspect-ratio:1;border-radius:3px;background:#26231c;border:1px solid rgba(213,195,154,.2);box-shadow:0 4px 10px rgba(0,0,0,.3);transform:rotate(-2deg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#D5C39A" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"></circle><path d="M15 9l-2 4-4 2 2-4 4-2z" fill="#D5C39A" stroke="none"></path></svg>
+                <span style="font:800 6px Manrope;letter-spacing:.05em;color:#6fc69e;border:1px solid rgba(111,198,158,.4);border-radius:2px;padding:0 3px;transform:rotate(4deg);opacity:.85">ВНЕСЕНО</span>
+              </div>
+              <div style="position:relative;aspect-ratio:1;border-radius:3px;background:#26231c;border:1px solid rgba(213,195,154,.2);box-shadow:0 4px 10px rgba(0,0,0,.3);transform:rotate(2deg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#D5C39A" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="9" width="16" height="10" rx="2"></rect><circle cx="9" cy="14" r="2.2"></circle><path d="M14 12.5h3M14 15.5h3M6 9l10-5"></path></svg>
+                <span style="font:800 6px Manrope;letter-spacing:.05em;color:#6fc69e;border:1px solid rgba(111,198,158,.4);border-radius:2px;padding:0 3px;transform:rotate(-3deg);opacity:.85">ВНЕСЕНО</span>
+              </div>
+              <div style="position:relative;aspect-ratio:1;border-radius:3px;background:#26231c;border:1px solid rgba(213,195,154,.2);box-shadow:0 4px 10px rgba(0,0,0,.3);transform:rotate(-1.5deg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#D5C39A" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="9" r="3"></circle><path d="M12 12v8M9 20h6"></path></svg>
+                <span style="font:800 6px Manrope;letter-spacing:.05em;color:#6fc69e;border:1px solid rgba(111,198,158,.4);border-radius:2px;padding:0 3px;transform:rotate(3deg);opacity:.85">ВНЕСЕНО</span>
+              </div>
+              <div style="position:relative;aspect-ratio:1;border-radius:3px;background:repeating-linear-gradient(45deg,rgba(184,138,69,.05) 0 7px,rgba(213,195,154,.02) 7px 14px);border:1px dashed rgba(213,195,154,.22);display:flex;align-items:center;justify-content:center">
+                <div style="width:21px;height:21px;border-radius:50%;border:1.3px solid rgba(213,195,154,.25);display:flex;align-items:center;justify-content:center"><span style="font:600 11px 'Cormorant Garamond',serif;color:#5d655d">?</span></div>
+              </div>
+            </div>
+            <button style="width:100%;height:40px;margin-top:14px;border-radius:7px;border:1px solid rgba(213,195,154,.2);background:rgba(213,195,154,.05);color:#D5C39A;font:600 12.5px Manrope;cursor:pointer">Открыть архив находок</button>
+          </div>
+
+          <!-- Новое дело -->
+          <div style="display:flex;align-items:center;gap:14px;background:rgba(184,138,69,.08);border:1px solid rgba(184,138,69,.4);border-radius:12px;padding:14px 18px">
+            <div style="width:44px;height:44px;border-radius:9px;background:rgba(184,138,69,.14);border:1px solid rgba(184,138,69,.45);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h5l2 2h9v10H4z"></path><path d="M4 7V5h6l2 2"></path></svg></div>
+            <div style="flex:1">
+              <div style="font:700 10px Manrope;letter-spacing:.22em;color:#B88A45">НОВОЕ ДЕЛО РАЗБЛОКИРОВАНО</div>
+              <div style="font:600 14px Manrope;color:#D5C39A;margin-top:3px">Песчаный меридиан · 13 уровней</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAMPAIGNS row v2 -->
+      <div style="position:relative;padding:22px 36px 0">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font:700 11px Manrope;letter-spacing:.28em;color:#B88A45">КАМПАНИИ</span>
+          <div style="flex:1;height:1px;background:rgba(213,195,154,.1)"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+          <!-- Белый · завершено -->
+          <div style="display:flex;gap:14px;background:#222A25;border:1px solid rgba(111,198,158,.3);border-radius:11px;padding:13px">
+            <div style="width:104px;height:104px;border-radius:8px;flex-shrink:0;background:repeating-linear-gradient(45deg,rgba(213,195,154,.07) 0 10px,rgba(213,195,154,.02) 10px 20px);border:1px dashed rgba(213,195,154,.25);display:flex;align-items:center;justify-content:center"><span style="font:500 8.5px 'JetBrains Mono',monospace;color:#879087;text-align:center">превью:<br>ледник</span></div>
+            <div style="flex:1;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:600 17px 'Cormorant Garamond',serif;color:#D5C39A">Белый меридиан</span><span style="display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:5px;background:rgba(111,198,158,.1);border:1px solid rgba(111,198,158,.35);font:700 9px Manrope;letter-spacing:.1em;color:#6fc69e"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#6fc69e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 6"></path></svg>ЗАВЕРШЕНО</span></div>
+              <div style="font:400 11px Manrope;color:#879087;line-height:1.45;margin-top:5px">Дело закрыто. Отчёт доступен в архиве.</div>
+              <div style="flex:1"></div>
+              <div style="display:flex;align-items:center;gap:9px"><div style="flex:1;height:5px;border-radius:3px;background:rgba(213,195,154,.1);overflow:hidden"><div style="width:100%;height:100%;background:linear-gradient(90deg,#6fc69e,#3f7a61)"></div></div><span style="font:600 11.5px 'JetBrains Mono',monospace;color:#6fc69e">13<span style="color:#879087">/13</span></span></div>
+            </div>
+          </div>
+          <!-- Песчаный · разблокирован -->
+          <div style="display:flex;gap:14px;background:#222A25;border:1px solid rgba(184,138,69,.42);border-radius:11px;padding:13px;box-shadow:0 0 0 1px rgba(184,138,69,.12),0 12px 28px rgba(0,0,0,.3)">
+            <div style="width:104px;height:104px;border-radius:8px;flex-shrink:0;background:repeating-linear-gradient(45deg,rgba(213,195,154,.07) 0 10px,rgba(213,195,154,.02) 10px 20px);border:1px dashed rgba(213,195,154,.25);display:flex;align-items:center;justify-content:center"><span style="font:500 8.5px 'JetBrains Mono',monospace;color:#879087;text-align:center">превью:<br>пустыня</span></div>
+            <div style="flex:1;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:600 17px 'Cormorant Garamond',serif;color:#D5C39A">Песчаный меридиан</span><span style="display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:5px;background:#B85C38;font:800 9px Manrope;letter-spacing:.1em;color:#f5efe0">НОВОЕ</span></div>
+              <div style="font:400 11px Manrope;color:#879087;line-height:1.45;margin-top:5px">Караван, исчезнувший между двумя оазисами.</div>
+              <div style="flex:1"></div>
+              <button style="height:34px;border:none;border-radius:6px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 12px Manrope;cursor:pointer">Начать экспедицию</button>
+            </div>
+          </div>
+          <!-- Изумрудный · закрыт -->
+          <div style="display:flex;gap:14px;background:rgba(34,42,37,.55);border:1px solid rgba(213,195,154,.1);border-radius:11px;padding:13px">
+            <div style="position:relative;width:104px;height:104px;border-radius:8px;flex-shrink:0;background:repeating-linear-gradient(45deg,rgba(213,195,154,.04) 0 10px,transparent 10px 20px);border:1px dashed rgba(213,195,154,.15);display:flex;align-items:center;justify-content:center;filter:grayscale(1)"><span style="font:500 8.5px 'JetBrains Mono',monospace;color:#5d655d;text-align:center">превью:<br>джунгли</span>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(21,27,24,.5);border-radius:8px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></div></div>
+            <div style="flex:1;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:600 17px 'Cormorant Garamond',serif;color:#9aa398">Изумрудный меридиан</span><span style="display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:5px;background:rgba(213,195,154,.06);border:1px solid rgba(213,195,154,.18);font:700 9px Manrope;letter-spacing:.1em;color:#879087">ЗАКРЫТО</span></div>
+              <div style="font:400 11px Manrope;color:#6d756c;line-height:1.45;margin-top:5px">Радиосигнал из сельвы спустя сорок лет тишины.</div>
+              <div style="flex:1"></div>
+              <div style="display:flex;align-items:center;gap:7px;font:500 10.5px Manrope;color:#879087"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>Завершите «Песчаный меридиан»</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SCREEN 3 · MOBILE LANDSCAPE -->
+  <!-- ============================================================ -->
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="display:inline-flex;align-items:center;height:26px;padding:0 11px;border-radius:7px;background:rgba(184,138,69,.16);border:1px solid rgba(184,138,69,.4);font:700 12px Manrope;color:#d8af63">Э3</span>
+      <span style="font:600 20px 'Cormorant Garamond',serif;color:#D5C39A">Mobile · landscape 932×430</span>
+      <span style="font:500 13px Manrope;color:#879087">· CTA ≥ 52px, кампании — компактный список справа</span>
+    </div>
+
+    <div data-screen-label="Mobile landscape · Хаб" style="position:relative;width:932px;height:430px;background:#151B18;border-radius:14px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.5);color:#D5C39A;flex-shrink:0">
+      <div style="position:absolute;inset:0;background:radial-gradient(120% 90% at 50% -25%,rgba(47,106,87,.14),transparent 55%);pointer-events:none"></div>
+
+      <!-- slim top bar -->
+      <div style="position:relative;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid rgba(213,195,154,.1)">
+        <div style="display:flex;align-items:center;gap:9px">
+          <svg width="22" height="22" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="15.2" stroke="#B88A45" stroke-width="1.6"></circle><path d="M17 6.5 L20 17 L17 27.5 L14 17 Z" fill="#B88A45"></path></svg>
+          <span style="font:700 10.5px Manrope;letter-spacing:.22em;color:#B88A45">ТАЙНЫ ЭКСПЕДИЦИЙ</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="display:flex;align-items:center;gap:6px;font:500 10px Manrope;color:#879087"><span style="width:6px;height:6px;border-radius:50%;background:#6fc69e"></span>Сохранено</div>
+          <div style="display:flex;align-items:center;gap:6px;height:32px;padding:0 11px;border-radius:7px;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.04)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.9" stroke-linecap="round"><path d="M9 18h6"></path><path d="M10 21h4"></path><path d="M12 3a6.5 6.5 0 0 0-3.8 11.8c.6.5 1.3 1.3 1.3 2.2h5a2.7 2.7 0 0 1 1.3-2.2A6.5 6.5 0 0 0 12 3z"></path></svg>
+            <span style="font:700 12px 'JetBrains Mono',monospace;color:#D5C39A">6</span>
+          </div>
+          <button style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.04);color:#D5C39A;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"></circle><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2-1.2L14.2 3h-4l-.4 2.5a7 7 0 0 0-2 1.2l-2.3-1-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2 1.2l.4 2.5h4l.4-2.5a7 7 0 0 0 2-1.2l2.3 1 2-3.4-2-1.5c.06-.4.1-.8.1-1.2z"></path></svg></button>
+        </div>
+      </div>
+
+      <!-- 3-column body -->
+      <div style="position:relative;display:grid;grid-template-columns:1fr 236px 226px;gap:12px;padding:12px 18px 14px;height:382px">
+
+        <!-- hero compact -->
+        <div style="position:relative;background:#222A25;border:1px solid rgba(184,138,69,.3);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#d8af63,#a9762f)"></div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="font:700 9px Manrope;letter-spacing:.26em;color:#B88A45">ТЕКУЩЕЕ ДЕЛО</span><span style="font:500 9px 'JetBrains Mono',monospace;color:#879087;border:1px solid rgba(213,195,154,.16);border-radius:4px;padding:1px 6px">№ 013-Б</span></div>
+          <div style="font:600 30px 'Cormorant Garamond',serif;color:#D5C39A;margin-top:6px;line-height:1.05">Белый меридиан</div>
+          <div style="font:500 11.5px Manrope;color:#879087;margin-top:4px">Восстановлено <span style="color:#d8af63;font-weight:700">5 / 13</span> снимков</div>
+          <div style="display:flex;gap:2px;margin-top:10px">
+            <span style="flex:1;height:6px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:6px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:6px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:6px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:6px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:6px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:6px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:6px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:6px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:6px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:6px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:6px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:6px;border-radius:2px;background:rgba(213,195,154,.1)"></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:12px;font:500 11px Manrope;color:#879087"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>Следующая точка: <span style="color:#D5C39A;font-weight:600">Метеостанция</span></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;font:500 11px Manrope;color:#879087"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7v5l3.4 2"></path></svg>До находки: <span style="color:#d8af63;font-weight:700">1 уровень</span></div>
+          <div style="flex:1"></div>
+          <div style="display:flex;gap:10px">
+            <button style="flex:1;height:52px;border:none;border-radius:9px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:800 14px Manrope;cursor:pointer;animation:glowbtn 3.2s ease-in-out infinite;display:flex;align-items:center;justify-content:center;gap:9px"><svg width="14" height="14" viewBox="0 0 24 24" fill="#1a130a"><path d="M7 4.5v15l13-7.5z"></path></svg>Продолжить экспедицию</button>
+            <button style="width:52px;height:52px;border-radius:9px;border:1px solid rgba(213,195,154,.22);background:rgba(213,195,154,.05);color:#D5C39A;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4z"></path><path d="M9 4v13M15 6.5v13"></path></svg></button>
+          </div>
+        </div>
+
+        <!-- middle: daily + collection -->
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="flex:1;background:#222A25;border:1px solid rgba(213,195,154,.14);border-radius:12px;padding:13px 15px;display:flex;flex-direction:column">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font:700 9.5px Manrope;letter-spacing:.2em;color:#B88A45">АРХИВ ДНЯ</span>
+              <span style="display:inline-flex;align-items:center;gap:4px;height:19px;padding:0 7px;border-radius:4px;background:rgba(184,138,69,.14);border:1px solid rgba(184,138,69,.35);font:700 8.5px Manrope;color:#d8af63">2 ДНЯ</span>
+            </div>
+            <div style="font:600 15px 'Cormorant Garamond',serif;color:#D5C39A;margin-top:6px">«Гавань в тумане»</div>
+            <div style="font:500 10px Manrope;color:#879087;margin-top:2px">Награда: <span style="color:#d8af63;font-weight:700">+1 подсказка</span></div>
+            <div style="flex:1"></div>
+            <button style="width:100%;height:38px;border:none;border-radius:7px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 12px Manrope;cursor:pointer">Открыть</button>
+          </div>
+          <div style="position:relative;flex:1;background:#222A25;border:1px solid rgba(213,195,154,.14);border-radius:3px 10px 10px 10px;padding:15px 15px 13px;display:flex;flex-direction:column">
+            <div style="position:absolute;top:-11px;left:13px;display:flex;align-items:center;gap:5px;background:#262e28;border:1px solid rgba(213,195,154,.16);border-bottom:none;border-radius:3px 6px 0 0;padding:3px 8px 6px">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h6l2 2h8v10H4z"></path></svg>
+              <span style="font:700 8.5px Manrope;letter-spacing:.16em;color:#B88A45">АРХИВ</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:flex-end">
+              <span style="font:600 11px 'JetBrains Mono',monospace;color:#d8af63">4<span style="color:#879087">/12</span></span>
+            </div>
+            <div style="display:flex;gap:7px;margin-top:9px">
+              <div style="position:relative;width:38px;height:38px;border-radius:4px;background:#2b2115;border:1px solid rgba(184,138,69,.4);box-shadow:0 3px 8px rgba(0,0,0,.35);transform:rotate(-3deg);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"></circle><path d="M15 9l-2 4-4 2 2-4 4-2z" fill="#d8af63" stroke="none"></path></svg><div style="position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:13px;height:2px;border-radius:1px;background:#6fc69e"></div><div style="position:absolute;top:-5px;right:-5px;width:11px;height:11px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#c96a44,#832f18);box-shadow:0 2px 5px rgba(0,0,0,.5)"></div></div>
+              <div style="position:relative;width:38px;height:38px;border-radius:4px;background:#26231c;border:1px solid rgba(213,195,154,.2);box-shadow:0 3px 8px rgba(0,0,0,.3);transform:rotate(2deg);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D5C39A" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="9" width="16" height="10" rx="2"></rect><circle cx="9" cy="14" r="2.2"></circle><path d="M6 9l10-5"></path></svg><div style="position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:13px;height:2px;border-radius:1px;background:#6fc69e"></div></div>
+              <div style="width:38px;height:38px;border-radius:4px;background:repeating-linear-gradient(45deg,rgba(184,138,69,.05) 0 6px,rgba(213,195,154,.02) 6px 12px);border:1px dashed rgba(213,195,154,.22);display:flex;align-items:center;justify-content:center"><div style="width:16px;height:16px;border-radius:50%;border:1.2px solid rgba(213,195,154,.25);display:flex;align-items:center;justify-content:center"><span style="font:600 9px 'Cormorant Garamond',serif;color:#5d655d">?</span></div></div>
+            </div>
+            <div style="flex:1"></div>
+            <button style="width:100%;height:38px;border-radius:7px;border:1px solid rgba(213,195,154,.2);background:rgba(213,195,154,.05);color:#D5C39A;font:600 11.5px Manrope;cursor:pointer">Открыть архив</button>
+          </div>
+        </div>
+
+        <!-- right: campaigns mini list -->
+        <div style="background:rgba(34,42,37,.6);border:1px solid rgba(213,195,154,.1);border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:9px">
+          <span style="font:700 9.5px Manrope;letter-spacing:.2em;color:#B88A45">КАМПАНИИ</span>
+          <div style="display:flex;align-items:center;gap:10px;background:rgba(213,195,154,.05);border:1px solid rgba(184,138,69,.35);border-radius:9px;padding:9px 11px;min-height:52px">
+            <span style="width:7px;height:7px;border-radius:50%;background:#6fc69e;flex-shrink:0;animation:pulse 2.6s ease-in-out infinite"></span>
+            <div style="flex:1"><div style="font:600 12.5px Manrope;color:#D5C39A">Белый меридиан</div><div style="font:500 9.5px 'JetBrains Mono',monospace;color:#d8af63;margin-top:2px">5/13 · в процессе</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;background:rgba(213,195,154,.03);border:1px solid rgba(213,195,154,.1);border-radius:9px;padding:9px 11px;min-height:52px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.9" style="flex-shrink:0"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
+            <div style="flex:1"><div style="font:600 12.5px Manrope;color:#9aa398">Песчаный меридиан</div><div style="font:500 9.5px Manrope;color:#6d756c;margin-top:2px">после Белого</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;background:rgba(213,195,154,.03);border:1px solid rgba(213,195,154,.1);border-radius:9px;padding:9px 11px;min-height:52px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#879087" stroke-width="1.9" style="flex-shrink:0"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
+            <div style="flex:1"><div style="font:600 12.5px Manrope;color:#9aa398">Изумрудный меридиан</div><div style="font:500 9.5px Manrope;color:#6d756c;margin-top:2px">после Песчаного</div></div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="display:flex;align-items:center;gap:8px;font:500 9.5px Manrope;color:#879087"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"></circle><path d="M15 9l-2 4-4 2 2-4 4-2z" fill="#d8af63" stroke="none"></path></svg>Ближайшая находка: <span style="color:#d8af63">1 ур.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4 · СОСТОЯНИЯ КАРТОЧЕК -->
+  <!-- ============================================================ -->
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="display:inline-flex;align-items:center;height:26px;padding:0 11px;border-radius:7px;background:rgba(184,138,69,.16);border:1px solid rgba(184,138,69,.4);font:700 12px Manrope;color:#d8af63">Э4</span>
+      <span style="font:600 20px 'Cormorant Garamond',serif;color:#D5C39A">Состояния карточек</span>
+      <span style="font:500 13px Manrope;color:#879087">· покрытие всех 8 UX-состояний из брифа</span>
+    </div>
+
+    <div data-screen-label="Состояния карточек" style="width:1440px;background:#11150f;border:1px solid rgba(213,195,154,.08);border-radius:12px;padding:28px 32px;display:flex;flex-direction:column;gap:26px">
+
+      <!-- hero states -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font:600 11px 'JetBrains Mono',monospace;letter-spacing:.18em;color:#879087">HERO «ТЕКУЩЕЕ ДЕЛО» · 4 СОСТОЯНИЯ</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+          <div style="background:#222A25;border:1px solid rgba(184,138,69,.3);border-radius:10px;padding:16px 18px">
+            <div style="font:700 8.5px Manrope;letter-spacing:.24em;color:#B88A45">ТЕКУЩЕЕ ДЕЛО</div>
+            <div style="font:600 21px 'Cormorant Garamond',serif;color:#D5C39A;margin-top:6px">Белый меридиан</div>
+            <div style="font:500 10.5px Manrope;color:#879087;margin-top:3px">Восстановлен <span style="color:#d8af63;font-weight:700">1 / 13</span> снимок</div>
+            <div style="height:5px;border-radius:3px;background:rgba(213,195,154,.1);overflow:hidden;margin-top:10px"><div style="width:8%;height:100%;background:linear-gradient(90deg,#d8af63,#a9762f)"></div></div>
+            <div style="font:500 10px Manrope;color:#6fc69e;margin-top:9px">Первая точка маршрута восстановлена</div>
+            <button style="width:100%;height:38px;margin-top:11px;border:none;border-radius:7px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 12px Manrope;cursor:pointer">Продолжить экспедицию</button>
+            <div style="font:500 9px 'JetBrains Mono',monospace;color:#5d655d;margin-top:9px">state 1 · новый игрок после ур. 1</div>
+          </div>
+          <div style="background:#222A25;border:1px solid rgba(184,138,69,.3);border-radius:10px;padding:16px 18px">
+            <div style="font:700 8.5px Manrope;letter-spacing:.24em;color:#B88A45">ТЕКУЩЕЕ ДЕЛО</div>
+            <div style="font:600 21px 'Cormorant Garamond',serif;color:#D5C39A;margin-top:6px">Белый меридиан</div>
+            <div style="font:500 10.5px Manrope;color:#879087;margin-top:3px">Восстановлено <span style="color:#d8af63;font-weight:700">5 / 13</span> снимков</div>
+            <div style="height:5px;border-radius:3px;background:rgba(213,195,154,.1);overflow:hidden;margin-top:10px"><div style="width:38%;height:100%;background:linear-gradient(90deg,#d8af63,#a9762f)"></div></div>
+            <div style="font:500 10px Manrope;color:#879087;margin-top:9px">До находки: <span style="color:#d8af63;font-weight:700">1 уровень</span> · Метеостанция</div>
+            <button style="width:100%;height:38px;margin-top:11px;border:none;border-radius:7px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 12px Manrope;cursor:pointer">Продолжить экспедицию</button>
+            <div style="font:500 9px 'JetBrains Mono',monospace;color:#5d655d;margin-top:9px">state 2 · середина кампании</div>
+          </div>
+          <div style="background:#222A25;border:1px solid rgba(216,175,99,.5);border-radius:10px;padding:16px 18px">
+            <div style="font:700 8.5px Manrope;letter-spacing:.24em;color:#d8af63">ДЕЛО ПОЧТИ ВОССТАНОВЛЕНО</div>
+            <div style="font:600 21px 'Cormorant Garamond',serif;color:#D5C39A;margin-top:6px">Белый меридиан</div>
+            <div style="font:500 10.5px Manrope;color:#879087;margin-top:3px">Восстановлено <span style="color:#d8af63;font-weight:700">11 / 13</span> снимков</div>
+            <div style="height:5px;border-radius:3px;background:rgba(213,195,154,.1);overflow:hidden;margin-top:10px"><div style="width:85%;height:100%;background:linear-gradient(90deg,#d8af63,#a9762f)"></div></div>
+            <div style="font:500 10px Manrope;color:#d8af63;margin-top:9px">Осталось 2 снимка до закрытия дела</div>
+            <button style="width:100%;height:38px;margin-top:11px;border:none;border-radius:7px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 12px Manrope;cursor:pointer;animation:glowbtn 3.2s ease-in-out infinite">Завершить дело</button>
+            <div style="font:500 9px 'JetBrains Mono',monospace;color:#5d655d;margin-top:9px">state 8a · близко к завершению</div>
+          </div>
+          <div style="background:#222A25;border:1px solid rgba(111,198,158,.4);border-radius:10px;padding:16px 18px;position:relative">
+            <div style="font:700 8.5px Manrope;letter-spacing:.24em;color:#6fc69e">ДЕЛО ВОССТАНОВЛЕНО</div>
+            <div style="font:600 21px 'Cormorant Garamond',serif;color:#D5C39A;margin-top:6px">Белый меридиан</div>
+            <div style="font:500 10.5px Manrope;color:#879087;margin-top:3px">Все <span style="color:#6fc69e;font-weight:700">13 / 13</span> снимков сверены</div>
+            <div style="height:5px;border-radius:3px;background:rgba(213,195,154,.1);overflow:hidden;margin-top:10px"><div style="width:100%;height:100%;background:linear-gradient(90deg,#6fc69e,#3f7a61)"></div></div>
+            <div style="font:500 10px Manrope;color:#879087;margin-top:9px">Следующее дело разблокировано</div>
+            <button style="width:100%;height:38px;margin-top:11px;border-radius:7px;border:1px solid rgba(111,198,158,.45);background:rgba(111,198,158,.08);color:#8fd6b4;font:700 12px Manrope;cursor:pointer">Открыть отчёт</button>
+            <div style="font:500 9px 'JetBrains Mono',monospace;color:#5d655d;margin-top:9px">state 8b · кампания завершена</div>
+            <div style="position:absolute;top:12px;right:12px;width:44px;height:44px;border:1.6px solid rgba(111,198,158,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;transform:rotate(12deg);font:800 6.5px Manrope;letter-spacing:.1em;color:#6fc69e;text-align:center;line-height:1.3">ДЕЛО<br>ЗАКРЫТО</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- daily + collection states -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font:600 11px 'JetBrains Mono',monospace;letter-spacing:.18em;color:#879087">АРХИВ ДНЯ · 2 СОСТОЯНИЯ</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div style="background:#222A25;border:1px solid rgba(213,195,154,.14);border-radius:10px;padding:15px 17px">
+              <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:700 9.5px Manrope;letter-spacing:.2em;color:#B88A45">АРХИВ ДНЯ</span><span style="height:19px;padding:0 7px;border-radius:4px;background:rgba(184,138,69,.14);border:1px solid rgba(184,138,69,.35);font:700 8.5px Manrope;color:#d8af63;display:inline-flex;align-items:center">СЕРИЯ · 2 ДНЯ</span></div>
+              <div style="font:600 15px 'Cormorant Garamond',serif;color:#D5C39A;margin-top:8px">«Гавань в тумане»</div>
+              <div style="font:500 10px Manrope;color:#879087;margin-top:3px">Награда: <span style="color:#d8af63;font-weight:700">+1 подсказка</span></div>
+              <button style="width:100%;height:36px;margin-top:11px;border:none;border-radius:7px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 11.5px Manrope;cursor:pointer">Открыть</button>
+              <div style="font:500 9px 'JetBrains Mono',monospace;color:#5d655d;margin-top:9px">state 4 · доступен</div>
+            </div>
+            <div style="background:rgba(34,42,37,.6);border:1px solid rgba(213,195,154,.1);border-radius:10px;padding:15px 17px">
+              <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:700 9.5px Manrope;letter-spacing:.2em;color:#879087">АРХИВ ДНЯ</span><span style="height:19px;padding:0 7px;border-radius:4px;background:rgba(111,198,158,.1);border:1px solid rgba(111,198,158,.35);font:700 8.5px Manrope;color:#6fc69e;display:inline-flex;align-items:center">ПОЛУЧЕНО</span></div>
+              <div style="font:600 15px 'Cormorant Garamond',serif;color:#9aa398;margin-top:8px">«Гавань в тумане»</div>
+              <div style="font:500 10px Manrope;color:#879087;margin-top:3px">Серия сохранена: <span style="color:#d8af63;font-weight:700">3 дня</span></div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:7px;width:100%;height:36px;margin-top:11px;border-radius:7px;border:1px dashed rgba(213,195,154,.2);font:600 11px 'JetBrains Mono',monospace;color:#879087">через 14:32</div>
+              <div style="font:500 9px 'JetBrains Mono',monospace;color:#5d655d;margin-top:9px">state 5 · уже получен</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font:600 11px 'JetBrains Mono',monospace;letter-spacing:.18em;color:#879087">ПОЛЕВОЙ АРХИВ · 2 СОСТОЯНИЯ</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div style="position:relative;background:#222A25;border:1px solid rgba(213,195,154,.14);border-radius:3px 10px 10px 10px;padding:16px 17px 15px">
+              <div style="position:absolute;top:-11px;left:14px;display:flex;align-items:center;gap:5px;background:#262e28;border:1px solid rgba(213,195,154,.16);border-bottom:none;border-radius:3px 6px 0 0;padding:3px 8px 6px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h6l2 2h8v10H4z"></path></svg><span style="font:700 8.5px Manrope;letter-spacing:.16em;color:#B88A45">АРХИВ</span></div>
+              <div style="display:flex;align-items:center;justify-content:flex-end"><span style="font:600 11px 'JetBrains Mono',monospace;color:#d8af63">4<span style="color:#879087">/12</span></span></div>
+              <div style="display:flex;gap:7px;margin-top:10px">
+                <div style="position:relative;width:36px;height:36px;border-radius:4px;background:#2b2115;border:1px solid rgba(184,138,69,.4);box-shadow:0 3px 8px rgba(0,0,0,.35);transform:rotate(-3deg);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"></circle><path d="M15 9l-2 4-4 2 2-4 4-2z" fill="#d8af63" stroke="none"></path></svg><div style="position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:13px;height:2px;border-radius:1px;background:#6fc69e"></div><div style="position:absolute;top:-6px;right:-6px;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#c96a44,#832f18);box-shadow:0 2px 5px rgba(0,0,0,.5)"></div></div>
+                <div style="position:relative;width:36px;height:36px;border-radius:4px;background:#26231c;border:1px solid rgba(213,195,154,.2);box-shadow:0 3px 8px rgba(0,0,0,.3);transform:rotate(2deg);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D5C39A" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="9" width="16" height="10" rx="2"></rect><circle cx="9" cy="14" r="2.2"></circle><path d="M6 9l10-5"></path></svg><div style="position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:13px;height:2px;border-radius:1px;background:#6fc69e"></div></div>
+                <div style="width:36px;height:36px;border-radius:4px;background:repeating-linear-gradient(45deg,rgba(184,138,69,.05) 0 6px,rgba(213,195,154,.02) 6px 12px);border:1px dashed rgba(213,195,154,.22);display:flex;align-items:center;justify-content:center"><div style="width:15px;height:15px;border-radius:50%;border:1.2px solid rgba(213,195,154,.25);display:flex;align-items:center;justify-content:center"><span style="font:600 9px 'Cormorant Garamond',serif;color:#5d655d">?</span></div></div>
+              </div>
+              <div style="font:500 9px 'JetBrains Mono',monospace;color:#5d655d;margin-top:12px">state 3 · свежее поступление запечатано сургучом</div>
+            </div>
+            <div style="position:relative;background:#222A25;border:1px solid rgba(213,195,154,.14);border-radius:3px 10px 10px 10px;padding:16px 17px 15px">
+              <div style="position:absolute;top:-11px;left:14px;display:flex;align-items:center;gap:5px;background:#262e28;border:1px solid rgba(213,195,154,.16);border-bottom:none;border-radius:3px 6px 0 0;padding:3px 8px 6px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h6l2 2h8v10H4z"></path></svg><span style="font:700 8.5px Manrope;letter-spacing:.16em;color:#B88A45">АРХИВ</span></div>
+              <div style="display:flex;align-items:center;justify-content:flex-end"><span style="font:600 11px 'JetBrains Mono',monospace;color:#d8af63">4<span style="color:#879087">/12</span></span></div>
+              <div style="display:flex;gap:7px;margin-top:10px">
+                <div style="position:relative;width:36px;height:36px;border-radius:4px;background:#26231c;border:1px solid rgba(213,195,154,.2);box-shadow:0 3px 8px rgba(0,0,0,.3);transform:rotate(-2deg);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D5C39A" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"></circle><path d="M15 9l-2 4-4 2 2-4 4-2z" fill="#D5C39A" stroke="none"></path></svg><div style="position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:13px;height:2px;border-radius:1px;background:#6fc69e"></div></div>
+                <div style="position:relative;width:36px;height:36px;border-radius:4px;background:#26231c;border:1px solid rgba(213,195,154,.2);box-shadow:0 3px 8px rgba(0,0,0,.3);transform:rotate(2deg);display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D5C39A" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="9" width="16" height="10" rx="2"></rect><circle cx="9" cy="14" r="2.2"></circle><path d="M6 9l10-5"></path></svg><div style="position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:13px;height:2px;border-radius:1px;background:#6fc69e"></div></div>
+                <div style="width:36px;height:36px;border-radius:4px;background:repeating-linear-gradient(45deg,rgba(184,138,69,.05) 0 6px,rgba(213,195,154,.02) 6px 12px);border:1px dashed rgba(213,195,154,.22);display:flex;align-items:center;justify-content:center"><div style="width:15px;height:15px;border-radius:50%;border:1.2px solid rgba(213,195,154,.25);display:flex;align-items:center;justify-content:center"><span style="font:600 9px 'Cormorant Garamond',serif;color:#5d655d">?</span></div></div>
+              </div>
+              <div style="font:500 9px 'JetBrains Mono',monospace;color:#5d655d;margin-top:12px">без свежих поступлений</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- campaign card states -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font:600 11px 'JetBrains Mono',monospace;letter-spacing:.18em;color:#879087">КАРТОЧКА КАМПАНИИ · 4 СОСТОЯНИЯ</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+          <div style="background:#222A25;border:1px solid rgba(184,138,69,.32);border-radius:10px;padding:14px 16px">
+            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:600 15px 'Cormorant Garamond',serif;color:#D5C39A">Белый меридиан</span><span style="height:18px;padding:0 7px;border-radius:4px;background:rgba(111,198,158,.1);border:1px solid rgba(111,198,158,.35);font:700 8px Manrope;letter-spacing:.08em;color:#6fc69e;display:inline-flex;align-items:center">В ПРОЦЕССЕ</span></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:11px"><div style="flex:1;height:5px;border-radius:3px;background:rgba(213,195,154,.1);overflow:hidden"><div style="width:38%;height:100%;background:linear-gradient(90deg,#d8af63,#a9762f)"></div></div><span style="font:600 10.5px 'JetBrains Mono',monospace;color:#d8af63">5<span style="color:#879087">/13</span></span></div>
+            <div style="font:500 9px 'JetBrains Mono',monospace;color:#5d655d;margin-top:11px">state 6a · активна</div>
+          </div>
+          <div style="background:#222A25;border:1px solid rgba(111,198,158,.3);border-radius:10px;padding:14px 16px">
+            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:600 15px 'Cormorant Garamond',serif;color:#D5C39A">Белый меридиан</span><span style="height:18px;padding:0 7px;border-radius:4px;background:rgba(111,198,158,.1);border:1px solid rgba(111,198,158,.35);font:700 8px Manrope;letter-spacing:.08em;color:#6fc69e;display:inline-flex;align-items:center">ЗАВЕРШЕНО</span></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:11px"><div style="flex:1;height:5px;border-radius:3px;background:rgba(213,195,154,.1);overflow:hidden"><div style="width:100%;height:100%;background:linear-gradient(90deg,#6fc69e,#3f7a61)"></div></div><span style="font:600 10.5px 'JetBrains Mono',monospace;color:#6fc69e">13<span style="color:#879087">/13</span></span></div>
+            <div style="font:500 9px 'JetBrains Mono',monospace;color:#5d655d;margin-top:11px">state 7a · завершена</div>
+          </div>
+          <div style="background:#222A25;border:1px solid rgba(184,138,69,.42);border-radius:10px;padding:14px 16px">
+            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:600 15px 'Cormorant Garamond',serif;color:#D5C39A">Песчаный меридиан</span><span style="height:18px;padding:0 7px;border-radius:4px;background:#B85C38;font:800 8px Manrope;letter-spacing:.08em;color:#f5efe0;display:inline-flex;align-items:center">НОВОЕ</span></div>
+            <button style="width:100%;height:32px;margin-top:11px;border:none;border-radius:6px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 11px Manrope;cursor:pointer">Начать экспедицию</button>
+            <div style="font:500 9px 'JetBrains Mono',monospace;color:#5d655d;margin-top:11px">state 7b · разблокирована</div>
+          </div>
+          <div style="background:rgba(34,42,37,.55);border:1px solid rgba(213,195,154,.1);border-radius:10px;padding:14px 16px">
+            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:600 15px 'Cormorant Garamond',serif;color:#9aa398">Изумрудный меридиан</span><span style="height:18px;padding:0 7px;border-radius:4px;background:rgba(213,195,154,.06);border:1px solid rgba(213,195,154,.18);font:700 8px Manrope;letter-spacing:.08em;color:#879087;display:inline-flex;align-items:center">ЗАКРЫТО</span></div>
+            <div style="display:flex;align-items:center;gap:7px;margin-top:13px;font:500 10px Manrope;color:#879087"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#B88A45" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="1.5"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>Завершите «Песчаный меридиан»</div>
+            <div style="font:500 9px 'JetBrains Mono',monospace;color:#5d655d;margin-top:11px">state 6b · закрыта</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5 · МИНИ ДИЗАЙН-СИСТЕМА -->
+  <!-- ============================================================ -->
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="display:inline-flex;align-items:center;height:26px;padding:0 11px;border-radius:7px;background:rgba(184,138,69,.16);border:1px solid rgba(184,138,69,.4);font:700 12px Manrope;color:#d8af63">Э5</span>
+      <span style="font:600 20px 'Cormorant Garamond',serif;color:#D5C39A">Мини дизайн-система</span>
+      <span style="font:500 13px Manrope;color:#879087">· кнопки, бейджи, прогресс, модалка</span>
+    </div>
+
+    <div data-screen-label="Мини дизайн-система" style="width:1440px;background:#11150f;border:1px solid rgba(213,195,154,.08);border-radius:12px;padding:28px 32px;display:grid;grid-template-columns:1fr 1fr 440px;gap:32px">
+
+      <!-- buttons + badges -->
+      <div style="display:flex;flex-direction:column;gap:22px">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font:600 11px 'JetBrains Mono',monospace;letter-spacing:.18em;color:#879087">КНОПКИ</div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+            <button style="height:50px;padding:0 26px;border:none;border-radius:8px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:800 14.5px Manrope;cursor:pointer;box-shadow:0 8px 20px rgba(184,138,69,.28),inset 0 1px 0 rgba(255,255,255,.3)">Primary · Продолжить экспедицию</button>
+            <button style="height:44px;padding:0 22px;border-radius:8px;border:1px solid rgba(213,195,154,.22);background:rgba(213,195,154,.05);color:#D5C39A;font:600 13px Manrope;cursor:pointer">Secondary · Карта маршрута</button>
+            <button style="height:36px;padding:0 16px;border:none;border-radius:6px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 12px Manrope;cursor:pointer">Small · Открыть</button>
+            <div style="display:flex;gap:10px;align-items:center">
+              <button style="width:44px;height:44px;border-radius:50%;border:1px solid rgba(213,195,154,.14);background:rgba(213,195,154,.04);color:#D5C39A;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"></circle><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2-1.2L14.2 3h-4l-.4 2.5a7 7 0 0 0-2 1.2l-2.3-1-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2 1.2l.4 2.5h4l.4-2.5a7 7 0 0 0 2-1.2l2.3 1 2-3.4-2-1.5c.06-.4.1-.8.1-1.2z"></path></svg></button>
+              <span style="font:500 10px 'JetBrains Mono',monospace;color:#5d655d">icon · 44px hit target</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <button style="height:44px;padding:0 22px;border-radius:8px;border:1px dashed rgba(213,195,154,.18);background:transparent;color:#5d655d;font:600 13px Manrope;cursor:not-allowed">Disabled · Недоступно</button>
+              <span style="font:500 10px 'JetBrains Mono',monospace;color:#5d655d">заблокированные действия</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font:600 11px 'JetBrains Mono',monospace;letter-spacing:.18em;color:#879087">БЕЙДЖИ И СТАТУСЫ</div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px">
+            <span style="height:22px;padding:0 9px;border-radius:5px;background:#B85C38;font:800 9.5px Manrope;letter-spacing:.1em;color:#f5efe0;display:inline-flex;align-items:center">НОВОЕ</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:5px;background:rgba(111,198,158,.1);border:1px solid rgba(111,198,158,.35);font:700 9.5px Manrope;letter-spacing:.1em;color:#6fc69e"><span style="width:5px;height:5px;border-radius:50%;background:#6fc69e"></span>В ПРОЦЕССЕ</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:5px;background:rgba(111,198,158,.1);border:1px solid rgba(111,198,158,.35);font:700 9.5px Manrope;letter-spacing:.1em;color:#6fc69e"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#6fc69e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 6"></path></svg>ЗАВЕРШЕНО</span>
+            <span style="height:22px;padding:0 9px;border-radius:5px;background:rgba(213,195,154,.06);border:1px solid rgba(213,195,154,.18);font:700 9.5px Manrope;letter-spacing:.1em;color:#879087;display:inline-flex;align-items:center">ЗАКРЫТО</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:5px;background:rgba(184,138,69,.14);border:1px solid rgba(184,138,69,.35);font:700 9.5px Manrope;color:#d8af63"><svg width="10" height="10" viewBox="0 0 24 24" fill="#d8af63"><path d="M12 2c1 4-3 5-3 9a3 3 0 0 0 6 0c0-2-1-3-1-5 3 2 5 5 5 8a7 7 0 0 1-14 0c0-6 6-8 7-12z"></path></svg>СЕРИЯ · 2 ДНЯ</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:5px;background:rgba(184,138,69,.14);border:1px solid rgba(184,138,69,.35);font:700 9.5px Manrope;color:#d8af63"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.9" stroke-linecap="round"><path d="M9 18h6"></path><path d="M10 21h4"></path><path d="M12 3a6.5 6.5 0 0 0-3.8 11.8c.6.5 1.3 1.3 1.3 2.2h5a2.7 2.7 0 0 1 1.3-2.2A6.5 6.5 0 0 0 12 3z"></path></svg>+1 ПОДСКАЗКА</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:5px;background:rgba(21,27,24,.6);border:1px solid rgba(213,195,154,.18);font:700 9.5px Manrope;letter-spacing:.1em;color:#D5C39A"><span style="width:5px;height:5px;border-radius:50%;background:#6fc69e"></span>СОХРАНЕНО</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font:600 11px 'JetBrains Mono',monospace;letter-spacing:.18em;color:#879087">ПРОГРЕСС</div>
+          <div style="display:flex;flex-direction:column;gap:12px;max-width:360px">
+            <div style="display:flex;gap:3px"><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:7px;border-radius:2px;background:linear-gradient(180deg,#d8af63,#a9762f)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span><span style="flex:1;height:7px;border-radius:2px;background:rgba(213,195,154,.1)"></span></div>
+            <div style="font:500 9.5px 'JetBrains Mono',monospace;color:#5d655d;margin-top:-6px">сегментный · уровни кампании (hero)</div>
+            <div style="height:5px;border-radius:3px;background:rgba(213,195,154,.1);overflow:hidden"><div style="width:38%;height:100%;background:linear-gradient(90deg,#d8af63,#a9762f)"></div></div>
+            <div style="font:500 9.5px 'JetBrains Mono',monospace;color:#5d655d;margin-top:-6px">тонкий · компактные карточки</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- typography + colors -->
+      <div style="display:flex;flex-direction:column;gap:22px">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font:600 11px 'JetBrains Mono',monospace;letter-spacing:.18em;color:#879087">ТИПОГРАФИКА</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="font:600 34px 'Cormorant Garamond',serif;color:#D5C39A">Заголовок дела — Cormorant</div>
+            <div style="font:600 19px 'Cormorant Garamond',serif;color:#D5C39A">Название карточки — Cormorant 19</div>
+            <div style="font:700 11px Manrope;letter-spacing:.26em;color:#B88A45">НАДЗАГОЛОВОК — MANROPE CAPS</div>
+            <div style="font:500 13px Manrope;color:#879087">Основной текст — Manrope 13 · описания и метаданные</div>
+            <div style="font:500 11px 'JetBrains Mono',monospace;color:#879087">Счётчики и штампы — JetBrains Mono · 5/13, № 013-Б</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font:600 11px 'JetBrains Mono',monospace;letter-spacing:.18em;color:#879087">ПАЛИТРА</div>
+          <div style="display:flex;gap:10px">
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:56px;height:56px;border-radius:9px;background:#151B18;border:1px solid rgba(213,195,154,.2)"></div><span style="font:500 8.5px 'JetBrains Mono',monospace;color:#879087">#151B18<br>фон</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:56px;height:56px;border-radius:9px;background:#222A25;border:1px solid rgba(213,195,154,.2)"></div><span style="font:500 8.5px 'JetBrains Mono',monospace;color:#879087">#222A25<br>панель</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:56px;height:56px;border-radius:9px;background:#D5C39A"></div><span style="font:500 8.5px 'JetBrains Mono',monospace;color:#879087">#D5C39A<br>пергамент</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:56px;height:56px;border-radius:9px;background:#d8af63"></div><span style="font:500 8.5px 'JetBrains Mono',monospace;color:#879087">#D8AF63<br>латунь</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:56px;height:56px;border-radius:9px;background:#B85C38"></div><span style="font:500 8.5px 'JetBrains Mono',monospace;color:#879087">#B85C38<br>ржавчина</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:56px;height:56px;border-radius:9px;background:#6fc69e"></div><span style="font:500 8.5px 'JetBrains Mono',monospace;color:#879087">#6FC69E<br>успех</span></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="font:600 11px 'JetBrains Mono',monospace;letter-spacing:.18em;color:#879087">ПРАВИЛА</div>
+          <div style="font:400 12px Manrope;color:#879087;line-height:1.65;max-width:420px">Один основной CTA на экран — латунный градиент. Успех и «завершено» — приглушённый зелёный. «Новое» — единственный тёплый терракотовый акцент. Закрытое — не красное и не штрафное: серое с латунным замком и объяснением, как открыть.</div>
+        </div>
+      </div>
+
+      <!-- modal -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font:600 11px 'JetBrains Mono',monospace;letter-spacing:.18em;color:#879087">МОДАЛКА · НАГРАДА ДНЯ</div>
+        <div style="position:relative;background:#151B18;border-radius:12px;padding:36px 28px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(213,195,154,.08)">
+          <div style="position:absolute;inset:0;background:rgba(10,13,11,.55);border-radius:12px"></div>
+          <div style="position:relative;width:340px;background:#222A25;border:1px solid rgba(184,138,69,.35);border-radius:14px;padding:26px 26px 24px;box-shadow:0 30px 70px rgba(0,0,0,.6);text-align:center">
+            <div style="width:64px;height:64px;border-radius:50%;background:rgba(184,138,69,.14);border:1px solid rgba(184,138,69,.45);display:flex;align-items:center;justify-content:center;margin:0 auto"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d8af63" stroke-width="1.7" stroke-linecap="round"><path d="M9 18h6"></path><path d="M10 21h4"></path><path d="M12 3a6.5 6.5 0 0 0-3.8 11.8c.6.5 1.3 1.3 1.3 2.2h5a2.7 2.7 0 0 1 1.3-2.2A6.5 6.5 0 0 0 12 3z"></path></svg></div>
+            <div style="font:700 10px Manrope;letter-spacing:.26em;color:#B88A45;margin-top:16px">АРХИВ ДНЯ · СВЕРЕНО</div>
+            <div style="font:600 24px 'Cormorant Garamond',serif;color:#D5C39A;margin-top:6px">+1 подсказка получена</div>
+            <div style="font:400 12px Manrope;color:#879087;line-height:1.5;margin-top:8px">Серия продолжается: 3 дня подряд.<br>Возвращайтесь завтра за фрагментом находки.</div>
+            <button style="width:100%;height:44px;margin-top:18px;border:none;border-radius:8px;background:linear-gradient(180deg,#d8af63,#b3812f);color:#1a130a;font:700 13.5px Manrope;cursor:pointer">Забрать</button>
+            <button style="width:100%;height:36px;margin-top:8px;border:none;background:none;color:#879087;font:600 12px Manrope;cursor:pointer">Закрыть</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+</body>
+</html>
