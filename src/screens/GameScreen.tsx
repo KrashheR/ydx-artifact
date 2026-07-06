@@ -4,6 +4,7 @@ import { getChapter, getLevelById } from "@/content/chapters";
 import { PhotoComparator } from "@/features/gameplay/PhotoComparator";
 import { ArtifactFoundToast, type ArtifactToastVariant } from "@/features/gameplay/ArtifactFoundToast";
 import { ArtifactRevealOverlay } from "@/features/collection/ArtifactRevealOverlay";
+import { CampaignCaseReportModal } from "@/features/campaign-report/CampaignCaseReportModal";
 import { LevelCompleteOverlay } from "@/features/gameplay/LevelCompleteOverlay";
 import { LevelFailedOverlay } from "@/features/gameplay/LevelFailedOverlay";
 import { getArtifactById } from "@/content/artifacts";
@@ -21,6 +22,7 @@ import {
 import { preloadImages } from "@/shared/lib/imagePreload";
 import { useGameStore } from "@/shared/store/gameStore";
 import { MAX_MAGNIFIERS } from "@/entities/save/schema";
+import { getNextCampaignReportChapterId } from "@/data/campaignReports";
 
 const TIME_LIMIT = 300; // 5 minutes
 const COMPLETE_OVERLAY_DELAY_MS = 200;
@@ -352,6 +354,11 @@ export function GameScreen({
   );
   const artifactRevealQueue = useGameStore((s) => s.artifactRevealQueue);
   const dismissArtifactReveal = useGameStore((s) => s.dismissArtifactReveal);
+  const markCampaignReportViewed = useGameStore((s) => s.markCampaignReportViewed);
+  const shouldShowCampaignReport = useGameStore((s) => s.shouldShowCampaignReport);
+  const getCampaignReportForCompletedCampaign = useGameStore(
+    (s) => s.getCampaignReportForCompletedCampaign,
+  );
 
   const [timedOut, setTimedOut] = useState(false);
   const [platformPaused, setPlatformPaused] = useState(getIsPlatformPaused);
@@ -404,10 +411,21 @@ export function GameScreen({
   const pendingRevealArtifact =
     artifactRevealQueue.length > 0 ? getArtifactById(artifactRevealQueue[0]) ?? null : null;
   const showArtifactReveal = showComplete && pendingRevealArtifact !== null;
+  const campaignReport =
+    level &&
+    chapter &&
+    mode === "campaign" &&
+    showComplete &&
+    !showArtifactReveal &&
+    level.order === chapter.levels.length &&
+    shouldShowCampaignReport(level.chapterId)
+      ? getCampaignReportForCompletedCampaign(level.chapterId)
+      : null;
+  const showCampaignReport = campaignReport !== null;
   const showRewardedHintModal = rewardedHintModal !== null;
   const showStartupOnboarding = mode === "campaign" && startupOnboardingOpen && !showComplete && !timedOut;
   const showOverlay =
-    showComplete || timedOut || showRewardedHintModal || isReviewPromptOpen || showStartupOnboarding;
+    showComplete || timedOut || showRewardedHintModal || isReviewPromptOpen || showStartupOnboarding || showCampaignReport;
   const gameplayBlocked =
     platformPaused ||
     !pageVisible ||
@@ -576,7 +594,7 @@ export function GameScreen({
           isCampaignMapActive: false,
           isPostLevelVictoryActive: true,
           isDocumentVisible: pageVisible && document.visibilityState === "visible",
-          hasBlockingOverlay: isReviewPromptOpen || showArtifactReveal,
+          hasBlockingOverlay: isReviewPromptOpen || showArtifactReveal || showCampaignReport,
           isAdActive:
             isInterstitialActive ||
             interstitialRuntime.nativeRequestInFlight ||
@@ -635,6 +653,7 @@ export function GameScreen({
     saveData.reviewPrompt,
     setReviewUnavailableReason,
     showArtifactReveal,
+    showCampaignReport,
     showComplete,
   ]);
 
@@ -658,6 +677,32 @@ export function GameScreen({
       }
     };
   }, []);
+
+  const reportShownRef = useRef<string | null>(null);
+  const reportRestoredLevels =
+    chapter?.levels.filter((candidate) => saveData.completedLevels.includes(candidate.id)).length ?? 0;
+  const reportTotalLevels = chapter?.levels.length ?? 0;
+  const reportUnlockedArtifactCount =
+    campaignReport?.artifactIds.filter((artifactId) => (saveData.artifacts[artifactId] ?? "locked") !== "locked")
+      .length ?? 0;
+  const reportTotalArtifactCount = campaignReport?.artifactIds.length ?? 0;
+
+  useEffect(() => {
+    if (!showCampaignReport || !campaignReport) return;
+    if (reportShownRef.current === campaignReport.id) return;
+    reportShownRef.current = campaignReport.id;
+    trackAnalyticsEvent("campaign_report_shown", {
+      campaignId: campaignReport.campaignId,
+      reportId: campaignReport.id,
+      restoredLevels: reportRestoredLevels,
+      artifactCount: reportUnlockedArtifactCount
+    });
+  }, [
+    campaignReport,
+    reportRestoredLevels,
+    reportUnlockedArtifactCount,
+    showCampaignReport,
+  ]);
 
   if (!level || !chapter) return null;
 
@@ -949,6 +994,42 @@ export function GameScreen({
     clearPendingInterstitialCheck();
     clearPendingReviewPromptCheck();
     navigate({ kind: "collection" });
+  }
+
+  function completeCampaignReportAction(action: "next_campaign" | "collection" | "archive" | "close") {
+    if (!campaignReport) return;
+    markCampaignReportViewed(campaignReport.id);
+    clearPendingInterstitialCheck();
+    clearPendingReviewPromptCheck();
+    trackAnalyticsEvent("campaign_report_cta_clicked", {
+      campaignId: campaignReport.campaignId,
+      reportId: campaignReport.id,
+      action
+    });
+    void save({ flush: true });
+  }
+
+  function handleCampaignReportPrimary() {
+    if (!campaignReport) return;
+    const nextChapterId = getNextCampaignReportChapterId(campaignReport);
+    completeCampaignReportAction(nextChapterId ? "next_campaign" : "archive");
+    if (nextChapterId) {
+      navigate({ kind: "map", chapterId: nextChapterId });
+      return;
+    }
+    navigate({ kind: "home" });
+  }
+
+  function handleCampaignReportCollection() {
+    if (!campaignReport) return;
+    completeCampaignReportAction("collection");
+    navigate({ kind: "collection" });
+  }
+
+  function handleCampaignReportClose() {
+    if (!campaignReport) return;
+    completeCampaignReportAction("close");
+    navigate({ kind: "map", chapterId });
   }
 
   function handleMap() {
@@ -1558,6 +1639,20 @@ export function GameScreen({
           backgroundSrc={level.imageB}
           onContinue={handleArtifactRevealContinue}
           onOpenCollection={handleArtifactRevealCollection}
+        />
+      )}
+
+      {showCampaignReport && campaignReport && (
+        <CampaignCaseReportModal
+          report={campaignReport}
+          restoredLevels={reportRestoredLevels}
+          totalLevels={reportTotalLevels}
+          unlockedArtifactCount={reportUnlockedArtifactCount}
+          totalArtifactCount={reportTotalArtifactCount}
+          artifactIds={campaignReport.artifactIds}
+          onPrimary={handleCampaignReportPrimary}
+          onOpenCollection={handleCampaignReportCollection}
+          onClose={handleCampaignReportClose}
         />
       )}
 

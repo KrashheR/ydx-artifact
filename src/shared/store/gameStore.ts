@@ -5,7 +5,14 @@ import {
   type ReviewUnavailableReason,
   type SaveData
 } from "@/entities/save/schema";
-import { getLevelById, type ChapterId } from "@/content/chapters";
+import { getChapter, getLevelById, type ChapterId } from "@/content/chapters";
+import {
+  getCampaignReportChapterId,
+  getCampaignReportForCampaign,
+  type CampaignReport,
+  type CampaignReportCampaignId,
+  type CampaignReportId
+} from "@/data/campaignReports";
 import {
   clearPersistentSave,
   loadPersistentSave,
@@ -86,6 +93,11 @@ type GameStore = {
   setReviewUnavailableReason: (reason?: ReviewUnavailableReason) => void;
   dismissArtifactReveal: (artifactId: string) => void;
   markArtifactViewed: (artifactId: string) => void;
+  markCampaignReportViewed: (reportId: CampaignReportId) => void;
+  shouldShowCampaignReport: (campaignId: CampaignReportCampaignId | ChapterId) => boolean;
+  getCampaignReportForCompletedCampaign: (
+    campaignId: CampaignReportCampaignId | ChapterId
+  ) => CampaignReport | null;
   resetLevelProgress: (levelId: string) => void;
   resetSave: () => Promise<void>;
 };
@@ -623,6 +635,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }));
     trackAnalyticsEvent("collection_artifact_viewed", { artifactId });
     void get().save();
+  },
+  markCampaignReportViewed(reportId) {
+    const viewedReportIds = get().saveData.viewedCampaignReportIds;
+    if (viewedReportIds.includes(reportId)) return;
+    set((state) => ({
+      saveData: {
+        ...state.saveData,
+        viewedCampaignReportIds: [...state.saveData.viewedCampaignReportIds, reportId]
+      }
+    }));
+    void get().save({ flush: true });
+  },
+  shouldShowCampaignReport(campaignId) {
+    const report = get().getCampaignReportForCompletedCampaign(campaignId);
+    if (!report) return false;
+    return !get().saveData.viewedCampaignReportIds.includes(report.id);
+  },
+  getCampaignReportForCompletedCampaign(campaignId) {
+    const report = getCampaignReportForCampaign(campaignId);
+    if (!report) return null;
+    const chapter = getChapter(getCampaignReportChapterId(report));
+    const isComplete = chapter.levels.every((level) =>
+      get().saveData.completedLevels.includes(level.id)
+    );
+    return isComplete ? report : null;
   },
   resetLevelProgress(levelId) {
     const inProgress = get().saveData.inProgress;

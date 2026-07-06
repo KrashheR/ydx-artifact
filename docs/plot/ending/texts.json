@@ -1,0 +1,16 @@
+{
+  "campaignReport": {
+    "label": "Дело экспедиции восстановлено",
+    "progressLabel": "Снимки восстановлены",
+    "findingsLabel": "Находки дела",
+    "accuracyLabel": "Точность архива",
+    "conclusionLabel": "Вывод архивариуса",
+    "primaryNextCampaign": "Открыть следующее дело",
+    "primaryFinal": "Вернуться в архив",
+    "secondaryCollection": "Посмотреть находки",
+    "secondaryMap": "Карта маршрута",
+    "perfectFindings": "Архив дела собран полностью",
+    "incompleteFindings": "Часть находок ещё скрыта в снимках",
+    "futureSectorButton": "Посмотреть закрытые сектора"
+  }
+}

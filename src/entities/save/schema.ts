@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ARTIFACT_IDS } from "@/content/artifacts";
+import { CAMPAIGN_REPORT_IDS } from "@/data/campaignReports";
 
 export const SAVE_VERSION = 2;
 
@@ -46,6 +47,12 @@ const inProgressV2Schema = z.object({
   mistakes: z.number().int().nonnegative()
 });
 
+const campaignReportIdSchema = z.enum([
+  "white-meridian-report",
+  "sand-meridian-report",
+  "emerald-meridian-report"
+]);
+
 export const saveSchema = z.object({
   version: z.literal(SAVE_VERSION),
   updatedAt: z.number(),
@@ -54,6 +61,7 @@ export const saveSchema = z.object({
   inProgress: inProgressV2Schema.nullable(),
   magnifiers: z.number().int().nonnegative(),
   artifacts: z.record(z.enum(["locked", "newly-unlocked", "viewed"])),
+  viewedCampaignReportIds: z.array(campaignReportIdSchema).default([]),
   daily: z.object({
     lastClaimDate: z.string().nullable(),
     streak: z.number().int().nonnegative()
@@ -90,6 +98,7 @@ const saveV1Schema = z.object({
     .optional(),
   magnifiers: z.number().optional(),
   artifacts: z.record(z.enum(["locked", "newly-unlocked", "viewed"])).optional(),
+  viewedCampaignReportIds: z.array(campaignReportIdSchema).optional(),
   daily: z
     .object({
       lastClaimDate: z.string().nullable().optional(),
@@ -143,7 +152,10 @@ export function migrateSaveData(value: unknown): SaveData {
       artifacts: {
         ...Object.fromEntries(ARTIFACT_IDS.map((artifactId) => [artifactId, "locked" as const])),
         ...v2.data.artifacts
-      }
+      },
+      viewedCampaignReportIds: v2.data.viewedCampaignReportIds.filter((reportId) =>
+        CAMPAIGN_REPORT_IDS.includes(reportId)
+      )
     };
   }
 
@@ -178,6 +190,7 @@ export function migrateSaveData(value: unknown): SaveData {
       MAX_MAGNIFIERS
     ),
     artifacts: { ...fallback.artifacts, ...(source.artifacts ?? {}) },
+    viewedCampaignReportIds: source.viewedCampaignReportIds ?? fallback.viewedCampaignReportIds,
     daily: {
       lastClaimDate: source.daily?.lastClaimDate ?? null,
       streak: clampNonNegativeInteger(source.daily?.streak, 0)
@@ -205,6 +218,7 @@ export function createDefaultSave(): SaveData {
     inProgress: null,
     magnifiers: MAX_MAGNIFIERS,
     artifacts: Object.fromEntries(ARTIFACT_IDS.map((artifactId) => [artifactId, "locked"])),
+    viewedCampaignReportIds: [],
     daily: {
       lastClaimDate: null,
       streak: 0

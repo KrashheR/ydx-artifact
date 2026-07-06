@@ -33,7 +33,8 @@ function resetStore() {
       pendingMapCheckCompletedLevels: null,
       lastResolvedCompletedLevels: 0,
       nativeRequestInFlight: false
-    }
+    },
+    artifactRevealQueue: []
   });
 }
 
@@ -111,5 +112,32 @@ describe("gameStore analytics", () => {
         durationBucket: "120_179s"
       })
     );
+  });
+});
+
+describe("gameStore campaign reports", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    resetStore();
+  });
+
+  it("shows a completed campaign report automatically only until it is viewed", () => {
+    for (const level of getChapterLevels("northern-route")) {
+      completeAttempt(level.id, 0, 80);
+    }
+
+    const report = useGameStore
+      .getState()
+      .getCampaignReportForCompletedCampaign("northern-route");
+
+    expect(report?.id).toBe("white-meridian-report");
+    expect(useGameStore.getState().shouldShowCampaignReport("northern-route")).toBe(true);
+
+    useGameStore.getState().markCampaignReportViewed("white-meridian-report");
+
+    expect(useGameStore.getState().shouldShowCampaignReport("northern-route")).toBe(false);
+    expect(
+      useGameStore.getState().getCampaignReportForCompletedCampaign("northern-route")?.id
+    ).toBe("white-meridian-report");
   });
 });

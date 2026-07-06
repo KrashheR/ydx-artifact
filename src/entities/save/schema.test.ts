@@ -34,4 +34,32 @@ describe("migrateSaveData", () => {
     expect(save.magnifiers).toBe(3);
     expect(save.inProgress).toBeNull();
   });
+
+  it("adds viewed campaign report ids to older v2 saves", () => {
+    const save = migrateSaveData({
+      version: 2,
+      updatedAt: 123,
+      completedLevels: [],
+      bestResults: {},
+      inProgress: null,
+      magnifiers: 3,
+      artifacts: {},
+      daily: { lastClaimDate: null, streak: 0 },
+      settings: {
+        locale: "ru",
+        localeSource: "auto",
+        vibration: true,
+        reducedMotion: false
+      },
+      reviewPrompt: {
+        schemaVersion: 1,
+        prePromptShownCount: 0,
+        nextEligibleCompletedLevel: 4,
+        nativeReviewResolved: false
+      },
+      purchases: { noForcedInterstitials: false, productIds: [] }
+    });
+
+    expect(save.viewedCampaignReportIds).toEqual([]);
+  });
 });

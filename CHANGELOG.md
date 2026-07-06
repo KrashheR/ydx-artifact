@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added the Campaign Case Report finale flow after level 13 of each campaign: a parchment archive report with 13/13 progress, five campaign findings, archivist conclusion, next-case/final-archive CTA, one-time auto-show save state, RU/EN copy and analytics events.
+
+- Added the active campaign preview image above the current-case title on the archive home screen.
+
 - Hardened gameplay browser-input suppression for Yandex moderation: active levels now prevent native context menus, text selection, and browser drag gestures across desktop and mobile scene interactions.
 
 - Replaced the home campaign-selection screen with the new archive hub from `docs/design_handoff_archive_hub`: current-case CTA, daily archive card, filed-finds archive preview, compact campaign list, hint/save status topbar and landscape-phone responsive layout.

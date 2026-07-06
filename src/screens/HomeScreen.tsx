@@ -7,6 +7,7 @@ import {
 } from "@/content/artifacts";
 import { chapters, getChapterLevels, type ChapterId } from "@/content/chapters";
 import { dailyLevels } from "@/content/levels";
+import { getChapterPreviewAsset } from "@/content/sceneAssets";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
 import { useGameStore } from "@/shared/store/gameStore";
 
@@ -295,6 +296,7 @@ function CurrentCaseCard({
   const { t } = useTranslation();
   const complete = campaign.status === "completed";
   const almostComplete = campaign.total - campaign.done <= 2 && !complete;
+  const previewSrc = getChapterPreviewAsset(campaign.chapterId);
 
   return (
     <section
@@ -324,6 +326,14 @@ function CurrentCaseCard({
         <span className="rounded-[4px] border border-exp-parch/[.16] px-2 py-0.5 font-jetbrains text-[10px] text-exp-muted">
           {t("homeHub.currentCase.caseNumber")}
         </span>
+      </div>
+      <div className="mt-4 aspect-[16/9] w-full overflow-hidden rounded-[8px] border border-exp-parch/[.12] bg-exp-ink">
+        <img
+          src={previewSrc}
+          alt=""
+          className="h-full w-full object-cover"
+          draggable={false}
+        />
       </div>
       <h1 className="mt-3 font-cormorant text-[38px] font-semibold leading-none text-exp-parch sm:text-[46px]">
         {t(`campaigns.${campaign.id}.title`)}

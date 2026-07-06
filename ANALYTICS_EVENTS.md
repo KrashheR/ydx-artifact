@@ -69,6 +69,8 @@ Only use letters, numbers and underscores in event names.
 | `level_exit_to_map` | Player leaves gameplay to the campaign map. | `levelId`, `mode`, `foundDifferences`, `mistakes`, `elapsedActiveSeconds`, `completed` |
 | `level_next_clicked` | Player starts the next level from the completion overlay. | `levelId`, `nextLevelId`, `campaignId`, `mode` |
 | `level_complete` | Level completion is committed to save. | `levelId`, `campaignId`, `levelOrder`, `mode`, `durationSeconds`, `durationBucket`, `foundDifferences`, `mistakes`, `accuracy`, `isReplay`, `completedLevels`, `rewardMagnifiers`, `magnifiersAfterReward`, `artifactUnlockCount`, `queuedReviewCheck`, `queuedInterstitialCheck` |
+| `campaign_report_shown` | Campaign finale report appears after completing level 13 and after any queued artifact reveal. | `campaignId`, `reportId`, `restoredLevels`, `artifactCount` |
+| `campaign_report_cta_clicked` | Player acts from the campaign finale report. | `campaignId`, `reportId`, `action` (`next_campaign`, `collection`, `archive`, `close`) |
 
 `durationSeconds` is the exact active gameplay completion time rounded down to seconds. `durationBucket` is a stable grouping for quick Metrica segmentation: `under_30s`, `30_59s`, `60_119s`, `120_179s`, `180_239s`, `240_299s`, `300s_plus`.
 

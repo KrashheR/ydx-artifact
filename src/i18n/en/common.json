@@ -279,6 +279,51 @@
     "toastReplayTitle": "Artifact already in the archive",
     "toastReplaySubtitle": "Level replay — no new discovery"
   },
+  "campaignReport": {
+    "label": "Expedition case restored",
+    "progressLabel": "Photos restored",
+    "findingsLabel": "Case findings",
+    "accuracyLabel": "Archive accuracy",
+    "conclusionLabel": "Archivist conclusion",
+    "nextHookLabel": "Next lead",
+    "primaryNextCampaign": "Open the next case",
+    "primaryFinal": "Return to archive",
+    "secondaryCollection": "View findings",
+    "secondaryMap": "Route map",
+    "perfectFindings": "The case archive is complete",
+    "incompleteFindings": "Some findings are still hidden in the photos",
+    "futureSectorButton": "View locked sectors",
+    "photosCount": "{{restored}} / {{total}} photos",
+    "findingsCount": "{{unlocked}} / {{total}} findings",
+    "newBadge": "NEW",
+    "closeLabel": "Close report",
+    "stamp": "Restored",
+    "reports": {
+      "white": {
+        "title": "White Meridian",
+        "caseName": "Case “Polarnaya-7”",
+        "shortResult": "The northern route was not a weather expedition, but a search for a hidden passage to the next meridian.",
+        "conclusion": "The White Meridian photographs have been restored. The Polarnaya-7 expedition did not vanish by the glacier: it found a passage to a sealed cove and descended to a vessel missing from the official reports. The compass, field radio, journal, echo recorder and descent rope form one chain: the group followed a signal leading beyond the northern route.",
+        "nextHook": "Sand dust and a coordinate fragment were found in the pocket of the red journal. The next mark leads to the archive's desert sector — Sand Meridian."
+      },
+      "sand": {
+        "title": "Sand Meridian",
+        "caseName": "Case “Aster-9”",
+        "shortResult": "The desert route was part of an ancient system of underground water and star navigation.",
+        "conclusion": "Case “Aster-9” has been restored. The desert expedition was not searching for ruins or a legendary oasis, but for a working node of an ancient water system. The rune marker identified the entrance, the helmets confirmed the descent, the Iram pump explained the water movement, the observatory lamp revealed the navigation method, and the buried riverbed map connected all points into one route.",
+        "nextHook": "A sign not found in the desert archive was discovered on the edge of the map: three streams converging in a green valley. The next case opens the tropical sector — Emerald Meridian."
+      },
+      "emerald": {
+        "title": "Emerald Meridian",
+        "caseName": "Case “Verde-12”",
+        "shortResult": "The tropical expedition proved that the White, Sand and Emerald routes were parts of one system.",
+        "conclusion": "Case “Verde-12” has been restored. The tropical expedition was not a separate route: it was checking the last known node of the meridian system. Botanical samples linked the valley to the northern flower, the green riverbed map revealed the hidden water network, the plaque of three streams connected all three campaigns, the spyglass confirmed the observatory's navigation role, and the evacuation aircraft proved that part of the archive was removed before the sector closed.",
+        "nextHook": "Empty coordinate cells remained on the back of the evacuation manifest. Three meridians are restored, but the archive map is not complete. New sectors have appeared in the locked catalog.",
+        "futureHookTitle": "The archive is not complete",
+        "futureHookText": "Other routes lie beyond the White, Sand and Emerald meridians. Their photos have not been restored yet."
+      }
+    }
+  },
   "artifacts": {
     "white-compass": {
       "name": "White Gull Compass",

@@ -16,7 +16,8 @@
   },
   "collection": {
     "unlockedArtifactIds": [],
-    "viewedArtifactIds": []
+    "viewedArtifactIds": [],
+    "viewedCampaignReportIds": []
   },
   "daily": {
     "lastClaimServerDate": null,
