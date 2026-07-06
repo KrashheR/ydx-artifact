@@ -462,9 +462,41 @@ export function GameScreen({
   }, [gameplayBlocked]);
 
   useEffect(() => {
-    const preventContextMenu = (event: MouseEvent) => event.preventDefault();
-    window.addEventListener("contextmenu", preventContextMenu);
-    return () => window.removeEventListener("contextmenu", preventContextMenu);
+    const preventBrowserGameGesture = (event: Event) => event.preventDefault();
+    const listenerOptions = { capture: true };
+
+    window.addEventListener(
+      "contextmenu",
+      preventBrowserGameGesture,
+      listenerOptions,
+    );
+    document.addEventListener(
+      "selectstart",
+      preventBrowserGameGesture,
+      listenerOptions,
+    );
+    document.addEventListener(
+      "dragstart",
+      preventBrowserGameGesture,
+      listenerOptions,
+    );
+    return () => {
+      window.removeEventListener(
+        "contextmenu",
+        preventBrowserGameGesture,
+        listenerOptions,
+      );
+      document.removeEventListener(
+        "selectstart",
+        preventBrowserGameGesture,
+        listenerOptions,
+      );
+      document.removeEventListener(
+        "dragstart",
+        preventBrowserGameGesture,
+        listenerOptions,
+      );
+    };
   }, []);
 
   // Warm both scene images up front: only one side is mounted in mobile

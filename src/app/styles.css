@@ -35,13 +35,19 @@ body {
     linear-gradient(135deg, #e7ddc8 0%, #b7aa90 52%, #496b68 100%);
   overscroll-behavior: none;
   user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
   -webkit-user-drag: none;
   -webkit-touch-callout: none;
 }
 
 img,
 svg {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
   -webkit-user-drag: none;
+  -webkit-touch-callout: none;
 }
 
 button,
@@ -186,8 +192,25 @@ select {
 
 .game-area {
   user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
   -webkit-user-drag: none;
+  -webkit-touch-callout: none;
   touch-action: none;
+}
+
+.game-screen,
+.game-play-area,
+.photo-comparator,
+.comparator-photo-frame,
+.comparator-photo-size,
+.comparator-photo,
+.comparator-slider-frame {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
 }
 
 .game-play-area {

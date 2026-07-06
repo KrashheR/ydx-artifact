@@ -297,6 +297,34 @@ describe("GameScreen", () => {
     expect(useGameStore.getState().saveData.magnifiers).toBe(0);
   });
 
+  it("prevents native context menus, text selection, and browser dragging during gameplay", () => {
+    const level = getChapterLevels("northern-route")[0];
+    useGameStore.getState().startLevel(level.id, "campaign");
+
+    render(<GameScreen levelId={level.id} mode="campaign" />);
+
+    const contextMenuEvent = new MouseEvent("contextmenu", {
+      bubbles: true,
+      cancelable: true,
+    });
+    window.dispatchEvent(contextMenuEvent);
+    expect(contextMenuEvent.defaultPrevented).toBe(true);
+
+    const selectStartEvent = new Event("selectstart", {
+      bubbles: true,
+      cancelable: true,
+    });
+    document.dispatchEvent(selectStartEvent);
+    expect(selectStartEvent.defaultPrevented).toBe(true);
+
+    const dragStartEvent = new Event("dragstart", {
+      bubbles: true,
+      cancelable: true,
+    });
+    document.dispatchEvent(dragStartEvent);
+    expect(dragStartEvent.defaultPrevented).toBe(true);
+  });
+
   it("shows rewarded hint failures inside the modal instead of a native alert", async () => {
     const level = getChapterLevels("northern-route")[0];
     const showRewarded = vi.fn(async () => "failed" as const);

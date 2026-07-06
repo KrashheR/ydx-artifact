@@ -705,7 +705,11 @@ function PhotoCanvas({
           boxShadow: "inset 0 0 60px rgba(0,0,0,.5)",
         } as React.CSSProperties
       }
-      onContextMenu={(e) => e.preventDefault()}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onDragStart={(e) => e.preventDefault()}
       onWheel={(e) => {
         e.preventDefault();
         const nextZoom = Math.max(
@@ -718,6 +722,7 @@ function PhotoCanvas({
         );
       }}
       onPointerDown={(e) => {
+        e.preventDefault();
         e.currentTarget.setPointerCapture(e.pointerId);
         pointer.current = {
           id: e.pointerId,

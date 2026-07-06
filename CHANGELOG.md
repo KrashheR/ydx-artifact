@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Hardened gameplay browser-input suppression for Yandex moderation: active levels now prevent native context menus, text selection, and browser drag gestures across desktop and mobile scene interactions.
+
 - Replaced the home campaign-selection screen with the new archive hub from `docs/design_handoff_archive_hub`: current-case CTA, daily archive card, filed-finds archive preview, compact campaign list, hint/save status topbar and landscape-phone responsive layout.
 
 - Added the artifact collection flow ("Коллекция находок") from the design handoff: a data-driven catalog of 15 collectible artifacts (`src/content/artifacts.ts`, milestone levels 3/6/8/10/13 per campaign), an in-gameplay discovery toast, a post-victory reveal ceremony modal (`ArtifactRevealOverlay`), a fully redesigned `CollectionScreen` (progress header, campaign filter tabs, card grids with `open`/`closed` artifact images, detail modal with clue text and level replay), Home topbar / landscape-phone entry points, RU+EN texts sourced from `docs/expedition_narrative_collection_ru.json`, save reconciliation for pre-collection saves, and normalized artifact asset filenames (`closed.webp`).
