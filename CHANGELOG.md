@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Converted the pending `public/assets/scenes/archive/1-7` scene intake from owner-provided PNG sources to lossless WebP derivatives with unchanged 1586x992 dimensions.
+
 - Added the Campaign Case Report finale flow after level 13 of each campaign: a parchment archive report with 13/13 progress, five campaign findings, archivist conclusion, next-case/final-archive CTA, one-time auto-show save state, RU/EN copy and analytics events.
 
 - Added the active campaign preview image above the current-case title on the archive home screen.

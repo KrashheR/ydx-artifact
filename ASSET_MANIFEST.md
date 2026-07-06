@@ -6,6 +6,8 @@ WebP assets under `public/assets/scenes/` were recompressed in place on 2026-06-
 
 Artifact state images under `public/assets/artifacts/<campaign-folder>/<level-order>/` were converted on 2026-07-05 from owner-provided PNG sources to lossless WebP and downscaled from 1254x1254 to 512x512. The runtime folder keeps only the WebP derivatives; original PNG exports should stay outside runtime folders if preservation is required. Later on 2026-07-05 the filenames were normalized to exactly `open.webp` (unlocked state) and `closed.webp` (locked state) — the mixed `close.webp` copies were renamed — stray `.DS_Store` files were removed, and the images were wired into runtime via `getArtifactAsset` in `src/content/sceneAssets.ts` (campaign folders resolve through `campaignManifest.assetFolder`, so `sand-meridian` keeps using the legacy `sand-meredian` folder).
 
+Archive intake scene images under `public/assets/scenes/archive/<level-order>/` were converted on 2026-07-06 from owner-provided PNG sources to lossless WebP with unchanged 1586x992 dimensions. The converted set covers folders `1-7` with `1.webp` scene A, `2.webp` scene B, and `3.webp` markup reference; the source PNG files are still present in the runtime folder until owner removal is confirmed.
+
 Production level intake stores converted runtime scene images under `public/assets/scenes/northern-route/<level-order>/`:
 
 - `1.webp`: left scene, wired to `imageA`.
@@ -41,6 +43,7 @@ Use `pnpm assets:optimize` for a dry-run gated recompression report on runtime `
 | placeholder-b | `public/assets/scenes/northern-route/placeholder/b.svg` | scene B | placeholder | local SVG generated for scaffold |
 | placeholder-thumb | `public/assets/scenes/northern-route/placeholder/thumb.svg` | thumbnail | placeholder | local SVG generated for scaffold |
 | artifact-state-images-2026-07-05 | `public/assets/artifacts/<campaign-folder>/<level-order>/{open,closed}.webp` | artifact state image | production-runtime | owner-provided PNG artifact images converted to 512x512 lossless WebP; wired to the collection via `src/content/artifacts.ts` |
+| archive-scene-package-2026-07-06 | `public/assets/scenes/archive/<level-order>/{1,2,3}.webp` | scene package | production-intake | owner-provided PNG archive scene folders `1-7` converted to lossless WebP with unchanged 1586x992 dimensions; source PNGs retained pending removal confirmation |
 | sand-meridian-preview | `public/assets/scenes/sand-meredian/preview.webp` | campaign menu preview | production-intake | content owner image provided in workspace, converted to WebP |
 | sand-meridian-package | `public/assets/scenes/sand-meredian/` | campaign scene package | production-intake | content owner package with scene triplets for folders `1-13` |
 | sm-01-13-markup | `public/assets/scenes/sand-meredian/<level-order>/3.webp` | markup reference | authoring-only | folders `1-13` transcribed into gameplay hitboxes in `src/content/sandMeridianLevels.ts`; levels 3, 7, 11, 12 and 13 include their marked circles after recheck |
