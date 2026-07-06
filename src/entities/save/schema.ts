@@ -4,7 +4,8 @@ import { CAMPAIGN_REPORT_IDS } from "@/data/campaignReports";
 
 export const SAVE_VERSION = 2;
 
-export const MAX_MAGNIFIERS = 3;
+export const INITIAL_MAGNIFIERS = 1;
+export const MAX_MAGNIFIERS = 5;
 
 export const reviewUnavailableReasonSchema = z.enum([
   "NO_AUTH",
@@ -216,7 +217,7 @@ export function createDefaultSave(): SaveData {
     completedLevels: [],
     bestResults: {},
     inProgress: null,
-    magnifiers: MAX_MAGNIFIERS,
+    magnifiers: INITIAL_MAGNIFIERS,
     artifacts: Object.fromEntries(ARTIFACT_IDS.map((artifactId) => [artifactId, "locked"])),
     viewedCampaignReportIds: [],
     daily: {

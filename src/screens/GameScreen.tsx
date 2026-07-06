@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getChapter, getLevelById } from "@/content/chapters";
-import { getDailyArchiveDateKey } from "@/content/dailyArchive";
 import { PhotoComparator } from "@/features/gameplay/PhotoComparator";
 import { ArtifactFoundToast, type ArtifactToastVariant } from "@/features/gameplay/ArtifactFoundToast";
 import { ArtifactRevealOverlay } from "@/features/collection/ArtifactRevealOverlay";
@@ -330,7 +329,6 @@ export function GameScreen({
   const spendMagnifiers = useGameStore((s) => s.spendMagnifiers);
   const addActiveLevelTime = useGameStore((s) => s.addActiveLevelTime);
   const save = useGameStore((s) => s.save);
-  const claimDailyReward = useGameStore((s) => s.claimDailyReward);
   const resetLevelProgress = useGameStore((s) => s.resetLevelProgress);
   const reviewPromptRuntime = useGameStore((s) => s.reviewPromptRuntime);
   const interstitialRuntime = useGameStore((s) => s.interstitialRuntime);
@@ -755,8 +753,6 @@ export function GameScreen({
         setPendingFinalStats(null);
         setFinalStats(stats);
         completeLevel(levelId, elapsed, mode);
-        if (mode === "daily")
-          claimDailyReward(getDailyArchiveDateKey());
         completeOverlayDelayRef.current = null;
       }, COMPLETE_OVERLAY_DELAY_MS);
     }

@@ -23,7 +23,8 @@
     "release:manifest": "tsx scripts/release-manifest.ts",
     "release:zip": "pnpm build && tsx scripts/release-zip.ts",
     "release:checksum": "tsx scripts/release-checksum.ts",
-    "metrika:goals": "tsx scripts/sync-metrica-goals.ts"
+    "metrika:goals": "tsx scripts/sync-metrica-goals.ts",
+    "metrika:goals:publish": "tsx scripts/sync-metrica-goals.ts --apply"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",

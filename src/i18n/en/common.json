@@ -73,6 +73,8 @@
     "completedBadge": "LEVEL {{order}} COMPLETE",
     "completedTitle": "All differences found",
     "completedDesc": "Archive photo restored. The route continues to the next expedition point.",
+    "dailyRewardTitle": "Daily reward: +1 hint",
+    "dailyRewardBody": "You won one hint for completing today's case.",
     "statTime": "TIME",
     "statFound": "FOUND",
     "statRating": "RATING",

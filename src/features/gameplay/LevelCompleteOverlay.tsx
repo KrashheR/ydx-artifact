@@ -141,6 +141,47 @@ export function LevelCompleteOverlay({
             </div>
           </div>
 
+          {isDaily && (
+            <div
+              className="mb-6 flex items-center justify-center gap-3 rounded-xl border border-exp-brass/[.35] px-4 py-3 text-left"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(184,138,69,.16), rgba(184,138,69,.06))"
+              }}
+            >
+              <span
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
+                style={{
+                  background: "radial-gradient(circle at 40% 34%, #d8af63, #8e642c 72%)",
+                  boxShadow: "0 8px 22px rgba(0,0,0,.35)"
+                }}
+                aria-hidden="true"
+              >
+                <svg
+                  width="21"
+                  height="21"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#1a130a"
+                  strokeWidth="1.9"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M9 18h6M10 21h4" />
+                  <path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z" />
+                </svg>
+              </span>
+              <div className="min-w-0">
+                <div className="text-[13px] font-bold text-exp-brass2">
+                  {t("game.dailyRewardTitle")}
+                </div>
+                <div className="mt-0.5 text-[12px] font-semibold text-exp-muted">
+                  {t("game.dailyRewardBody")}
+                </div>
+              </div>
+            </div>
+          )}
+
           {onNext ? (
             <button
               onClick={onNext}

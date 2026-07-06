@@ -642,6 +642,7 @@ function getCampaignProgress(
 export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
   const { t } = useTranslation();
   const navigate = useGameStore((state) => state.navigate);
+  const startLevel = useGameStore((state) => state.startLevel);
   const completedLevels = useGameStore((state) => state.saveData.completedLevels);
   const artifactStates = useGameStore((state) => state.saveData.artifacts);
   const daily = useGameStore((state) => state.saveData.daily);
@@ -751,10 +752,16 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
   const openDaily = () => {
     trackAnalyticsEvent("daily_opened", {
       source: "home_hub",
+      levelId: dailyEntry.levelId,
       streak: daily.streak,
       claimed: dailyClaimed
     });
-    navigate({ kind: "daily" });
+    trackAnalyticsEvent("daily_start_clicked", {
+      levelId: dailyEntry.levelId,
+      streak: daily.streak,
+      lastClaimDate: daily.lastClaimDate
+    });
+    startLevel(dailyEntry.levelId, "daily");
   };
 
   return (

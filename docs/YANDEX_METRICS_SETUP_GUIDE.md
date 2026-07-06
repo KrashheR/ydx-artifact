@@ -346,10 +346,10 @@ Dry run. Add --apply to create missing goals:
 Когда dry-run выглядит правильно:
 
 ```powershell
-pnpm metrika:goals -- --apply
+pnpm metrika:goals:publish
 ```
 
-Важно: двойной дефис `--` нужен, чтобы `pnpm` передал флаг `--apply` внутрь скрипта.
+Это отдельный npm script для безопасной публикации только отсутствующих целей. Он запускает тот же sync-скрипт с флагом `--apply`.
 
 Скрипт:
 

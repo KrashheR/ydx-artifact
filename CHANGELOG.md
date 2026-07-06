@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Changed hint economy: new saves now start with 1 hint, stored hints cap at 5, completing a Daily Archive case grants +1 hint once per local date through the shared level-completion flow, and the daily victory result now tells the player they won one hint.
+
+- Changed the Archive Hub daily card to open the current Daily Archive case directly in shared gameplay, preserving the archive rotation, daily reward tracking and campaign progression isolation without the intermediate Daily screen.
+
 - Wired the `public/assets/scenes/archive/1-7` scene package into 7 standalone Daily Archive cases with hitboxes transcribed from `3.webp` markup references, deterministic local `dayNumber % 7` rotation, Archive Hub entry, main-menu-only post-completion return, and campaign progression isolation.
 
 - Converted the pending `public/assets/scenes/archive/1-7` scene intake from owner-provided PNG sources to lossless WebP derivatives with unchanged 1586x992 dimensions, then removed the source PNG files from runtime assets.
@@ -50,7 +54,7 @@
 
 - Restored campaign-card texts in mobile landscape (description clamped to two lines, progress counter and locked-campaign info box are visible again; the title selector now targets the redesigned `h2`), and widened mobile map level cards from 210px to 240px.
 
-- Redesigned the mobile landscape hint control after the "Кнопка подсказки - варианты" design (variants 2a/2b): with hints left the FAB shows a glowing ring plus three charge pips and an "N left" caption; with no hints left it shows a rotating dashed ring with a text-only "Watch ad" badge. Hints (magnifiers) are now capped at 3 total — level rewards, daily rewards and loaded saves clamp to `MAX_MAGNIFIERS`.
+- Redesigned the mobile landscape hint control after the "Кнопка подсказки - варианты" design (variants 2a/2b): with hints left the FAB shows a glowing ring plus charge pips and an "N left" caption; with no hints left it shows a rotating dashed ring with a text-only "Watch ad" badge. Hints (magnifiers) are capped by `MAX_MAGNIFIERS` for level rewards, daily rewards and loaded saves.
 
 - Added a `durationBucket` field to `level_complete` analytics so Yandex Metrica can segment level completion speed alongside the exact `durationSeconds` value.
 

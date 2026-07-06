@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { getDailyArchiveDateKey } from "@/content/dailyArchive";
 import {
   createDefaultSave,
   MAX_MAGNIFIERS,
@@ -327,6 +328,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const completionEvents: LevelCompletionAnalyticsPayload[] = [];
     let artifactUnlockCount = 0;
     let newlyUnlockedArtifactIds: string[] = [];
+    let dailyRewardAnalyticsPayload: AnalyticsPayload | null = null;
+    const dailyRewardDate = mode === "daily" ? getDailyArchiveDateKey() : null;
     set((state) => {
       const level = getLevelById(levelId);
       if (!level) return state;
@@ -356,17 +359,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const completedLevels = !isCampaignCompletion || wasAlreadyCompleted
         ? state.saveData.completedLevels
         : [...state.saveData.completedLevels, levelId];
+      const shouldClaimDailyReward =
+        dailyRewardDate !== null && state.saveData.daily.lastClaimDate !== dailyRewardDate;
+      const daily = shouldClaimDailyReward
+        ? {
+            lastClaimDate: dailyRewardDate,
+            streak: state.saveData.daily.streak + 1
+          }
+        : state.saveData.daily;
       const saveBeforeArtifactUnlocks = {
         ...state.saveData,
         completedLevels,
         inProgress: null,
         magnifiers: Math.min(
           state.saveData.magnifiers +
-            (isCampaignCompletion ? level.reward.magnifiers ?? 0 : 0),
+            (isCampaignCompletion ? level.reward.magnifiers ?? 0 : 0) +
+            (shouldClaimDailyReward ? 1 : 0),
           MAX_MAGNIFIERS
         ),
+        daily,
         bestResults
       };
+      if (shouldClaimDailyReward) {
+        dailyRewardAnalyticsPayload = {
+          date: dailyRewardDate,
+          previousClaimDate: state.saveData.daily.lastClaimDate,
+          streak: daily.streak
+        };
+      }
       const nextSave = applyArtifactUnlocks(saveBeforeArtifactUnlocks);
       newlyUnlockedArtifactIds = Object.entries(nextSave.artifacts)
         .filter(
@@ -432,6 +452,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (mode === "campaign" && !completionPayload.isReplay) {
         trackAnalyticsEvent("campaign_progress", completionPayload);
       }
+    }
+    if (dailyRewardAnalyticsPayload) {
+      trackAnalyticsEvent("daily_reward_claimed", dailyRewardAnalyticsPayload);
     }
     for (const artifactId of newlyUnlockedArtifactIds) {
       trackAnalyticsEvent("artifact_unlock_queued", {

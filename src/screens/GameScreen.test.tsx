@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@/i18n";
+import { dailyArchiveLevels } from "@/content/dailyArchive";
 import { getChapterLevels } from "@/content/chapters";
 import { createDefaultSave } from "@/entities/save/schema";
 import { GameScreen } from "@/screens/GameScreen";
@@ -164,8 +165,37 @@ describe("GameScreen", () => {
     });
   });
 
+  it("shows the earned hint reward on the daily completion overlay", async () => {
+    const level = dailyArchiveLevels[0];
+    useGameStore.setState((state) => ({
+      saveData: { ...state.saveData, magnifiers: 0 },
+    }));
+    useGameStore.getState().startLevel(level.id, "daily");
+
+    render(<GameScreen levelId={level.id} mode="daily" />);
+
+    for (const difference of level.differences) {
+      fireEvent.click(
+        screen.getByRole("button", { name: `find ${difference.id}` }),
+      );
+      await waitFor(() => {
+        expect(
+          useGameStore.getState().saveData.inProgress?.foundDifferenceIds ?? [],
+        ).toContain(difference.id);
+      });
+    }
+
+    expect(
+      await screen.findByText(/Награда дня|Daily reward/i),
+    ).toBeInTheDocument();
+    expect(useGameStore.getState().saveData.magnifiers).toBe(1);
+  });
+
   it("does not spend another magnifier while an area hint is already active", async () => {
     const level = getChapterLevels("northern-route")[0];
+    useGameStore.setState((state) => ({
+      saveData: { ...state.saveData, magnifiers: 2 },
+    }));
     useGameStore.getState().startLevel(level.id, "campaign");
 
     render(<GameScreen levelId={level.id} mode="campaign" />);
@@ -178,11 +208,11 @@ describe("GameScreen", () => {
     expect(screen.getByTestId("active-hint")).toHaveTextContent(
       hintedDifference.id,
     );
-    expect(useGameStore.getState().saveData.magnifiers).toBe(2);
+    expect(useGameStore.getState().saveData.magnifiers).toBe(1);
 
     fireEvent.click(hintButton);
 
-    expect(useGameStore.getState().saveData.magnifiers).toBe(2);
+    expect(useGameStore.getState().saveData.magnifiers).toBe(1);
     expect(hintButton).toBeDisabled();
 
     fireEvent.click(

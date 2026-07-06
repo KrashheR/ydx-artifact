@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { migrateSaveData } from "@/entities/save/schema";
+import { INITIAL_MAGNIFIERS, MAX_MAGNIFIERS, migrateSaveData } from "@/entities/save/schema";
 
 describe("migrateSaveData", () => {
   it("migrates v1 elapsedSeconds to v2 elapsedActiveSeconds", () => {
@@ -31,8 +31,37 @@ describe("migrateSaveData", () => {
     const save = migrateSaveData({ version: 2, magnifiers: -100 });
 
     expect(save.version).toBe(2);
-    expect(save.magnifiers).toBe(3);
+    expect(save.magnifiers).toBe(INITIAL_MAGNIFIERS);
     expect(save.inProgress).toBeNull();
+  });
+
+  it("caps loaded v2 magnifiers at the current maximum", () => {
+    const save = migrateSaveData({
+      version: 2,
+      updatedAt: 123,
+      completedLevels: [],
+      bestResults: {},
+      inProgress: null,
+      magnifiers: 99,
+      artifacts: {},
+      viewedCampaignReportIds: [],
+      daily: { lastClaimDate: null, streak: 0 },
+      settings: {
+        locale: "ru",
+        localeSource: "auto",
+        vibration: true,
+        reducedMotion: false
+      },
+      reviewPrompt: {
+        schemaVersion: 1,
+        prePromptShownCount: 0,
+        nextEligibleCompletedLevel: 4,
+        nativeReviewResolved: false
+      },
+      purchases: { noForcedInterstitials: false, productIds: [] }
+    });
+
+    expect(save.magnifiers).toBe(MAX_MAGNIFIERS);
   });
 
   it("adds viewed campaign report ids to older v2 saves", () => {

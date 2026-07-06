@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { dailyArchiveLevels } from "@/content/dailyArchive";
 import { getChapterLevels } from "@/content/chapters";
-import { createDefaultSave } from "@/entities/save/schema";
+import { MAX_MAGNIFIERS, createDefaultSave } from "@/entities/save/schema";
 import { starsForAccuracy } from "@/shared/lib/progression";
 import { useGameStore } from "@/shared/store/gameStore";
 
@@ -118,6 +118,9 @@ describe("gameStore analytics", () => {
   it("keeps daily completion out of campaign progression", () => {
     const dailyLevel = dailyArchiveLevels[0];
 
+    useGameStore.setState((state) => ({
+      saveData: { ...state.saveData, magnifiers: 0 }
+    }));
     useGameStore.getState().startLevel(dailyLevel.id, "daily");
     useGameStore.setState((state) => ({
       saveData: {
@@ -134,9 +137,24 @@ describe("gameStore analytics", () => {
     useGameStore.getState().completeLevel(dailyLevel.id, 75, "daily");
 
     expect(useGameStore.getState().saveData.completedLevels).toEqual([]);
+    expect(useGameStore.getState().saveData.magnifiers).toBe(1);
+    expect(useGameStore.getState().saveData.daily).toMatchObject({
+      lastClaimDate: expect.any(String),
+      streak: 1
+    });
     expect(
       window.__artifactAnalyticsEvents?.some((event) => event.event === "campaign_progress")
     ).toBe(false);
+  });
+
+  it("caps daily reward magnifiers at the maximum", () => {
+    useGameStore.setState((state) => ({
+      saveData: { ...state.saveData, magnifiers: MAX_MAGNIFIERS }
+    }));
+
+    useGameStore.getState().claimDailyReward("2026-07-07");
+
+    expect(useGameStore.getState().saveData.magnifiers).toBe(MAX_MAGNIFIERS);
   });
 });
 
