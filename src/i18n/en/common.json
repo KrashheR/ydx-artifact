@@ -2,7 +2,7 @@
   "app": {
     "title": "Spot the Differences: Expedition Mysteries",
     "subtitle": "White Meridian",
-    "pitch": "Restore paired archive photographs from a vanished 1977 expedition."
+    "pitch": "Restore paired archive photos from missing expeditions and learn who rewrote their routes."
   },
   "actions": {
     "start": "Start expedition",
@@ -15,7 +15,7 @@
     "back": "Back",
     "previous": "Previous",
     "next": "Next",
-    "compare": "Compare",
+    "compare": "Flip",
     "hintArea": "Area hint",
     "pause": "Pause",
     "resume": "Resume",
@@ -45,7 +45,7 @@
     "levelBadge": "{{campaign}} · LEVEL {{current}} / {{total}}",
     "labelOriginal": "ARCHIVE PHOTO · ORIGINAL",
     "labelCopy": "COPY · SPOT DIFFERENCES",
-    "diffCount": "Found",
+    "diffCount": "Differences",
     "foundLabel": "FOUND",
     "accuracyLabel": "ACCURACY",
     "timeLabel": "TIME",
@@ -72,7 +72,7 @@
     "rewardedHintFailed": "Ad is unavailable. Try again later.",
     "completedBadge": "LEVEL {{order}} COMPLETE",
     "completedTitle": "All differences found",
-    "completedDesc": "Archive photo restored. The route continues to the next expedition point.",
+    "completedDesc": "The archive photo has been restored. One more edit is lifted from the route, and the case leads to the next expedition point.",
     "dailyRewardTitle": "Daily reward: +1 hint",
     "dailyRewardBody": "You won one hint for completing today's case.",
     "statTime": "TIME",
@@ -258,6 +258,207 @@
       "title": "Evacuation Airstrip"
     }
   },
+  "story": {
+    "actLabel": "Act {{act}}",
+    "clueLabel": "Photo clue",
+    "levels": {
+      "white01": {
+        "intro": "The first paired Polarnaya-7 photo enters the archive. Already on the pier, objects appear that were never listed in the manifest.",
+        "victory": "The first photo is restored. The route starts not at a weather station, but at a closed pier used by expedition vessels.",
+        "clue": "There was more cargo than the manifest allowed: the expedition was preparing for a route that officially did not exist."
+      },
+      "white02": {
+        "intro": "The warehouse photos should confirm the cargo list, but the copies disagree on navigation gear, cables, and supplies.",
+        "victory": "The warehouse does not match the ledger. Polarnaya-7 packed for a deep ice route, not an ordinary winter station.",
+        "clue": "The supplies and cables show the group already knew it would go beyond the coast."
+      },
+      "white03": {
+        "intro": "White Gull lighthouse held the last official landmark of the expedition. The photo should reveal where the group turned.",
+        "victory": "The lighthouse compass is found. Its needle was fixed not toward north, but along an old meridian line.",
+        "clue": "The compass is the first proof of editing: someone hid a direction missing from later maps."
+      },
+      "white04": {
+        "intro": "The trail reaches an ice railway. The branch is absent from new maps, but the photos show an active platform.",
+        "victory": "The platform confirms the expedition moved inland by rail, not on foot. The ice route had been cleared in advance.",
+        "clue": "The closed branch operated after the official evacuation and led into the inner route."
+      },
+      "white05": {
+        "intro": "The weather station was supposed to be the end point, but the instruments in the photos measure heat under the glacier, not weather.",
+        "victory": "The station data is not a forecast. There was a warm zone beneath the glacier, and the expedition knew where to look.",
+        "clue": "The temperature edits hid not an instrument error, but an entrance to a living valley under the ice."
+      },
+      "white06": {
+        "intro": "The glacier camp preserves the object that could have received Polarnaya-7’s last signal before the descent.",
+        "victory": "The field radio is found. Its casing still bears the frequency of a short message sent before the group went under the ice.",
+        "clue": "The transmission was not an SOS but route confirmation: the group went below the ice by choice."
+      },
+      "white07": {
+        "intro": "The tunnel is older than the expedition and looks like a technical corridor used before Polarnaya-7 arrived.",
+        "victory": "The tunnel links the glacier to an inner valley. The expedition did not discover the way; it followed existing markers.",
+        "clue": "Power and supply traces prove the meridian line was infrastructure, not legend."
+      },
+      "white08": {
+        "intro": "The observatory preserves the leader’s field journal. It may explain why the group left the official route voluntarily.",
+        "victory": "The red journal is found. Its last entry says: “The compass no longer shows north. It shows the route.”",
+        "clue": "The journal links the compass, observatory, and valley: the expedition followed a line older than modern maps."
+      },
+      "white09": {
+        "intro": "The polar greenhouse should not survive in this climate. The heat source beneath the glacier had to be stable.",
+        "victory": "The greenhouse proves the hidden valley existed. The blue flower belongs to the same route as the compass.",
+        "clue": "The blue flower turns the anomaly into proof of an ecosystem someone chose to protect."
+      },
+      "white10": {
+        "intro": "At the radio tower, a device records not voices but low reflected signals from beneath the ice.",
+        "victory": "The echo recorder is found. Its spool holds a signal repeating at equal meridian intervals.",
+        "clue": "The northern node is not alone: a chain beneath the ground answers beyond the ice."
+      },
+      "white11": {
+        "intro": "The living module was left in haste. Personal items remain, but routes and some records are gone.",
+        "victory": "There is no sign of disaster in the module. The group left in order and took only what the next crossing required.",
+        "clue": "The disappearance looks less like an accident than a controlled evacuation with the route scrubbed behind it."
+      },
+      "white12": {
+        "intro": "The hidden valley archive photos should show why the group searched for a place missing from every report.",
+        "victory": "The valley archive is restored. Its maps mark not only northern coordinates: one route leaves for the desert sector.",
+        "clue": "Polarnaya-7 found not an endpoint, but the first sector of a wider meridian map."
+      },
+      "white13": {
+        "intro": "The final northern photo was taken at the ice cliff. One detail should explain why the group was never found on land.",
+        "victory": "The descent rope is found. The expedition did not die at the cliff; it descended to a hidden cove and left by sea.",
+        "clue": "Salt traces on the rope open the next case: the coordinates lead to the Sand Meridian."
+      },
+      "sand01": {
+        "intro": "The desert case begins at the edge of the sands. Aster-9 followed coordinates left by the northern expedition.",
+        "victory": "The first desert photo is restored. The gear points not to surface digs, but to a long descent under the plateau.",
+        "clue": "The northern lead becomes a desert route: someone prepared an underground crossing in advance."
+      },
+      "sand02": {
+        "intro": "An old caravan trail crosses the modern camp. Instruments moved along this line long before Aster-9.",
+        "victory": "The caravan route confirms the Sand Meridian was used as a hidden transport corridor.",
+        "clue": "This was no random expedition: cargo moved along a line known before modern maps."
+      },
+      "sand03": {
+        "intro": "A stone marker with an ancient sign stands in the dune basin. It may be the first point of the shared system.",
+        "victory": "The rune marker is found. The red sign repeats the northern compass direction, but points downward.",
+        "clue": "The compass and marker speak the same language: the meridian continues beneath the sands."
+      },
+      "sand04": {
+        "intro": "The dry well may be an entrance into the underground network. Archive edits will show why it was guarded like a scientific site.",
+        "victory": "The well is part of an old communication shaft. Below it ran a line that once carried water.",
+        "clue": "The desert hides not a temple myth, but an engineered water system."
+      },
+      "sand05": {
+        "intro": "The rock arch separates the camp from the dig zone. Marks at its base resemble the northern meridian signs.",
+        "victory": "The arch was not a natural landmark. It is an entrance sign cut into older stone.",
+        "clue": "The marks align the path on a noon axis and confirm deliberate navigation."
+      },
+      "sand06": {
+        "intro": "Descent gear remains in the canyon. It should prove Aster-9 went underground.",
+        "victory": "The descent helmets are found. Their fittings hold dust from lower halls where daylight never reached.",
+        "clue": "The expedition was not studying the surface: it worked in the sealed lower chambers of the meridian."
+      },
+      "sand07": {
+        "intro": "The dig site was abandoned without removing equipment. The group seems to have found something more important than artifacts.",
+        "victory": "There is no panic at the dig. Heavy tools were left, while lamps, helmets, and water instruments went onward.",
+        "clue": "Aster-9 changed its purpose: archaeology gave way to protecting a working system."
+      },
+      "sand08": {
+        "intro": "The oasis should not exist here. A hidden mechanism in the photos could lift water from the ancient network.",
+        "victory": "The hydraulic pump is found. It did not merely raise water; it activated part of the ancient system beneath the desert.",
+        "clue": "The pump proves the central risk: a node can be started more easily than stopped."
+      },
+      "sand09": {
+        "intro": "The salt flat reflects sound and vibration. Here the group may have heard the same signal recorded at the northern radio tower.",
+        "victory": "The salt mirror confirmed the repeating signal. The northern echo recorder and the desert network share one frequency.",
+        "clue": "The signal links two sectors: water and ice answer as parts of one mechanism."
+      },
+      "sand10": {
+        "intro": "A bronze lamp lies in the ruined observatory. The traces inside the metal matter more than the legend.",
+        "victory": "The bronze lamp is found. There is no oil inside, only mineral residue from the underground water system.",
+        "clue": "The lamp was not decoration, but a marker for a water outlet and a warning about the next node."
+      },
+      "sand11": {
+        "intro": "The temple courtyard looks ritual, but the lines on its slabs resemble a water distribution diagram.",
+        "victory": "The temple courtyard is an engineering map node. Its symbols hid the practical plan of the meridian.",
+        "clue": "The architecture confirms the ancient system disguised technology as sacred design."
+      },
+      "sand12": {
+        "intro": "Storm Ridge is the last measuring point before the final archive. Wind erased the tracks, but not the direction.",
+        "victory": "Measurements from the ridge point southeast. The route ends not at the temple, but at the map of the next meridian.",
+        "clue": "Aster-9 protected the route from mining and looters by leaving only a verifiable chain of clues."
+      },
+      "sand13": {
+        "intro": "The final desert photo must connect the water network to a new expedition.",
+        "victory": "The buried riverbed map is found. Desert water and the rivers of the green valley belong to the same ancient system.",
+        "clue": "The Sand Meridian opens the third stream: Emerald Valley, where the network has already awakened."
+      },
+      "emerald01": {
+        "intro": "The green case begins at a river landing. Verde-12 followed the route the desert map called the living riverbed.",
+        "victory": "The first tropical photo is restored. The group searched not for a settlement, but for the water system beneath the jungle.",
+        "clue": "The desert map did not end in the sands: its lines enter the tropical river network."
+      },
+      "emerald02": {
+        "intro": "The jungle radio station received signals from several directions. It may have heard both the north and the desert.",
+        "victory": "The radio station connects all three cases. The signal came not from one point, but through a chain of meridian nodes.",
+        "clue": "The link worked after the official disappearance, meaning the expedition still controlled the route."
+      },
+      "emerald03": {
+        "intro": "The botanical camp holds vials of plant samples. If the northern flower and tropical samples match, this is a system.",
+        "victory": "The herbarium vials are found. They contain plants with the same blue pigment as the polar greenhouse.",
+        "clue": "Biology links the White and Emerald meridians more strongly than any map."
+      },
+      "emerald04": {
+        "intro": "The flooded bridge shows water rising too quickly. The system may have been activated shortly before the group arrived.",
+        "victory": "Rain did not flood the bridge. Water rose through old channels as if someone had restarted the mechanism.",
+        "clue": "The valley responds to interference: the network works and changes the water level."
+      },
+      "emerald05": {
+        "intro": "The stone terraces look agricultural, but their form repeats nodes from the desert hydraulic system.",
+        "victory": "The terraces are the outer part of a water diagram. The network crossed climates and worked by one principle.",
+        "clue": "The ancient technology is not local: every climate received its own mask for the same system."
+      },
+      "emerald06": {
+        "intro": "A river map survives in the stilt village. It may show how people lived beside the system for generations.",
+        "victory": "The green river map is found. It marks both rivers and lines matching the northern and desert meridians.",
+        "clue": "The locals knew the network rules without the archive name: rivers should not be woken without reason."
+      },
+      "emerald07": {
+        "intro": "Three waterfall streams meet in one basin. The match to three restored directions is too exact.",
+        "victory": "The waterfall is a natural mask over a distribution node. The three streams correspond to the three found routes.",
+        "clue": "Here the map becomes machinery: three campaigns converge in controlled water."
+      },
+      "emerald08": {
+        "intro": "The Temple of Roots contains an ancient plaque. It looks like relief art, but may be a diagram of the whole system.",
+        "victory": "The stone plaque is found. Three streams join into one node, while spaces along the edges wait for new routes.",
+        "clue": "The plaque proves the global scale: only the central archive sectors have been restored."
+      },
+      "emerald09": {
+        "intro": "The underground reservoir is the heart of the water route. Here it becomes clear whether the system is ruined or sleeping.",
+        "victory": "The reservoir has preserved pressure. The ancient network can be activated again if someone assembles enough of the map.",
+        "clue": "The real danger is not in the ruins, but in the startup instructions the player is gradually restoring."
+      },
+      "emerald10": {
+        "intro": "The canopy observatory checked distant points. The brass spyglass may reveal the next sector.",
+        "victory": "The brass spyglass is found. It marked lines between peaks, temples, and water nodes.",
+        "clue": "The observatory calibrates the network and shows future sectors can be found by the same method."
+      },
+      "emerald11": {
+        "intro": "The heart of the valley joins plants, water, and old machinery. For the first time, the archive looks like one system.",
+        "victory": "The valley confirms all three cases are linked. Its plants react to network water like the northern blue flower.",
+        "clue": "Verde-12 understood the scale: a complete map could redistribute water between regions."
+      },
+      "emerald12": {
+        "intro": "The geological station recorded the consequences of interference. The last group may have learned the network must not be fully activated.",
+        "victory": "The station was not destroyed by time. Instruments show a sharp pressure spike in the channels before evacuation.",
+        "clue": "Industrial mining would have been a catastrophe: drilling would strike the main aquifer directly."
+      },
+      "emerald13": {
+        "intro": "The final Verde-12 photo was taken at the airstrip. If the group flew out, it had time to leave a warning.",
+        "victory": "The evacuation aircraft is found. The expedition left, but it kept the map with empty sectors for future meridians.",
+        "clue": "The expeditions left the archive incomplete not out of fear: a complete map is dangerous in the wrong hands."
+      }
+    }
+  },
   "collection": {
     "eyebrow": "EXPEDITION SOCIETY ARCHIVE",
     "title": "Collection of Finds",
@@ -317,25 +518,25 @@
       "white": {
         "title": "White Meridian",
         "caseName": "Case “Polarnaya-7”",
-        "shortResult": "The northern route was not a weather expedition, but a search for a hidden passage to the next meridian.",
-        "conclusion": "The White Meridian photographs have been restored. The Polarnaya-7 expedition did not vanish by the glacier: it found a passage to a sealed cove and descended to a vessel missing from the official reports. The compass, field radio, journal, echo recorder and descent rope form one chain: the group followed a signal leading beyond the northern route.",
-        "nextHook": "Sand dust and a coordinate fragment were found in the pocket of the red journal. The next mark leads to the archive's desert sector — Sand Meridian."
+        "shortResult": "The northern expedition did not perish: it found the first node of the meridian network and began erasing its own trail.",
+        "conclusion": "The White Meridian photographs have been restored. Polarnaya-7 was not chasing weather data, but a low signal under the ice. The compass was fixed by hand, the radio sent not an SOS but a route confirmation, the journal breaks off at a line older than any map, and the rope leads to a salt cove beneath the glacier. The main finding is more troubling than any rescue theory: the group left alive and deliberately damaged part of the archive copies so the next investigator would not open the node too soon.",
+        "nextHook": "Grains of sand and half a coordinate were hidden in the spine of the red journal. The other half should lie where the northern signal becomes a dry riverbed: in the Sand Meridian case."
       },
       "sand": {
         "title": "Sand Meridian",
         "caseName": "Case “Aster-9”",
-        "shortResult": "The desert route was part of an ancient system of underground water and star navigation.",
-        "conclusion": "Case “Aster-9” has been restored. The desert expedition was not searching for ruins or a legendary oasis, but for a working node of an ancient water system. The rune marker identified the entrance, the helmets confirmed the descent, the Iram pump explained the water movement, the observatory lamp revealed the navigation method, and the buried riverbed map connected all points into one route.",
-        "nextHook": "A sign not found in the desert archive was discovered on the edge of the map: three streams converging in a green valley. The next case opens the tropical sector — Emerald Meridian."
+        "shortResult": "The desert expedition proved the meridians control water, while someone again cut the key signs of activation out of the photos.",
+        "conclusion": "Case “Aster-9” has been restored. Beneath the sand was not a temple myth but a working hydraulic machine: the marker set the descent, the helmets confirmed the lower halls, the Iram pump raised the water, the bronze lamp marked an outlet, and the riverbed map showed the network as a living system. The photo differences now read as deliberate editing: the copies did not lose pretty details, they lost warnings that an activated node sends water onward into the tropics.",
+        "nextHook": "A salt-scoured line appeared on the back of the map: “Do not wake the third stream.” The trail leads into the green valley, where the water has already woken."
       },
       "emerald": {
         "title": "Emerald Meridian",
         "caseName": "Case “Verde-12”",
-        "shortResult": "The tropical expedition proved that the White, Sand and Emerald routes were parts of one system.",
-        "conclusion": "Case “Verde-12” has been restored. The tropical expedition was not a separate route: it was checking the last known node of the meridian system. Botanical samples linked the valley to the northern flower, the green riverbed map revealed the hidden water network, the plaque of three streams connected all three campaigns, the spyglass confirmed the observatory's navigation role, and the evacuation aircraft proved that part of the archive was removed before the sector closed.",
-        "nextHook": "Empty coordinate cells remained on the back of the evacuation manifest. Three meridians are restored, but the archive map is not complete. New sectors have appeared in the locked catalog.",
+        "shortResult": "The tropical case reveals the real reason for the disappearances: the expeditions did not vanish, they tried to stop the meridian network.",
+        "conclusion": "Case “Verde-12” has been restored. Emerald Meridian was not the final point but the heart of the system. Blue plants link the valley to the polar greenhouse, the village map repeats the desert riverbed, the Plaque of Three Streams shows three active nodes, the spyglass calibrates the next sectors, and the plane proves Verde-12 evacuated part of the archive before the valley flooded. Now the edits across all three cases make sense. The expeditions hid not a route to treasure, but a mechanism capable of redistributing water between continents.",
+        "nextHook": "Empty coordinate cells remained on the evacuation manifest beside an unsigned note: “Do not assemble the full map until the archive is protected.” Three meridians are restored, but the locked catalog is already answering with new sectors.",
         "futureHookTitle": "The archive is not complete",
-        "futureHookText": "Other routes lie beyond the White, Sand and Emerald meridians. Their photos have not been restored yet."
+        "futureHookText": "Other routes lie beyond the White, Sand and Emerald meridians. Their photos are still corrected by an unknown hand because the complete map is dangerous without a protected archive."
       }
     }
   },
@@ -343,7 +544,7 @@
     "white-compass": {
       "name": "White Gull Compass",
       "body": "The compass was found at the lighthouse where the expedition last followed its official route. The needle was fixed in a strange position: it pointed not north but toward the glacier.",
-      "reveal": "It seems the group never got lost. Someone — or something — was guiding them along the old meridian line.",
+      "reveal": "The group never got lost. They fixed the needle themselves so a future archivist would understand: north is no longer the main direction here.",
       "description": "A brass compass from the lighthouse archive. The inner ring shows traces of the needle being fixed by hand. Judging by its position, the expedition deliberately turned onto the closed ice route.",
       "clue": "Matches the red sign on the desert marker stone.",
       "foundAt": "Found at the White Gull lighthouse."
@@ -351,7 +552,7 @@
     "white-field-radio": {
       "name": "Polarnaya-7 Field Radio",
       "body": "The radio stood in the glacier camp. The dial is knocked out of line, but a frequency mark remains on the casing. The group sent a short message on it before the descent.",
-      "reveal": "The message was no distress call. It was a note: “Route confirmed. Going below the ice.”",
+      "reveal": "The message was no distress call. It was a password for whoever came later: “Route confirmed. Going below the ice.”",
       "description": "An old portable radio with a worn dial. The frequency mark on the casing matches a later record from the radio relay tower.",
       "clue": "Proves the expedition went under the glacier by plan.",
       "foundAt": "Found in the glacier camp."
@@ -367,7 +568,7 @@
     "white-echo-recorder": {
       "name": "Echo Recorder M-10",
       "body": "The device by the radio tower looks like a comms unit, but its dials are tuned to low oscillations. It recorded a signal reflected from beneath the ice.",
-      "reveal": "The signal repeats at even intervals, as if a chain of nodes works underground. The northern route is only the first part of the system.",
+      "reveal": "The signal repeats at even intervals, as if a chain of nodes is answering underground. The northern route is the first note in someone else's score.",
       "description": "A heavy field unit with several dials and a reel. It did not transmit messages — it recorded a low-frequency echo. The same rhythm was later found on the salt flat of the desert route.",
       "clue": "First proof that the meridians are linked by an underground signal.",
       "foundAt": "Found by the radio relay tower."
@@ -375,7 +576,7 @@
     "white-descent-rope": {
       "name": "Descent Rope at the Ice Cliff",
       "body": "The rope lay at the edge of the ice cliff, its end worn by salt rather than snow. Below was not an abyss but a way down to the water.",
-      "reveal": "Polarnaya-7 did not perish. The group descended to a hidden cove, left by sea and stored the coordinates of the next case in the archive: Sand Meridian.",
+      "reveal": "Polarnaya-7 did not perish. The group descended to a hidden cove, left by sea and hid the coordinates so they could be found only after the photos were restored.",
       "description": "A rough descent rope with salt traces in its fibers. It explains why search parties never found a camp below the cliff: Polarnaya-7 left through a hidden cove.",
       "clue": "Opens the way to the Sand Meridian case.",
       "foundAt": "Found at the final ice camp."
@@ -399,7 +600,7 @@
     "sand-hydraulic-pump": {
       "name": "Iram Hydraulic Pump",
       "body": "The device by the oasis only looks modern at first glance. It was connected to ancient pipes running deep beneath the plateau.",
-      "reveal": "The oasis was not natural. Water rose through the old network that Aster-9 set in motion once again.",
+      "reveal": "The oasis was not natural. Water rose through the old network, and Aster-9 learned too late that starting a node is easier than stopping one.",
       "description": "An intricate pump with brass cylinders, pipes and a pressure gauge. Mineral traces show it worked with water that had traveled far through an underground channel.",
       "clue": "Proves the desert meridian is tied to water, not only to ruins.",
       "foundAt": "Found by the Iram oasis."
@@ -407,7 +608,7 @@
     "sand-bronze-lamp": {
       "name": "Bronze Observatory Lamp",
       "body": "Local legends called it a djinn's lamp, yet inside there is no oil and no soot. A pale mineral film remains on the walls.",
-      "reveal": "The lamp was not a magical object but a marker vessel: it was placed where water from the network reached the surface.",
+      "reveal": "The lamp was not a magical object but a marker vessel: it was placed where water reached the surface and where the next risk began.",
       "description": "A small bronze lamp from the ruined observatory. Folklore tied it to djinns, but archive data points to a practical purpose: marking a water outlet and the direction to the next node.",
       "clue": "The mineral residue inside resembles water traces from the tropical reservoir.",
       "foundAt": "Found in the ruined observatory."
@@ -415,7 +616,7 @@
     "sand-buried-map": {
       "name": "Map of the Buried Riverbed",
       "body": "The map was found in the final archive of the desert line. It marks dry riverbeds, wells and a single route leading beyond the desert.",
-      "reveal": "The desert's underground water is linked to the tropical river system. The next case begins where the map calls the riverbed alive: Emerald Meridian.",
+      "reveal": "The desert's underground water is linked to the tropical river system. The next case begins where the map calls the riverbed alive and marks it as dangerous.",
       "description": "An old map with lines of dry riverbeds and underground passages. Unlike ordinary archaeological charts, it continues beyond the desert and points to the tropical valley.",
       "clue": "Opens the way to the Emerald Meridian case.",
       "foundAt": "Found in the final archive of the desert line."
@@ -423,7 +624,7 @@
     "emerald-botanical-vials": {
       "name": "Verde-12 Herbarium Vials",
       "body": "Vials with plant samples survived in the botanical camp. Among them are leaves with a rare blue pigment.",
-      "reveal": "The same pigment was found in the polar greenhouse. The northern anomaly and the tropical valley feed from one system.",
+      "reveal": "The same pigment was found in the polar greenhouse. The northern anomaly and the tropical valley only look unrelated from the surface.",
       "description": "A set of glass vials with leaves, mosses and rare plants. Archive notes link some of the samples to the blue flower from the northern greenhouse.",
       "clue": "Proves the biological link between the White and Emerald meridians.",
       "foundAt": "Found in the botanical camp."
@@ -439,7 +640,7 @@
     "emerald-stone-plaque": {
       "name": "Plaque of Three Streams",
       "body": "The stone plaque from the Temple of Roots looks like a decorative relief. Compared with the maps, however, it is clearly a diagram of the network.",
-      "reveal": "Three streams — northern, desert and green. Along the edges several empty nodes remain, as if the archive is not fully restored.",
+      "reveal": "Three streams — northern, desert and green. Empty nodes remain along the edges, and one of them has been freshly scratched over the ancient stone.",
       "description": "A heavy stone plaque with a relief of mountains, channels and nodes. The three central streams match the three restored expeditions, while the side points remain unnamed.",
       "clue": "Leaves room for future campaigns and new meridians.",
       "foundAt": "Found in the Temple of Roots."
@@ -455,7 +656,7 @@
     "emerald-evacuation-aircraft": {
       "name": "Verde-12 Evacuation Aircraft",
       "body": "The plane stood on the wet strip, ready for takeoff. In the cockpit was not a distress signal but a neatly folded archive sheet.",
-      "reveal": "Verde-12 evacuated in time. Before takeoff the group left a map of the network: three meridians restored, yet several sectors on it still empty.",
+      "reveal": "Verde-12 evacuated in time. Before takeoff the group left a map of the network and deliberately kept several sectors blank.",
       "description": "A small expedition aircraft with mud-stained wings and traces of a hurried departure. It proves the third group did not vanish — it left the valley after grasping the scale of the system.",
       "clue": "The final key to continuing the global meridian line.",
       "foundAt": "Found at the evacuation airstrip."
@@ -520,7 +721,7 @@
     "supra": "EXPEDITION MYSTERIES",
     "campaignLabel": "EXPEDITION",
     "heading": "Choose Your Expedition",
-    "subheading": "Three routes. One archive. Follow the clues.",
+    "subheading": "Three routes. One archive. Find who edited the photos and why.",
     "autoSave": "Progress is saved automatically",
     "totalProgress": "{{done}} / {{total}}",
     "totalDone": "TOTAL COMPLETED",
@@ -542,20 +743,20 @@
     "lastLevel": "Last level: {{name}}",
     "white": {
       "title": "White Meridian",
-      "description": "A lost northern expedition and the mystery of a valley that isn't on any map.",
-      "lockReason": "Complete «White Meridian»",
+      "description": "A missing northern team left not a distress trail in the snow, but a cipher to the first node of the meridian network.",
+      "lockReason": "Complete “White Meridian”",
       "levelsLeft": "This is the first available campaign"
     },
     "sand": {
       "title": "Sand Meridian",
-      "description": "An archaeological expedition discovers a temple complex built along an unknown meridian.",
-      "lockReason": "Complete «White Meridian»",
+      "description": "A desert team descends beneath the plateau and starts an ancient water machine someone tried to hide in the photo copies.",
+      "lockReason": "Complete “White Meridian”",
       "levelsLeft": "{{count}} levels left to unlock"
     },
     "emerald": {
       "title": "Emerald Meridian",
-      "description": "A tropical jungle expedition finds traces of a system linking ancient complexes across the globe.",
-      "lockReason": "Complete «Sand Meridian»",
+      "description": "A tropical expedition finds the network's heart and leaves the archive's central question: who has the right to wake the meridians?",
+      "lockReason": "Complete “Sand Meridian”",
       "finalLabel": "Final archive expedition",
       "levelsLeft": "{{count}} levels left to unlock"
     },

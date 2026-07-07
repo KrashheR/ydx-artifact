@@ -7,21 +7,35 @@ import { useGameStore } from "@/shared/store/gameStore";
 
 const REVEAL_DELAY_MS = 1400;
 
-function SealBadge({ size = 64 }: { size?: number }) {
+function ArchiveWaxSeal({ opening }: { opening: boolean }) {
   return (
     <div
-      className="flex items-center justify-center rounded-full"
-      style={{
-        width: size,
-        height: size,
-        background: "radial-gradient(circle at 38% 30%, #e7c074, #a9762f)",
-        border: "2px solid rgba(255,236,196,.5)",
-        boxShadow: "0 10px 24px rgba(0,0,0,.5)"
-      }}
+      className={`artifact-wax-seal ${opening ? "artifact-wax-seal--opening" : ""}`}
+      aria-hidden="true"
     >
-      <svg width={size * 0.4} height={size * 0.4} viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" strokeWidth="1.8">
-        <rect x="5" y="11" width="14" height="9.5" rx="1.6" />
-        <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+      <div className="artifact-wax-seal__half artifact-wax-seal__half--left" />
+      <div className="artifact-wax-seal__half artifact-wax-seal__half--right" />
+      <svg
+        className="artifact-wax-seal__mark"
+        width="38"
+        height="38"
+        viewBox="0 0 40 40"
+        fill="none"
+        focusable="false"
+      >
+        <circle cx="20" cy="20" r="13.5" stroke="#2a1d0c" strokeWidth="1.7" opacity=".72" />
+        <path
+          d="M20 9.5v21M9.5 20h21M14 14l12 12M26 14 14 26"
+          stroke="#2a1d0c"
+          strokeLinecap="round"
+          strokeWidth="1.4"
+          opacity=".7"
+        />
+        <path
+          d="M20 12.8 22.2 18l5.6.5-4.2 3.7 1.3 5.5L20 24.8l-4.9 2.9 1.3-5.5-4.2-3.7 5.6-.5L20 12.8Z"
+          fill="#2a1d0c"
+          opacity=".62"
+        />
       </svg>
     </div>
   );
@@ -96,29 +110,30 @@ export function ArtifactRevealOverlay({
         <div className="relative mt-6 h-[200px] w-[200px] sm:h-[220px] sm:w-[220px]">
           {/* Sealed state */}
           <div
-            className="absolute inset-0 flex items-center justify-center rounded-[6px] transition-opacity duration-700"
+            className={`artifact-sealed-card absolute inset-0 flex items-center justify-center rounded-[6px] transition-opacity duration-700 ${
+              revealed ? "artifact-sealed-card--opening" : ""
+            }`}
             style={{
-              background:
-                "repeating-linear-gradient(45deg, rgba(213,195,154,.06) 0 10px, rgba(213,195,154,.02) 10px 20px)",
-              border: "1px dashed rgba(184,138,69,.5)",
               opacity: revealed ? 0 : 1
             }}
             aria-hidden={revealed}
           >
-            <div className="absolute left-[14px] right-[14px] top-[44%] h-[1.5px]" style={{ background: "rgba(184,138,69,.5)" }} />
-            <div className="absolute bottom-[14px] left-[44%] top-[14px] w-[1.5px]" style={{ background: "rgba(184,138,69,.5)" }} />
-            <SealBadge />
+            <div className="artifact-sealed-card__paper artifact-sealed-card__paper--top" />
+            <div className="artifact-sealed-card__paper artifact-sealed-card__paper--bottom" />
+            <div className="artifact-sealed-card__fold artifact-sealed-card__fold--horizontal" />
+            <div className="artifact-sealed-card__fold artifact-sealed-card__fold--vertical" />
+            <ArchiveWaxSeal opening={revealed} />
           </div>
 
           {/* Revealed state */}
           <div
-            className="absolute inset-0 flex items-center justify-center rounded-[8px] transition-all duration-700"
+            className="artifact-revealed-card absolute inset-0 flex items-center justify-center rounded-[8px] transition-all duration-700"
             style={{
               background: "linear-gradient(160deg, #2b2115, #1c150c)",
               border: "1px solid rgba(184,138,69,.5)",
               boxShadow: "0 22px 44px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,236,196,.08)",
               opacity: revealed ? 1 : 0,
-              transform: revealed ? "scale(1)" : "scale(.92)"
+              transform: revealed ? "translateY(0) scale(1)" : "translateY(10px) scale(.92)"
             }}
             aria-hidden={!revealed}
           >

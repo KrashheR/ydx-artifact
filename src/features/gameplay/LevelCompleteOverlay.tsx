@@ -57,6 +57,7 @@ export function LevelCompleteOverlay({
     : completedLevelIds.filter((id) => chapter.levels.some((l) => l.id === id)).length;
   const progressTotal = isDaily ? 1 : chapter.levels.length;
   const progressLabel = isDaily ? t("actions.daily").toUpperCase() : t(chapter.titleKey).toUpperCase();
+  const story = !isDaily ? level.story : undefined;
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center p-3">
@@ -98,8 +99,21 @@ export function LevelCompleteOverlay({
             {t("game.completedTitle")}
           </h2>
           <p className="result-desc mx-auto mt-2.5 max-w-[380px] text-[14px] leading-[1.55] text-exp-muted">
-            {t("game.completedDesc")}
+            {story ? t(story.victoryKey) : t("game.completedDesc")}
           </p>
+          {story && (
+            <div
+              className="mx-auto mt-4 max-w-[420px] rounded-xl border border-exp-brass/[.24] px-4 py-3 text-left"
+              style={{ background: "rgba(21,27,24,.42)" }}
+            >
+              <div className="text-[10px] font-bold uppercase tracking-[.16em] text-exp-brass2">
+                {t("story.clueLabel")} · {t("story.actLabel", { act: story.act })}
+              </div>
+              <p className="mt-1.5 text-[13px] font-semibold leading-[1.45] text-exp-parch">
+                {t(story.clueKey)}
+              </p>
+            </div>
+          )}
           </div>
 
           <div className="result-body">

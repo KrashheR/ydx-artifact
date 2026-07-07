@@ -4,6 +4,8 @@ Runtime placeholder assets live in `public/assets/scenes/northern-route/placehol
 
 Runtime artifact state images live under `public/assets/artifacts/<campaign-folder>/<level-order>/` as WebP derivatives named exactly `open.webp` (unlocked) and `closed.webp` (locked); `<campaign-folder>` matches `campaignManifest.assetFolder`. Convert owner-provided PNG exports to lossless WebP, downscale to the target runtime size, and keep master/source PNG files outside `public/assets/` when they need to be preserved. The collectible catalog itself is data-driven in `src/content/artifacts.ts` (artifact id, campaign, milestone level order 3/6/8/10/13, optional toast `differenceId`); artifact display texts live in both locales under `artifacts.<id>.*` in `src/i18n/*/common.json`, with the RU narrative source in `docs/expedition_narrative_collection_ru.json`.
 
+Campaign levels must also carry a `story` block from `src/content/levelStory.ts`: `act`, `introKey`, `victoryKey`, and `clueKey`. RU/EN strings live under `story.levels.<campaign><order>.*` in `src/i18n/*/common.json`. The completion overlay shows `victoryKey` plus a labeled `clueKey`, so each restored photo advances the archive mystery instead of falling back to the generic completion text. `pnpm validate:content` fails if any campaign level is missing story keys, if the locale keys are missing, or if the level is assigned to the wrong 4-act band (1-3, 4-7, 8-10, 11-13).
+
 Chapter 1 map point titles in `src/i18n/*/common.json` are sourced from `docs/plot/meridian/10_STORY_AND_SCENE_PROMPTS.md`.
 
 Playable chapter wiring now goes through `src/content/campaignManifest.ts`, campaign builder modules, and `src/content/chapters.ts`. To connect a new campaign quickly:
@@ -13,7 +15,7 @@ Playable chapter wiring now goes through `src/content/campaignManifest.ts`, camp
 3. Register asset folder, preview filename and map aspect ratio in `src/content/campaignManifest.ts`.
 4. Create a level builder module like `src/content/sandMeridianLevels.ts`.
 5. Register the chapter once in `src/content/chapters.ts` with map points and level list.
-6. Add locale titles in `src/i18n/ru/common.json` and `src/i18n/en/common.json`.
+6. Add locale titles and `story.levels.*` intro/victory/clue texts in `src/i18n/ru/common.json` and `src/i18n/en/common.json`.
 7. Run `pnpm validate:content`.
 
 Production replacement should follow the docs pipeline: master A, local B edits only, diff validation, hitbox annotation, manifest and provenance update.

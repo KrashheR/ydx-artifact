@@ -749,6 +749,27 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
     navigate({ kind: "map", chapterId: chapters[CAMPAIGN_BY_ID[campaignId]].id });
   };
 
+  const continueCampaign = (campaign: Campaign) => {
+    const nextLevel = getChapterLevels(campaign.chapterId).find(
+      (level) => !completedLevels.includes(level.id)
+    );
+
+    if (!nextLevel) {
+      openCampaign(campaign.id);
+      return;
+    }
+
+    trackAnalyticsEvent("campaign_selected", {
+      campaignCardId: campaign.id,
+      campaignStatus: campaign.status,
+      completedInCampaign: campaign.done,
+      totalInCampaign: campaign.total,
+      source: "home_continue"
+    });
+
+    startLevel(nextLevel.id, "campaign");
+  };
+
   const openDaily = () => {
     trackAnalyticsEvent("daily_opened", {
       source: "home_hub",
@@ -798,7 +819,7 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
         <div className="home-hub-grid grid min-h-0 flex-1 grid-cols-1 gap-4 md:grid-cols-[minmax(0,1.25fr)_minmax(260px,.72fr)_minmax(300px,.78fr)]">
           <CurrentCaseCard
             campaign={activeCampaign}
-            onContinue={() => openCampaign(activeCampaign.id)}
+            onContinue={() => continueCampaign(activeCampaign)}
             onOpenMap={() => openCampaign(activeCampaign.id)}
           />
 

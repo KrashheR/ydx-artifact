@@ -158,6 +158,45 @@ describe("gameStore analytics", () => {
   });
 });
 
+describe("gameStore campaign hint rewards", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    resetStore();
+  });
+
+  it("adds one magnifier after every second newly completed campaign level", () => {
+    const levels = getChapterLevels("northern-route");
+    useGameStore.setState((state) => ({
+      saveData: { ...state.saveData, magnifiers: 0 }
+    }));
+
+    completeAttempt(levels[0].id, 0, 80);
+    expect(useGameStore.getState().saveData.magnifiers).toBe(0);
+
+    completeAttempt(levels[1].id, 0, 80);
+    expect(useGameStore.getState().saveData.magnifiers).toBe(1);
+
+    completeAttempt(levels[2].id, 0, 80);
+    expect(useGameStore.getState().saveData.magnifiers).toBe(1);
+
+    completeAttempt(levels[3].id, 0, 80);
+    expect(useGameStore.getState().saveData.magnifiers).toBe(2);
+  });
+
+  it("does not grant the campaign cadence reward for replays", () => {
+    const levels = getChapterLevels("northern-route");
+    useGameStore.setState((state) => ({
+      saveData: { ...state.saveData, magnifiers: 0 }
+    }));
+
+    completeAttempt(levels[0].id, 0, 80);
+    completeAttempt(levels[1].id, 0, 80);
+    completeAttempt(levels[1].id, 0, 70);
+
+    expect(useGameStore.getState().saveData.magnifiers).toBe(1);
+  });
+});
+
 describe("gameStore campaign reports", () => {
   beforeEach(() => {
     vi.restoreAllMocks();

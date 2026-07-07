@@ -34,11 +34,19 @@ export const differenceSchema = z.object({
   difficulty: z.union([z.literal(1), z.literal(2), z.literal(3)])
 });
 
+const levelStorySchema = z.object({
+  act: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
+  introKey: z.string().min(1),
+  victoryKey: z.string().min(1),
+  clueKey: z.string().min(1)
+});
+
 export const levelSchema = z.object({
   id: z.string().min(1),
   chapterId: z.enum(["northern-route", "sand-meridian", "emerald-meridian"]),
   order: z.number().int().min(1).max(13),
   titleKey: z.string().min(1),
+  story: levelStorySchema.optional(),
   imageA: z.string().min(1),
   imageB: z.string().min(1),
   thumbnail: z.string().min(1),

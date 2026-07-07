@@ -1,5 +1,6 @@
 import { levelSchema, type LevelDefinition } from "../entities/level/schema";
 import { getLevelSceneAsset } from "./sceneAssets";
+import { getLevelStory } from "./levelStory";
 import sandMeridianMapLayout from "../../docs/plot/sand_meridian/map-handoff/sand-meridian-map-layout.json";
 
 const sandMeridianDifferenceOverrides = {
@@ -22,7 +23,8 @@ const sandMeridianDifferenceOverrides = {
       { id: "ventilator", x: 0.532, y: 0.509, radius: 0.0647 },
       { id: "field-phone", x: 0.277, y: 0.579, radius: 0.04 },
       { id: "jeep-radio", x: 0.7678, y: 0.7312, radius: 0.0698 },
-      { id: "equipment-case", x: 0.46, y: 0.89, radius: 0.07 }
+      { id: "equipment-case", x: 0.46, y: 0.89, radius: 0.07 },
+      { id: "new-hitbox-9", shape: { kind: "ellipse", cx: 0.503, cy: 0.7071, rx: 0.0435, ry: 0.0766 } }
     ],
   3: [
       { id: "signal-marker", x: 0.653, y: 0.133, radius: 0.04 },
@@ -41,20 +43,17 @@ const sandMeridianDifferenceOverrides = {
       { id: "wind-holes", shape: { kind: "ellipse", cx: 0.391, cy: 0.4591, rx: 0.0962, ry: 0.1009 } },
       { id: "horn-speaker", x: 0.4116, y: 0.5851, radius: 0.0492 },
       { id: "cable-run", x: 0.592, y: 0.648, radius: 0.05 },
-      { id: "stone-cairn", x: 0.492, y: 0.673, radius: 0.04 },
       { id: "tent-peak", x: 0.8709, y: 0.6304, radius: 0.1775 },
       { id: "radio-crates", x: 0.836, y: 0.634, radius: 0.06 },
       { id: "dish-antenna", x: 0.7834, y: 0.8577, radius: 0.07 }
     ],
   5: [
       { id: "scaffold-frame", shape: { kind: "ellipse", cx: 0.2999, cy: 0.3956, rx: 0.1411, ry: 0.3222 } },
-      { id: "work-light", x: 0.3385, y: 0.1669, radius: 0.0488 },
-      { id: "rope-coil", x: 0.3364, y: 0.5523, radius: 0.0454 },
+      { id: "rope-coil", shape: { kind: "ellipse", cx: 0.4351, cy: 0.897, rx: 0.0493, ry: 0.2553, rotation: 45.6026 } },
       { id: "chalk-markings", x: 0.4934, y: 0.4078, radius: 0.05 },
-      { id: "rope-barrier", x: 0.6216, y: 0.5294, radius: 0.0351 },
       { id: "alcove-row", shape: { kind: "ellipse", cx: 0.7703, cy: 0.424, rx: 0.12, ry: 0.1076 } },
-      { id: "orange-reel", x: 0.4044, y: 0.6888, radius: 0.045 },
-      { id: "mine-cart", x: 0.5423, y: 0.6786, radius: 0.0727 },
+      { id: "orange-reel", x: 0.4013, y: 0.6838, radius: 0.045 },
+      { id: "mine-cart", x: 0.542, y: 0.6768, radius: 0.0727 },
       { id: "helmet-bench", shape: { kind: "ellipse", cx: 0.8206, cy: 0.6771, rx: 0.11, ry: 0.1037 } }
     ],
   6: [
@@ -94,7 +93,7 @@ const sandMeridianDifferenceOverrides = {
       { id: "gong", x: 0.3849, y: 0.3261, radius: 0.09 },
       { id: "tripod-mic", shape: { kind: "ellipse", cx: 0.4963, cy: 0.6214, rx: 0.0724, ry: 0.2058 } },
       { id: "floor-cable", shape: { kind: "ellipse", cx: 0.5864, cy: 0.6633, rx: 0.0799, ry: 0.2844 } },
-      { id: "back-light", x: 0.5821, y: 0.4359, radius: 0.027 },
+      { id: "back-light", shape: { kind: "ellipse", cx: 0.7094, cy: 0.4078, rx: 0.027, ry: 0.0955 } },
       { id: "marker-flag", x: 0.774, y: 0.337, radius: 0.03 },
       { id: "horn-speaker", x: 0.82, y: 0.518, radius: 0.06 },
       { id: "tape-recorder", x: 0.6745, y: 0.8353, radius: 0.0927 }
@@ -108,19 +107,17 @@ const sandMeridianDifferenceOverrides = {
       { id: "striped-awning", shape: { kind: "ellipse", cx: 0.6736, cy: 0.3524, rx: 0.1327, ry: 0.1312 } },
       { id: "wall-hooks", shape: { kind: "ellipse", cx: 0.7771, cy: 0.5138, rx: 0.085, ry: 0.1203 } },
       { id: "stone-basin", shape: { kind: "ellipse", cx: 0.7219, cy: 0.6286, rx: 0.09, ry: 0.1164 } },
-      { id: "leather-straps", shape: { kind: "ellipse", cx: 0.8098, cy: 0.7844, rx: 0.08, ry: 0.1307 } }
+      { id: "leather-straps", shape: { kind: "ellipse", cx: 0.8813, cy: 0.7432, rx: 0.1287, ry: 0.1869 } }
     ],
   11: [
       { id: "bridge-bunting", x: 0.9217, y: 0.2208, radius: 0.06 },
       { id: "rock-symbol", shape: { kind: "ellipse", cx: 0.5594, cy: 0.1568, rx: 0.1368, ry: 0.0939 } },
-      { id: "crate", shape: { kind: "ellipse", cx: 0.7144, cy: 0.2429, rx: 0.0312, ry: 0.0789 } },
       { id: "bridge-lantern", x: 0.776, y: 0.223, radius: 0.04 },
-      { id: "bridge-post", shape: { kind: "ellipse", cx: 0.7941, cy: 0.3402, rx: 0.089, ry: 0.1423 } },
-      { id: "plank-span", shape: { kind: "ellipse", cx: 0.5786, cy: 0.4181, rx: 0.1272, ry: 0.2003 } },
+      { id: "plank-span", shape: { kind: "ellipse", cx: 0.6092, cy: 0.4496, rx: 0.1824, ry: 0.1316, rotation: -25.4573 } },
       { id: "bridge-planks", x: 0.4052, y: 0.6495, radius: 0.0539 },
       { id: "left-lantern", x: 0.3834, y: 0.0959, radius: 0.04 },
       { id: "winch", x: 0.287, y: 0.801, radius: 0.065 },
-      { id: "bridge-net", shape: { kind: "ellipse", cx: 0.6498, cy: 0.6567, rx: 0.1187, ry: 0.2159 } }
+      { id: "bridge-net", shape: { kind: "ellipse", cx: 0.6366, cy: 0.6752, rx: 0.0453, ry: 0.1779, rotation: 53.097 } }
     ],
   12: [
       { id: "mirror", x: 0.17, y: 0.378, radius: 0.05 },
@@ -202,6 +199,7 @@ function makeLevel(level: SandMeridianLayoutLevel): LevelDefinition {
     chapterId: "sand-meridian",
     order: level.order,
     titleKey: getTitleKey(level),
+    story: getLevelStory("sand", level.order),
     imageA: getLevelSceneAsset("sand-meredian", level.order, "1.webp"),
     imageB: getLevelSceneAsset("sand-meredian", level.order, "2.webp"),
     thumbnail: getLevelSceneAsset("sand-meredian", level.order, "1.webp"),

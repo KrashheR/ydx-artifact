@@ -141,6 +141,13 @@ function normalizePath(path: string) {
   return path.replace(/\\/g, "/").replace(/^\//, "");
 }
 
+function getExpectedStoryAct(order: number) {
+  if (order <= 3) return 1;
+  if (order <= 7) return 2;
+  if (order <= 10) return 3;
+  return 4;
+}
+
 const ruLocale = readJson<LocaleDictionary>("src/i18n/ru/common.json");
 const enLocale = readJson<LocaleDictionary>("src/i18n/en/common.json");
 const provenance = readJson<AssetProvenance>("ASSET_PROVENANCE.json");
@@ -199,6 +206,23 @@ for (const level of [...allLevels, ...dailyArchiveLevels]) {
   }
   if (!hasLocaleKey(ruLocale, level.titleKey)) errors.push(`${level.id}: missing RU locale key ${level.titleKey}`);
   if (!hasLocaleKey(enLocale, level.titleKey)) errors.push(`${level.id}: missing EN locale key ${level.titleKey}`);
+  if (level.chapterId !== "northern-route" && level.chapterId !== "sand-meridian" && level.chapterId !== "emerald-meridian") {
+    errors.push(`${level.id}: unknown campaign chapter ${level.chapterId}`);
+  }
+  if (chapterList.some((chapter) => chapter.id === level.chapterId && chapter.levels.some((candidate) => candidate.id === level.id))) {
+    if (!level.story) {
+      errors.push(`${level.id}: campaign level is missing story keys`);
+    } else {
+      const expectedAct = getExpectedStoryAct(level.order);
+      if (level.story.act !== expectedAct) {
+        errors.push(`${level.id}: story act ${level.story.act} should be ${expectedAct}`);
+      }
+      for (const key of [level.story.introKey, level.story.victoryKey, level.story.clueKey]) {
+        if (!hasLocaleKey(ruLocale, key)) errors.push(`${level.id}: missing RU locale key ${key}`);
+        if (!hasLocaleKey(enLocale, key)) errors.push(`${level.id}: missing EN locale key ${key}`);
+      }
+    }
+  }
   validateAssetPath(level.id, level.imageA, { requireProvenance: true, requireMarkup: true });
   validateAssetPath(level.id, level.imageB, { requireProvenance: true, requireMarkup: true });
   validateAssetPath(level.id, level.thumbnail, { requireProvenance: true });

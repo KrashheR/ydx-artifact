@@ -1,203 +1,116 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "chapterId": "white-meridian",
+  "runtimeChapterId": "northern-route",
   "titleRu": "Белый меридиан",
-  "premiseRu": "Игрок сравнивает исходные полевые снимки и намеренно изменённые архивные копии экспедиции «Полярная-7».",
-  "truthRu": "Экспедиция скрыла геотермальную долину и редкий синий цветок, чтобы защитить место от промышленной разработки.",
+  "caseTitle": "Дело «Полярная-7»",
+  "premiseRu": "В архиве найдены парные снимки экспедиции Полярная-7. Официальные документы говорят, что группа пропала у ледника, но расхождения на снимках указывают на другое: экспедиция шла по заранее найденной меридианной линии.",
+  "mysteryQuestionRu": "Почему Полярная-7 ушла с официального маршрута и куда она исчезла после ледяного обрыва?",
+  "truthRu": "Экспедиция Полярная-7 не погибла у ледника. Она нашла первый узел меридианной сети, ушла через скрытую бухту и намеренно оставила архив неполным, чтобы полная карта не попала в неподготовленные руки.",
   "tone": [
     "cozy-mystery",
     "scientific",
     "northern-expedition",
     "non-supernatural"
   ],
+  "artifactProgression": [
+    "white-compass",
+    "white-field-radio",
+    "white-red-diary",
+    "white-echo-recorder",
+    "white-descent-rope"
+  ],
   "levels": [
     {
       "order": 1,
-      "id": "nr-01-boreas-harbor",
+      "id": "white-01-boreas-pier",
       "titleRu": "Пристань Борея",
-      "differenceCount": 4,
-      "storyClueRu": "Груза было больше, чем указано в манифесте.",
-      "differences": [
-        "brass-compass-removed",
-        "fuel-canister-count",
-        "life-ring-stripe-color",
-        "seagull-removed"
-      ]
+      "storyClueRu": "Первый снимок восстановлен. Маршрут начинается не с научной станции, а с закрытого причала, откуда уходили только экспедиционные суда.",
+      "artifactId": null
     },
     {
       "order": 2,
-      "id": "nr-02-coastal-warehouse",
+      "id": "white-02-coastal-warehouse",
       "titleRu": "Береговой склад",
-      "differenceCount": 5,
-      "storyClueRu": "Запасов хватало минимум на две недели.",
-      "differences": [
-        "sleeping-bag-count",
-        "blue-rope-removed",
-        "lantern-shade-color",
-        "snowshoe-count",
-        "door-crate-removed"
-      ]
+      "storyClueRu": "Склад не совпадает с ведомостью. У экспедиции было больше навигационных приборов и кабелей, чем требовалось для обычной зимовки.",
+      "artifactId": null
     },
     {
       "order": 3,
-      "id": "nr-03-white-gull-lighthouse",
-      "titleRu": "Маяк Белой Чайки",
-      "differenceCount": 5,
-      "artifactId": "brass-compass",
-      "storyClueRu": "На маяке отмечен другой маршрут.",
-      "differences": [
-        "lens-direction",
-        "compass-removed",
-        "signal-lamp-count",
-        "red-route-mark-removed",
-        "window-open-state"
-      ]
+      "id": "white-03-white-gull-lighthouse",
+      "titleRu": "Маяк Белой чайки",
+      "storyClueRu": "Компас с маяка найден. Его стрелка была зафиксирована не на севере, а на старой линии меридиана, исчезнувшей с поздних карт.",
+      "artifactId": "white-compass"
     },
     {
       "order": 4,
-      "id": "nr-04-ice-rail-platform",
-      "titleRu": "Ледовая железнодорожная платформа",
-      "differenceCount": 6,
-      "storyClueRu": "Закрытая ветка использовалась после эвакуации.",
-      "differences": [
-        "track-switch-direction",
-        "barrel-count",
-        "railcar-door-state",
-        "mittens-removed",
-        "signal-glass-color",
-        "trolley-position"
-      ]
+      "id": "white-04-ice-railway-platform",
+      "titleRu": "Ледовая платформа",
+      "storyClueRu": "Платформа подтверждает: экспедиция ушла вглубь материка не пешком. Кто-то заранее расчистил путь через лёд.",
+      "artifactId": null
     },
     {
       "order": 5,
-      "id": "nr-05-weather-station",
-      "titleRu": "Метеорологическая станция",
-      "differenceCount": 6,
-      "storyClueRu": "Температурные данные намеренно занизили.",
-      "differences": [
-        "thermometer-pointer",
-        "wind-vane-direction",
-        "mug-count",
-        "blue-weather-mark-removed",
-        "snow-gauge-sections",
-        "barometer-cover-state"
-      ]
+      "id": "white-05-weather-station",
+      "titleRu": "Метеостанция",
+      "storyClueRu": "Данные станции не похожи на обычную метеосводку. Под ледником была зона тепла, и экспедиция знала, где её искать.",
+      "artifactId": null
     },
     {
       "order": 6,
-      "id": "nr-06-glacier-camp",
+      "id": "white-06-glacier-camp",
       "titleRu": "Лагерь у ледника",
-      "differenceCount": 6,
-      "artifactId": "field-radio",
-      "storyClueRu": "Радиопередачи продолжались.",
-      "differences": [
-        "field-radio-removed",
-        "ski-pair-count",
-        "ice-core-removed",
-        "survey-flag-color",
-        "sled-position",
-        "bootprints-removed"
-      ]
+      "storyClueRu": "Радиоприёмник найден. На шкале сохранился след частоты, по которой группа передала короткое сообщение перед спуском к леднику.",
+      "artifactId": "white-field-radio"
     },
     {
       "order": 7,
-      "id": "nr-07-mountain-tunnel",
+      "id": "white-07-old-mountain-tunnel",
       "titleRu": "Старый горный тоннель",
-      "differenceCount": 7,
-      "storyClueRu": "Тоннель был открыт и снабжался электричеством.",
-      "differences": [
-        "deep-lamp-state",
-        "cable-connection",
-        "crate-removed",
-        "vent-state",
-        "sled-tracks-removed",
-        "red-lantern-side",
-        "door-symbol-removed"
-      ]
+      "storyClueRu": "Тоннель связывает ледник с внутренней долиной. Экспедиция не открывала путь — она шла по уже существующим указателям.",
+      "artifactId": null
     },
     {
       "order": 8,
-      "id": "nr-08-observatory-dome",
+      "id": "white-08-observatory-dome",
       "titleRu": "Купол обсерватории",
-      "differenceCount": 7,
-      "storyClueRu": "Обсерватория следила за долиной.",
-      "differences": [
-        "telescope-direction",
-        "red-notebook-removed",
-        "hatch-state",
-        "golden-diagram-point-removed",
-        "chair-position",
-        "lens-cap-removed",
-        "clock-hands"
-      ]
+      "storyClueRu": "Красный журнал найден. Последняя запись говорит: «Компас больше не показывает север. Он показывает маршрут».",
+      "artifactId": "white-red-diary"
     },
     {
       "order": 9,
-      "id": "nr-09-polar-greenhouse",
+      "id": "white-09-polar-greenhouse",
       "titleRu": "Полярная теплица",
-      "differenceCount": 7,
-      "artifactId": "blue-flower",
-      "storyClueRu": "Синий цветок существовал.",
-      "differences": [
-        "blue-flower-replaced",
-        "pot-count",
-        "grow-light-color",
-        "watering-can-position",
-        "condensation-clear-patch",
-        "thermometer-pointer",
-        "specimen-tray-state"
-      ]
+      "storyClueRu": "Теплица доказывает, что скрытая долина существовала. Синий цветок на старых снимках связан с тем же маршрутом, что и компас.",
+      "artifactId": null
     },
     {
       "order": 10,
-      "id": "nr-10-radio-relay",
+      "id": "white-10-radio-relay-tower",
       "titleRu": "Радиорелейная башня",
-      "differenceCount": 7,
-      "storyClueRu": "Сигналы шли между внутренними станциями.",
-      "differences": [
-        "dish-direction",
-        "indicator-color",
-        "field-radio-removed",
-        "cable-socket",
-        "wire-spool-removed",
-        "signal-lamp-state",
-        "route-line-removed"
-      ]
+      "storyClueRu": "Эхо-регистратор найден. Его катушка хранит низкий сигнал, повторяющийся ровно через каждые три меридианные отметки.",
+      "artifactId": "white-echo-recorder"
     },
     {
       "order": 11,
-      "id": "nr-11-living-module",
+      "id": "white-11-living-module",
       "titleRu": "Жилой модуль",
-      "differenceCount": 8,
-      "storyClueRu": "Экспедиция ушла организованно.",
-      "differences": [
-        "bed-state",
-        "mug-count",
-        "jacket-removed",
-        "chess-piece-position",
-        "locker-state",
-        "firewood-removed",
-        "plant-removed",
-        "boot-pair-count"
-      ]
+      "storyClueRu": "В модуле нет следов катастрофы. Группа уходила организованно и забрала только то, что нужно для следующего перехода.",
+      "artifactId": null
     },
     {
       "order": 12,
-      "id": "nr-12-hidden-archive",
-      "titleRu": "Скрытый архив долины",
-      "differenceCount": 8,
-      "artifactId": "torn-map",
-      "storyClueRu": "Исчезновение было способом защитить долину.",
-      "differences": [
-        "map-fragment-removed",
-        "compass-direction",
-        "pressed-flower-removed",
-        "radio-power-state",
-        "extra-lamp-state",
-        "rock-sample-count",
-        "sled-removed",
-        "steam-plume-removed"
-      ]
+      "id": "white-12-hidden-valley-archive",
+      "titleRu": "Архив скрытой долины",
+      "storyClueRu": "Архив долины восстановлен. На картах отмечены не только северные координаты: один маршрут уходит к пустынному сектору.",
+      "artifactId": null
+    },
+    {
+      "order": 13,
+      "id": "white-13-ice-cliff-camp",
+      "titleRu": "Лагерь у ледяного обрыва",
+      "storyClueRu": "Спусковой трос найден. Экспедиция не погибла у обрыва — она спустилась к скрытой бухте и ушла морем, оставив координаты Sand Meridian.",
+      "artifactId": "white-descent-rope"
     }
   ]
 }

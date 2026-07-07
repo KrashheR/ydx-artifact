@@ -1,5 +1,6 @@
 import { levelSchema, type LevelDefinition } from "../entities/level/schema";
 import { getLevelSceneAsset } from "./sceneAssets";
+import { getLevelStory } from "./levelStory";
 
 const emeraldLevelIds = [
   "em-01-river-landing",
@@ -70,7 +71,7 @@ const perLevelDiffs: DiffSpec[][] = [
   // ── Level 2: em-02-radio-station (9) ─────────────────────────────────────
   [
       { id: "antenna-top", shape: { kind: "circle", cx: 0.2201, cy: 0.1055, r: 0.0693 } },
-      { id: "roof-board", shape: { kind: "circle", cx: 0.354, cy: 0.295, r: 0.042 } },
+      { id: "roof-board", shape: { kind: "ellipse", cx: 0.4935, cy: 0.8836, rx: 0.2101, ry: 0.0961, rotation: 18.2966 } },
       { id: "hanging-tube", shape: { kind: "circle", cx: 0.6939, cy: 0.4167, r: 0.042 } },
       { id: "window-foliage", shape: { kind: "circle", cx: 0.8284, cy: 0.4165, r: 0.0979 } },
       { id: "radio-dial", shape: { kind: "ellipse", cx: 0.5396, cy: 0.5466, rx: 0.0767, ry: 0.0844 } },
@@ -84,11 +85,10 @@ const perLevelDiffs: DiffSpec[][] = [
       { id: "microscope-case", shape: { kind: "ellipse", cx: 0.0894, cy: 0.3623, rx: 0.09, ry: 0.1361 } },
       { id: "glass-cylinder", shape: { kind: "ellipse", cx: 0.933, cy: 0.392, rx: 0.05, ry: 0.108 } },
       { id: "colored-bottles", shape: { kind: "ellipse", cx: 0.677, cy: 0.545, rx: 0.08, ry: 0.1363 } },
-      { id: "specimen-row", shape: { kind: "ellipse", cx: 0.386, cy: 0.616, rx: 0.215, ry: 0.105 } },
+      { id: "specimen-row", shape: { kind: "ellipse", cx: 0.819, cy: 0.6774, rx: 0.1267, ry: 0.0737, rotation: 37.9964 } },
       { id: "flower-jar", shape: { kind: "ellipse", cx: 0.2685, cy: 0.9338, rx: 0.0761, ry: 0.07 } },
-      { id: "survey-map", shape: { kind: "ellipse", cx: 0.3787, cy: 0.7598, rx: 0.175, ry: 0.05 } },
-      { id: "herbarium-box", shape: { kind: "ellipse", cx: 0.8209, cy: 0.6718, rx: 0.0963, ry: 0.1252 } },
-      { id: "field-boots", shape: { kind: "ellipse", cx: 0.4752, cy: 0.9288, rx: 0.0797, ry: 0.098 } }
+      { id: "herbarium-box", shape: { kind: "ellipse", cx: 0.3902, cy: 0.6581, rx: 0.2335, ry: 0.1252 } },
+      { id: "field-boots", shape: { kind: "ellipse", cx: 0.4752, cy: 0.9288, rx: 0.0797, ry: 0.098, rotation: -6.1883 } }
     ],
   // ── Level 4: em-04-flooded-bridge (7) ────────────────────────────────────
   [
@@ -113,10 +113,10 @@ const perLevelDiffs: DiffSpec[][] = [
       { id: "window-shutter", shape: { kind: "circle", cx: 0.1667, cy: 0.23, r: 0.0889 } },
       { id: "map-board", shape: { kind: "circle", cx: 0.5095, cy: 0.385, r: 0.07 } },
       { id: "hut-basket", shape: { kind: "ellipse", cx: 0.6775, cy: 0.3845, rx: 0.0568, ry: 0.1494 } },
-      { id: "hammock", shape: { kind: "ellipse", cx: 0.7906, cy: 0.3973, rx: 0.055, ry: 0.07 } },
+      { id: "hammock", shape: { kind: "ellipse", cx: 0.792, cy: 0.4088, rx: 0.055, ry: 0.093 } },
       { id: "red-basket", shape: { kind: "circle", cx: 0.1956, cy: 0.5865, r: 0.05 } },
-      { id: "water-buoys", shape: { kind: "ellipse", cx: 0.8668, cy: 0.6057, rx: 0.1378, ry: 0.1367 } },
-      { id: "oar", shape: { kind: "ellipse", cx: 0.1269, cy: 0.8347, rx: 0.0768, ry: 0.2029 } },
+      { id: "water-buoys", shape: { kind: "ellipse", cx: 0.8649, cy: 0.6411, rx: 0.1414, ry: 0.0481, rotation: 39.7923 } },
+      { id: "oar", shape: { kind: "ellipse", cx: 0.1315, cy: 0.8386, rx: 0.0768, ry: 0.2029, rotation: -22.4763 } },
       { id: "first-aid-box", shape: { kind: "circle", cx: 0.27, cy: 0.835, r: 0.065 } },
       { id: "deck-jar", shape: { kind: "circle", cx: 0.4084, cy: 0.9011, r: 0.05 } }
     ],
@@ -134,10 +134,10 @@ const perLevelDiffs: DiffSpec[][] = [
     ],
   // ── Level 8: em-08-temple-of-roots (9) ───────────────────────────────────
   [
-      { id: "relief-panel", shape: { kind: "ellipse", cx: 0.479, cy: 0.6133, rx: 0.0818, ry: 0.0977 } },
+      { id: "relief-panel", shape: { kind: "ellipse", cx: 0.4692, cy: 0.3769, rx: 0.1058, ry: 0.1806 } },
       { id: "dark-doorway", shape: { kind: "ellipse", cx: 0.7655, cy: 0.3825, rx: 0.065, ry: 0.1893 } },
       { id: "flashlight", shape: { kind: "circle", cx: 0.6084, cy: 0.5595, r: 0.0582 } },
-      { id: "water-trickle", shape: { kind: "ellipse", cx: 0.4667, cy: 0.3734, rx: 0.0957, ry: 0.168 } },
+      { id: "water-trickle", shape: { kind: "ellipse", cx: 0.4498, cy: 0.6208, rx: 0.0642, ry: 0.0697 } },
       { id: "stone-well", shape: { kind: "ellipse", cx: 0.723, cy: 0.6857, rx: 0.0831, ry: 0.065 } },
       { id: "compass", shape: { kind: "circle", cx: 0.1585, cy: 0.8756, r: 0.0474 } },
       { id: "paint-brush", shape: { kind: "circle", cx: 0.3043, cy: 0.8253, r: 0.06 } },
@@ -191,7 +191,8 @@ const perLevelDiffs: DiffSpec[][] = [
       { id: "core-box", shape: { kind: "ellipse", cx: 0.22, cy: 0.815, rx: 0.1177, ry: 0.1135 } },
       { id: "drill-pipes", shape: { kind: "ellipse", cx: 0.5575, cy: 0.8654, rx: 0.155, ry: 0.1585 } },
       { id: "hose-coupling", shape: { kind: "ellipse", cx: 0.7129, cy: 0.7027, rx: 0.07, ry: 0.0703 } },
-      { id: "cable-end", shape: { kind: "circle", cx: 0.8081, cy: 0.87, r: 0.055 } }
+      { id: "cable-end", shape: { kind: "circle", cx: 0.8081, cy: 0.87, r: 0.055 } },
+      { id: "new-hitbox-10", shape: { kind: "ellipse", cx: 0.1143, cy: 0.5701, rx: 0.0468, ry: 0.0632 } }
     ],
   // ── Level 13: em-13-evacuation-airstrip (9) ──────────────────────────────
   [
@@ -220,6 +221,7 @@ function makeLevel(levelId: (typeof emeraldLevelIds)[number], order: number): Le
     chapterId: "emerald-meridian",
     order,
     titleKey: getTitleKey(levelId),
+    story: getLevelStory("emerald", order),
     imageA: getLevelSceneAsset("emerald-meridian", order, "1.webp"),
     imageB: getLevelSceneAsset("emerald-meridian", order, "2.webp"),
     thumbnail: getLevelSceneAsset("emerald-meridian", order, "1.webp"),

@@ -154,6 +154,19 @@ function getDurationBucket(durationSeconds: number) {
   return "300s_plus";
 }
 
+const CAMPAIGN_LEVELS_PER_HINT_REWARD = 2;
+
+function getCampaignCompletionRewardMagnifiers(
+  completedCampaignLevels: number,
+  isNewCampaignCompletion: boolean
+) {
+  if (!isNewCampaignCompletion) return 0;
+  return completedCampaignLevels > 0 &&
+    completedCampaignLevels % CAMPAIGN_LEVELS_PER_HINT_REWARD === 0
+    ? 1
+    : 0;
+}
+
 export const useGameStore = create<GameStore>((set, get) => ({
   screen: { kind: "home" },
   saveData: createDefaultSave(),
@@ -358,6 +371,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const completedLevels = !isCampaignCompletion || wasAlreadyCompleted
         ? state.saveData.completedLevels
         : [...state.saveData.completedLevels, levelId];
+      const campaignRewardMagnifiers = isCampaignCompletion
+        ? getCampaignCompletionRewardMagnifiers(completedLevels.length, !wasAlreadyCompleted)
+        : 0;
       const shouldClaimDailyReward =
         dailyRewardDate !== null && state.saveData.daily.lastClaimDate !== dailyRewardDate;
       const daily = shouldClaimDailyReward
@@ -372,7 +388,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         inProgress: null,
         magnifiers:
           state.saveData.magnifiers +
-          (isCampaignCompletion ? level.reward.magnifiers ?? 0 : 0) +
+          campaignRewardMagnifiers +
           (shouldClaimDailyReward ? 1 : 0),
         daily,
         bestResults
@@ -407,7 +423,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         accuracy: Number(accuracy.toFixed(4)),
         isReplay: wasAlreadyCompleted,
         completedLevels: completedLevels.length,
-        rewardMagnifiers: isCampaignCompletion ? level.reward.magnifiers ?? 0 : 0,
+        rewardMagnifiers: campaignRewardMagnifiers,
         magnifiersAfterReward: nextSave.magnifiers,
         artifactUnlockCount,
         queuedReviewCheck: shouldQueueReviewCheck,

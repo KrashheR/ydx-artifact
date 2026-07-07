@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import i18n from "i18next";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@/i18n";
+import { getChapterLevels } from "@/content/chapters";
 import { getDailyArchiveEntryForDate } from "@/content/dailyArchive";
 import { createDefaultSave } from "@/entities/save/schema";
 import { HomeScreen } from "@/screens/HomeScreen";
@@ -62,5 +63,28 @@ describe("HomeScreen", () => {
       });
     });
     expect(window.__artifactAnalyticsEvents?.some((event) => event.event === "daily_start_clicked")).toBe(true);
+  });
+
+  it("continues the active campaign directly into the next unfinished level", async () => {
+    const [firstLevel, secondLevel] = getChapterLevels("northern-route");
+
+    useGameStore.setState((state) => ({
+      saveData: {
+        ...state.saveData,
+        completedLevels: [firstLevel.id]
+      }
+    }));
+
+    render(<HomeScreen onOpenSettings={() => undefined} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Continue expedition/i }));
+
+    await waitFor(() => {
+      expect(useGameStore.getState().screen).toEqual({
+        kind: "game",
+        levelId: secondLevel.id,
+        mode: "campaign"
+      });
+    });
   });
 });

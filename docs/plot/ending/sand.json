@@ -22,17 +22,17 @@
       "line": "Подтвердили подготовку к глубокому спуску под плато."
     },
     {
-      "artifactId": "sand-water-apparatus",
+      "artifactId": "sand-hydraulic-pump",
       "title": "Гидравлический насос Ирама",
       "line": "Доказал, что древняя водная система ещё частично работала."
     },
     {
-      "artifactId": "sand-iram-lamp",
+      "artifactId": "sand-bronze-lamp",
       "title": "Бронзовая лампа обсерватории",
       "line": "Оказалась не украшением, а частью оптической разметки маршрута."
     },
     {
-      "artifactId": "sand-route-map",
+      "artifactId": "sand-buried-map",
       "title": "Карта погребённого русла",
       "line": "Связала колодец, храмовый двор и обсерваторию в один меридианный путь."
     }

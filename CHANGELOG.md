@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- Changed campaign hint rewards to grant +1 hint after every second newly completed campaign level; replays no longer grant the campaign cadence reward.
+
+- Changed the home hub primary "Continue expedition" action to launch the active campaign's next unfinished level directly; the separate map icon still opens the campaign level journal.
+
+- Added per-level campaign story beats to the completion result flow: all 39 campaign levels now carry RU/EN intro, victory and clue keys in a checked 4-act structure, and the result modal shows the restored photo's concrete clue instead of only the generic completion copy.
+
+- Synchronized the canonical narrative docs with the current 3-campaign Meridian Archive scope, including 39 campaign levels, 7 Daily Archive cases, 15 milestone artifacts, Aster-9 naming for Sand Meridian and the non-supernatural finale premise that the complete meridian map is dangerous without archive protection.
+
+- Elevated the RU/EN campaign storyline with a stronger cross-campaign mystery: restored photos are now framed as deliberately edited archive copies, the vanished expeditions become protectors of a dangerous meridian water network, and campaign cards, artifact reveals and final reports share the same investigative arc.
+
+- Polished RU/EN player-facing copy for clearer expedition storytelling, Russian-only UI wording, and more precise A/B gameplay labels.
+
+- Reworked the artifact reveal ceremony sealed state: the broken-looking placeholder is replaced with a CSS/SVG archive wax seal that stamps in, splits open and reveals the collected artifact card.
+
 - Removed the maximum hint balance cap: loaded saves preserve large magnifier balances and level/daily rewards keep accumulating above 5.
 
 - Changed startup routing so only a brand-new save opens White Meridian level 01 directly; returning saves now open the archive hub/main menu instead of auto-resuming gameplay.
