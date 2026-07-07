@@ -104,7 +104,11 @@ select {
   overflow: hidden;
   border: 1px dashed rgba(184, 138, 69, 0.5);
   background:
-    radial-gradient(circle at 50% 48%, rgba(216, 175, 99, 0.13), transparent 34%),
+    radial-gradient(
+      circle at 50% 48%,
+      rgba(216, 175, 99, 0.13),
+      transparent 34%
+    ),
     repeating-linear-gradient(
       45deg,
       rgba(213, 195, 154, 0.07) 0 10px,
@@ -170,7 +174,8 @@ select {
   position: relative;
   width: 78px;
   height: 78px;
-  animation: artifact-seal-stamp 520ms cubic-bezier(0.2, 0.8, 0.3, 1.2) 120ms both;
+  animation: artifact-seal-stamp 520ms cubic-bezier(0.2, 0.8, 0.3, 1.2) 120ms
+    both;
   filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.55));
 }
 
@@ -932,7 +937,8 @@ select {
 
   .home-side-grid {
     gap: 10px !important;
-    grid-template-rows: minmax(122px, 0.72fr) minmax(0, 1.28fr) !important;
+    grid-template-rows: auto auto !important;
+    align-content: space-between !important;
   }
 
   .home-side-grid > section {
@@ -943,10 +949,6 @@ select {
   .home-side-grid h2 {
     font-size: 18px !important;
     line-height: 1.05 !important;
-  }
-
-  .home-side-grid .grid {
-    gap: 5px !important;
   }
 
   .home-side-grid > section:first-child h2 {
@@ -961,8 +963,8 @@ select {
     padding-top: 16px !important;
   }
 
-  .home-side-grid > section:nth-child(2) .mt-3 {
-    margin-top: 8px !important;
+  .home-side-grid > section:nth-child(2) .mt-auto {
+    margin-top: 14px !important;
   }
 
   .home-side-grid > section:nth-child(2) .pt-4 {
@@ -974,7 +976,7 @@ select {
     letter-spacing: 0.18em !important;
   }
 
-  .home-side-grid > section:nth-child(2) .grid > div:nth-child(n + 5) {
+  .home-side-grid > section:nth-child(2) .grid {
     display: none !important;
   }
 
@@ -1022,10 +1024,6 @@ select {
 
     .home-side-grid > section:nth-child(2) {
       padding-top: 14px !important;
-    }
-
-    .home-side-grid > section:nth-child(2) .grid {
-      gap: 4px !important;
     }
 
     .home-side-grid > section:nth-child(2) button {

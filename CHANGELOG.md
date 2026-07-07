@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Refreshed `docs/GAME_OVERVIEW.md` into an up-to-date game summary covering the current Archive Hub, 39 campaign levels, 7 Daily Archive cases, collection, campaign reports, save/platform systems and remaining product decisions.
+
+- Moved the in-game artifact discovery toast lower so it no longer overlaps the gameplay header.
+
 - Changed campaign hint rewards to grant +1 hint after every second newly completed campaign level; replays no longer grant the campaign cadence reward.
 
 - Changed the home hub primary "Continue expedition" action to launch the active campaign's next unfinished level directly; the separate map icon still opens the campaign level journal.

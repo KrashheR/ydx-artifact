@@ -3,12 +3,12 @@ import { useTranslation } from "react-i18next";
 import {
   ARTIFACT_IDS,
   TOTAL_ARTIFACTS,
-  artifactList
+  artifactList,
 } from "@/content/artifacts";
 import { chapters, getChapterLevels, type ChapterId } from "@/content/chapters";
 import {
   getDailyArchiveDateKey,
-  getDailyArchiveEntryForDate
+  getDailyArchiveEntryForDate,
 } from "@/content/dailyArchive";
 import { getChapterPreviewAsset } from "@/content/sceneAssets";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
@@ -30,12 +30,18 @@ type Campaign = {
 const CAMPAIGN_BY_ID: Record<CampaignId, ChapterId> = {
   white: "northern-route",
   sand: "sand-meridian",
-  emerald: "emerald-meridian"
+  emerald: "emerald-meridian",
 };
 
 function CompassIcon({ size = 36 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 36 36" fill="none" aria-hidden="true">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 36 36"
+      fill="none"
+      aria-hidden="true"
+    >
       <circle cx="18" cy="18" r="16" stroke="#B88A45" strokeWidth="1.5" />
       <circle cx="18" cy="18" r="2" fill="#B88A45" />
       <path d="M18 5.5 21 18l-3 4.5L15 18 18 5.5Z" fill="#D8AF63" />
@@ -56,25 +62,67 @@ function CompassIcon({ size = 36 }: { size?: number }) {
 
 function SettingsGearIcon() {
   return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="19"
+      height="19"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="12" r="3.2" />
       <path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2-1.2L14.2 3h-4l-.4 2.5a7 7 0 0 0-2 1.2l-2.3-1-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2 1.2l.4 2.5h4l.4-2.5a7 7 0 0 0 2-1.2l2.3 1 2-3.4-2-1.5c.06-.4.1-.8.1-1.2Z" />
     </svg>
   );
 }
 
-function LockIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+function LockIcon({
+  size = 16,
+  color = "currentColor",
+}: {
+  size?: number;
+  color?: string;
+}) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <rect x="5" y="11" width="14" height="9" rx="1.6" />
       <path d="M8 11V8a4 4 0 0 1 8 0v3" />
     </svg>
   );
 }
 
-function CheckIcon({ size = 14, color = "#6FC69E" }: { size?: number; color?: string }) {
+function CheckIcon({
+  size = 14,
+  color = "#6FC69E",
+}: {
+  size?: number;
+  color?: string;
+}) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M5 12l5 5L20 6" />
     </svg>
   );
@@ -82,7 +130,17 @@ function CheckIcon({ size = 14, color = "#6FC69E" }: { size?: number; color?: st
 
 function LightbulbIcon({ size = 18 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M9 18h6" />
       <path d="M10 21h4" />
       <path d="M12 3a6.5 6.5 0 0 0-3.8 11.8c.6.5 1.3 1.3 1.3 2.2h5a2.7 2.7 0 0 1 1.3-2.2A6.5 6.5 0 0 0 12 3Z" />
@@ -92,7 +150,17 @@ function LightbulbIcon({ size = 18 }: { size?: number }) {
 
 function CalendarIcon({ size = 16 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M7 3v4M17 3v4M4 9h16" />
       <rect x="4" y="5" width="16" height="16" rx="2" />
     </svg>
@@ -101,7 +169,13 @@ function CalendarIcon({ size = 16 }: { size?: number }) {
 
 function FlameIcon({ size = 14 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="#D8AF63" aria-hidden="true">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="#D8AF63"
+      aria-hidden="true"
+    >
       <path d="M12 2c1 4-3 5-3 9a3 3 0 0 0 6 0c0-2-1-3-1-5 3 2 5 5 5 8a7 7 0 0 1-14 0c0-6 6-8 7-12Z" />
     </svg>
   );
@@ -109,7 +183,17 @@ function FlameIcon({ size = 14 }: { size?: number }) {
 
 function FolderIcon({ size = 18 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M4 7h6l2 2h8v10H4Z" />
     </svg>
   );
@@ -117,7 +201,13 @@ function FolderIcon({ size = 18 }: { size?: number }) {
 
 function PlayIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
       <path d="M7 4.5v15l13-7.5Z" />
     </svg>
   );
@@ -125,7 +215,17 @@ function PlayIcon() {
 
 function MapIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4Z" />
       <path d="M9 4v13M15 6.5v13" />
     </svg>
@@ -134,7 +234,17 @@ function MapIcon() {
 
 function PinIcon() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z" />
       <circle cx="12" cy="10" r="2.4" />
     </svg>
@@ -144,7 +254,7 @@ function PinIcon() {
 function SegmentBar({
   done,
   total,
-  complete = false
+  complete = false,
 }: {
   done: number;
   total: number;
@@ -162,7 +272,7 @@ function SegmentBar({
                 ? complete
                   ? "linear-gradient(180deg,#6FC69E,#2F6A57)"
                   : "linear-gradient(180deg,#D8AF63,#A9762F)"
-                : "rgba(213,195,154,.1)"
+                : "rgba(213,195,154,.1)",
           }}
         />
       ))}
@@ -174,7 +284,7 @@ function PrimaryButton({
   children,
   onClick,
   className = "",
-  disabled = false
+  disabled = false,
 }: {
   children: React.ReactNode;
   onClick?: () => void;
@@ -190,7 +300,7 @@ function PrimaryButton({
       style={{
         background: "linear-gradient(180deg,#D8AF63,#B3812F)",
         boxShadow:
-          "0 8px 18px rgba(184,138,69,.25), inset 0 1px 0 rgba(255,255,255,.3)"
+          "0 8px 18px rgba(184,138,69,.25), inset 0 1px 0 rgba(255,255,255,.3)",
       }}
     >
       {children}
@@ -201,7 +311,7 @@ function PrimaryButton({
 function SecondaryButton({
   children,
   onClick,
-  className = ""
+  className = "",
 }: {
   children: React.ReactNode;
   onClick?: () => void;
@@ -221,7 +331,7 @@ function SecondaryButton({
 function TopBar({
   magnifiers,
   saveState,
-  onOpenSettings
+  onOpenSettings,
 }: {
   magnifiers: number;
   saveState: "idle" | "saving" | "saved" | "local-only";
@@ -257,7 +367,9 @@ function TopBar({
           title={t("homeHub.hints")}
         >
           <LightbulbIcon size={16} />
-          <span className="font-jetbrains text-[13px] font-bold">{magnifiers}</span>
+          <span className="font-jetbrains text-[13px] font-bold">
+            {magnifiers}
+          </span>
           <span className="hidden text-[11px] font-semibold text-exp-parch/75 sm:inline">
             {t("homeHub.hintsShort")}
           </span>
@@ -279,7 +391,7 @@ function TopBar({
 function CurrentCaseCard({
   campaign,
   onContinue,
-  onOpenMap
+  onOpenMap,
 }: {
   campaign: Campaign;
   onContinue: () => void;
@@ -300,7 +412,7 @@ function CurrentCaseCard({
           : complete
             ? "rgba(111,198,158,.4)"
             : "rgba(184,138,69,.3)",
-        boxShadow: "0 14px 32px rgba(0,0,0,.32)"
+        boxShadow: "0 14px 32px rgba(0,0,0,.32)",
       }}
     >
       <div
@@ -308,12 +420,14 @@ function CurrentCaseCard({
         style={{
           background: complete
             ? "linear-gradient(90deg,#6FC69E,#2F6A57)"
-            : "linear-gradient(90deg,#D8AF63,#A9762F)"
+            : "linear-gradient(90deg,#D8AF63,#A9762F)",
         }}
       />
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-[10px] font-bold uppercase tracking-[.26em] text-exp-brass">
-          {complete ? t("homeHub.currentCase.completeEyebrow") : t("homeHub.currentCase.eyebrow")}
+          {complete
+            ? t("homeHub.currentCase.completeEyebrow")
+            : t("homeHub.currentCase.eyebrow")}
         </span>
         <span className="rounded-[4px] border border-exp-parch/[.16] px-2 py-0.5 font-jetbrains text-[10px] text-exp-muted">
           {t("homeHub.currentCase.caseNumber")}
@@ -333,11 +447,15 @@ function CurrentCaseCard({
       <p className="mt-2 text-[13px] font-medium leading-[1.5] text-exp-muted">
         {t("homeHub.currentCase.restored", {
           done: campaign.done,
-          total: campaign.total
+          total: campaign.total,
         })}
       </p>
       <div className="mt-4">
-        <SegmentBar done={campaign.done} total={campaign.total} complete={complete} />
+        <SegmentBar
+          done={campaign.done}
+          total={campaign.total}
+          complete={complete}
+        />
       </div>
       <div className="mt-5 flex flex-col gap-2 text-[12px] font-medium text-exp-muted">
         <div className="flex items-center gap-2">
@@ -359,7 +477,7 @@ function CurrentCaseCard({
             {complete
               ? t("homeHub.currentCase.nextCaseUnlocked")
               : t("homeHub.currentCase.toFind", {
-                  count: Math.max(1, campaign.total - campaign.done)
+                  count: Math.max(1, campaign.total - campaign.done),
                 })}
           </span>
         </div>
@@ -367,9 +485,11 @@ function CurrentCaseCard({
       <div className="mt-auto flex gap-2 pt-6">
         <PrimaryButton onClick={onContinue} className="flex-1">
           <PlayIcon />
-          {complete ? t("homeHub.currentCase.openReport") : t("homeHub.currentCase.continue")}
+          {complete
+            ? t("homeHub.currentCase.openReport")
+            : t("homeHub.currentCase.continue")}
         </PrimaryButton>
-        <SecondaryButton onClick={onOpenMap} className="w-[52px] px-0" >
+        <SecondaryButton onClick={onOpenMap} className="w-[52px] px-0">
           <MapIcon />
         </SecondaryButton>
       </div>
@@ -381,7 +501,7 @@ function DailyArchiveCard({
   title,
   streak,
   claimed,
-  onOpen
+  onOpen,
 }: {
   title: string;
   streak: number;
@@ -411,8 +531,15 @@ function DailyArchiveCard({
         {claimed ? t("homeHub.daily.claimed") : t("homeHub.daily.reward")}
       </p>
       <div className="mt-auto pt-4">
-        <PrimaryButton onClick={onOpen} className="w-full min-h-[40px] text-[12px]">
-          {claimed ? <CheckIcon size={13} color="#1A130A" /> : <LightbulbIcon size={14} />}
+        <PrimaryButton
+          onClick={onOpen}
+          className="w-full min-h-[40px] text-[12px]"
+        >
+          {claimed ? (
+            <CheckIcon size={13} color="#1A130A" />
+          ) : (
+            <LightbulbIcon size={14} />
+          )}
           {claimed ? t("homeHub.daily.claimedCta") : t("homeHub.daily.open")}
         </PrimaryButton>
       </div>
@@ -424,7 +551,7 @@ function ArchiveSlot({
   unlocked,
   isNew,
   image,
-  label
+  label,
 }: {
   unlocked: boolean;
   isNew: boolean;
@@ -442,21 +569,27 @@ function ArchiveSlot({
           ? "1px solid rgba(184,138,69,.4)"
           : "1px dashed rgba(213,195,154,.22)",
         boxShadow: unlocked ? "0 3px 8px rgba(0,0,0,.35)" : "none",
-        transform: unlocked ? "rotate(-2deg)" : undefined
+        transform: unlocked ? "rotate(-2deg)" : undefined,
       }}
       aria-label={label}
       title={label}
     >
       {unlocked ? (
         <>
-          <img src={image} alt="" className="h-full w-full object-cover" draggable={false} />
+          <img
+            src={image}
+            alt=""
+            className="h-full w-full object-cover"
+            draggable={false}
+          />
           <span className="absolute bottom-0.5 left-1/2 h-[3px] w-5 -translate-x-1/2 rounded-full bg-exp-success" />
           {isNew && (
             <span
               className="absolute -right-0.5 -top-0.5 h-3.5 w-3.5 rounded-full"
               style={{
-                background: "radial-gradient(circle at 35% 30%,#C96A44,#832F18)",
-                boxShadow: "0 2px 5px rgba(0,0,0,.5)"
+                background:
+                  "radial-gradient(circle at 35% 30%,#C96A44,#832F18)",
+                boxShadow: "0 2px 5px rgba(0,0,0,.5)",
               }}
             />
           )}
@@ -474,7 +607,7 @@ function FieldArchiveCard({
   collectionDone,
   collectionHasNew,
   artifactStates,
-  onOpen
+  onOpen,
 }: {
   collectionDone: number;
   collectionHasNew: boolean;
@@ -504,7 +637,7 @@ function FieldArchiveCard({
       <p className="mt-1 text-[11.5px] font-medium text-exp-muted">
         {t("homeHub.archive.progress", {
           done: collectionDone,
-          total: TOTAL_ARTIFACTS
+          total: TOTAL_ARTIFACTS,
         })}
       </p>
       <div className="mt-3 grid grid-cols-4 gap-2">
@@ -546,7 +679,9 @@ function CampaignStatusBadge({ status }: { status: CampaignStatus }) {
           : "border-exp-success/[.35] bg-exp-success/[.1] text-exp-success";
 
   return (
-    <span className={`inline-flex h-[20px] items-center rounded-[5px] border px-2 text-[8.5px] font-bold uppercase tracking-[.08em] ${style}`}>
+    <span
+      className={`inline-flex h-[20px] items-center rounded-[5px] border px-2 text-[8.5px] font-bold uppercase tracking-[.08em] ${style}`}
+    >
       {t(`homeHub.campaignStatus.${status}`)}
     </span>
   );
@@ -554,7 +689,7 @@ function CampaignStatusBadge({ status }: { status: CampaignStatus }) {
 
 function CampaignMiniList({
   campaigns,
-  onOpenCampaign
+  onOpenCampaign,
 }: {
   campaigns: Campaign[];
   onOpenCampaign: (id: CampaignId) => void;
@@ -576,11 +711,13 @@ function CampaignMiniList({
             onClick={() => onOpenCampaign(campaign.id)}
             className="flex min-h-[56px] items-center gap-3 rounded-[9px] border px-3 py-2.5 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
             style={{
-              background: locked ? "rgba(213,195,154,.03)" : "rgba(213,195,154,.05)",
+              background: locked
+                ? "rgba(213,195,154,.03)"
+                : "rgba(213,195,154,.05)",
               borderColor:
                 campaign.status === "in_progress"
                   ? "rgba(184,138,69,.35)"
-                  : "rgba(213,195,154,.1)"
+                  : "rgba(213,195,154,.1)",
             }}
           >
             <span className="flex h-5 w-5 shrink-0 items-center justify-center text-exp-brass2">
@@ -593,15 +730,19 @@ function CampaignMiniList({
               )}
             </span>
             <span className="min-w-0 flex-1">
-              <span className={`block truncate text-[13px] font-semibold ${locked ? "text-[#9AA398]" : "text-exp-parch"}`}>
+              <span
+                className={`block truncate text-[13px] font-semibold ${locked ? "text-[#9AA398]" : "text-exp-parch"}`}
+              >
                 {t(`campaigns.${campaign.id}.title`)}
               </span>
-              <span className={`mt-0.5 block text-[10.5px] ${locked ? "text-[#6D756C]" : "font-jetbrains text-exp-brass2"}`}>
+              <span
+                className={`mt-0.5 block text-[10.5px] ${locked ? "text-[#6D756C]" : "font-jetbrains text-exp-brass2"}`}
+              >
                 {locked
                   ? campaign.lockHint
                   : t("homeHub.campaigns.progress", {
                       done: campaign.done,
-                      total: campaign.total
+                      total: campaign.total,
                     })}
               </span>
             </span>
@@ -616,7 +757,9 @@ function CampaignMiniList({
         <span>
           {t("homeHub.campaigns.nearest")}{" "}
           <span className="font-semibold text-exp-brass2">
-            {nearest ? t(`campaigns.${nearest.id}.title`) : t("homeHub.currentCase.closed")}
+            {nearest
+              ? t(`campaigns.${nearest.id}.title`)
+              : t("homeHub.currentCase.closed")}
           </span>
         </span>
       </div>
@@ -627,15 +770,17 @@ function CampaignMiniList({
 function getCampaignProgress(
   chapterId: ChapterId,
   completedLevels: string[],
-  t: ReturnType<typeof useTranslation>["t"]
+  t: ReturnType<typeof useTranslation>["t"],
 ) {
   const levels = getChapterLevels(chapterId);
-  const done = levels.filter((level) => completedLevels.includes(level.id)).length;
+  const done = levels.filter((level) =>
+    completedLevels.includes(level.id),
+  ).length;
   const nextLevel = levels.find((level) => !completedLevels.includes(level.id));
   return {
     done,
     total: levels.length,
-    nextLevelTitle: nextLevel ? t(nextLevel.titleKey) : null
+    nextLevelTitle: nextLevel ? t(nextLevel.titleKey) : null,
   };
 }
 
@@ -643,15 +788,25 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
   const { t } = useTranslation();
   const navigate = useGameStore((state) => state.navigate);
   const startLevel = useGameStore((state) => state.startLevel);
-  const completedLevels = useGameStore((state) => state.saveData.completedLevels);
+  const completedLevels = useGameStore(
+    (state) => state.saveData.completedLevels,
+  );
   const artifactStates = useGameStore((state) => state.saveData.artifacts);
   const daily = useGameStore((state) => state.saveData.daily);
   const magnifiers = useGameStore((state) => state.saveData.magnifiers);
   const saveStatus = useGameStore((state) => state.saveStatus);
 
-  const whiteProgress = getCampaignProgress("northern-route", completedLevels, t);
+  const whiteProgress = getCampaignProgress(
+    "northern-route",
+    completedLevels,
+    t,
+  );
   const sandProgress = getCampaignProgress("sand-meridian", completedLevels, t);
-  const emeraldProgress = getCampaignProgress("emerald-meridian", completedLevels, t);
+  const emeraldProgress = getCampaignProgress(
+    "emerald-meridian",
+    completedLevels,
+    t,
+  );
 
   const sandUnlocked = whiteProgress.done === whiteProgress.total;
   const emeraldUnlocked = sandProgress.done === sandProgress.total;
@@ -666,7 +821,7 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
           : whiteProgress.done === whiteProgress.total
             ? "completed"
             : "in_progress",
-      ...whiteProgress
+      ...whiteProgress,
     },
     {
       id: "sand",
@@ -681,9 +836,9 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
       lockHint: sandUnlocked
         ? undefined
         : t("campaigns.sand.levelsLeft", {
-            count: whiteProgress.total - whiteProgress.done
+            count: whiteProgress.total - whiteProgress.done,
           }),
-      ...sandProgress
+      ...sandProgress,
     },
     {
       id: "emerald",
@@ -698,10 +853,10 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
       lockHint: emeraldUnlocked
         ? undefined
         : t("campaigns.emerald.levelsLeft", {
-            count: sandProgress.total - sandProgress.done
+            count: sandProgress.total - sandProgress.done,
           }),
-      ...emeraldProgress
-    }
+      ...emeraldProgress,
+    },
   ];
 
   const activeCampaign =
@@ -710,10 +865,10 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
     campaigns[campaigns.length - 1];
 
   const collectionDone = ARTIFACT_IDS.filter(
-    (artifactId) => (artifactStates[artifactId] ?? "locked") !== "locked"
+    (artifactId) => (artifactStates[artifactId] ?? "locked") !== "locked",
   ).length;
   const collectionHasNew = ARTIFACT_IDS.some(
-    (artifactId) => artifactStates[artifactId] === "newly-unlocked"
+    (artifactId) => artifactStates[artifactId] === "newly-unlocked",
   );
   const dailyEntry = getDailyArchiveEntryForDate();
   const dailyClaimed = daily.lastClaimDate === getDailyArchiveDateKey();
@@ -722,18 +877,20 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
     trackAnalyticsEvent("collection_opened", {
       source,
       unlockedArtifacts: collectionDone,
-      hasNew: collectionHasNew
+      hasNew: collectionHasNew,
     });
     navigate({ kind: "collection" });
   };
 
   const openCampaign = (campaignId: CampaignId) => {
-    const selectedCampaign = campaigns.find((campaign) => campaign.id === campaignId);
+    const selectedCampaign = campaigns.find(
+      (campaign) => campaign.id === campaignId,
+    );
     trackAnalyticsEvent("campaign_selected", {
       campaignCardId: campaignId,
       campaignStatus: selectedCampaign?.status,
       completedInCampaign: selectedCampaign?.done,
-      totalInCampaign: selectedCampaign?.total
+      totalInCampaign: selectedCampaign?.total,
     });
 
     if (!selectedCampaign || selectedCampaign.status === "locked") {
@@ -741,17 +898,20 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
         campaignCardId: campaignId,
         campaignStatus: selectedCampaign?.status,
         completedInCampaign: selectedCampaign?.done,
-        totalInCampaign: selectedCampaign?.total
+        totalInCampaign: selectedCampaign?.total,
       });
       return;
     }
 
-    navigate({ kind: "map", chapterId: chapters[CAMPAIGN_BY_ID[campaignId]].id });
+    navigate({
+      kind: "map",
+      chapterId: chapters[CAMPAIGN_BY_ID[campaignId]].id,
+    });
   };
 
   const continueCampaign = (campaign: Campaign) => {
     const nextLevel = getChapterLevels(campaign.chapterId).find(
-      (level) => !completedLevels.includes(level.id)
+      (level) => !completedLevels.includes(level.id),
     );
 
     if (!nextLevel) {
@@ -764,7 +924,7 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
       campaignStatus: campaign.status,
       completedInCampaign: campaign.done,
       totalInCampaign: campaign.total,
-      source: "home_continue"
+      source: "home_continue",
     });
 
     startLevel(nextLevel.id, "campaign");
@@ -775,12 +935,12 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
       source: "home_hub",
       levelId: dailyEntry.levelId,
       streak: daily.streak,
-      claimed: dailyClaimed
+      claimed: dailyClaimed,
     });
     trackAnalyticsEvent("daily_start_clicked", {
       levelId: dailyEntry.levelId,
       streak: daily.streak,
-      lastClaimDate: daily.lastClaimDate
+      lastClaimDate: daily.lastClaimDate,
     });
     startLevel(dailyEntry.levelId, "daily");
   };
@@ -810,7 +970,10 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
             <div className="hidden rounded-[7px] border border-exp-parch/[.12] bg-exp-parch/[.04] px-3 py-2 font-jetbrains text-[11px] text-exp-muted md:block">
               {t("homeHub.totalProgress", {
                 done: completedLevels.length,
-                total: campaigns.reduce((sum, campaign) => sum + campaign.total, 0)
+                total: campaigns.reduce(
+                  (sum, campaign) => sum + campaign.total,
+                  0,
+                ),
               })}
             </div>
           </div>
@@ -838,7 +1001,10 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
             />
           </div>
 
-          <CampaignMiniList campaigns={campaigns} onOpenCampaign={openCampaign} />
+          <CampaignMiniList
+            campaigns={campaigns}
+            onOpenCampaign={openCampaign}
+          />
         </div>
       </main>
     </div>

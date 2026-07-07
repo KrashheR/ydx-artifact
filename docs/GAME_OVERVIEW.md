@@ -1,581 +1,190 @@
-# Полное описание игры: Find the Differences / Expedition Mysteries
+# Game Overview: Find the Differences / Expedition Mysteries
 
-Документ описывает текущее состояние проекта `anomaly-archive` как игры: что видит игрок, как работает основной цикл, какие есть кампании, уровни, механики, мета-системы и куда проект можно развивать дальше.
+Актуальное саммари проекта `anomaly-archive` как игры и вертикального среза для Yandex Games.
 
-Источники: `README.md`, `docs/game_concept.json`, `docs/expedition_narrative_collection_ru.json`, `src/app/App.tsx`, `src/screens/*`, `src/features/collection/ArtifactRevealOverlay.tsx`, `src/features/gameplay/ArtifactFoundToast.tsx`, `src/content/*`, `src/shared/store/gameStore.ts`, `src/shared/lib/progression.ts`, `src/entities/save/schema.ts`, `ANALYTICS_EVENTS.md`.
+Основные источники актуальности: `README.md`, `src/content/*`, `src/shared/store/gameStore.ts`, `src/shared/lib/progression.ts`, `src/entities/save/schema.ts`, `src/screens/*`, `src/features/gameplay/*`, `src/features/collection/*`, `src/features/campaign-report/*`, `src/data/campaignReports.ts`, `ANALYTICS_EVENTS.md`.
 
-## 1. Короткое резюме проекта
+## Коротко
 
-Игра - спокойная визуальная головоломка в жанре "найди отличия". Игрок работает с архивными парными снимками экспедиций, сравнивает оригинал и копию, отмечает аномальные расхождения и восстанавливает маршрут архива.
+`Найди отличия: Тайны экспедиций` / `Spot the Differences: Expedition Mysteries` - спокойная визуальная головоломка "найди отличия" про восстановление архивных экспедиционных снимков. Игрок сравнивает оригинальный кадр и измененную архивную копию, находит все расхождения, открывает следующее дело, собирает артефакты и постепенно складывает историю трех меридианов.
 
-Текущая версия реализована как вертикальный срез для Yandex Games:
+Текущий срез уже содержит:
 
-- 3 кампании по 13 уровней: White Meridian, Sand Meridian, Emerald Meridian.
-- 39 игровых уровней с локальными WebP-сценами A/B.
-- 7 daily-записей, подключенных как отдельные архивные дела из `public/assets/scenes/archive/1-7/`.
-- 15 коллекционных находок: по 5 milestone-артефактов на каждую кампанию.
-- Линейное открытие уровней внутри кампании.
-- Линейное открытие кампаний: White -> Sand -> Emerald.
-- Archive hub на home screen: активное дело, daily archive, коллекция находок и список кампаний.
-- Startup routing: новый игрок сразу попадает в первый уровень с onboarding, возвращающийся игрок начинает с archive hub/main menu.
-- Сохранение прогресса в локальное/облачное хранилище через platform adapter.
-- RU/EN локализация, ручной переключатель языка.
-- Подсказки через `magnifiers` и rewarded-рекламу.
-- Flow находок: toast при клике по коллекционному отличию, post-level reveal после полного восстановления снимка, коллекция с фильтрами по кампаниям и состояниями `locked` / `newly-unlocked` / `viewed`.
-- Полноэкранная реклама после каждого третьего нового campaign-completion, показывается только при нажатии "следующий уровень" на победном экране.
-- Review prompt после позитивного момента прохождения.
-- Продуктовая аналитика с локальным буфером и опциональной отправкой в Yandex Metrica.
+- 3 линейные кампании по 13 уровней: Белый, Песчаный и Изумрудный меридиан.
+- 39 campaign-уровней с локальными WebP A/B-сценами и data-driven hitbox-геометрией.
+- 7 Daily Archive дел из `public/assets/scenes/archive/1-7/` с детерминированной дневной ротацией.
+- 15 коллекционных артефактов: по 5 milestone-находок на кампанию, открываются на уровнях 3, 6, 8, 10 и 13.
+- Archive Hub как основной home screen: активное дело, daily, коллекция, список кампаний, счетчик подсказок и статус сохранения.
+- Сохранения через Yandex Player Data с `localStorage`-fallback и версионированной схемой save v2.
+- RU/EN локализацию, Yandex lifecycle, рекламу подсказок, queued interstitial, review pre-prompt и продуктовую аналитику.
 
-Тон игры: архив, экспедиция, спокойная тайна, музейная достоверность, внимательное исследование. Не хоррор, не казино, не агрессивный free-to-play.
+Тон игры: архивная экспедиционная тайна без хоррора и агрессивного F2P. Центральная фантазия - игрок восстанавливает намеренно измененные фотодоказательства и понимает, зачем исчезнувшие экспедиции скрывали маршрут меридианной водной сети.
 
-## 2. Первый запуск, startup routing и archive hub
+## Игроковый Flow
 
-При открытии игры пользователь сначала видит короткий bootstrap/loading screen. В это время приложение:
+1. При первом запуске новый save сразу открывает White/Белый Meridian level 01 с мягким onboarding overlay.
+2. Любой не новый save открывает Archive Hub, а не принудительный auto-resume.
+3. Из Archive Hub игрок может продолжить активную кампанию, открыть журнал уровней кампании, пройти Daily Archive или перейти в коллекцию.
+4. Campaign progression линейная: Белый меридиан -> Песчаный меридиан -> Изумрудный меридиан; внутри кампании уровни тоже открываются по порядку.
+5. Уровень показывает пару снимков A/B. Desktop использует side-by-side сравнение; mobile portrait блокируется rotate-device gate; mobile landscape использует 16:10 before/after slider.
+6. Игрок находит все отличия (`requiredDifferences` равно количеству authored differences), ошибки снижают accuracy, подсказка подсвечивает `hintArea`.
+7. После нахождения всех отличий показывается victory/result flow: статистика, clue текущего уровня, награды, next/retry/map actions.
+8. Если уровень является milestone, поверх victory показывается artifact reveal ceremony; затем артефакт остается в Collection со статусом `newly-unlocked`, пока игрок его не просмотрит.
+9. После 13-го уровня кампании автоматически доступен Campaign Case Report: 13/13, пять findings кампании, вывод архивариуса и CTA к следующему делу или финальному архиву.
+10. Daily completion возвращает игрока в Archive Hub и не пишет прогресс в `completedLevels` кампаний.
 
-- отправляет событие `game_open`;
-- загружает сохранение;
-- определяет язык через сохраненные настройки или язык окружения Yandex SDK;
-- прогревает основные изображения кампаний;
-- ждет готовности шрифтов;
-- вызывает platform-ready lifecycle после первого интерактивного кадра;
-- отправляет `game_ready`.
-
-После загрузки `openStartupScreen()` выбирает точку входа по save:
-
-- если это новый save без прогресса, запускается первый уровень White Meridian с мягким onboarding overlay;
-- если save уже содержит прогресс, `inProgress`, daily/reward state или завершенный контент, игрок попадает в archive hub/main menu.
-
-Home screen остается основным archive hub, куда игрок возвращается с карты, daily и коллекции. Он показывает:
-
-- верхнюю панель с magnifiers, save status и настройками;
-- активное дело/current case с быстрым продолжением и переходом на карту;
-- daily archive card со streak и статусом сегодняшней награды;
-- field archive card с прогрессом коллекции `done / 15`, превью первых слотов и индикатором новых находок;
-- список кампаний со статусами `available`, `in_progress`, `completed`, `locked`;
-- общий прогресс восстановленных campaign levels.
-
-Для нового игрока доступна первая кампания White Meridian. Sand Meridian заблокирована до полного прохождения White Meridian. Emerald Meridian заблокирована до полного прохождения Sand Meridian.
-
-Campaign map открывается из archive hub или после выхода из уровня. Это журнал уровней конкретной кампании: карточки с превью сцен, статусом уровня, звездами пройденных уровней, текущей точкой маршрута и блокировками будущих уровней.
-
-## 3. Основной пользовательский flow
-
-Текущий основной flow:
-
-1. Игрок открывает игру.
-2. Игра загружает save, локаль и критичные ассеты.
-3. Startup routing открывает первый уровень для нового игрока или archive hub/main menu для возвращающегося игрока.
-4. Из archive hub игрок может открыть активное дело, карту кампании, daily archive или коллекцию находок.
-5. На карте игрок запускает текущий доступный уровень или переигрывает уже пройденный.
-6. Открывается gameplay screen с парой изображений A/B.
-7. Игрок ищет все отличия, нажимая по любому из двух снимков.
-8. Каждое найденное отличие отмечается и сохраняется.
-9. Если отличие связано с коллекционной находкой, поверх HUD показывается non-blocking toast.
-10. Ошибочные клики увеличивают счетчик ошибок и снижают итоговую точность.
-11. Игрок может использовать подсказку.
-12. После нахождения всех отличий показывается экран победы.
-13. Игра сохраняет результат, награды, milestone-находки и прогресс.
-14. Если уровень открыл новую находку, поверх victory state показывается reveal-церемония с кнопками "продолжить маршрут" и "открыть коллекцию".
-15. Игрок может перейти к следующему уровню, переиграть уровень, открыть коллекцию или вернуться на карту.
-16. При некоторых completion-событиях может появиться review prompt или interstitial.
-17. После завершения кампании открывается следующая кампания; при следующем запуске игрок возвращается в archive hub/main menu.
-
-В save сохраняются:
-
-- завершенные уровни;
-- лучшие результаты;
-- in-progress уровень;
-- найденные отличия текущего уровня;
-- активное время уровня;
-- ошибки;
-- magnifiers;
-- артефакты;
-- daily/streak;
-- настройки;
-- review state;
-- покупки/флаги отключения forced interstitial.
-
-## 4. Игровой процесс уровня
-
-### Цель
-
-На каждом уровне есть две версии одной сцены: A и B. Игрок должен найти все отличия, заданные в данных уровня.
-
-Уровень завершен, когда количество найденных отличий достигает `requiredDifferences`.
-
-### Экран уровня
-
-Gameplay screen содержит:
-
-- кнопку назад на карту;
-- название кампании и уровень;
-- таймер активного времени;
-- счетчик найденных отличий;
-- кнопку подсказки;
-- кнопку настроек;
-- игровую область с PhotoComparator;
-- нижнюю инструкцию и streak-индикатор на desktop;
-- compact HUD на mobile.
-
-### Управление
-
-Desktop:
-
-- два изображения A/B рядом;
-- клик по любому снимку засчитывает найденное отличие;
-- drag/pan внутри изображения;
-- mouse wheel zoom;
-- найденные отличия отмечаются на обоих изображениях.
-
-Mobile:
-
-- есть rotate-device gate: игра требует landscape для продолжения;
-- comparator поддерживает отдельные mobile-режимы: single image A/B toggle и landscape before/after slider;
-- кнопка Compare переключает версию снимка;
-- найденные маркеры, ошибочные клики и подсказки работают так же, как на desktop.
-
-### Hit testing
-
-Отличия описаны data-driven:
-
-- `circle`;
-- `ellipse`;
-- `polygon`.
-
-Каждое отличие содержит:
-
-- `hitAreaA`;
-- `hitAreaB`;
-- `hintArea`;
-- `difficulty`;
-- `id`.
-
-Геометрия хранится в нормализованных координатах 0..1. UI не дублирует геометрию, а использует общий hit testing.
-
-### Успешный клик
-
-Если игрок нажал внутри hit area еще не найденного отличия:
-
-- отличие добавляется в `foundDifferenceIds`;
-- на сцене появляется маркер;
-- событие сохраняется;
-- отправляется `difference_found`;
-- если найдено последнее отличие, запускается completion flow.
-
-### Ошибка
-
-Если игрок нажал вне всех активных hit areas:
-
-- увеличивается `mistakes`;
-- появляется краткий красный marker wrong click;
-- отправляется `level_misclick`;
-- итоговая accuracy снижается.
-
-Ошибки не отнимают валюту и не сбрасывают уровень.
-
-### Таймер и проигрыш
-
-Фактическая реализация сейчас использует 5-минутный лимит (`TIME_LIMIT = 300`). Если время заканчивается до нахождения всех отличий:
-
-- появляется timeout overlay;
-- игрок видит, сколько отличий найдено и сколько осталось;
-- можно начать заново;
-- можно вернуться на карту;
-- можно продлить время на 30 секунд за 2 magnifiers, если баланс позволяет.
-
-Важно: это отличается от раннего продуктового принципа "кампания без жесткого таймера". Для развития проекта стоит решить, оставлять ли таймер как часть текущей сложности или вернуть кампанию к более расслабленному flow.
-
-### Completion
-
-После нахождения всех отличий:
-
-- показывается победный overlay;
-- отображаются время, найденные отличия и rating stars;
-- accuracy считается как `found / (found + mistakes)`;
-- 3 звезды: accuracy >= 0.85;
-- 2 звезды: accuracy >= 0.6;
-- 1 звезда: ниже 0.6;
-- результат сравнивается с текущим best result;
-- сохраняется лучший результат;
-- уровень добавляется в `completedLevels`, если это первое прохождение;
-- начисляются rewards;
-- открываются milestone-находки, если завершен уровень 3, 6, 8, 10 или 13 любой кампании;
-- новая находка добавляется в `artifactRevealQueue`, если она относится к только что завершенному уровню;
-- очищается `inProgress`;
-- показывается victory CTA на следующий уровень, retry или карту;
-- если есть queued-находка, перед продолжением показывается `ArtifactRevealOverlay`.
-
-## 5. Прогрессия и мета
+## Контент
 
 ### Кампании
 
-Кампании открываются последовательно:
+| Campaign id | UI name | Runtime assets | Levels | Notes |
+|---|---|---:|---:|---|
+| `northern-route` | Белый меридиан / White Meridian | `public/assets/scenes/northern-route/` | 13 | Стартовая северная экспедиция и вход в меридианную тайну. |
+| `sand-meridian` | Песчаный меридиан / Sand Meridian | `public/assets/scenes/sand-meredian/` | 13 | Пустынная линия Aster-9; runtime-папка сохраняет legacy spelling `sand-meredian`. |
+| `emerald-meridian` | Изумрудный меридиан / Emerald Meridian | `public/assets/scenes/emerald-meridian/` | 13 | Тропическая финальная кампания текущего контента. |
 
-- White Meridian доступна сразу.
-- Sand Meridian открывается после завершения всех 13 уровней White Meridian.
-- Emerald Meridian открывается после завершения всех 13 уровней Sand Meridian.
+Campaign metadata, runtime folders, preview filenames and map aspect ratios централизованы в `src/content/campaignManifest.ts`.
 
-### Уровни
+### Daily Archive
 
-Внутри кампании уровни открываются линейно:
+Daily Archive содержит 7 самостоятельных дел:
 
-- уровень 1 доступен всегда;
-- каждый следующий уровень доступен после completion предыдущего;
-- уже пройденные уровни можно переигрывать.
+- `daily-archive-01` ... `daily-archive-07`;
+- сцены лежат в `public/assets/scenes/archive/1-7/`;
+- выбранное дело определяется по локальному `dayNumber % 7`;
+- награда за первое daily completion в локальную дату: `+1` подсказка и увеличение streak;
+- daily completion не открывает campaign levels, не влияет на campaign reports и не записывается в `completedLevels`.
 
-### Награды
+### Коллекция
 
-Каждый уровень дает archive points и иногда magnifiers. Archive points сейчас существуют как reward data, но в текущем save schema отдельный баланс archive points не хранится. Практическая мета-валюта - `magnifiers`.
+Коллекция содержит 15 артефактов:
 
-Начальный баланс нового save: 3 magnifiers. Максимум: 3 magnifiers.
+- Белый меридиан: compass, field radio, red diary, echo recorder, descent rope.
+- Песчаный меридиан: rune marker, descent helmets, hydraulic pump, bronze lamp, buried map.
+- Изумрудный меридиан: botanical vials, tropical map, stone plaque, brass spyglass, evacuation aircraft.
 
-Magnifiers используются:
+Каждый artifact имеет `open.webp` и `closed.webp`, состояние в save (`locked`, `newly-unlocked`, `viewed`) и связь с campaign milestone level.
 
-- 1 magnifier - area hint;
-- 2 magnifiers - продлить время после timeout на 30 секунд.
+## Механики Уровня
 
-Если magnifiers нет, игрок может запросить rewarded ad за бесплатную подсказку.
+Уровень описывается data-driven через Zod-схему:
 
-### Артефакты
+- `imageA`, `imageB`, `thumbnail`;
+- массив `differences`;
+- `requiredDifferences`;
+- reward metadata;
+- optional `story` keys.
 
-В текущей реализации коллекция называется "Коллекция находок" и содержит 15 артефактов: по 5 на каждую кампанию. Milestone-уровни одинаковые для всех кампаний: 3, 6, 8, 10 и 13.
+Каждое отличие содержит:
 
-| Кампания | Уровни открытия | Находки |
-|---|---|---|
-| White Meridian | 3, 6, 8, 10, 13 | Компас Белой чайки; Полевой радиоприёмник Полярной-7; Красный журнал экспедиции; Эхо-регистратор М-10; Спусковой трос у ледяного обрыва |
-| Sand Meridian | 3, 6, 8, 10, 13 | Рунный указатель Астер-9; Шлемы спусковой группы; Гидравлический насос Ирама; Бронзовая лампа обсерватории; Карта погребённого русла |
-| Emerald Meridian | 3, 6, 8, 10, 13 | Колбы гербария Verde-12; Карта зелёного русла; Плита трёх потоков; Латунная подзорная труба; Эвакуационный самолёт Verde-12 |
+- `id`;
+- `hitAreaA`;
+- `hitAreaB`;
+- `hintArea`;
+- `difficulty`.
 
-Состояния артефакта:
+Hit testing поддерживает `circle`, `ellipse` с optional `rotation` и `polygon`. Логика геометрии должна оставаться в `src/shared/lib/hitTesting.ts`; UI не должен дублировать математику.
 
-- `locked`;
-- `newly-unlocked`;
-- `viewed`.
+Таймер уровня сейчас жесткий: `TIME_LIMIT = 300` секунд. При timeout показывается failure overlay; если у игрока есть минимум 2 подсказки, он может продлить попытку. Это остается важным продуктовым решением, потому что исходный тон игры спокойный, а timer добавляет давление.
 
-Flow открытия:
+## Награды И Экономика
 
-- на milestone-уровне один `differenceId` может быть связан с находкой;
-- когда игрок нажимает по этому отличию, показывается короткий `ArtifactFoundToast`;
-- сама находка открывается не сразу по клику, а после completion уровня, потому что игра требует найти все отличия;
-- completion вызывает reconcile по `completedLevels`, переводит найденные milestone-артефакты из `locked` в `newly-unlocked`;
-- если новая находка относится к только что завершенному уровню, она попадает в runtime-only `artifactRevealQueue`;
-- `ArtifactRevealOverlay` показывает запечатанную карточку, затем открытое изображение, reveal-текст, прогресс коллекции кампании и CTA: продолжить маршрут или открыть коллекцию;
-- если находка открыта ретроактивно после миграции/старого save, reveal-церемония не повторяется, но коллекция показывает бейдж "new".
+- Новый save стартует с 1 подсказкой (`INITIAL_MAGNIFIERS = 1`).
+- Campaign replay не выдает cadence-награды повторно.
+- За каждый второй новый completed campaign level начисляется `+1` подсказка.
+- Daily Archive выдает `+1` подсказку один раз за локальную дату.
+- Баланс подсказок не имеет верхнего cap.
+- Если подсказок нет, кнопка hint открывает rewarded ad flow; area hint применяется только после rewarded completion.
+- `archivePoints` остаются в level reward metadata, но пока не представлены как видимая мета-валюта.
 
-Collection screen:
+## Реклама И Review
 
-- доступен из archive hub через Field Archive card;
-- открывается автоматически после полного завершения всех campaign levels;
-- группирует находки по кампаниям и имеет фильтр `all` / конкретная кампания;
-- показывает общий прогресс `done / 15`;
-- locked cards показывают закрытое изображение и подсказку, unlocked cards - открытый арт, описание, clue/reveal text и место находки;
-- открытие карточки переводит `newly-unlocked` в `viewed`;
-- для уже завершенного milestone-уровня из detail modal можно переиграть уровень, где была найдена находка.
+- Rewarded ad используется для zero-balance area hint и не блокирует core gameplay.
+- Forced fullscreen interstitial ставится в очередь после каждого третьего нового campaign completion (`3, 6, 9...`).
+- Interstitial показывается только с победного next-level CTA, не во время gameplay и не при возврате на карту.
+- `purchases.noForcedInterstitials` в save отключает forced interstitial, но полноценный shop/IAP UI сейчас не является частью основного flow.
+- Review pre-prompt показывается после позитивного post-victory момента, первая eligibility - после 4 новых completed campaign levels.
+- Native review, ads, cloud save and SDK lifecycle идут через сервисы/adapters, не напрямую из React-компонентов.
 
-### Daily
+## Сохранения, Platform И Analytics
 
-Daily screen существует и выбирает одну из семи standalone Daily Archive записей детерминированно по локальному календарному дню: `dayNumber % 7`.
+Save schema version: `2`.
 
-Текущие daily:
-
-| Daily ID | Название | Runtime folder |
-|---|---|---|
-| `daily-archive-01` | Daily case: sealed envelope | `public/assets/scenes/archive/1` |
-| `daily-archive-02` | Daily case: photo lab | `public/assets/scenes/archive/2` |
-| `daily-archive-03` | Daily case: card catalog | `public/assets/scenes/archive/3` |
-| `daily-archive-04` | Daily case: red room | `public/assets/scenes/archive/4` |
-| `daily-archive-05` | Daily case: route map | `public/assets/scenes/archive/5` |
-| `daily-archive-06` | Daily case: expedition shelf | `public/assets/scenes/archive/6` |
-| `daily-archive-07` | Daily case: archivist safe | `public/assets/scenes/archive/7` |
-
-При completion daily:
-
-- выдается +1 magnifier без ограничения максимального баланса;
-- сохраняется `lastClaimDate`;
-- увеличивается `streak`;
-- отправляется `daily_reward_claimed`;
-- daily completion не добавляется в campaign `completedLevels`, не открывает следующие campaign levels и после победы ведет только обратно в archive hub.
-
-Daily доступен из archive hub через Daily Archive card. Route также остается отдельным lazy-loaded screen в `App`.
-
-## 6. Кампании
-
-### White Meridian
-
-Первая доступная экспедиция. Сеттинг - северный маршрут, лед, побережье, маяки, метеостанции, горные тоннели, обсерватория и скрытый архив долины.
-
-Продуктовая роль:
-
-- вводит игрока в базовую механику;
-- знакомит с маршрутом;
-- открывает 5 коллекционных находок дела "Полярная-7";
-- постепенно повышает плотность сцен и сложность поиска.
-
-### Sand Meridian
-
-Вторая экспедиция, открывается после White Meridian. Сеттинг - пустыня, археологический маршрут, караванные следы, колодцы, раскопки, оазис, соляная равнина, руины обсерватории и храмовый комплекс вдоль неизвестного меридиана.
-
-Продуктовая роль:
-
-- расширяет мир за пределы северной экспедиции;
-- добавляет археологическую линию;
-- открывает 5 находок, доказывающих подземный маршрут и водную сеть пустыни;
-- делает сцены более насыщенными объектами снаряжения, камня, раскопок и храмовой инфраструктуры.
-
-### Emerald Meridian
-
-Третья и финальная текущая экспедиция. Сеттинг - тропическая речная экспедиция, джунгли, радио-точки, ботанические лагеря, затопленные мосты, деревни на сваях, водопады, храмы, подземные резервуары и эвакуационный аэродром.
-
-Продуктовая роль:
-
-- финальный масштаб текущего архива;
-- связывает древние комплексы в глобальную систему;
-- открывает 5 находок Verde-12, которые связывают северный, пустынный и зеленый маршруты;
-- дает наиболее разнообразный визуальный набор: вода, зелень, камень, древняя инженерия, полевые станции.
-
-## 7. Уровни
-
-Ниже - игровое описание текущих 39 уровней. "Объекты поиска" не перечисляют все технические `difference id`, а описывают, какие типы деталей игрок фактически ищет.
-
-### White Meridian
-
-| # | Уровень | Сеттинг и роль | Отличий | Сложность | Награда |
-|---:|---|---|---:|---:|---|
-| 1 | Boreas Pier | Пристань и старт северного маршрута. Тут игрок быстро понимает принцип A/B-сравнения на крупных объектах. | 4 | 1 | 110 AP |
-| 2 | Coastal Warehouse | Береговой склад с экспедиционным снаряжением. Учит искать изменения количества, цвета и добавленные предметы. | 5 | 1 | 120 AP |
-| 3 | White Gull Lighthouse | Маяк и навигационные детали. Первый заметный milestone коллекции. | 5 | 1 | 130 AP, +1 magnifier, Компас Белой чайки |
-| 4 | Ice Railway Platform | Ледовая железнодорожная платформа. Больше объектов на средней дистанции: двери, бочки, тележки, фонари. | 6 | 1 | 140 AP |
-| 5 | Weather Station | Метеостанция с приборами. Фокус на инструментах, шкалах, карте погоды и мелких предметах. | 6 | 2 | 150 AP |
-| 6 | Glacier Camp | Лагерь у ледника. Сцена про полевое снаряжение, лыжи, следы, флаги и грузовые элементы. | 6 | 2 | 160 AP, +1 magnifier, Полевой радиоприёмник Полярной-7 |
-| 7 | Old Mountain Tunnel | Старый горный тоннель. Игрок ищет ставни, лампы, двери, ящики и цветовые акценты. | 7 | 2 | 170 AP |
-| 8 | Observatory Dome | Купол обсерватории. Более плотная композиция с телескопом, часами, люком, книгой и мебелью. | 7 | 2 | 180 AP, Красный журнал экспедиции |
-| 9 | Polar Greenhouse | Полярная теплица. Фокус на растениях, емкостях, приборах, поддонах и синем цветке. | 7 | 2 | 190 AP, +1 magnifier |
-| 10 | Radio Relay Tower | Радиорелейная башня. Сложнее из-за приборных и сигнальных деталей, кабелей и индикаторов. | 7 | 3 | 200 AP, Эхо-регистратор М-10 |
-| 11 | Living Module | Жилой модуль экспедиции. Мелкие бытовые детали: полки, шахматная фигура, одежда, ботинки. | 7 | 3 | 210 AP |
-| 12 | Hidden Valley Archive | Скрытый архив долины. Финальный архивный узел с радиостанцией, компасом, цветком, картой и ящиками. | 8 | 3 | 220 AP, +1 magnifier |
-| 13 | Ice Cliff Camp | Лагерь у ледяного обрыва. Эпилог северного маршрута с палаткой, мостом, веревками, приборами и дальними деталями. | 9 | 3 | 230 AP, Спусковой трос у ледяного обрыва |
-
-### Sand Meridian
-
-| # | Уровень | Сеттинг и роль | Отличий | Сложность | Награда |
-|---:|---|---|---:|---:|---|
-| 1 | Desert Edge Camp | Край барханов и старт пустынной экспедиции. Много снаряжения, ящиков, тросов, топлива и лагерных деталей. | 9 | 1 | 150 AP |
-| 2 | Caravan Trail | След каравана и полевой лагерь. Игрок ищет генератор, сигнальные предметы, бочки, радио и кейсы. | 8 | 1 | 160 AP |
-| 3 | Dune Basin | Чаша дюн, камни и входы в полевые точки. Акцент на маркерах, лампах, скальных формах и инструментах. | 9 | 1 | 170 AP, +1 magnifier, Рунный указатель Астер-9 |
-| 4 | Dry Well | Сухой колодец и коммуникационная точка. Сцена смешивает флаги, кабели, антенны, палатки и камни. | 9 | 1 | 180 AP |
-| 5 | Rock Arch | Каменная арка и рабочая зона раскопок. Много строительных/археологических объектов: леса, разметка, тележка, каски. | 9 | 2 | 190 AP |
-| 6 | Canyon Pass | Каньонный проход. Больше вертикальных форм, лестниц, флагов, генераторов, лебедок и цепей. | 8 | 2 | 200 AP, +1 magnifier, Шлемы спусковой группы |
-| 7 | Abandoned Dig Site | Заброшенный раскоп. Сцена с прожекторами, минеральными колоннами, мостками, кейсами и закрытыми штабелями. | 9 | 2 | 210 AP |
-| 8 | Oasis Iram | Оазис и водная инженерия. Отличия вокруг акведука, мостика, водяных ворот, бутылок, насоса и мерной рейки. | 8 | 2 | 220 AP, Гидравлический насос Ирама |
-| 9 | Salt Flat | Соляное зеркало и акустико-полевое оборудование. Сложная сцена с кабелями, микрофонами, гонгом и диктофоном. | 9 | 2 | 230 AP, +1 magnifier |
-| 10 | Ruined Observatory | Разрушенная обсерватория. Игрок ищет дверные, каменные, посудные и навесные детали среди руин. | 9 | 3 | 240 AP, Бронзовая лампа обсерватории |
-| 11 | Buried Temple Courtyard | Двор засыпанного храма. Много мостов, фонарей, символов, сетей и лебедок. | 10 | 3 | 250 AP |
-| 12 | Storm Ridge | Гряда бури и измерительная площадка. Уровень короче по числу отличий, но с крупными приборами и геометрией пола. | 6 | 3 | 260 AP, +1 magnifier |
-| 13 | Buried Meridian | Погребенный меридиан. Финал пустынной линии: таблички, карты, проходы, ткани, веревки и стол с находками. | 8 | 3 | 270 AP, Карта погребённого русла |
-
-### Emerald Meridian
-
-| # | Уровень | Сеттинг и роль | Отличий | Сложность | Награда |
-|---:|---|---|---:|---:|---|
-| 1 | River Landing | Речной причал и старт тропической экспедиции. Лодка, бочки, банки, карта, насос и наборы образцов. | 10 | 1 | 190 AP |
-| 2 | Abandoned Radio Station | Заброшенная радиостанция в джунглях. Антенна, радиопанели, батареи, вентилятор, бутылки и заросли. | 9 | 1 | 200 AP |
-| 3 | Botanical Camp | Лагерь ботаников. Микроскопы, колбы, specimen row, гербарии, обувь и полевые карты. | 8 | 1 | 210 AP, +1 magnifier, Колбы гербария Verde-12 |
-| 4 | Flooded Bridge | Затопленный мост. Игрок ищет веревки, кейсы, инструмент, доски, узлы, следы и сумки. | 7 | 1 | 220 AP |
-| 5 | Stone Terraces | Каменные террасы и древняя гидросистема. Меньше отличий, но крупные формы: цилиндры, глифы, колесо и бассейн. | 5 | 2 | 230 AP |
-| 6 | Stilt Village | Деревня на сваях. Сцена с хижинами, картой, корзинами, гамаком, буйками, веслом и аптечкой. | 9 | 2 | 240 AP, +1 magnifier, Карта зелёного русла |
-| 7 | Three-Stream Waterfall | Водопад трех потоков. Природа плюс руины: скалы, храмовый вход, ступени, тренога, плот и каменные блоки. | 9 | 2 | 250 AP |
-| 8 | Temple of Roots | Храм корней. Темные проемы, рельефы, фонарь, компас, кисть, трещины пола и водные следы. | 9 | 2 | 260 AP, Плита трёх потоков |
-| 9 | Underground Reservoir | Подземный резервуар. Вода, ниши, шлюзы, растения, водопады, банки и латунный цилиндр. | 9 | 2 | 270 AP, +1 magnifier |
-| 10 | Canopy Observatory | Обсерватория над кронами. Телескопы, гномон, озеро, стойки, компасная роза и водяная чаша. | 10 | 3 | 280 AP, Латунная подзорная труба |
-| 11 | Heart of the Green Valley | Сердце зеленой долины. Лабораторно-природная сцена с синими растениями, плотиной, terrarium и образцами. | 9 | 3 | 290 AP |
-| 12 | Ruined Geological Station | Разрушенная геологическая станция. Буры, теодолит, грязевые следы, бутылки, трубы и керны. | 9 | 3 | 300 AP, +1 magnifier |
-| 13 | Evacuation Airstrip | Эвакуационный аэродром. Финальная точка с самолетом, радиосвязью, ящиками, картой, шлангами и лагерем. | 9 | 3 | 310 AP, Эвакуационный самолёт Verde-12 |
-
-## 8. Подсказки, реклама и review prompt
-
-### Area hint
-
-Подсказка подсвечивает `hintArea` одного из еще не найденных отличий.
-
-Если у игрока есть magnifiers:
-
-- кнопка подсказки тратит 1 magnifier;
-- сразу подсвечивает следующее отличие.
-
-Если magnifiers нет:
-
-- открывается rewarded hint modal;
-- игрок может посмотреть видео;
-- если rewarded завершился успешно, подсказка выдается без траты magnifier;
-- если реклама закрыта или недоступна, игрок возвращается в уровень без потери прогресса.
-
-### Interstitial
-
-Forced fullscreen interstitial ставится в очередь после каждого третьего нового completion в campaign mode:
-
-- 3, 6, 9 и т.д. новых campaign levels;
-- не показывается во время gameplay;
-- не показывается при возврате на карту;
-- показывается только при нажатии next-level CTA на победном экране;
-- отключается покупкой/флагом `noForcedInterstitials`, если он есть в save.
-
-### Review prompt
-
-Review pre-prompt появляется после позитивного post-victory момента, если:
-
-- completed levels достигли eligibility;
-- нет блокирующих overlay/ad/purchase состояний;
-- документ видим;
-- native review API доступен.
-
-Первичная eligibility в save: после 4 completed levels. Если игрок выбирает "Later", следующий порог откладывается.
-
-## 9. Сохранения, локаль и Yandex Games
-
-### Save
-
-Save schema version: 2.
-
-Игра сохраняет:
+Save хранит:
 
 - `completedLevels`;
 - `bestResults`;
-- `inProgress`;
+- `inProgress` с `elapsedActiveSeconds`;
 - `magnifiers`;
 - `artifacts`;
+- `viewedCampaignReportIds`;
 - `daily`;
 - `settings`;
 - `reviewPrompt`;
 - `purchases`.
 
-Сохранение вызывается:
+Platform layer:
 
-- после старта уровня;
-- после найденного отличия;
-- после ошибки;
-- после completion;
-- после spending magnifiers;
-- после смены языка;
-- после daily reward;
-- при `visibilitychange` и `pagehide`.
+- production подключает Yandex `/sdk.js`;
+- вызывает `LoadingAPI.ready()` один раз после bootstrap/hydration readiness;
+- централизует `GameplayAPI.start()` / `stop()` вокруг активного gameplay;
+- использует Yandex Player Data cloud save с local mirror/fallback;
+- берет стартовый язык из `ysdk.environment.i18n.lang`, если нет manual override.
 
-Если cloud недоступен, игра продолжает работу через local fallback. UI имеет save status: `idle`, `saving`, `saved`, `local-only`.
+Analytics:
 
-### Локаль
+- события приватно-безопасные;
+- локально доступны через QA buffer;
+- опционально уходят в Yandex Metrica через `VITE_YANDEX_METRICA_ID`;
+- покрывают app readiness, screen navigation, campaign/map flow, gameplay, hints, ads, daily reward, artifacts, campaign reports and review prompts.
 
-Production locales:
+## Dev И Release Support
 
-- `ru`;
-- `en`.
+Основные команды:
 
-По умолчанию используется auto locale. Если игрок вручную меняет язык, выбор сохраняется как manual и больше не перезаписывается auto-detection.
+- `pnpm dev` - обычный dev server.
+- `pnpm dev --cheat` - dev server с unlock all content.
+- `pnpm dev:validate` - hitbox-alignment view на `3.webp` markup references.
+- `pnpm validate:final` - hitbox editor на финальных `1.webp` / `2.webp`.
+- `pnpm validate:archive` - hitbox editor для 7 Daily Archive cases.
+- `pnpm validate:content` - content/assets/locales/provenance validation.
+- `pnpm agent:check` - lint, typecheck, content validation.
+- `pnpm release:validate` и `pnpm release:zip` - production validation and Yandex archive packaging.
 
-### Yandex lifecycle
+Production build исключает `3.webp` markup references, unused placeholders and sourcemaps by default; release ZIP uses relative asset links for Yandex hosting.
 
-Платформенный слой отделен от React-компонентов:
+## Текущее Состояние
 
-- `/sdk.js` подключается как platform-provided SDK;
-- `LoadingAPI.ready()` вызывается после hydration/первого интерактивного кадра;
-- `GameplayAPI.start()/stop()` централизованы через platform lifecycle;
-- реклама, review, cloud save и environment language идут через сервисы/adapters.
+Реализовано и должно считаться текущим baseline:
 
-## 10. Текущее состояние реализации
+- playable archive hub;
+- 3 campaign journals with 39 levels total;
+- 7 daily archive cases;
+- full data-driven scene assets and hitboxes for current content;
+- desktop and mobile-landscape gameplay layouts;
+- first-run onboarding into level 01;
+- local/cloud save, migration and fallback;
+- collection flow with artifact toast, reveal ceremony and collection screen;
+- campaign finale reports;
+- daily reward and streak tracking;
+- hint economy with rewarded fallback;
+- queued interstitial and review pre-prompt;
+- Yandex lifecycle and optional Metrica transport;
+- local hitbox authoring tools.
 
-Уже реализовано:
+Не до конца закрыто или требует продуктового решения:
 
-- Vite + React + TypeScript strict.
-- Zustand store.
-- Zod-валидация контента и save schema.
-- Data-driven уровни.
-- 39 campaign levels.
-- 7 standalone Daily Archive entries.
-- Local/cloud save adapter.
-- RU/EN i18n.
-- Настройки языка.
-- Archive hub с активным делом, Daily, коллекцией и campaign list.
-- Gameplay comparator с hit testing.
-- Found markers, wrong click markers, hint markers.
-- 5-минутный таймер и timeout overlay.
-- Victory overlay.
-- Linear campaign/level progression.
-- 15 коллекционных находок по всем трем кампаниям.
-- In-game artifact toast, post-level reveal overlay и collection screen с фильтрами по кампаниям.
-- Rewarded hint flow.
-- Queued interstitial flow.
-- Review pre-prompt.
-- Product analytics.
-- Dev hitbox editor/validation modes.
-- Asset manifest/scene pipeline.
+- `archivePoints` технически есть в rewards, но не являются видимой мета-ценностью.
+- 5-минутный timer может конфликтовать со спокойным positioning игры.
+- Daily reward ladder пока простая: одно daily completion в дату дает `+1` hint.
+- Shop/IAP не оформлен как полноценный пользовательский flow, хотя purchase flags в save уже есть.
+- Pre-level story пока не вынесен в отдельный экран; narrative раскрывается через level result clue, artifacts and campaign reports.
 
-Недоделанные или спорные места:
+## Ближайшие Логичные Улучшения
 
-- Archive points записаны как rewards в level data, но не представлены как отдельный баланс в save/metagame.
-- В концепте основная кампания описана как расслабленная без жесткого timer fail, но текущий GameScreen имеет 5-минутный timeout.
-- Purchase/IAP описан в концепте, save хранит purchase flags, но полноценный shop/purchase UI в актуальном основном flow не виден.
-- Daily streak reward сейчас фактически +1 magnifier за день, без более богатой трехдневной reward ladder из концепта.
-- Pre-level story screen пока не выделен отдельным экраном; сюжетный прогресс сейчас читается через completion clue на каждом campaign level, коллекцию находок и campaign finale report после 13-го уровня.
-
-## 11. Как игру развивать дальше
-
-### Первый приоритет: закрыть core loop
-
-1. Решить продуктово, остается ли 5-минутный timer в campaign mode.
-2. Сделать post-level reward/result более системным: stars, magnifiers, новая находка, сюжетная улика, прогресс дела и следующий маршрут должны читаться как единая выдача.
-3. Развить campaign finale/case report после 13-го уровня кампании: добавить больше связей между найденными артефактами и пустыми секторами архива.
-4. Привести archive points к решению: удалить из rewards, если не нужны, или превратить в видимую мета-ценность.
-5. Проверить, что startup routing не слишком резко бросает нового игрока в gameplay без контекста archive hub.
-
-### Второй приоритет: усилить мету
-
-1. Добавить отдельный pre-level archive note screen или компактную карточку перед стартом уровня, используя уже подключённые `story.introKey`.
-2. Развить daily streak: 1 день, 2 день, 3 день, missed day, already claimed.
-3. Добавить глобальную карту/досье меридианов, где 15 находок связываются в общую схему.
-4. Расширить Collection как альбом дела: case summary, финальный вывод кампании, связь с будущими секторами.
-5. Поддержать future campaign hook из `docs/expedition_narrative_collection_ru.json`: финал Emerald Meridian показывает пустые сектора архива.
-
-### Третий приоритет: качество уровней
-
-1. Использовать аналитику для bad difference detector: долгий time-to-find, много misclicks, высокий hint rate.
-2. Пересмотреть уровни с 9-10 отличиями на ранних этапах, если retention падает.
-3. Проверить mobile читаемость мелких отличий.
-4. Добавить difficulty tags не только числом, но и типом отличий: color, missing, moved, quantity, instrument, reflection.
-5. Поддерживать баланс между крупными очевидными отличиями и мелкими архивными деталями.
-
-### Четвертый приоритет: монетизация без давления
-
-1. Оставить rewarded ads как мягкую помощь, а не обязательный gate.
-2. Проверить частоту interstitial на retention.
-3. Реализовать starter pack/no forced interstitials только после стабильного save/purchase recovery.
-4. Не вводить energy/lives/multiple currencies, чтобы не ломать спокойный тон игры.
-
-### Пятый приоритет: контентное расширение
-
-Возможные направления:
-
-- новые мини-архивы по 6 уровней;
-- новые daily-сцены не только из White Meridian;
-- специальные weekend challenges;
-- расширение глобальной линии "меридианов";
-- новые типы архивных экспонатов;
-- сезонные подборки без battle pass.
-
-## 12. Быстрый продуктовый диагноз
-
-Сильные стороны:
-
-- Механика понятна сразу.
-- Уже есть много контента: 39 уровней.
-- Кампании хорошо различаются визуально и тематически.
-- Система сохранения и аналитики заложена серьезно.
-- Реклама встроена аккуратно и не блокирует gameplay.
-- Data-driven контент позволяет масштабировать уровни.
-
-Главные риски:
-
-- Первый экран сейчас фокусируется на выборе кампании, но не показывает Daily/Collection как часть живой меты.
-- Таймер может конфликтовать с расслабленным позиционированием.
-- Коллекция пока слишком простая, чтобы быть полноценной мотивацией.
-- Story glue между уровнями появился в post-level clue, но pre-level контекст пока не вынесен в отдельный UX.
-- Награды частично технические: archive points не используются как видимая мета-ценность.
-
-Главный следующий шаг: сделать мета-слой видимым и полезным, не перегружая core gameplay. Для этого лучше всего доработать Home/Map как настоящий игровой hub: текущая экспедиция, daily, коллекция, прогресс, следующий reward milestone и понятная кнопка "играть дальше".
+1. Принять решение по campaign timer: оставить как tension-механику, смягчить или убрать из campaign mode.
+2. Превратить `archivePoints` в понятную мета-ценность либо удалить их из rewards, если они не нужны.
+3. Усилить pre-level context: добавить компактную архивную карточку перед стартом уровня на основе уже подключенных story keys.
+4. Развить daily reward/streak: больше состояний, но без агрессивного event hub.
+5. Углубить collection/campaign reports как case archive: больше связей между артефактами, выводами кампаний и будущим контентом.
+6. Использовать analytics для quality review конкретных differences: high hint rate, long time-to-find, high misclick rate.

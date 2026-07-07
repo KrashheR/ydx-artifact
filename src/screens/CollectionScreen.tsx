@@ -4,7 +4,7 @@ import {
   artifactList,
   getChapterArtifacts,
   TOTAL_ARTIFACTS,
-  type ArtifactDefinition
+  type ArtifactDefinition,
 } from "@/content/artifacts";
 import { chapterList, getChapter, type ChapterId } from "@/content/chapters";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
@@ -17,17 +17,29 @@ type CampaignFilter = "all" | ChapterId;
 const CAMPAIGN_ACCENT: Record<ChapterId, string> = {
   "northern-route": "#6fa3c9",
   "sand-meridian": "#c98f4a",
-  "emerald-meridian": "#5cab84"
+  "emerald-meridian": "#5cab84",
 };
 
-function getArtifactState(states: Record<string, string>, artifactId: string): ArtifactState {
+function getArtifactState(
+  states: Record<string, string>,
+  artifactId: string,
+): ArtifactState {
   const state = states[artifactId];
   return state === "newly-unlocked" || state === "viewed" ? state : "locked";
 }
 
 function BackIcon() {
   return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="19"
+      height="19"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M15 18l-6-6 6-6" />
     </svg>
   );
@@ -42,11 +54,18 @@ function SealLockBadge({ size = 34 }: { size?: number }) {
         height: size,
         background: "radial-gradient(circle at 38% 32%, #caa05a, #7e5b2a 72%)",
         border: "1.5px solid rgba(255,236,196,.35)",
-        boxShadow: "0 8px 18px rgba(0,0,0,.5)"
+        boxShadow: "0 8px 18px rgba(0,0,0,.5)",
       }}
       aria-hidden="true"
     >
-      <svg width={size * 0.42} height={size * 0.42} viewBox="0 0 24 24" fill="none" stroke="#2a1d0c" strokeWidth="1.8">
+      <svg
+        width={size * 0.42}
+        height={size * 0.42}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#2a1d0c"
+        strokeWidth="1.8"
+      >
         <rect x="5" y="11" width="14" height="9.5" rx="1.6" />
         <path d="M8 11V8a4 4 0 0 1 8 0v3" />
       </svg>
@@ -56,7 +75,15 @@ function SealLockBadge({ size = 34 }: { size?: number }) {
 
 function CheckIcon({ color = "#6fc69e" }: { color?: string }) {
   return (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round">
+    <svg
+      width="11"
+      height="11"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth="3"
+      strokeLinecap="round"
+    >
       <path d="M5 12l5 5L20 6" />
     </svg>
   );
@@ -65,7 +92,7 @@ function CheckIcon({ color = "#6fc69e" }: { color?: string }) {
 function ArtifactCard({
   artifact,
   state,
-  onOpen
+  onOpen,
 }: {
   artifact: ArtifactDefinition;
   state: ArtifactState;
@@ -82,11 +109,15 @@ function ArtifactCard({
       className="relative flex min-h-[44px] flex-col overflow-hidden rounded-[12px] text-left transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
       style={{
         background: unlocked ? "#222A25" : "rgba(34,42,37,.6)",
-        border: unlocked ? "1px solid rgba(184,138,69,.3)" : "1px solid rgba(213,195,154,.1)",
-        boxShadow: "0 12px 26px rgba(0,0,0,.32)"
+        border: unlocked
+          ? "1px solid rgba(184,138,69,.3)"
+          : "1px solid rgba(213,195,154,.1)",
+        boxShadow: "0 12px 26px rgba(0,0,0,.32)",
       }}
       aria-label={
-        unlocked ? t(`artifacts.${artifact.id}.name`) : t("collection.detailLockedTitle")
+        unlocked
+          ? t(`artifacts.${artifact.id}.name`)
+          : t("collection.detailLockedTitle")
       }
     >
       {state === "newly-unlocked" && (
@@ -98,13 +129,13 @@ function ArtifactCard({
         </span>
       )}
 
-      <div className="relative h-[104px] sm:h-[118px]">
+      <div className="relative h-[104px] sm:h-[320px]">
         {unlocked ? (
           <div
             className="absolute inset-[10px] overflow-hidden rounded-[6px]"
             style={{
               background: "linear-gradient(160deg, #2b2115, #1c150c)",
-              border: "1px solid rgba(184,138,69,.4)"
+              border: "1px solid rgba(184,138,69,.4)",
             }}
           >
             <img
@@ -148,10 +179,14 @@ function ArtifactCard({
           className="min-h-[38px] font-cormorant text-[15.5px] font-semibold leading-[1.15]"
           style={{ color: unlocked ? "#D5C39A" : "#9aa398" }}
         >
-          {unlocked ? t(`artifacts.${artifact.id}.name`) : t("collection.detailLockedTitle")}
+          {unlocked
+            ? t(`artifacts.${artifact.id}.name`)
+            : t("collection.detailLockedTitle")}
         </div>
         <div className="text-[10.5px] font-medium leading-[1.4] text-[#6d756c]">
-          {unlocked ? t("collection.cardUnlockedHint") : t("collection.cardLockedHint")}
+          {unlocked
+            ? t("collection.cardUnlockedHint")
+            : t("collection.cardLockedHint")}
         </div>
       </div>
     </button>
@@ -162,7 +197,7 @@ function ArtifactDetailModal({
   artifact,
   state,
   onClose,
-  onReplayLevel
+  onReplayLevel,
 }: {
   artifact: ArtifactDefinition;
   state: ArtifactState;
@@ -192,7 +227,7 @@ function ArtifactDetailModal({
           background: "#222A25",
           border: "1px solid rgba(184,138,69,.35)",
           boxShadow: "0 44px 90px rgba(0,0,0,.6)",
-          maxHeight: "calc(100vh - 32px)"
+          maxHeight: "calc(100vh - 32px)",
         }}
       >
         {/* Image column */}
@@ -200,22 +235,28 @@ function ArtifactDetailModal({
           className="flex items-center justify-center p-6 sm:p-[30px]"
           style={{
             background:
-              "repeating-linear-gradient(45deg, rgba(213,195,154,.03) 0 14px, transparent 14px 28px)"
+              "repeating-linear-gradient(45deg, rgba(213,195,154,.03) 0 14px, transparent 14px 28px)",
           }}
         >
           <div
             className="relative h-[160px] w-[160px] overflow-hidden rounded-[8px] sm:h-[220px] sm:w-[220px]"
             style={{
               background: "linear-gradient(160deg, #2b2115, #1c150c)",
-              border: unlocked ? "1px solid rgba(184,138,69,.4)" : "1px dashed rgba(213,195,154,.25)",
-              boxShadow: "0 20px 40px rgba(0,0,0,.5)"
+              border: unlocked
+                ? "1px solid rgba(184,138,69,.4)"
+                : "1px dashed rgba(213,195,154,.25)",
+              boxShadow: "0 20px 40px rgba(0,0,0,.5)",
             }}
           >
             <img
               src={unlocked ? artifact.openImage : artifact.closedImage}
               alt=""
               className="h-full w-full object-cover"
-              style={unlocked ? undefined : { filter: "saturate(.55) brightness(.75)" }}
+              style={
+                unlocked
+                  ? undefined
+                  : { filter: "saturate(.55) brightness(.75)" }
+              }
               draggable={false}
             />
             {!unlocked && (
@@ -236,26 +277,39 @@ function ArtifactDetailModal({
                   ? {
                       color: "#6fc69e",
                       background: "rgba(111,198,158,.1)",
-                      border: "1px solid rgba(111,198,158,.35)"
+                      border: "1px solid rgba(111,198,158,.35)",
                     }
                   : {
                       color: "#9aa398",
                       background: "rgba(213,195,154,.06)",
-                      border: "1px solid rgba(213,195,154,.16)"
+                      border: "1px solid rgba(213,195,154,.16)",
                     }
               }
             >
               {unlocked && <CheckIcon />}
-              {unlocked ? t("collection.detailStatusUnlocked") : t("collection.detailStatusLocked")}
+              {unlocked
+                ? t("collection.detailStatusUnlocked")
+                : t("collection.detailStatusLocked")}
             </span>
             <button
               type="button"
               onClick={onClose}
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] text-exp-parch transition hover:bg-white/5"
-              style={{ border: "1px solid rgba(213,195,154,.14)", background: "rgba(213,195,154,.05)" }}
+              style={{
+                border: "1px solid rgba(213,195,154,.14)",
+                background: "rgba(213,195,154,.05)",
+              }}
               aria-label={t("collection.closeLabel")}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
                 <path d="M6 6l12 12M18 6 6 18" />
               </svg>
             </button>
@@ -265,14 +319,24 @@ function ArtifactDetailModal({
             id="artifact-detail-title"
             className="mt-3 font-cormorant text-[26px] font-semibold leading-tight text-exp-parch sm:text-[34px]"
           >
-            {unlocked ? t(`artifacts.${artifact.id}.name`) : t("collection.detailLockedTitle")}
+            {unlocked
+              ? t(`artifacts.${artifact.id}.name`)
+              : t("collection.detailLockedTitle")}
           </h2>
           <div className="mt-1.5 font-jetbrains text-[11px] font-semibold tracking-[.08em] text-exp-muted">
-            {t("collection.detailMeta", { campaign: campaignTitle, order: artifact.unlockLevelOrder })}
+            {t("collection.detailMeta", {
+              campaign: campaignTitle,
+              order: artifact.unlockLevelOrder,
+            })}
           </div>
 
-          <p className="mt-4 text-[13.5px] leading-[1.6]" style={{ color: "#a9b0a6" }}>
-            {unlocked ? t(`artifacts.${artifact.id}.description`) : t("collection.detailLockedBody")}
+          <p
+            className="mt-4 text-[13.5px] leading-[1.6]"
+            style={{ color: "#a9b0a6" }}
+          >
+            {unlocked
+              ? t(`artifacts.${artifact.id}.description`)
+              : t("collection.detailLockedBody")}
           </p>
 
           <div
@@ -280,14 +344,14 @@ function ArtifactDetailModal({
             style={{
               border: "1px dashed rgba(184,138,69,.45)",
               background: "rgba(184,138,69,.07)",
-              color: "#c9a869"
+              color: "#c9a869",
             }}
           >
             {unlocked
               ? t(`artifacts.${artifact.id}.clue`)
               : t("collection.detailLockedHint", {
                   campaign: campaignTitle,
-                  order: artifact.unlockLevelOrder
+                  order: artifact.unlockLevelOrder,
                 })}
           </div>
 
@@ -302,7 +366,10 @@ function ArtifactDetailModal({
               type="button"
               onClick={onClose}
               className="min-h-[46px] flex-1 rounded-[9px] text-[13.5px] font-semibold text-exp-parch"
-              style={{ border: "1px solid rgba(213,195,154,.2)", background: "rgba(213,195,154,.05)" }}
+              style={{
+                border: "1px solid rgba(213,195,154,.2)",
+                background: "rgba(213,195,154,.05)",
+              }}
             >
               {t("collection.detailBack")}
             </button>
@@ -313,7 +380,8 @@ function ArtifactDetailModal({
                 className="min-h-[46px] flex-1 rounded-[9px] border-none text-[14px] font-extrabold text-[#1a130a]"
                 style={{
                   background: "linear-gradient(180deg, #d8af63, #b3812f)",
-                  boxShadow: "0 10px 26px rgba(184,138,69,.28), inset 0 1px 0 rgba(255,255,255,.3)"
+                  boxShadow:
+                    "0 10px 26px rgba(184,138,69,.28), inset 0 1px 0 rgba(255,255,255,.3)",
                 }}
               >
                 {t("collection.detailReplay")}
@@ -332,24 +400,29 @@ export function CollectionScreen() {
   const startLevel = useGameStore((state) => state.startLevel);
   const markArtifactViewed = useGameStore((state) => state.markArtifactViewed);
   const artifactStates = useGameStore((state) => state.saveData.artifacts);
-  const completedLevels = useGameStore((state) => state.saveData.completedLevels);
+  const completedLevels = useGameStore(
+    (state) => state.saveData.completedLevels,
+  );
 
   const [filter, setFilter] = useState<CampaignFilter>("all");
   const [openedArtifactId, setOpenedArtifactId] = useState<string | null>(null);
 
   const totalUnlocked = useMemo(
     () =>
-      artifactList.filter((artifact) => getArtifactState(artifactStates, artifact.id) !== "locked")
-        .length,
-    [artifactStates]
+      artifactList.filter(
+        (artifact) =>
+          getArtifactState(artifactStates, artifact.id) !== "locked",
+      ).length,
+    [artifactStates],
   );
 
   const visibleChapters = chapterList.filter(
-    (chapter) => filter === "all" || chapter.id === filter
+    (chapter) => filter === "all" || chapter.id === filter,
   );
 
   const openedArtifact = openedArtifactId
-    ? artifactList.find((artifact) => artifact.id === openedArtifactId) ?? null
+    ? (artifactList.find((artifact) => artifact.id === openedArtifactId) ??
+      null)
     : null;
 
   function handleOpenArtifact(artifact: ArtifactDefinition) {
@@ -363,7 +436,7 @@ export function CollectionScreen() {
     trackAnalyticsEvent("collection_replay_level_clicked", {
       artifactId: artifact.id,
       levelId: level.id,
-      campaignId: artifact.chapterId
+      campaignId: artifact.chapterId,
     });
     setOpenedArtifactId(null);
     startLevel(level.id, "campaign");
@@ -376,7 +449,8 @@ export function CollectionScreen() {
       <div
         className="pointer-events-none fixed inset-0"
         style={{
-          background: "radial-gradient(120% 60% at 50% -10%, rgba(47,106,87,.12), transparent 55%)"
+          background:
+            "radial-gradient(120% 60% at 50% -10%, rgba(47,106,87,.12), transparent 55%)",
         }}
       />
 
@@ -386,7 +460,8 @@ export function CollectionScreen() {
         style={{
           minHeight: 74,
           borderBottom: "1px solid rgba(213,195,154,.11)",
-          background: "linear-gradient(180deg, rgba(34,42,37,.9), rgba(21,27,24,.35))"
+          background:
+            "linear-gradient(180deg, rgba(34,42,37,.9), rgba(21,27,24,.35))",
         }}
       >
         <div className="flex items-center gap-3.5">
@@ -394,7 +469,10 @@ export function CollectionScreen() {
             type="button"
             onClick={() => navigate({ kind: "home" })}
             className="flex h-11 w-11 items-center justify-center rounded-[10px] text-exp-parch transition hover:bg-white/5"
-            style={{ border: "1px solid rgba(213,195,154,.14)", background: "rgba(213,195,154,.05)" }}
+            style={{
+              border: "1px solid rgba(213,195,154,.14)",
+              background: "rgba(213,195,154,.05)",
+            }}
             aria-label={t("actions.back")}
           >
             <BackIcon />
@@ -411,7 +489,10 @@ export function CollectionScreen() {
         {/* pr clears the floating settings gear pinned to the viewport corner */}
         <div className="flex flex-col items-end gap-1.5 pr-[36px] md:pr-[58px]">
           <span className="text-[15px] font-bold text-exp-brass2">
-            {t("collection.progress", { done: totalUnlocked, total: TOTAL_ARTIFACTS })}
+            {t("collection.progress", {
+              done: totalUnlocked,
+              total: TOTAL_ARTIFACTS,
+            })}
           </span>
           <div
             className="h-1.5 w-[160px] overflow-hidden rounded-[2px] sm:w-[220px]"
@@ -421,7 +502,7 @@ export function CollectionScreen() {
               className="h-full transition-all duration-500"
               style={{
                 width: `${progressPct}%`,
-                background: "linear-gradient(90deg, #d8af63, #a9762f)"
+                background: "linear-gradient(90deg, #d8af63, #a9762f)",
               }}
             />
           </div>
@@ -434,10 +515,13 @@ export function CollectionScreen() {
           {t("collection.subtitle")}
         </p>
         <div className="mt-[18px] flex flex-wrap gap-2.5">
-          {([
+          {[
             { key: "all" as const, label: t("collection.filterAll") },
-            ...chapterList.map((chapter) => ({ key: chapter.id, label: t(chapter.titleKey) }))
-          ]).map((tab) => {
+            ...chapterList.map((chapter) => ({
+              key: chapter.id,
+              label: t(chapter.titleKey),
+            })),
+          ].map((tab) => {
             const active = filter === tab.key;
             return (
               <button
@@ -451,12 +535,12 @@ export function CollectionScreen() {
                         background: "rgba(184,138,69,.16)",
                         border: "1px solid rgba(184,138,69,.45)",
                         color: "#d8af63",
-                        fontWeight: 700
+                        fontWeight: 700,
                       }
                     : {
                         border: "1px solid rgba(213,195,154,.14)",
                         background: "rgba(213,195,154,.04)",
-                        color: "#a9b0a6"
+                        color: "#a9b0a6",
                       }
                 }
                 aria-pressed={active}
@@ -473,7 +557,8 @@ export function CollectionScreen() {
         {visibleChapters.map((chapter) => {
           const chapterArtifacts = getChapterArtifacts(chapter.id);
           const unlockedCount = chapterArtifacts.filter(
-            (artifact) => getArtifactState(artifactStates, artifact.id) !== "locked"
+            (artifact) =>
+              getArtifactState(artifactStates, artifact.id) !== "locked",
           ).length;
           const accent = CAMPAIGN_ACCENT[chapter.id];
           const allCollected = unlockedCount === chapterArtifacts.length;
@@ -495,24 +580,30 @@ export function CollectionScreen() {
                     style={{
                       color: "#6fc69e",
                       background: "rgba(111,198,158,.1)",
-                      border: "1px solid rgba(111,198,158,.35)"
+                      border: "1px solid rgba(111,198,158,.35)",
                     }}
                   >
                     <CheckIcon />
                     {t("collection.campaignComplete", {
                       done: unlockedCount,
-                      total: chapterArtifacts.length
+                      total: chapterArtifacts.length,
                     })}
                   </span>
                 ) : (
-                  <span className="font-jetbrains text-[12px] font-bold" style={{ color: accent }}>
+                  <span
+                    className="font-jetbrains text-[12px] font-bold"
+                    style={{ color: accent }}
+                  >
                     {t("collection.campaignProgress", {
                       done: unlockedCount,
-                      total: chapterArtifacts.length
+                      total: chapterArtifacts.length,
                     })}
                   </span>
                 )}
-                <div className="h-px flex-1" style={{ background: "rgba(213,195,154,.1)" }} />
+                <div
+                  className="h-px flex-1"
+                  style={{ background: "rgba(213,195,154,.1)" }}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
@@ -535,14 +626,12 @@ export function CollectionScreen() {
           artifact={openedArtifact}
           state={getArtifactState(artifactStates, openedArtifact.id)}
           onClose={() => setOpenedArtifactId(null)}
-          onReplayLevel={
-            (() => {
-              const level = getArtifactLevel(openedArtifact);
-              return level && completedLevels.includes(level.id)
-                ? () => handleReplayLevel(openedArtifact)
-                : null;
-            })()
-          }
+          onReplayLevel={(() => {
+            const level = getArtifactLevel(openedArtifact);
+            return level && completedLevels.includes(level.id)
+              ? () => handleReplayLevel(openedArtifact)
+              : null;
+          })()}
         />
       )}
     </div>
