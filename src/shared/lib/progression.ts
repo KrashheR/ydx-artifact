@@ -6,7 +6,7 @@ type BestResult = SaveData["bestResults"][string];
 
 export type StartupDestination =
   | { kind: "game"; levelId: string; showOnboarding: boolean }
-  | { kind: "collection" };
+  | { kind: "home" };
 
 export function isLevelUnlocked(levelId: string, save: SaveData): boolean {
   const level = getLevelById(levelId);
@@ -56,26 +56,29 @@ export function getNextCampaignLevelId(save: SaveData) {
   return null;
 }
 
+export function isFirstLaunchSave(save: SaveData): boolean {
+  const hasUnlockedArtifacts = Object.values(save.artifacts).some((state) => state !== "locked");
+
+  return (
+    save.completedLevels.length === 0 &&
+    Object.keys(save.bestResults).length === 0 &&
+    save.inProgress === null &&
+    !hasUnlockedArtifacts &&
+    save.viewedCampaignReportIds.length === 0 &&
+    save.daily.lastClaimDate === null &&
+    save.daily.streak === 0
+  );
+}
+
 export function resolveStartupDestination(save: SaveData): StartupDestination {
-  const inProgressLevel = save.inProgress ? getLevelById(save.inProgress.levelId) : null;
-  const inProgressCampaignLevel =
-    inProgressLevel &&
-    chapterList.some((chapter) => chapter.levels.some((level) => level.id === inProgressLevel.id));
-  if (inProgressLevel && inProgressCampaignLevel) {
-    return {
-      kind: "game",
-      levelId: inProgressLevel.id,
-      showOnboarding: false
-    };
-  }
+  if (!isFirstLaunchSave(save)) return { kind: "home" };
 
-  const nextLevelId = getNextCampaignLevelId(save);
-  if (!nextLevelId) return { kind: "collection" };
-
+  const nextLevelId = getFirstCampaignLevelId();
+  if (!nextLevelId) return { kind: "home" };
   return {
     kind: "game",
     levelId: nextLevelId,
-    showOnboarding: nextLevelId === getFirstCampaignLevelId() && save.completedLevels.length === 0
+    showOnboarding: true
   };
 }
 

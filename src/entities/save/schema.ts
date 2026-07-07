@@ -5,7 +5,6 @@ import { CAMPAIGN_REPORT_IDS } from "@/data/campaignReports";
 export const SAVE_VERSION = 2;
 
 export const INITIAL_MAGNIFIERS = 1;
-export const MAX_MAGNIFIERS = 5;
 
 export const reviewUnavailableReasonSchema = z.enum([
   "NO_AUTH",
@@ -149,7 +148,6 @@ export function migrateSaveData(value: unknown): SaveData {
   if (v2.success) {
     return {
       ...v2.data,
-      magnifiers: Math.min(v2.data.magnifiers, MAX_MAGNIFIERS),
       artifacts: {
         ...Object.fromEntries(ARTIFACT_IDS.map((artifactId) => [artifactId, "locked" as const])),
         ...v2.data.artifacts
@@ -186,10 +184,7 @@ export function migrateSaveData(value: unknown): SaveData {
           mistakes: clampNonNegativeInteger(source.inProgress.mistakes, 0)
         }
       : null,
-    magnifiers: Math.min(
-      clampNonNegativeInteger(source.magnifiers, fallback.magnifiers),
-      MAX_MAGNIFIERS
-    ),
+    magnifiers: clampNonNegativeInteger(source.magnifiers, fallback.magnifiers),
     artifacts: { ...fallback.artifacts, ...(source.artifacts ?? {}) },
     viewedCampaignReportIds: source.viewedCampaignReportIds ?? fallback.viewedCampaignReportIds,
     daily: {

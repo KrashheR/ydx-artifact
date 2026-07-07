@@ -22,11 +22,11 @@ import {
 } from "@/services/platform/platformLifecycle";
 import { preloadImages } from "@/shared/lib/imagePreload";
 import { useGameStore } from "@/shared/store/gameStore";
-import { MAX_MAGNIFIERS } from "@/entities/save/schema";
 import { getNextCampaignReportChapterId } from "@/data/campaignReports";
 
 const TIME_LIMIT = 300; // 5 minutes
 const COMPLETE_OVERLAY_DELAY_MS = 200;
+const HINT_PIP_COUNT = 5;
 const DEBUG_LAYOUT_MODE = import.meta.env.VITE_LAYOUT_DEBUG === "true";
 const FINAL_VALIDATE_MODE = import.meta.env.VITE_FINAL_VALIDATE === "true";
 const ARCHIVE_VALIDATE_MODE = import.meta.env.VITE_ARCHIVE_VALIDATE === "true";
@@ -1447,7 +1447,7 @@ export function GameScreen({
               {magnifiers > 0 ? (
                 <>
                   <span className="game-hint-pips" aria-hidden="true">
-                    {Array.from({ length: MAX_MAGNIFIERS }).map((_, i) => (
+                    {Array.from({ length: HINT_PIP_COUNT }).map((_, i) => (
                       <span
                         key={i}
                         className={

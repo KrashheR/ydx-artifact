@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { getDailyArchiveDateKey } from "@/content/dailyArchive";
 import {
   createDefaultSave,
-  MAX_MAGNIFIERS,
   type ReviewUnavailableReason,
   type SaveData
 } from "@/entities/save/schema";
@@ -205,8 +204,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   openStartupScreen() {
     const destination = resolveStartupDestination(get().saveData);
-    if (destination.kind === "collection") {
-      const screen: Screen = { kind: "collection" };
+    if (destination.kind === "home") {
+      const screen: Screen = { kind: "home" };
       set({ screen });
       trackAnalyticsEvent("screen_view", getScreenAnalyticsPayload(screen));
       return;
@@ -371,12 +370,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ...state.saveData,
         completedLevels,
         inProgress: null,
-        magnifiers: Math.min(
+        magnifiers:
           state.saveData.magnifiers +
-            (isCampaignCompletion ? level.reward.magnifiers ?? 0 : 0) +
-            (shouldClaimDailyReward ? 1 : 0),
-          MAX_MAGNIFIERS
-        ),
+          (isCampaignCompletion ? level.reward.magnifiers ?? 0 : 0) +
+          (shouldClaimDailyReward ? 1 : 0),
         daily,
         bestResults
       };
@@ -529,7 +526,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return {
         saveData: {
           ...state.saveData,
-          magnifiers: Math.min(state.saveData.magnifiers + 1, MAX_MAGNIFIERS),
+          magnifiers: state.saveData.magnifiers + 1,
           daily: { lastClaimDate: date, streak: state.saveData.daily.streak + 1 }
         }
       };

@@ -2,13 +2,17 @@
 
 ## Unreleased
 
+- Removed the maximum hint balance cap: loaded saves preserve large magnifier balances and level/daily rewards keep accumulating above 5.
+
+- Changed startup routing so only a brand-new save opens White Meridian level 01 directly; returning saves now open the archive hub/main menu instead of auto-resuming gameplay.
+
 - Added authoring controls to the local hitbox validation editor: the bottom bar can add a new hitbox, editable markers have a confirmation-backed delete X, and Apply now keeps northern-route `requiredDifferences` in sync when hitboxes are added or removed.
 
 - Added `pnpm validate:archive`, a final A/B hitbox validation server for Daily Archive cases that opens case 1 directly, exposes a 1-7 in-game switcher, and lets the hitbox editor Apply changes back into `src/content/dailyArchive.ts`.
 
 - Extended browser-input suppression from active gameplay to the whole app shell: native context menus, text selection and browser drag gestures are now blocked across menus, overlays and levels.
 
-- Changed hint economy: new saves now start with 1 hint, stored hints cap at 5, completing a Daily Archive case grants +1 hint once per local date through the shared level-completion flow, and the daily victory result now tells the player they won one hint.
+- Changed hint economy: new saves now start with 1 hint, completing a Daily Archive case grants +1 hint once per local date through the shared level-completion flow, and the daily victory result now tells the player they won one hint.
 
 - Changed the Archive Hub daily card to open the current Daily Archive case directly in shared gameplay, preserving the archive rotation, daily reward tracking and campaign progression isolation without the intermediate Daily screen.
 
@@ -60,7 +64,7 @@
 
 - Restored campaign-card texts in mobile landscape (description clamped to two lines, progress counter and locked-campaign info box are visible again; the title selector now targets the redesigned `h2`), and widened mobile map level cards from 210px to 240px.
 
-- Redesigned the mobile landscape hint control after the "Кнопка подсказки - варианты" design (variants 2a/2b): with hints left the FAB shows a glowing ring plus charge pips and an "N left" caption; with no hints left it shows a rotating dashed ring with a text-only "Watch ad" badge. Hints (magnifiers) are capped by `MAX_MAGNIFIERS` for level rewards, daily rewards and loaded saves.
+- Redesigned the mobile landscape hint control after the "Кнопка подсказки - варианты" design (variants 2a/2b): with hints left the FAB shows a glowing ring plus charge pips and an "N left" caption; with no hints left it shows a rotating dashed ring with a text-only "Watch ad" badge.
 
 - Added a `durationBucket` field to `level_complete` analytics so Yandex Metrica can segment level completion speed alongside the exact `durationSeconds` value.
 

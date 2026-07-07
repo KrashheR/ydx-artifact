@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { INITIAL_MAGNIFIERS, MAX_MAGNIFIERS, migrateSaveData } from "@/entities/save/schema";
+import { INITIAL_MAGNIFIERS, migrateSaveData } from "@/entities/save/schema";
 
 describe("migrateSaveData", () => {
   it("migrates v1 elapsedSeconds to v2 elapsedActiveSeconds", () => {
@@ -35,7 +35,7 @@ describe("migrateSaveData", () => {
     expect(save.inProgress).toBeNull();
   });
 
-  it("caps loaded v2 magnifiers at the current maximum", () => {
+  it("keeps large loaded v2 magnifier balances", () => {
     const save = migrateSaveData({
       version: 2,
       updatedAt: 123,
@@ -61,7 +61,7 @@ describe("migrateSaveData", () => {
       purchases: { noForcedInterstitials: false, productIds: [] }
     });
 
-    expect(save.magnifiers).toBe(MAX_MAGNIFIERS);
+    expect(save.magnifiers).toBe(99);
   });
 
   it("adds viewed campaign report ids to older v2 saves", () => {

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { dailyArchiveLevels } from "@/content/dailyArchive";
 import { getChapterLevels } from "@/content/chapters";
-import { MAX_MAGNIFIERS, createDefaultSave } from "@/entities/save/schema";
+import { createDefaultSave } from "@/entities/save/schema";
 import { starsForAccuracy } from "@/shared/lib/progression";
 import { useGameStore } from "@/shared/store/gameStore";
 
@@ -147,14 +147,14 @@ describe("gameStore analytics", () => {
     ).toBe(false);
   });
 
-  it("caps daily reward magnifiers at the maximum", () => {
+  it("adds daily reward magnifiers without a maximum cap", () => {
     useGameStore.setState((state) => ({
-      saveData: { ...state.saveData, magnifiers: MAX_MAGNIFIERS }
+      saveData: { ...state.saveData, magnifiers: 99 }
     }));
 
     useGameStore.getState().claimDailyReward("2026-07-07");
 
-    expect(useGameStore.getState().saveData.magnifiers).toBe(MAX_MAGNIFIERS);
+    expect(useGameStore.getState().saveData.magnifiers).toBe(100);
   });
 });
 

@@ -7,6 +7,7 @@ import {
   getArtifactForLevel,
   getArtifactLevel,
   getNextCampaignLevelId,
+  isFirstLaunchSave,
   isLevelUnlocked,
   resolveStartupDestination,
   unlockedArtifactsForCompleted
@@ -34,6 +35,7 @@ describe("progression", () => {
   });
 
   it("opens a new player directly on the first campaign level with onboarding", () => {
+    expect(isFirstLaunchSave(createDefaultSave())).toBe(true);
     expect(resolveStartupDestination(createDefaultSave())).toEqual({
       kind: "game",
       levelId: levels[0].id,
@@ -41,10 +43,9 @@ describe("progression", () => {
     });
   });
 
-  it("resumes an in-progress level before choosing the next campaign level", () => {
+  it("opens the home menu for a returning player with an in-progress level", () => {
     const save = {
       ...createDefaultSave(),
-      completedLevels: [levels[0].id],
       inProgress: {
         levelId: levels[0].id,
         foundDifferenceIds: ["compass-removed-1"],
@@ -53,22 +54,16 @@ describe("progression", () => {
       }
     };
 
-    expect(resolveStartupDestination(save)).toEqual({
-      kind: "game",
-      levelId: levels[0].id,
-      showOnboarding: false
-    });
+    expect(isFirstLaunchSave(save)).toBe(false);
+    expect(resolveStartupDestination(save)).toEqual({ kind: "home" });
   });
 
-  it("opens the next uncompleted campaign level when no level is in progress", () => {
+  it("keeps the next uncompleted campaign level available without using it for startup", () => {
     const save = { ...createDefaultSave(), completedLevels: [levels[0].id] };
 
     expect(getNextCampaignLevelId(save)).toBe(levels[1].id);
-    expect(resolveStartupDestination(save)).toEqual({
-      kind: "game",
-      levelId: levels[1].id,
-      showOnboarding: false
-    });
+    expect(isFirstLaunchSave(save)).toBe(false);
+    expect(resolveStartupDestination(save)).toEqual({ kind: "home" });
   });
 
   it("maps every artifact to an existing milestone level and its differences", () => {
@@ -101,7 +96,7 @@ describe("progression", () => {
     ).toEqual(["white-compass"]);
   });
 
-  it("opens the expedition case after all campaign levels are completed", () => {
+  it("opens the home menu after all campaign levels are completed", () => {
     const allCampaignLevelIds = [
       ...getChapterLevels("northern-route"),
       ...getChapterLevels("sand-meridian"),
@@ -109,6 +104,6 @@ describe("progression", () => {
     ].map((level) => level.id);
     const save = { ...createDefaultSave(), completedLevels: allCampaignLevelIds };
 
-    expect(resolveStartupDestination(save)).toEqual({ kind: "collection" });
+    expect(resolveStartupDestination(save)).toEqual({ kind: "home" });
   });
 });

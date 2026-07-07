@@ -17,26 +17,6 @@ export function getDailyArchiveDateKey(date = new Date()) {
   return `${year}-${month}-${day}`;
 }
 
-function ellipse(
-  id: string,
-  cx: number,
-  cy: number,
-  rx: number,
-  ry: number,
-  difficulty: DifferenceDefinition["difficulty"] = 2,
-): DifferenceDefinition {
-  const hintRx = Math.min(1, rx + 0.025);
-  const hintRy = Math.min(1, ry + 0.03);
-
-  return {
-    id,
-    hitAreaA: { kind: "ellipse", cx, cy, rx, ry },
-    hitAreaB: { kind: "ellipse", cx, cy, rx, ry },
-    hintArea: { kind: "ellipse", cx, cy, rx: hintRx, ry: hintRy },
-    difficulty,
-  };
-}
-
 function dailyLevel(
   order: number,
   titleKey: string,
@@ -77,9 +57,9 @@ export const dailyArchiveLevels: LevelDefinition[] = [
     },
     {
       id: "archive-01-magnifier",
-      hitAreaA: { kind: "ellipse", cx: 0.1453, cy: 0.4788, rx: 0.1119, ry: 0.2246, rotation: 31.7182 },
-      hitAreaB: { kind: "ellipse", cx: 0.1453, cy: 0.4788, rx: 0.1119, ry: 0.2246, rotation: 31.7182 },
-      hintArea: { kind: "ellipse", cx: 0.1453, cy: 0.4788, rx: 0.1369, ry: 0.2546, rotation: 31.7182 },
+      hitAreaA: { kind: "ellipse", cx: 0.1487, cy: 0.4701, rx: 0.0953, ry: 0.2549, rotation: 39.6356 },
+      hitAreaB: { kind: "ellipse", cx: 0.1487, cy: 0.4701, rx: 0.0953, ry: 0.2549, rotation: 39.6356 },
+      hintArea: { kind: "ellipse", cx: 0.1487, cy: 0.4701, rx: 0.1203, ry: 0.2849, rotation: 39.6356 },
       difficulty: 1,
     },
     {
@@ -102,55 +82,271 @@ export const dailyArchiveLevels: LevelDefinition[] = [
       hitAreaB: { kind: "ellipse", cx: 0.659, cy: 0.8728, rx: 0.0665, ry: 0.1099 },
       hintArea: { kind: "ellipse", cx: 0.659, cy: 0.8728, rx: 0.0915, ry: 0.1399 },
       difficulty: 1,
+    },
+    {
+      id: "new-hitbox-7",
+      hitAreaA: { kind: "ellipse", cx: 0.3738, cy: 0.9151, rx: 0.107, ry: 0.065, rotation: -11.8755 },
+      hitAreaB: { kind: "ellipse", cx: 0.3738, cy: 0.9151, rx: 0.107, ry: 0.065, rotation: -11.8755 },
+      hintArea: { kind: "ellipse", cx: 0.3738, cy: 0.9151, rx: 0.132, ry: 0.095, rotation: -11.8755 },
+      difficulty: 1,
     }
   ]),
   dailyLevel(2, "daily.archiveCase02.title", [
-    ellipse("archive-02-fixing-jar", 0.7323, 0.2636, 0.0612, 0.1109, 1),
-    ellipse("archive-02-tweezers", 0.818, 0.584, 0.078, 0.094, 1),
-    ellipse("archive-02-gloves", 0.842, 0.827, 0.157, 0.172, 1),
-    ellipse("archive-02-photo-mark", 0.2963, 0.6421, 0.0533, 0.0832, 1),
-    ellipse("archive-02-film-strip", 0.0943, 0.7873, 0.0908, 0.1689, 1),
-    ellipse("archive-02-brush", 0.5363, 0.7823, 0.1646, 0.0932, 1),
+    {
+      id: "archive-02-fixing-jar",
+      hitAreaA: { kind: "ellipse", cx: 0.7456, cy: 0.2758, rx: 0.0612, ry: 0.1109 },
+      hitAreaB: { kind: "ellipse", cx: 0.7456, cy: 0.2758, rx: 0.0612, ry: 0.1109 },
+      hintArea: { kind: "ellipse", cx: 0.7456, cy: 0.2758, rx: 0.0862, ry: 0.1409 },
+      difficulty: 1,
+    },
+    {
+      id: "archive-02-tweezers",
+      hitAreaA: { kind: "ellipse", cx: 0.818, cy: 0.584, rx: 0.078, ry: 0.094 },
+      hitAreaB: { kind: "ellipse", cx: 0.818, cy: 0.584, rx: 0.078, ry: 0.094 },
+      hintArea: { kind: "ellipse", cx: 0.818, cy: 0.584, rx: 0.103, ry: 0.124 },
+      difficulty: 1,
+    },
+    {
+      id: "archive-02-gloves",
+      hitAreaA: { kind: "ellipse", cx: 0.829, cy: 0.8332, rx: 0.157, ry: 0.172 },
+      hitAreaB: { kind: "ellipse", cx: 0.829, cy: 0.8332, rx: 0.157, ry: 0.172 },
+      hintArea: { kind: "ellipse", cx: 0.829, cy: 0.8332, rx: 0.182, ry: 0.202 },
+      difficulty: 1,
+    },
+    {
+      id: "archive-02-photo-mark",
+      hitAreaA: { kind: "ellipse", cx: 0.2963, cy: 0.6421, rx: 0.0533, ry: 0.0832 },
+      hitAreaB: { kind: "ellipse", cx: 0.2963, cy: 0.6421, rx: 0.0533, ry: 0.0832 },
+      hintArea: { kind: "ellipse", cx: 0.2963, cy: 0.6421, rx: 0.0783, ry: 0.1132 },
+      difficulty: 1,
+    },
+    {
+      id: "archive-02-film-strip",
+      hitAreaA: { kind: "ellipse", cx: 0.0635, cy: 0.7798, rx: 0.0427, ry: 0.2117, rotation: 15.2466 },
+      hitAreaB: { kind: "ellipse", cx: 0.0635, cy: 0.7798, rx: 0.0427, ry: 0.2117, rotation: 15.2466 },
+      hintArea: { kind: "ellipse", cx: 0.0635, cy: 0.7798, rx: 0.0677, ry: 0.2417, rotation: 15.2466 },
+      difficulty: 1,
+    },
+    {
+      id: "archive-02-brush",
+      hitAreaA: { kind: "ellipse", cx: 0.5363, cy: 0.7823, rx: 0.1646, ry: 0.0932 },
+      hitAreaB: { kind: "ellipse", cx: 0.5363, cy: 0.7823, rx: 0.1646, ry: 0.0932 },
+      hintArea: { kind: "ellipse", cx: 0.5363, cy: 0.7823, rx: 0.1896, ry: 0.1232 },
+      difficulty: 1,
+    }
   ]),
   dailyLevel(3, "daily.archiveCase03.title", [
-    ellipse("archive-03-top-drawer", 0.8566, 0.1603, 0.046, 0.0731, 2),
-    ellipse("archive-03-open-drawer", 0.4975, 0.437, 0.0735, 0.1169, 2),
-    ellipse("archive-03-card-stack", 0.4023, 0.629, 0.0514, 0.0398, 2),
-    ellipse("archive-03-stamp", 0.1456, 0.754, 0.064, 0.1023, 2),
-    ellipse("archive-03-red-thread", 0.5873, 0.747, 0.0523, 0.0822, 2),
-    ellipse("archive-03-key", 0.4842, 0.8584, 0.0476, 0.0736, 2),
+    {
+      id: "archive-03-top-drawer",
+      hitAreaA: { kind: "ellipse", cx: 0.8559, cy: 0.1701, rx: 0.046, ry: 0.0731 },
+      hitAreaB: { kind: "ellipse", cx: 0.8559, cy: 0.1701, rx: 0.046, ry: 0.0731 },
+      hintArea: { kind: "ellipse", cx: 0.8559, cy: 0.1701, rx: 0.071, ry: 0.1031 },
+      difficulty: 2,
+    },
+    {
+      id: "archive-03-open-drawer",
+      hitAreaA: { kind: "ellipse", cx: 0.4975, cy: 0.437, rx: 0.0735, ry: 0.1169 },
+      hitAreaB: { kind: "ellipse", cx: 0.4975, cy: 0.437, rx: 0.0735, ry: 0.1169 },
+      hintArea: { kind: "ellipse", cx: 0.4975, cy: 0.437, rx: 0.0985, ry: 0.1469 },
+      difficulty: 2,
+    },
+    {
+      id: "archive-03-card-stack",
+      hitAreaA: { kind: "ellipse", cx: 0.4635, cy: 0.6624, rx: 0.0514, ry: 0.0398 },
+      hitAreaB: { kind: "ellipse", cx: 0.4635, cy: 0.6624, rx: 0.0514, ry: 0.0398 },
+      hintArea: { kind: "ellipse", cx: 0.4635, cy: 0.6624, rx: 0.0764, ry: 0.0698 },
+      difficulty: 2,
+    },
+    {
+      id: "archive-03-stamp",
+      hitAreaA: { kind: "ellipse", cx: 0.1456, cy: 0.754, rx: 0.064, ry: 0.1023 },
+      hitAreaB: { kind: "ellipse", cx: 0.1456, cy: 0.754, rx: 0.064, ry: 0.1023 },
+      hintArea: { kind: "ellipse", cx: 0.1456, cy: 0.754, rx: 0.089, ry: 0.1323 },
+      difficulty: 2,
+    },
+    {
+      id: "archive-03-red-thread",
+      hitAreaA: { kind: "ellipse", cx: 0.5873, cy: 0.747, rx: 0.0523, ry: 0.0822 },
+      hitAreaB: { kind: "ellipse", cx: 0.5873, cy: 0.747, rx: 0.0523, ry: 0.0822 },
+      hintArea: { kind: "ellipse", cx: 0.5873, cy: 0.747, rx: 0.0773, ry: 0.1122 },
+      difficulty: 2,
+    },
+    {
+      id: "archive-03-key",
+      hitAreaA: { kind: "ellipse", cx: 0.4842, cy: 0.8584, rx: 0.0476, ry: 0.0736 },
+      hitAreaB: { kind: "ellipse", cx: 0.4842, cy: 0.8584, rx: 0.0476, ry: 0.0736 },
+      hintArea: { kind: "ellipse", cx: 0.4842, cy: 0.8584, rx: 0.0726, ry: 0.1036 },
+      difficulty: 2,
+    },
+    {
+      id: "new-hitbox-7",
+      hitAreaA: { kind: "ellipse", cx: 0.2616, cy: 0.4094, rx: 0.04, ry: 0.065 },
+      hitAreaB: { kind: "ellipse", cx: 0.2616, cy: 0.4094, rx: 0.04, ry: 0.065 },
+      hintArea: { kind: "ellipse", cx: 0.2616, cy: 0.4094, rx: 0.065, ry: 0.095 },
+      difficulty: 1,
+    }
   ]),
   dailyLevel(4, "daily.archiveCase04.title", [
-    ellipse("archive-04-photo", 0.3042, 0.2051, 0.0574, 0.0887, 2),
-    ellipse("archive-04-timer", 0.4927, 0.5055, 0.0511, 0.0806, 2),
-    ellipse("archive-04-bottle", 0.7686, 0.5212, 0.0526, 0.0832, 2),
-    ellipse("archive-04-developer-tray", 0.5047, 0.7056, 0.0523, 0.0832, 2),
-    ellipse("archive-04-tongs", 0.6091, 0.7828, 0.0526, 0.0837, 2),
-    ellipse("archive-04-film", 0.2954, 0.8826, 0.1059, 0.0897, 2),
+    {
+      id: "archive-04-photo",
+      hitAreaA: { kind: "ellipse", cx: 0.4923, cy: 0.2303, rx: 0.0856, ry: 0.1618 },
+      hitAreaB: { kind: "ellipse", cx: 0.4923, cy: 0.2303, rx: 0.0856, ry: 0.1618 },
+      hintArea: { kind: "ellipse", cx: 0.4923, cy: 0.2303, rx: 0.1106, ry: 0.1918 },
+      difficulty: 2,
+    },
+    {
+      id: "archive-04-timer",
+      hitAreaA: { kind: "ellipse", cx: 0.4927, cy: 0.5055, rx: 0.0511, ry: 0.0806 },
+      hitAreaB: { kind: "ellipse", cx: 0.4927, cy: 0.5055, rx: 0.0511, ry: 0.0806 },
+      hintArea: { kind: "ellipse", cx: 0.4927, cy: 0.5055, rx: 0.0761, ry: 0.1106 },
+      difficulty: 2,
+    },
+    {
+      id: "archive-04-bottle",
+      hitAreaA: { kind: "ellipse", cx: 0.7717, cy: 0.4233, rx: 0.0526, ry: 0.1692, rotation: 7.2085 },
+      hitAreaB: { kind: "ellipse", cx: 0.7717, cy: 0.4233, rx: 0.0526, ry: 0.1692, rotation: 7.2085 },
+      hintArea: { kind: "ellipse", cx: 0.7717, cy: 0.4233, rx: 0.0776, ry: 0.1992, rotation: 7.2085 },
+      difficulty: 2,
+    },
+    {
+      id: "archive-04-developer-tray",
+      hitAreaA: { kind: "ellipse", cx: 0.4929, cy: 0.7082, rx: 0.0967, ry: 0.0832 },
+      hitAreaB: { kind: "ellipse", cx: 0.4929, cy: 0.7082, rx: 0.0967, ry: 0.0832 },
+      hintArea: { kind: "ellipse", cx: 0.4929, cy: 0.7082, rx: 0.1217, ry: 0.1132 },
+      difficulty: 2,
+    },
+    {
+      id: "archive-04-tongs",
+      hitAreaA: { kind: "ellipse", cx: 0.6635, cy: 0.8069, rx: 0.0994, ry: 0.062, rotation: 26.7147 },
+      hitAreaB: { kind: "ellipse", cx: 0.6635, cy: 0.8069, rx: 0.0994, ry: 0.062, rotation: 26.7147 },
+      hintArea: { kind: "ellipse", cx: 0.6635, cy: 0.8069, rx: 0.1244, ry: 0.092, rotation: 26.7147 },
+      difficulty: 2,
+    }
   ]),
   dailyLevel(5, "daily.archiveCase05.title", [
-    ellipse("archive-05-red-route", 0.3471, 0.3911, 0.0517, 0.1144, 2),
-    ellipse("archive-05-left-photo", 0.1709, 0.4425, 0.0526, 0.0842, 2),
-    ellipse("archive-05-map-blank", 0.7059, 0.6487, 0.0277, 0.0444, 2),
-    ellipse("archive-05-blue-pin", 0.5243, 0.7072, 0.0265, 0.0423, 2),
-    ellipse("archive-05-compass", 0.1195, 0.8372, 0.053, 0.0857, 2),
-    ellipse("archive-05-scroll", 0.3433, 0.8695, 0.0731, 0.0736, 2),
+    {
+      id: "archive-05-red-route",
+      hitAreaA: { kind: "ellipse", cx: 0.4067, cy: 0.5582, rx: 0.0429, ry: 0.2199, rotation: -44.6294 },
+      hitAreaB: { kind: "ellipse", cx: 0.4067, cy: 0.5582, rx: 0.0429, ry: 0.2199, rotation: -44.6294 },
+      hintArea: { kind: "ellipse", cx: 0.4067, cy: 0.5582, rx: 0.0679, ry: 0.2499, rotation: -44.6294 },
+      difficulty: 2,
+    },
+    {
+      id: "archive-05-left-photo",
+      hitAreaA: { kind: "ellipse", cx: 0.1596, cy: 0.4425, rx: 0.0875, ry: 0.1018 },
+      hitAreaB: { kind: "ellipse", cx: 0.1596, cy: 0.4425, rx: 0.0875, ry: 0.1018 },
+      hintArea: { kind: "ellipse", cx: 0.1596, cy: 0.4425, rx: 0.1125, ry: 0.1318 },
+      difficulty: 2,
+    },
+    {
+      id: "archive-05-map-blank",
+      hitAreaA: { kind: "ellipse", cx: 0.6753, cy: 0.5905, rx: 0.0614, ry: 0.0878 },
+      hitAreaB: { kind: "ellipse", cx: 0.6753, cy: 0.5905, rx: 0.0614, ry: 0.0878 },
+      hintArea: { kind: "ellipse", cx: 0.6753, cy: 0.5905, rx: 0.0864, ry: 0.1178 },
+      difficulty: 2,
+    },
+    {
+      id: "archive-05-blue-pin",
+      hitAreaA: { kind: "ellipse", cx: 0.6482, cy: 0.8482, rx: 0.0521, ry: 0.0828 },
+      hitAreaB: { kind: "ellipse", cx: 0.6482, cy: 0.8482, rx: 0.0521, ry: 0.0828 },
+      hintArea: { kind: "ellipse", cx: 0.6482, cy: 0.8482, rx: 0.0771, ry: 0.1128 },
+      difficulty: 2,
+    },
+    {
+      id: "archive-05-compass",
+      hitAreaA: { kind: "ellipse", cx: 0.1195, cy: 0.8372, rx: 0.053, ry: 0.0857 },
+      hitAreaB: { kind: "ellipse", cx: 0.1195, cy: 0.8372, rx: 0.053, ry: 0.0857 },
+      hintArea: { kind: "ellipse", cx: 0.1195, cy: 0.8372, rx: 0.078, ry: 0.1157 },
+      difficulty: 2,
+    },
+    {
+      id: "archive-05-scroll",
+      hitAreaA: { kind: "ellipse", cx: 0.3769, cy: 0.87, rx: 0.1013, ry: 0.0736 },
+      hitAreaB: { kind: "ellipse", cx: 0.3769, cy: 0.87, rx: 0.1013, ry: 0.0736 },
+      hintArea: { kind: "ellipse", cx: 0.3769, cy: 0.87, rx: 0.1263, ry: 0.1036 },
+      difficulty: 2,
+    }
   ]),
   dailyLevel(6, "daily.archiveCase06.title", [
-    ellipse("archive-06-sextant", 0.3449, 0.2475, 0.076, 0.1381, 3),
-    ellipse("archive-06-vase", 0.5218, 0.3785, 0.0473, 0.0806, 3),
-    ellipse("archive-06-lantern", 0.1431, 0.687, 0.0596, 0.126, 3),
-    ellipse("archive-06-case-lock", 0.2967, 0.7475, 0.0706, 0.1048, 3),
-    ellipse("archive-06-hook", 0.4492, 0.7581, 0.0448, 0.0771, 3),
-    ellipse("archive-06-canvas-roll", 0.634, 0.814, 0.0523, 0.0615, 3),
+    {
+      id: "archive-06-sextant",
+      hitAreaA: { kind: "ellipse", cx: 0.3449, cy: 0.2475, rx: 0.0805, ry: 0.1512 },
+      hitAreaB: { kind: "ellipse", cx: 0.3449, cy: 0.2475, rx: 0.0805, ry: 0.1512 },
+      hintArea: { kind: "ellipse", cx: 0.3449, cy: 0.2475, rx: 0.1055, ry: 0.1812 },
+      difficulty: 3,
+    },
+    {
+      id: "archive-06-vase",
+      hitAreaA: { kind: "ellipse", cx: 0.4679, cy: 0.6168, rx: 0.0473, ry: 0.0806 },
+      hitAreaB: { kind: "ellipse", cx: 0.4679, cy: 0.6168, rx: 0.0473, ry: 0.0806 },
+      hintArea: { kind: "ellipse", cx: 0.4679, cy: 0.6168, rx: 0.0723, ry: 0.1106 },
+      difficulty: 3,
+    },
+    {
+      id: "archive-06-lantern",
+      hitAreaA: { kind: "ellipse", cx: 0.1422, cy: 0.6685, rx: 0.0596, ry: 0.1857 },
+      hitAreaB: { kind: "ellipse", cx: 0.1422, cy: 0.6685, rx: 0.0596, ry: 0.1857 },
+      hintArea: { kind: "ellipse", cx: 0.1422, cy: 0.6685, rx: 0.0846, ry: 0.2157 },
+      difficulty: 3,
+    },
+    {
+      id: "archive-06-case-lock",
+      hitAreaA: { kind: "ellipse", cx: 0.3123, cy: 0.6475, rx: 0.1014, ry: 0.148 },
+      hitAreaB: { kind: "ellipse", cx: 0.3123, cy: 0.6475, rx: 0.1014, ry: 0.148 },
+      hintArea: { kind: "ellipse", cx: 0.3123, cy: 0.6475, rx: 0.1264, ry: 0.178 },
+      difficulty: 3,
+    },
+    {
+      id: "archive-06-hook",
+      hitAreaA: { kind: "ellipse", cx: 0.4492, cy: 0.7581, rx: 0.0448, ry: 0.0771 },
+      hitAreaB: { kind: "ellipse", cx: 0.4492, cy: 0.7581, rx: 0.0448, ry: 0.0771 },
+      hintArea: { kind: "ellipse", cx: 0.4492, cy: 0.7581, rx: 0.0698, ry: 0.1071 },
+      difficulty: 3,
+    },
+    {
+      id: "archive-06-canvas-roll",
+      hitAreaA: { kind: "ellipse", cx: 0.6054, cy: 0.7524, rx: 0.125, ry: 0.1421 },
+      hitAreaB: { kind: "ellipse", cx: 0.6054, cy: 0.7524, rx: 0.125, ry: 0.1421 },
+      hintArea: { kind: "ellipse", cx: 0.6054, cy: 0.7524, rx: 0.15, ry: 0.1721 },
+      difficulty: 3,
+    }
   ]),
   dailyLevel(7, "daily.archiveCase07.title", [
-    ellipse("archive-07-scrolls", 0.4931, 0.2792, 0.0583, 0.1064, 3),
-    ellipse("archive-07-keys", 0.6652, 0.3468, 0.0369, 0.0922, 3),
-    ellipse("archive-07-open-box", 0.3972, 0.4889, 0.0627, 0.1013, 3),
-    ellipse("archive-07-paper-bundle", 0.5287, 0.5121, 0.0555, 0.0771, 3),
-    ellipse("archive-07-envelope", 0.5738, 0.8397, 0.088, 0.0731, 3),
-    ellipse("archive-07-padlock", 0.2856, 0.9178, 0.0426, 0.0685, 3),
+    {
+      id: "archive-07-keys",
+      hitAreaA: { kind: "ellipse", cx: 0.6652, cy: 0.3468, rx: 0.0369, ry: 0.0922 },
+      hitAreaB: { kind: "ellipse", cx: 0.6652, cy: 0.3468, rx: 0.0369, ry: 0.0922 },
+      hintArea: { kind: "ellipse", cx: 0.6652, cy: 0.3468, rx: 0.0619, ry: 0.1222 },
+      difficulty: 3,
+    },
+    {
+      id: "archive-07-open-box",
+      hitAreaA: { kind: "ellipse", cx: 0.3972, cy: 0.4889, rx: 0.0627, ry: 0.1013 },
+      hitAreaB: { kind: "ellipse", cx: 0.3972, cy: 0.4889, rx: 0.0627, ry: 0.1013 },
+      hintArea: { kind: "ellipse", cx: 0.3972, cy: 0.4889, rx: 0.0877, ry: 0.1313 },
+      difficulty: 3,
+    },
+    {
+      id: "archive-07-paper-bundle",
+      hitAreaA: { kind: "ellipse", cx: 0.5287, cy: 0.5121, rx: 0.0555, ry: 0.0771 },
+      hitAreaB: { kind: "ellipse", cx: 0.5287, cy: 0.5121, rx: 0.0555, ry: 0.0771 },
+      hintArea: { kind: "ellipse", cx: 0.5287, cy: 0.5121, rx: 0.0805, ry: 0.1071 },
+      difficulty: 3,
+    },
+    {
+      id: "archive-07-envelope",
+      hitAreaA: { kind: "ellipse", cx: 0.5738, cy: 0.8397, rx: 0.1138, ry: 0.0882 },
+      hitAreaB: { kind: "ellipse", cx: 0.5738, cy: 0.8397, rx: 0.1138, ry: 0.0882 },
+      hintArea: { kind: "ellipse", cx: 0.5738, cy: 0.8397, rx: 0.1388, ry: 0.1182 },
+      difficulty: 3,
+    },
+    {
+      id: "archive-07-padlock",
+      hitAreaA: { kind: "ellipse", cx: 0.273, cy: 0.9328, rx: 0.062, ry: 0.0769 },
+      hitAreaB: { kind: "ellipse", cx: 0.273, cy: 0.9328, rx: 0.062, ry: 0.0769 },
+      hintArea: { kind: "ellipse", cx: 0.273, cy: 0.9328, rx: 0.087, ry: 0.1069 },
+      difficulty: 3,
+    }
   ]),
 ];
 
