@@ -5,6 +5,7 @@ import { GameScreen } from "@/screens/GameScreen";
 import { HomeScreen } from "@/screens/HomeScreen";
 import { MapScreen } from "@/screens/MapScreen";
 import { campaignManifestList } from "@/content/campaignManifest";
+import { dailyArchiveLevels } from "@/content/dailyArchive";
 import { getChapterPreviewAsset } from "@/content/sceneAssets";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
 import { mockPlatform } from "@/services/platform/mockPlatform";
@@ -112,6 +113,20 @@ export function App() {
   const [settingsMounted, setSettingsMounted] = useState(false);
   const [bootstrapped, setBootstrapped] = useState(false);
 
+  useEffect(() => {
+    const preventBrowserGameGesture = (event: Event) => event.preventDefault();
+    const listenerOptions = { capture: true };
+
+    window.addEventListener("contextmenu", preventBrowserGameGesture, listenerOptions);
+    document.addEventListener("selectstart", preventBrowserGameGesture, listenerOptions);
+    document.addEventListener("dragstart", preventBrowserGameGesture, listenerOptions);
+    return () => {
+      window.removeEventListener("contextmenu", preventBrowserGameGesture, listenerOptions);
+      document.removeEventListener("selectstart", preventBrowserGameGesture, listenerOptions);
+      document.removeEventListener("dragstart", preventBrowserGameGesture, listenerOptions);
+    };
+  }, []);
+
   const openSettings = useCallback((source: string) => {
     trackAnalyticsEvent("settings_opened", { source, screen: screen.kind });
     setSettingsMounted(true);
@@ -150,6 +165,11 @@ export function App() {
         if (!cancelled && import.meta.env.DEV && import.meta.env.VITE_DEV_VALIDATE_CHEAT === "true") {
           const { unlockAllDevContent } = await import("@/dev/devContent");
           await unlockAllDevContent();
+        }
+
+        if (!cancelled && import.meta.env.DEV && import.meta.env.VITE_ARCHIVE_VALIDATE === "true") {
+          useGameStore.getState().startLevel(dailyArchiveLevels[0].id, "daily");
+          return nextLocale;
         }
 
         if (!cancelled && useGameStore.getState().screen.kind === "home") {

@@ -8,6 +8,7 @@
     "dev:validate": "tsx scripts/dev-validate.ts",
     "dev:validate:cheat": "tsx scripts/dev-validate.ts --cheat",
     "validate:final": "tsx scripts/dev-validate.ts --final --cheat",
+    "validate:archive": "tsx scripts/dev-validate.ts --archive",
     "preview": "vite preview --host 127.0.0.1",
     "build": "tsx scripts/build.ts",
     "lint": "eslint .",

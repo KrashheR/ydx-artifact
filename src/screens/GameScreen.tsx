@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getChapter, getLevelById } from "@/content/chapters";
+import { dailyArchiveLevels } from "@/content/dailyArchive";
 import { PhotoComparator } from "@/features/gameplay/PhotoComparator";
 import { ArtifactFoundToast, type ArtifactToastVariant } from "@/features/gameplay/ArtifactFoundToast";
 import { ArtifactRevealOverlay } from "@/features/collection/ArtifactRevealOverlay";
@@ -28,6 +29,7 @@ const TIME_LIMIT = 300; // 5 minutes
 const COMPLETE_OVERLAY_DELAY_MS = 200;
 const DEBUG_LAYOUT_MODE = import.meta.env.VITE_LAYOUT_DEBUG === "true";
 const FINAL_VALIDATE_MODE = import.meta.env.VITE_FINAL_VALIDATE === "true";
+const ARCHIVE_VALIDATE_MODE = import.meta.env.VITE_ARCHIVE_VALIDATE === "true";
 const noop = () => undefined;
 
 function getDeviceType() {
@@ -1048,6 +1050,15 @@ export function GameScreen({
     navigate(mode === "daily" ? { kind: "home" } : { kind: "map", chapterId });
   }
 
+  function handleArchiveValidationLevel(nextLevelId: string) {
+    if (nextLevelId === levelId || completionPending) return;
+    setPendingFinalStats(null);
+    setFinalStats(null);
+    setTimedOut(false);
+    setHintId(undefined);
+    startLevel(nextLevelId, "daily");
+  }
+
   function handleReviewLater() {
     dismissReviewPrompt();
     setIsReviewPromptOpen(false);
@@ -1152,6 +1163,8 @@ export function GameScreen({
     liveFoundIds.length < level.requiredDifferences &&
     (magnifiers > 0 ? !activeHintIsUnfound : hasRewardedAreaHintTarget);
   const displayStreak = Math.max(0, liveFoundIds.length - liveMistakes);
+  const showArchiveValidationNav =
+    import.meta.env.DEV && ARCHIVE_VALIDATE_MODE && mode === "daily";
 
   return (
     <div className="game-screen fixed inset-0 flex flex-col overflow-hidden bg-exp-bg font-manrope text-exp-parch">
@@ -1478,6 +1491,49 @@ export function GameScreen({
         </header>
 
         {/* ── MOBILE COMPACT HUD ──────────────────────────────────────── */}
+        {showArchiveValidationNav ? (
+          <nav
+            className="archive-validation-nav z-30 flex shrink-0 items-center justify-center gap-2 px-4 py-2"
+            style={{
+              borderBottom: "1px solid rgba(213,195,154,.1)",
+              background: "rgba(12,16,14,.78)",
+            }}
+            aria-label="Archive hitbox validation levels"
+          >
+            <span className="hidden font-jetbrains text-[10px] font-semibold tracking-[.16em] text-exp-success sm:inline">
+              ARCHIVE HITBOXES
+            </span>
+            <div className="flex items-center gap-1.5">
+              {dailyArchiveLevels.map((archiveLevel) => {
+                const active = archiveLevel.id === levelId;
+                return (
+                  <button
+                    key={archiveLevel.id}
+                    type="button"
+                    className="flex h-8 min-w-8 items-center justify-center rounded-[7px] px-2 font-jetbrains text-[11px] font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+                    style={
+                      active
+                        ? {
+                            background: "#6fc69e",
+                            color: "#102016",
+                          }
+                        : {
+                            border: "1px solid rgba(213,195,154,.18)",
+                            background: "rgba(213,195,154,.06)",
+                            color: "#d5c39a",
+                          }
+                    }
+                    aria-current={active ? "page" : undefined}
+                    onClick={() => handleArchiveValidationLevel(archiveLevel.id)}
+                  >
+                    {archiveLevel.order}
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+        ) : null}
+
         <div
           className="game-mobile-title flex shrink-0 items-center justify-between px-4 pb-[10px] pt-[6px] sm:hidden"
           style={{ borderBottom: "1px solid rgba(213,195,154,.08)" }}

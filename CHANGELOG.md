@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added `pnpm validate:archive`, a final A/B hitbox validation server for Daily Archive cases that opens case 1 directly, exposes a 1-7 in-game switcher, and lets the hitbox editor Apply changes back into `src/content/dailyArchive.ts`.
+
+- Extended browser-input suppression from active gameplay to the whole app shell: native context menus, text selection and browser drag gestures are now blocked across menus, overlays and levels.
+
 - Changed hint economy: new saves now start with 1 hint, stored hints cap at 5, completing a Daily Archive case grants +1 hint once per local date through the shared level-completion flow, and the daily victory result now tells the player they won one hint.
 
 - Changed the Archive Hub daily card to open the current Daily Archive case directly in shared gameplay, preserving the archive rotation, daily reward tracking and campaign progression isolation without the intermediate Daily screen.

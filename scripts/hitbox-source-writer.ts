@@ -42,6 +42,9 @@ export async function writeHitboxesToSource(
 ): Promise<HitboxSourceWriteResult> {
   validateRequest(request);
 
+  if (request.levelId.startsWith("daily-archive-")) {
+    return replaceDailyArchiveDifferences(root, request);
+  }
   if (request.chapterId === "northern-route") {
     return replaceNorthernDifferences(root, request);
   }
@@ -49,6 +52,33 @@ export async function writeHitboxesToSource(
     return replaceSandMeridianSpecs(root, request);
   }
   return replaceEmeraldMeridianSpecs(root, request);
+}
+
+async function replaceDailyArchiveDifferences(root: string, request: HitboxSourceWriteRequest) {
+  const file = "src/content/dailyArchive.ts";
+  const filePath = join(root, file);
+  const source = await readFile(filePath, "utf8");
+  const sourceFile = createSourceFile(filePath, source);
+  const dailyLevelCall = findCallExpression(sourceFile, (node) => {
+    if (!ts.isIdentifier(node.expression) || node.expression.text !== "dailyLevel") return false;
+    const orderArg = node.arguments[0];
+    if (!orderArg) return false;
+    return ts.isNumericLiteral(orderArg) && Number(orderArg.text) === request.order;
+  });
+  if (!dailyLevelCall) throw new Error(`Could not find Daily Archive level ${request.order} in ${file}`);
+
+  const differences = dailyLevelCall.arguments[2];
+  if (!differences || !ts.isArrayLiteralExpression(differences)) {
+    throw new Error(`Could not find differences array for ${request.levelId} in ${file}`);
+  }
+
+  await writeReplacement(filePath, source, {
+    start: differences.getStart(sourceFile),
+    end: differences.getEnd(),
+    text: formatDifferencesArray(request.differences, 2)
+  });
+
+  return { file, levelId: request.levelId, differenceCount: request.differences.length };
 }
 
 async function replaceNorthernDifferences(root: string, request: HitboxSourceWriteRequest) {
@@ -122,6 +152,15 @@ function validateRequest(request: HitboxSourceWriteRequest) {
   if (!["northern-route", "sand-meridian", "emerald-meridian"].includes(request.chapterId)) {
     throw new Error("chapterId is invalid");
   }
+  if (request.levelId.startsWith("daily-archive-")) {
+    if (!Number.isInteger(request.order) || request.order < 1 || request.order > 7) {
+      throw new Error("daily archive order must be an integer from 1 to 7");
+    }
+    if (!Array.isArray(request.differences) || request.differences.length < 1) {
+      throw new Error("differences must be a non-empty array");
+    }
+    return;
+  }
   if (!Number.isInteger(request.order) || request.order < 1 || request.order > 13) {
     throw new Error("order must be an integer from 1 to 13");
   }
@@ -143,6 +182,25 @@ function findObjectLiteral(
   function visit(node: ts.Node) {
     if (match) return;
     if (ts.isObjectLiteralExpression(node) && predicate(node)) {
+      match = node;
+      return;
+    }
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+  return match;
+}
+
+function findCallExpression(
+  sourceFile: ts.SourceFile,
+  predicate: (node: ts.CallExpression) => boolean
+) {
+  let match: ts.CallExpression | undefined;
+
+  function visit(node: ts.Node) {
+    if (match) return;
+    if (ts.isCallExpression(node) && predicate(node)) {
       match = node;
       return;
     }

@@ -149,7 +149,7 @@ Yandex может показывать fullscreen ad при запуске бе�
 
 # 4. Browser behavior
 
-В gameplay area:
+В app shell and gameplay area:
 
 - `contextmenu` предотвращается;
 - `user-select: none`;

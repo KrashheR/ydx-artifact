@@ -46,6 +46,7 @@ pnpm release:zip
 pnpm dev:validate
 pnpm dev:validate:cheat
 pnpm validate:final
+pnpm validate:archive
 pnpm test:e2e
 ```
 
@@ -55,6 +56,7 @@ For broad agent edits, `pnpm agent:check` runs lint, typecheck and content valid
 `pnpm dev:validate:cheat` starts the same validation server and automatically unlocks all currently implemented campaigns and levels in the local dev save.
 `pnpm dev --cheat` starts the plain dev server (no hitbox debug overlay) with that same all-content unlock applied to the local dev save.
 `pnpm validate:final` starts the same hitbox editor over the final gameplay `1.*` and `2.*` scene images instead of the `3.*` markup reference, so A/B hitboxes can be moved, resized, rotated, copied and applied against the real pair.
+`pnpm validate:archive` starts the final A/B hitbox editor directly on Daily Archive case 1 and adds an in-game 1-7 switcher so all `public/assets/scenes/archive/` cases can be reviewed without waiting for the calendar rotation.
 Production builds exclude scene markup reference files named `3.webp` from `dist/assets/scenes/**`; the source files stay in `public` for `pnpm validate:content`, `pnpm dev:validate`, and local hitbox review.
 Production builds also exclude unused scene placeholder SVGs, emit relative Vite asset links for Yandex ZIP hosting, and keep the Yandex Games SDK as the platform-provided `/sdk.js` script in `index.html`.
 Custom gameplay analytics can be enabled by adding `VITE_YANDEX_METRICA_ID=<counter id>` to `.env.production.local`; `pnpm dev`, `pnpm dev:validate`, `pnpm build` and release validation load that production-local Vite env automatically. Setup steps and the Metrica goal list are documented in `docs/YANDEX_METRICS_SETUP_GUIDE.md`.
@@ -76,6 +78,7 @@ Production builds do not emit sourcemaps by default to keep the Yandex upload sm
 - Daily Archive levels are wired from `public/assets/scenes/archive/1-7/` through `src/content/dailyArchive.ts`; the Archive Hub daily card starts the selected archive case directly in the shared `GameScreen` daily mode, the calendar selection is deterministic by local `dayNumber % 7`, daily completions grant `+1` hint up to the 5-hint cap, and they do not write to campaign `completedLevels`.
 - `GameScreen` layout-debug mode is opt-in via `VITE_LAYOUT_DEBUG=true pnpm dev`: the comparator draws all authored difference markers immediately and swaps scene `1/2` assets for the local `3.*` markup reference on both sides so button/marker positions can be adjusted visually.
 - `pnpm dev:validate` runs the same hitbox-alignment view through Vite dev/HMR so hitbox edits can be reviewed live against `3.*`; `pnpm validate:final` uses the final gameplay `1.*`/`2.*` images with the same editor. In these modes, visible hitbox markers are draggable; drag the marker frame to move it, the right/bottom handles to resize one axis, the bottom-right handle to resize both axes, or the top round handle to rotate ellipse hitboxes. Editing either A/B marker updates both side hitboxes and the shared hint area synchronously. Edits apply immediately to the current level, persist in localStorage for that level, and the on-screen "Apply" button writes the edited hitboxes back into the relevant `src/content/*` level module through a local dev-only Vite endpoint. "Copy JSON" still copies the edited `differences` array, and "Reset" clears the local authoring override.
+- `pnpm validate:archive` reuses the final A/B hitbox editor for Daily Archive cases and can Apply edits back into `src/content/dailyArchive.ts`; the validation bar exposes all seven archive cases in one session.
 - Responsive photo comparator with desktop side-by-side and mobile landscape A/B flip; mobile portrait is blocked by a rotate-device gate and is not a playable layout.
 - Circle/polygon hit testing, found markers, hints, misclicks and completion. New saves start with 1 hint and can hold up to 5.
 - Yandex Player Data cloud saves with a `ysdk.getStorage()` / `localStorage` mirror fallback and versioned schema.

@@ -20,6 +20,12 @@ const viteArgs = process.argv.slice(2).filter((arg) => {
     process.env.VITE_LAYOUT_DEBUG = "false";
     return false;
   }
+  if (arg === "archive" || arg === "--archive") {
+    process.env.VITE_FINAL_VALIDATE = "true";
+    process.env.VITE_ARCHIVE_VALIDATE = "true";
+    process.env.VITE_LAYOUT_DEBUG = "false";
+    return false;
+  }
   if (arg !== "cheat" && arg !== "--cheat") return true;
   process.env.VITE_DEV_VALIDATE_CHEAT = "true";
   return false;

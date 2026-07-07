@@ -61,12 +61,48 @@ function dailyLevel(
 
 export const dailyArchiveLevels: LevelDefinition[] = [
   dailyLevel(1, "daily.archiveCase01.title", [
-    ellipse("archive-01-photo", 0.7405, 0.1416, 0.0845, 0.1361, 1),
-    ellipse("archive-01-rope-coil", 0.8922, 0.3317, 0.0886, 0.1467, 1),
-    ellipse("archive-01-magnifier", 0.1721, 0.4093, 0.1119, 0.191, 1),
-    ellipse("archive-01-knife", 0.7481, 0.4657, 0.0643, 0.182, 1),
-    ellipse("archive-01-wax-seal", 0.506, 0.437, 0.0675, 0.1109, 1),
-    ellipse("archive-01-compass", 0.6583, 0.8705, 0.0665, 0.1099, 1),
+    {
+      id: "archive-01-photo",
+      hitAreaA: { kind: "ellipse", cx: 0.7405, cy: 0.1416, rx: 0.0845, ry: 0.1361 },
+      hitAreaB: { kind: "ellipse", cx: 0.7405, cy: 0.1416, rx: 0.0845, ry: 0.1361 },
+      hintArea: { kind: "ellipse", cx: 0.7405, cy: 0.1416, rx: 0.1095, ry: 0.1661 },
+      difficulty: 1,
+    },
+    {
+      id: "archive-01-rope-coil",
+      hitAreaA: { kind: "ellipse", cx: 0.8922, cy: 0.3317, rx: 0.0886, ry: 0.1467 },
+      hitAreaB: { kind: "ellipse", cx: 0.8922, cy: 0.3317, rx: 0.0886, ry: 0.1467 },
+      hintArea: { kind: "ellipse", cx: 0.8922, cy: 0.3317, rx: 0.1136, ry: 0.1767 },
+      difficulty: 1,
+    },
+    {
+      id: "archive-01-magnifier",
+      hitAreaA: { kind: "ellipse", cx: 0.1453, cy: 0.4788, rx: 0.1119, ry: 0.2246, rotation: 31.7182 },
+      hitAreaB: { kind: "ellipse", cx: 0.1453, cy: 0.4788, rx: 0.1119, ry: 0.2246, rotation: 31.7182 },
+      hintArea: { kind: "ellipse", cx: 0.1453, cy: 0.4788, rx: 0.1369, ry: 0.2546, rotation: 31.7182 },
+      difficulty: 1,
+    },
+    {
+      id: "archive-01-knife",
+      hitAreaA: { kind: "ellipse", cx: 0.7481, cy: 0.4657, rx: 0.0643, ry: 0.182 },
+      hitAreaB: { kind: "ellipse", cx: 0.7481, cy: 0.4657, rx: 0.0643, ry: 0.182 },
+      hintArea: { kind: "ellipse", cx: 0.7481, cy: 0.4657, rx: 0.0893, ry: 0.212 },
+      difficulty: 1,
+    },
+    {
+      id: "archive-01-wax-seal",
+      hitAreaA: { kind: "ellipse", cx: 0.506, cy: 0.437, rx: 0.045, ry: 0.068 },
+      hitAreaB: { kind: "ellipse", cx: 0.506, cy: 0.437, rx: 0.045, ry: 0.068 },
+      hintArea: { kind: "ellipse", cx: 0.506, cy: 0.437, rx: 0.07, ry: 0.098 },
+      difficulty: 1,
+    },
+    {
+      id: "archive-01-compass",
+      hitAreaA: { kind: "ellipse", cx: 0.659, cy: 0.8728, rx: 0.0665, ry: 0.1099 },
+      hitAreaB: { kind: "ellipse", cx: 0.659, cy: 0.8728, rx: 0.0665, ry: 0.1099 },
+      hintArea: { kind: "ellipse", cx: 0.659, cy: 0.8728, rx: 0.0915, ry: 0.1399 },
+      difficulty: 1,
+    }
   ]),
   dailyLevel(2, "daily.archiveCase02.title", [
     ellipse("archive-02-fixing-jar", 0.7323, 0.2636, 0.0612, 0.1109, 1),

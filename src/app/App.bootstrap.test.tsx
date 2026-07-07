@@ -124,6 +124,33 @@ describe("App bootstrap", () => {
     await waitFor(() => expect(dialog).toBeVisible());
   });
 
+  it("prevents native context menus, text selection, and browser dragging app-wide", async () => {
+    render(<App />);
+
+    await waitFor(() => {
+      const contextMenuEvent = new MouseEvent("contextmenu", {
+        bubbles: true,
+        cancelable: true
+      });
+      window.dispatchEvent(contextMenuEvent);
+      expect(contextMenuEvent.defaultPrevented).toBe(true);
+    });
+
+    const selectStartEvent = new Event("selectstart", {
+      bubbles: true,
+      cancelable: true
+    });
+    document.dispatchEvent(selectStartEvent);
+    expect(selectStartEvent.defaultPrevented).toBe(true);
+
+    const dragStartEvent = new Event("dragstart", {
+      bubbles: true,
+      cancelable: true
+    });
+    document.dispatchEvent(dragStartEvent);
+    expect(dragStartEvent.defaultPrevented).toBe(true);
+  });
+
   it("keeps the settings button inside the map topbar", async () => {
     useGameStore.setState({
       screen: { kind: "map", chapterId: "northern-route" },
