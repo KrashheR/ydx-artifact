@@ -93,12 +93,25 @@ async function replaceNorthernDifferences(root: string, request: HitboxSourceWri
   if (!differences || !ts.isArrayLiteralExpression(differences)) {
     throw new Error(`Could not find differences array for ${request.levelId} in ${file}`);
   }
+  const requiredDifferences = getPropertyInitializer(levelObject, "requiredDifferences");
+  if (!requiredDifferences || !ts.isNumericLiteral(requiredDifferences)) {
+    throw new Error(`Could not find requiredDifferences for ${request.levelId} in ${file}`);
+  }
 
-  await writeReplacement(filePath, source, {
-    start: differences.getStart(sourceFile),
-    end: differences.getEnd(),
-    text: formatDifferencesArray(request.differences, 4)
-  });
+  const replacements = [
+    {
+      start: differences.getStart(sourceFile),
+      end: differences.getEnd(),
+      text: formatDifferencesArray(request.differences, 4)
+    },
+    {
+      start: requiredDifferences.getStart(sourceFile),
+      end: requiredDifferences.getEnd(),
+      text: String(request.differences.length)
+    }
+  ];
+
+  await writeReplacements(filePath, source, replacements);
 
   return { file, levelId: request.levelId, differenceCount: request.differences.length };
 }
@@ -265,6 +278,16 @@ function getStringProperty(node: ts.ObjectLiteralExpression, name: string) {
 
 async function writeReplacement(filePath: string, source: string, replacement: Replacement) {
   const nextSource = source.slice(0, replacement.start) + replacement.text + source.slice(replacement.end);
+  await writeFile(filePath, nextSource, "utf8");
+}
+
+async function writeReplacements(filePath: string, source: string, replacements: Replacement[]) {
+  const ordered = [...replacements].sort((a, b) => b.start - a.start);
+  const nextSource = ordered.reduce(
+    (current, replacement) =>
+      current.slice(0, replacement.start) + replacement.text + current.slice(replacement.end),
+    source
+  );
   await writeFile(filePath, nextSource, "utf8");
 }
 

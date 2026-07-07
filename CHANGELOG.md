@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added authoring controls to the local hitbox validation editor: the bottom bar can add a new hitbox, editable markers have a confirmation-backed delete X, and Apply now keeps northern-route `requiredDifferences` in sync when hitboxes are added or removed.
+
 - Added `pnpm validate:archive`, a final A/B hitbox validation server for Daily Archive cases that opens case 1 directly, exposes a 1-7 in-game switcher, and lets the hitbox editor Apply changes back into `src/content/dailyArchive.ts`.
 
 - Extended browser-input suppression from active gameplay to the whole app shell: native context menus, text selection and browser drag gestures are now blocked across menus, overlays and levels.

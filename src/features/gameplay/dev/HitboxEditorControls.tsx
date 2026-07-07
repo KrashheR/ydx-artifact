@@ -10,6 +10,7 @@ type Props = {
   storageKey: string;
   applyStatus: ApplyStatus;
   onApplyStatus: (status: ApplyStatus) => void;
+  onAddHitbox: () => void;
   onReset: () => void;
 };
 
@@ -21,6 +22,7 @@ export function HitboxEditorControls({
   storageKey,
   applyStatus,
   onApplyStatus,
+  onAddHitbox,
   onReset
 }: Props) {
   async function copyEditedDifferences() {
@@ -66,6 +68,14 @@ export function HitboxEditorControls({
         onClick={applyEditedDifferences}
       >
         {applyStatus === "saving" ? "Applying..." : "Apply"}
+      </button>
+      <button
+        type="button"
+        className="rounded-[7px] px-3 py-1 font-manrope text-[11px] font-bold text-[#102016]"
+        style={{ background: "rgba(111,198,158,.88)" }}
+        onClick={onAddHitbox}
+      >
+        Add hitbox
       </button>
       <button
         type="button"

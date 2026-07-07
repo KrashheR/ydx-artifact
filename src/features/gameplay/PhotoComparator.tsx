@@ -146,6 +146,7 @@ export function PhotoComparator({
   function updateEditableDifferences(
     updater: (differences: DifferenceDefinition[]) => DifferenceDefinition[],
   ) {
+    setApplyStatus("idle");
     setEditableDifferences((current) => {
       const next = updater(current);
       if (hitboxEditorEnabled) {
@@ -153,6 +154,24 @@ export function PhotoComparator({
       }
       return next;
     });
+  }
+
+  function handleAddHitbox() {
+    updateEditableDifferences((differences) => [
+      ...differences,
+      createNewDifference(level, differences),
+    ]);
+  }
+
+  function handleHitboxDelete(differenceId: string) {
+    const confirmed = window.confirm(
+      `Delete hitbox "${differenceId}"? This only changes the editor draft until you click Apply.`,
+    );
+    if (!confirmed) return;
+    hitboxEdit.current = null;
+    updateEditableDifferences((differences) =>
+      differences.filter((difference) => difference.id !== differenceId),
+    );
   }
 
   function handleHitboxMove(
@@ -275,6 +294,7 @@ export function PhotoComparator({
             onHitboxMove={handleHitboxMove}
             onHitboxResize={handleHitboxResize}
             onHitboxRotate={handleHitboxRotate}
+            onHitboxDelete={handleHitboxDelete}
             compareLabel={
               version === "A" ? t("game.labelOriginal") : t("game.labelCopy")
             }
@@ -315,6 +335,7 @@ export function PhotoComparator({
         onHitboxMove={handleHitboxMove}
         onHitboxResize={handleHitboxResize}
         onHitboxRotate={handleHitboxRotate}
+        onHitboxDelete={handleHitboxDelete}
         compareLabel={
           side === "A" ? t("game.labelOriginal") : t("game.labelCopy")
         }
@@ -515,6 +536,7 @@ export function PhotoComparator({
             storageKey={editorStorageKey}
             applyStatus={applyStatus}
             onApplyStatus={setApplyStatus}
+            onAddHitbox={handleAddHitbox}
             onReset={resetEditedDifferences}
           />
         </Suspense>
@@ -603,6 +625,7 @@ function PhotoCanvas({
   onHitboxMove,
   onHitboxResize,
   onHitboxRotate,
+  onHitboxDelete,
   compareLabel,
 }: {
   levelId: string;
@@ -643,6 +666,7 @@ function PhotoCanvas({
     side: "A" | "B",
     deltaDegrees: number,
   ) => void;
+  onHitboxDelete: (differenceId: string) => void;
   compareLabel: string;
 }) {
   const frameRef = useRef<HTMLDivElement | null>(null);
@@ -922,6 +946,7 @@ function PhotoCanvas({
                     ),
                   };
                 }}
+                onDelete={() => onHitboxDelete(d.id)}
               />
             );
           })}
@@ -969,6 +994,7 @@ function FoundMarker({
   onEditStart,
   onResizeStart,
   onRotateStart,
+  onDelete,
 }: {
   difference: DifferenceDefinition;
   side: "A" | "B";
@@ -984,6 +1010,7 @@ function FoundMarker({
     event: React.PointerEvent<HTMLSpanElement>,
     center: { x: number; y: number },
   ) => void;
+  onDelete?: () => void;
 }) {
   const shape = side === "A" ? difference.hitAreaA : difference.hitAreaB;
   const box = shapeBounds(shape, aspectRatio);
@@ -1003,7 +1030,7 @@ function FoundMarker({
         touchAction: editable ? "none" : undefined,
       }}
       onPointerDown={editable ? onEditStart : undefined}
-      aria-hidden
+      aria-hidden={editable ? undefined : true}
     >
       {/* Outer ring */}
       <span
@@ -1095,6 +1122,40 @@ function FoundMarker({
           title={`Rotate ${Math.round(rotation)} deg`}
           onPointerDown={(event) => onRotateStart?.(event, center)}
         />
+      ) : null}
+      {editable ? (
+        <button
+          type="button"
+          className="absolute right-0 top-0 flex h-[22px] w-[22px] translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-[#1a130a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+          style={{
+            background: "#ff9d8a",
+            border: "2px solid #102016",
+            boxShadow: "0 0 12px rgba(255,157,138,.7)",
+            pointerEvents: "auto",
+            touchAction: "none",
+          }}
+          aria-label={`Delete hitbox ${difference.id}`}
+          title={`Delete ${difference.id}`}
+          onPointerDown={(event) => event.stopPropagation()}
+          onPointerUp={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            onDelete?.();
+          }}
+        >
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <path d="M6 6l12 12M18 6 6 18" />
+          </svg>
+        </button>
       ) : null}
     </span>
   );
@@ -1402,6 +1463,46 @@ function loadEditedDifferences(
   } catch {
     return cloneDifferences(fallback);
   }
+}
+
+function createNewDifference(
+  level: LevelDefinition,
+  differences: DifferenceDefinition[],
+): DifferenceDefinition {
+  const hitArea = createDefaultHitShape(0.04, 0.065);
+  return {
+    id: createNewDifferenceId(level, differences),
+    hitAreaA: hitArea,
+    hitAreaB: { ...hitArea },
+    hintArea: createDefaultHitShape(0.065, 0.095),
+    difficulty: 1,
+  };
+}
+
+function createNewDifferenceId(
+  level: LevelDefinition,
+  differences: DifferenceDefinition[],
+) {
+  const existingIds = new Set(differences.map((difference) => difference.id));
+  let index = differences.length + 1;
+  while (true) {
+    const candidate =
+      level.chapterId === "sand-meridian"
+        ? `new-hitbox-${index}-${level.order}`
+        : `new-hitbox-${index}`;
+    if (!existingIds.has(candidate)) return candidate;
+    index += 1;
+  }
+}
+
+function createDefaultHitShape(rx: number, ry: number): HitShape {
+  return {
+    kind: "ellipse",
+    cx: 0.5,
+    cy: 0.5,
+    rx,
+    ry,
+  };
 }
 
 function moveDifferenceHitboxPair(
