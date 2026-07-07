@@ -129,7 +129,7 @@ function ArtifactCard({
         </span>
       )}
 
-      <div className="relative h-[104px] sm:h-[320px]">
+      <div className="relative h-[104px] md:h-[160px] sm:h-[320px]">
         {unlocked ? (
           <div
             className="absolute inset-[10px] overflow-hidden rounded-[6px]"
@@ -445,7 +445,7 @@ export function CollectionScreen() {
   const progressPct = Math.round((totalUnlocked / TOTAL_ARTIFACTS) * 100);
 
   return (
-    <div className="min-h-screen bg-exp-bg font-manrope text-exp-parch">
+    <div className="h-dvh overflow-hidden bg-exp-bg font-manrope text-exp-parch">
       <div
         className="pointer-events-none fixed inset-0"
         style={{
@@ -454,171 +454,173 @@ export function CollectionScreen() {
         }}
       />
 
-      {/* Header */}
-      <header
-        className="app-screen-topbar relative flex flex-wrap items-center justify-between gap-3 px-5 py-3 sm:px-[34px]"
-        style={{
-          minHeight: 74,
-          borderBottom: "1px solid rgba(213,195,154,.11)",
-          background:
-            "linear-gradient(180deg, rgba(34,42,37,.9), rgba(21,27,24,.35))",
-        }}
-      >
-        <div className="flex items-center gap-3.5">
-          <button
-            type="button"
-            onClick={() => navigate({ kind: "home" })}
-            className="flex h-11 w-11 items-center justify-center rounded-[10px] text-exp-parch transition hover:bg-white/5"
-            style={{
-              border: "1px solid rgba(213,195,154,.14)",
-              background: "rgba(213,195,154,.05)",
-            }}
-            aria-label={t("actions.back")}
-          >
-            <BackIcon />
-          </button>
-          <div>
-            <div className="text-[10px] font-bold tracking-[.24em] text-exp-brass">
-              {t("collection.eyebrow")}
-            </div>
-            <h1 className="mt-px font-cormorant text-[24px] font-semibold leading-tight text-exp-parch sm:text-[28px]">
-              {t("collection.title")}
-            </h1>
-          </div>
-        </div>
-        {/* pr clears the floating settings gear pinned to the viewport corner */}
-        <div className="flex flex-col items-end gap-1.5 pr-[36px] md:pr-[58px]">
-          <span className="text-[15px] font-bold text-exp-brass2">
-            {t("collection.progress", {
-              done: totalUnlocked,
-              total: TOTAL_ARTIFACTS,
-            })}
-          </span>
-          <div
-            className="h-1.5 w-[160px] overflow-hidden rounded-[2px] sm:w-[220px]"
-            style={{ background: "rgba(213,195,154,.1)" }}
-          >
-            <div
-              className="h-full transition-all duration-500"
+      <div className="relative z-10 flex h-full min-h-0 flex-col">
+        {/* Header */}
+        <header
+          className="app-screen-topbar relative flex flex-wrap items-center justify-between gap-3 px-5 py-3 sm:px-[34px]"
+          style={{
+            minHeight: 74,
+            borderBottom: "1px solid rgba(213,195,154,.11)",
+            background:
+              "linear-gradient(180deg, rgba(34,42,37,.9), rgba(21,27,24,.35))",
+          }}
+        >
+          <div className="flex items-center gap-3.5">
+            <button
+              type="button"
+              onClick={() => navigate({ kind: "home" })}
+              className="flex h-11 w-11 items-center justify-center rounded-[10px] text-exp-parch transition hover:bg-white/5"
               style={{
-                width: `${progressPct}%`,
-                background: "linear-gradient(90deg, #d8af63, #a9762f)",
+                border: "1px solid rgba(213,195,154,.14)",
+                background: "rgba(213,195,154,.05)",
               }}
-            />
+              aria-label={t("actions.back")}
+            >
+              <BackIcon />
+            </button>
+            <div>
+              <div className="text-[10px] font-bold tracking-[.24em] text-exp-brass">
+                {t("collection.eyebrow")}
+              </div>
+              <h1 className="mt-px font-cormorant text-[24px] font-semibold leading-tight text-exp-parch sm:text-[28px]">
+                {t("collection.title")}
+              </h1>
+            </div>
+          </div>
+          {/* pr clears the floating settings gear pinned to the viewport corner */}
+          <div className="flex flex-col items-end gap-1.5 pr-[36px] md:pr-[58px]">
+            <span className="text-[15px] font-bold text-exp-brass2">
+              {t("collection.progress", {
+                done: totalUnlocked,
+                total: TOTAL_ARTIFACTS,
+              })}
+            </span>
+            <div
+              className="h-1.5 w-[160px] overflow-hidden rounded-[2px] sm:w-[220px]"
+              style={{ background: "rgba(213,195,154,.1)" }}
+            >
+              <div
+                className="h-full transition-all duration-500"
+                style={{
+                  width: `${progressPct}%`,
+                  background: "linear-gradient(90deg, #d8af63, #a9762f)",
+                }}
+              />
+            </div>
+          </div>
+        </header>
+
+        {/* Subtitle + filters */}
+        <div className="relative shrink-0 px-5 pb-1.5 pt-[22px] md:pt-[8px] sm:px-[34px]">
+          <p className="max-w-[700px] text-[13.5px] leading-[1.5] text-exp-muted">
+            {t("collection.subtitle")}
+          </p>
+          <div className="mt-[18px] md:mt-[4px] flex flex-wrap gap-2.5">
+            {[
+              { key: "all" as const, label: t("collection.filterAll") },
+              ...chapterList.map((chapter) => ({
+                key: chapter.id,
+                label: t(chapter.titleKey),
+              })),
+            ].map((tab) => {
+              const active = filter === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => setFilter(tab.key)}
+                  className="flex h-11 md:h-8 items-center rounded-[8px] px-[18px] text-[12.5px] font-semibold transition"
+                  style={
+                    active
+                      ? {
+                          background: "rgba(184,138,69,.16)",
+                          border: "1px solid rgba(184,138,69,.45)",
+                          color: "#d8af63",
+                          fontWeight: 700,
+                        }
+                      : {
+                          border: "1px solid rgba(213,195,154,.14)",
+                          background: "rgba(213,195,154,.04)",
+                          color: "#a9b0a6",
+                        }
+                  }
+                  aria-pressed={active}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
         </div>
-      </header>
 
-      {/* Subtitle + filters */}
-      <div className="relative px-5 pb-1.5 pt-[22px] sm:px-[34px]">
-        <p className="max-w-[700px] text-[13.5px] leading-[1.5] text-exp-muted">
-          {t("collection.subtitle")}
-        </p>
-        <div className="mt-[18px] flex flex-wrap gap-2.5">
-          {[
-            { key: "all" as const, label: t("collection.filterAll") },
-            ...chapterList.map((chapter) => ({
-              key: chapter.id,
-              label: t(chapter.titleKey),
-            })),
-          ].map((tab) => {
-            const active = filter === tab.key;
+        {/* Campaign sections */}
+        <div className="map-scroll-area relative flex min-h-0 flex-1 flex-col gap-[26px] overflow-y-auto px-5 pb-[34px] pt-3 sm:px-[34px]">
+          {visibleChapters.map((chapter) => {
+            const chapterArtifacts = getChapterArtifacts(chapter.id);
+            const unlockedCount = chapterArtifacts.filter(
+              (artifact) =>
+                getArtifactState(artifactStates, artifact.id) !== "locked",
+            ).length;
+            const accent = CAMPAIGN_ACCENT[chapter.id];
+            const allCollected = unlockedCount === chapterArtifacts.length;
+
             return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setFilter(tab.key)}
-                className="flex h-11 items-center rounded-[8px] px-[18px] text-[12.5px] font-semibold transition"
-                style={
-                  active
-                    ? {
-                        background: "rgba(184,138,69,.16)",
-                        border: "1px solid rgba(184,138,69,.45)",
-                        color: "#d8af63",
-                        fontWeight: 700,
-                      }
-                    : {
-                        border: "1px solid rgba(213,195,154,.14)",
-                        background: "rgba(213,195,154,.04)",
-                        color: "#a9b0a6",
-                      }
-                }
-                aria-pressed={active}
-              >
-                {tab.label}
-              </button>
+              <section key={chapter.id} className="flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <span
+                    className="h-2 w-2 rounded-[2px]"
+                    style={{ transform: "rotate(45deg)", background: accent }}
+                    aria-hidden="true"
+                  />
+                  <h2 className="font-cormorant text-[18px] font-semibold text-exp-parch sm:text-[20px]">
+                    {t(chapter.titleKey)}
+                  </h2>
+                  {allCollected ? (
+                    <span
+                      className="inline-flex h-6 items-center gap-1.5 rounded-[6px] px-2.5 text-[11px] font-bold"
+                      style={{
+                        color: "#6fc69e",
+                        background: "rgba(111,198,158,.1)",
+                        border: "1px solid rgba(111,198,158,.35)",
+                      }}
+                    >
+                      <CheckIcon />
+                      {t("collection.campaignComplete", {
+                        done: unlockedCount,
+                        total: chapterArtifacts.length,
+                      })}
+                    </span>
+                  ) : (
+                    <span
+                      className="font-jetbrains text-[12px] font-bold"
+                      style={{ color: accent }}
+                    >
+                      {t("collection.campaignProgress", {
+                        done: unlockedCount,
+                        total: chapterArtifacts.length,
+                      })}
+                    </span>
+                  )}
+                  <div
+                    className="h-px flex-1"
+                    style={{ background: "rgba(213,195,154,.1)" }}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
+                  {chapterArtifacts.map((artifact) => (
+                    <ArtifactCard
+                      key={artifact.id}
+                      artifact={artifact}
+                      state={getArtifactState(artifactStates, artifact.id)}
+                      onOpen={() => handleOpenArtifact(artifact)}
+                    />
+                  ))}
+                </div>
+              </section>
             );
           })}
         </div>
-      </div>
-
-      {/* Campaign sections */}
-      <div className="relative flex flex-col gap-[26px] px-5 pb-[34px] pt-3 sm:px-[34px]">
-        {visibleChapters.map((chapter) => {
-          const chapterArtifacts = getChapterArtifacts(chapter.id);
-          const unlockedCount = chapterArtifacts.filter(
-            (artifact) =>
-              getArtifactState(artifactStates, artifact.id) !== "locked",
-          ).length;
-          const accent = CAMPAIGN_ACCENT[chapter.id];
-          const allCollected = unlockedCount === chapterArtifacts.length;
-
-          return (
-            <section key={chapter.id} className="flex flex-col gap-3">
-              <div className="flex items-center gap-3">
-                <span
-                  className="h-2 w-2 rounded-[2px]"
-                  style={{ transform: "rotate(45deg)", background: accent }}
-                  aria-hidden="true"
-                />
-                <h2 className="font-cormorant text-[18px] font-semibold text-exp-parch sm:text-[20px]">
-                  {t(chapter.titleKey)}
-                </h2>
-                {allCollected ? (
-                  <span
-                    className="inline-flex h-6 items-center gap-1.5 rounded-[6px] px-2.5 text-[11px] font-bold"
-                    style={{
-                      color: "#6fc69e",
-                      background: "rgba(111,198,158,.1)",
-                      border: "1px solid rgba(111,198,158,.35)",
-                    }}
-                  >
-                    <CheckIcon />
-                    {t("collection.campaignComplete", {
-                      done: unlockedCount,
-                      total: chapterArtifacts.length,
-                    })}
-                  </span>
-                ) : (
-                  <span
-                    className="font-jetbrains text-[12px] font-bold"
-                    style={{ color: accent }}
-                  >
-                    {t("collection.campaignProgress", {
-                      done: unlockedCount,
-                      total: chapterArtifacts.length,
-                    })}
-                  </span>
-                )}
-                <div
-                  className="h-px flex-1"
-                  style={{ background: "rgba(213,195,154,.1)" }}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
-                {chapterArtifacts.map((artifact) => (
-                  <ArtifactCard
-                    key={artifact.id}
-                    artifact={artifact}
-                    state={getArtifactState(artifactStates, artifact.id)}
-                    onOpen={() => handleOpenArtifact(artifact)}
-                  />
-                ))}
-              </div>
-            </section>
-          );
-        })}
       </div>
 
       {openedArtifact && (
