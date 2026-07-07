@@ -296,7 +296,7 @@ function PrimaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[7px] px-5 text-[13.5px] font-extrabold text-[#1A130A] transition hover:brightness-105 active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass disabled:cursor-not-allowed disabled:opacity-45 ${className}`}
+      className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[7px] px-5 text-[13.5px] font-bold text-[#1A130A] transition hover:brightness-105 active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass disabled:cursor-not-allowed disabled:opacity-45 ${className}`}
       style={{
         background: "linear-gradient(180deg,#D8AF63,#B3812F)",
         boxShadow:
@@ -533,7 +533,7 @@ function DailyArchiveCard({
       <div className="mt-auto pt-4">
         <PrimaryButton
           onClick={onOpen}
-          className="w-full min-h-[40px] text-[12px]"
+          className="w-full min-h-[40px] text-[12px] !font-bold"
         >
           {claimed ? (
             <CheckIcon size={13} color="#1A130A" />

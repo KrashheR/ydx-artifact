@@ -918,7 +918,7 @@ select {
 
   .home-case-card h1 {
     margin-top: 7px !important;
-    font-size: clamp(25px, 8dvh, 34px) !important;
+    font-size: clamp(25px, 8dvh, 21px) !important;
   }
 
   .home-case-card p,

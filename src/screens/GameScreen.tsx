@@ -1279,8 +1279,7 @@ export function GameScreen({
             >
               <div className="flex items-center gap-[6px] rounded-[11px]">
                 <svg
-                  width="19"
-                  height="19"
+                  className="h-[14px] w-[14px] md:h-[19px] md:w-[19px]"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="#d8af63"
