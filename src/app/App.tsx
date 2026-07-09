@@ -250,6 +250,7 @@ export function App() {
             mode={screen.mode}
             showOnboarding={screen.showOnboarding ?? false}
             onOpenSettings={() => openSettings("game_hud")}
+            isSettingsOpen={settingsOpen}
           />
         );
       case "daily":
@@ -265,7 +266,7 @@ export function App() {
           </Suspense>
         );
     }
-  }, [openSettings, screen]);
+  }, [openSettings, screen, settingsOpen]);
 
   if (!bootstrapped) {
     return <BootstrapScreen />;

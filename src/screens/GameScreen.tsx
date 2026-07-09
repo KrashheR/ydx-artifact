@@ -314,11 +314,13 @@ export function GameScreen({
   mode,
   showOnboarding = false,
   onOpenSettings = noop,
+  isSettingsOpen = false,
 }: {
   levelId: string;
   mode: "campaign" | "daily";
   showOnboarding?: boolean;
   onOpenSettings?: () => void;
+  isSettingsOpen?: boolean;
 }) {
   const { t } = useTranslation();
 
@@ -430,6 +432,7 @@ export function GameScreen({
   const gameplayBlocked =
     platformPaused ||
     !pageVisible ||
+    isSettingsOpen ||
     showStartupOnboarding ||
     showRewardedHintModal ||
     rewardedHintInFlight ||
@@ -742,7 +745,7 @@ export function GameScreen({
   }
 
   function handleDifference(differenceId: string) {
-    if (completionPending || showComplete || timedOut || platformPaused || showStartupOnboarding) return;
+    if (completionPending || showComplete || timedOut || platformPaused || isSettingsOpen || showStartupOnboarding) return;
     if (hintId === differenceId) setHintId(undefined);
     showArtifactToast(differenceId);
     recordDiff(levelId, differenceId);
@@ -798,7 +801,8 @@ export function GameScreen({
       showStartupOnboarding ||
       completionPending ||
       rewardedHintInFlight ||
-      platformPaused
+      platformPaused ||
+      isSettingsOpen
     )
       return;
     if (magnifiers > 0) {
@@ -829,6 +833,7 @@ export function GameScreen({
       completionPending ||
       rewardedHintInFlight ||
       platformPaused ||
+      isSettingsOpen ||
       magnifiers > 0 ||
       !hasRewardedAreaHintTarget
     )
@@ -1602,7 +1607,7 @@ export function GameScreen({
             hintId={hintId}
             onDifference={handleDifference}
             onMisclick={() => {
-              if (!completionPending && !platformPaused) recordMiss(levelId);
+              if (!completionPending && !platformPaused && !isSettingsOpen) recordMiss(levelId);
             }}
             labelA={t("game.labelOriginal")}
             labelB={t("game.labelCopy")}

@@ -6,6 +6,8 @@
 
 - Moved the in-game artifact discovery toast lower so it no longer overlaps the gameplay header.
 
+- Fixed gameplay pausing while the settings modal is open: the active level timer, difference clicks, misclicks and hint actions now stop accumulating/registering whenever the settings gear icon opens the language modal, matching the existing platform-pause behavior.
+
 - Changed campaign hint rewards to grant +1 hint after every second newly completed campaign level; replays no longer grant the campaign cadence reward.
 
 - Changed the home hub primary "Continue expedition" action to launch the active campaign's next unfinished level directly; the separate map icon still opens the campaign level journal.
