@@ -24,7 +24,8 @@ const sandMeridianDifferenceOverrides = {
       { id: "field-phone", x: 0.277, y: 0.579, radius: 0.04 },
       { id: "jeep-radio", x: 0.7678, y: 0.7312, radius: 0.0698 },
       { id: "equipment-case", x: 0.46, y: 0.89, radius: 0.07 },
-      { id: "new-hitbox-9", shape: { kind: "ellipse", cx: 0.503, cy: 0.7071, rx: 0.0435, ry: 0.0766 } }
+      { id: "new-hitbox-9", shape: { kind: "ellipse", cx: 0.503, cy: 0.7071, rx: 0.0435, ry: 0.0766 } },
+      { id: "new-hitbox-10", shape: { kind: "ellipse", cx: 0.0873, cy: 0.7162, rx: 0.005, ry: 0.1206, rotation: -0.8345 } }
     ],
   3: [
       { id: "signal-marker", x: 0.653, y: 0.133, radius: 0.04 },

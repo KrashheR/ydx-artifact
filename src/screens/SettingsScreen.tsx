@@ -2,6 +2,8 @@ import { useEffect, useId, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
+import type { ComparatorScheme } from "@/entities/save/schema";
+import { isMobileGameplayDevice } from "@/shared/lib/device";
 import { useGameStore } from "@/shared/store/gameStore";
 
 const LANGS = [
@@ -92,6 +94,27 @@ export function SettingsModal({ isOpen, onClose }: Props) {
 
   const locale = useGameStore((s) => s.saveData.settings.locale);
   const setLocale = useGameStore((s) => s.setLocale);
+  const comparatorScheme = useGameStore(
+    (s) => s.saveData.settings.comparatorScheme,
+  );
+  const setComparatorScheme = useGameStore((s) => s.setComparatorScheme);
+  const showSchemeSection = isMobileGameplayDevice();
+  const schemeOptions: {
+    scheme: ComparatorScheme;
+    title: string;
+    description: string;
+  }[] = [
+    {
+      scheme: "slider",
+      title: t("controlScheme.sliderTitle"),
+      description: t("controlScheme.sliderShort"),
+    },
+    {
+      scheme: "flip",
+      title: t("controlScheme.flipTitle"),
+      description: t("controlScheme.flipShort"),
+    },
+  ];
 
   useEffect(() => {
     if (!isOpen) return;
@@ -251,6 +274,13 @@ export function SettingsModal({ isOpen, onClose }: Props) {
               </button>
             </div>
 
+            <div
+              className="settings-body flex-1 overflow-y-auto sm:max-h-[368px] sm:flex-none"
+              style={{
+                scrollbarWidth: "thin",
+                scrollbarColor: "rgba(184,138,69,.4) rgba(213,195,154,.05)",
+              }}
+            >
             {/* Language section label */}
             <div className="settings-section-label flex flex-shrink-0 items-center gap-2.5 px-7 pb-2 pt-5">
               <GlobeIcon />
@@ -268,13 +298,7 @@ export function SettingsModal({ isOpen, onClose }: Props) {
             </div>
 
             {/* Language list */}
-            <div
-              className="settings-language-list flex-1 overflow-y-auto px-[22px] pb-1.5 pt-2 sm:max-h-[368px] sm:flex-none md:flex-col"
-              style={{
-                scrollbarWidth: "thin",
-                scrollbarColor: "rgba(184,138,69,.4) rgba(213,195,154,.05)",
-              }}
-            >
+            <div className="settings-language-list px-[22px] pb-1.5 pt-2 md:flex-col">
               {LANGS.map((lang) => {
                 const selected = locale === lang.code;
                 return (
@@ -348,6 +372,85 @@ export function SettingsModal({ isOpen, onClose }: Props) {
                   </button>
                 );
               })}
+            </div>
+
+            {showSchemeSection && (
+              <>
+                {/* Compare scheme section label */}
+                <div className="settings-section-label settings-scheme-label flex flex-shrink-0 items-center gap-2.5 px-7 pb-2 pt-3">
+                  <span className="text-[11px] font-bold uppercase tracking-[.2em] text-exp-muted">
+                    {t("settings.schemeSection")}
+                  </span>
+                  <div
+                    className="h-px flex-1"
+                    aria-hidden="true"
+                    style={{ background: "rgba(213,195,154,.1)" }}
+                  />
+                </div>
+
+                {/* Compare scheme options */}
+                <div className="settings-scheme-list px-[22px] pb-1.5 pt-2">
+                  {schemeOptions.map((option) => {
+                    const selected =
+                      (comparatorScheme ?? "slider") === option.scheme;
+                    return (
+                      <button
+                        key={option.scheme}
+                        type="button"
+                        onClick={() => setComparatorScheme(option.scheme)}
+                        className="relative mb-1.5 flex w-full items-center gap-3.5 rounded-[10px] px-4 py-3.5 text-left transition hover:brightness-110 active:brightness-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+                        style={{
+                          border: selected
+                            ? "1.5px solid rgba(184,138,69,.6)"
+                            : "1px solid rgba(213,195,154,.08)",
+                          background: selected
+                            ? "linear-gradient(180deg, rgba(184,138,69,.16), rgba(184,138,69,.05))"
+                            : "rgba(21,27,24,.3)",
+                        }}
+                      >
+                        {selected && (
+                          <div
+                            className="pointer-events-none absolute bottom-3.5 left-0 top-3.5 w-[3px] rounded-r-[3px]"
+                            aria-hidden="true"
+                            style={{
+                              background:
+                                "linear-gradient(180deg, #d8af63, #a9762f)",
+                            }}
+                          />
+                        )}
+
+                        <span className="relative flex-1">
+                          <span className="block text-[15px] font-semibold leading-snug text-exp-parch">
+                            {option.title}
+                          </span>
+                          <span className="mt-0.5 block text-[11px] font-medium text-exp-muted">
+                            {option.description}
+                          </span>
+                        </span>
+
+                        <span
+                          className="relative flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full"
+                          aria-hidden="true"
+                          style={
+                            selected
+                              ? {
+                                  background:
+                                    "linear-gradient(180deg, #d8af63, #b3812f)",
+                                  boxShadow: "0 4px 10px rgba(184,138,69,.4)",
+                                }
+                              : {
+                                  border: "1.5px solid rgba(213,195,154,.16)",
+                                }
+                          }
+                        >
+                          {selected && <CheckmarkIcon />}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
             </div>
 
             {/* Footer */}

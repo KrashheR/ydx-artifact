@@ -44,6 +44,7 @@ Only use letters, numbers and underscores in event names.
 | `settings_opened` | Settings modal opens. | `source`, `screen` |
 | `settings_closed` | Settings modal closes. | `screen` |
 | `settings_language_changed` | Player manually changes language. | `previousLanguage`, `language` |
+| `settings_comparator_scheme_changed` | Player picks or changes the mobile compare scheme (first-launch modal or settings). | `previousScheme` (`none` when unset), `scheme` |
 
 ## Campaign And Map Events
 

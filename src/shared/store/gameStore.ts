@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { getDailyArchiveDateKey } from "@/content/dailyArchive";
 import {
   createDefaultSave,
+  type ComparatorScheme,
   type ReviewUnavailableReason,
   type SaveData
 } from "@/entities/save/schema";
@@ -80,6 +81,7 @@ type GameStore = {
   spendMagnifiers: (amount: number) => boolean;
   setLocale: (locale: "ru" | "en") => void;
   setAutoLocale: (locale: "ru" | "en") => void;
+  setComparatorScheme: (scheme: ComparatorScheme) => void;
   addActiveLevelTime: (levelId: string, seconds: number, options?: { save?: boolean; flush?: boolean }) => void;
   claimDailyReward: (date: string) => void;
   clearPendingReviewPromptCheck: () => void;
@@ -510,6 +512,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
           settings: { ...state.saveData.settings, locale, localeSource: "auto" }
         }
       };
+    });
+    void get().save({ flush: true });
+  },
+  setComparatorScheme(scheme) {
+    const previousScheme = get().saveData.settings.comparatorScheme;
+    if (previousScheme === scheme) return;
+    set((state) => ({
+      saveData: {
+        ...state.saveData,
+        settings: { ...state.saveData.settings, comparatorScheme: scheme }
+      }
+    }));
+    trackAnalyticsEvent("settings_comparator_scheme_changed", {
+      previousScheme: previousScheme ?? "none",
+      scheme
     });
     void get().save({ flush: true });
   },

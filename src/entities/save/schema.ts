@@ -47,6 +47,10 @@ const inProgressV2Schema = z.object({
   mistakes: z.number().int().nonnegative()
 });
 
+export const comparatorSchemeSchema = z.enum(["slider", "flip"]);
+
+export type ComparatorScheme = z.infer<typeof comparatorSchemeSchema>;
+
 const campaignReportIdSchema = z.enum([
   "white-meridian-report",
   "sand-meridian-report",
@@ -70,7 +74,8 @@ export const saveSchema = z.object({
     locale: z.enum(["ru", "en"]),
     localeSource: z.enum(["auto", "manual"]),
     vibration: z.boolean(),
-    reducedMotion: z.boolean()
+    reducedMotion: z.boolean(),
+    comparatorScheme: comparatorSchemeSchema.nullable().default(null)
   }),
   reviewPrompt: reviewPromptStateSchema.default(initialReviewPromptState),
   purchases: z.object({
@@ -195,7 +200,8 @@ export function migrateSaveData(value: unknown): SaveData {
       locale: source.settings?.locale ?? fallback.settings.locale,
       localeSource: "manual",
       vibration: source.settings?.vibration ?? fallback.settings.vibration,
-      reducedMotion: source.settings?.reducedMotion ?? fallback.settings.reducedMotion
+      reducedMotion: source.settings?.reducedMotion ?? fallback.settings.reducedMotion,
+      comparatorScheme: null
     },
     reviewPrompt: source.reviewPrompt ?? fallback.reviewPrompt,
     purchases: {
@@ -223,7 +229,8 @@ export function createDefaultSave(): SaveData {
       locale: "ru",
       localeSource: "auto",
       vibration: true,
-      reducedMotion: false
+      reducedMotion: false,
+      comparatorScheme: null
     },
     reviewPrompt: initialReviewPromptState,
     purchases: {

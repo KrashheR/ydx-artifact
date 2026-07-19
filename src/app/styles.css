@@ -1099,19 +1099,22 @@ select {
   }
 
   .map-level-grid::-webkit-scrollbar,
-  .settings-language-list::-webkit-scrollbar {
+  .settings-language-list::-webkit-scrollbar,
+  .settings-body::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 
   .map-level-grid::-webkit-scrollbar-track,
-  .settings-language-list::-webkit-scrollbar-track {
+  .settings-language-list::-webkit-scrollbar-track,
+  .settings-body::-webkit-scrollbar-track {
     background: rgba(213, 195, 154, 0.05);
     border-radius: 4px;
   }
 
   .map-level-grid::-webkit-scrollbar-thumb,
-  .settings-language-list::-webkit-scrollbar-thumb {
+  .settings-language-list::-webkit-scrollbar-thumb,
+  .settings-body::-webkit-scrollbar-thumb {
     border: 1px solid rgba(21, 27, 24, 0.55);
     border-radius: 4px;
     background: linear-gradient(180deg, #d8af63, #a9762f);
@@ -1203,6 +1206,12 @@ select {
   .map-desktop-journal {
     display: block !important;
     padding: 18px 0 0 24px !important;
+  }
+
+  /* Below the md breakpoint Tailwind keeps the mobile list visible, so the
+     landscape rail and the mobile list would render at the same time. */
+  .map-mobile-level-list {
+    display: none !important;
   }
 
   .map-journal-shell {
@@ -1517,20 +1526,30 @@ select {
   }
 
   .comparator-desktop,
-  .comparator-mobile-portrait,
-  .comparator-landscape-flip {
+  .comparator-mobile-portrait {
     display: none !important;
   }
 
-  .comparator-landscape-slider {
+  .comparator-landscape-slider,
+  .comparator-landscape-flip {
     display: flex !important;
     width: 100%;
     min-width: 0;
   }
 
-  .comparator-landscape-slider > .comparator-photo-frame {
+  .comparator-landscape-slider > .comparator-photo-frame,
+  .comparator-landscape-flip .comparator-photo-frame {
     width: 100%;
     flex: 1 1 auto;
+  }
+
+  .comparator-landscape-flip .comparator-photo-column {
+    width: 100%;
+    min-height: 0;
+  }
+
+  .comparator-landscape-flip .comparator-flip-button {
+    flex-shrink: 0;
   }
 
   .comparator-photo {
@@ -1587,24 +1606,29 @@ select {
     font-size: 32px !important;
   }
 
-  .settings-section-label {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: start;
-    padding: 24px 24px 8px 18px !important;
-  }
-
-  .settings-language-list {
+  .settings-body {
     grid-column: 2;
     grid-row: 1 / span 2;
     display: flex;
-    gap: 12px;
-    margin-top: 58px;
+    flex-direction: column;
+    overflow-y: auto;
     max-height: none !important;
-    padding: 0 30px 18px !important;
+    padding: 10px 30px 18px;
   }
 
-  .settings-language-list button {
+  .settings-section-label {
+    padding: 14px 0 8px !important;
+  }
+
+  .settings-language-list,
+  .settings-scheme-list {
+    display: flex;
+    gap: 12px;
+    padding: 0 !important;
+  }
+
+  .settings-language-list button,
+  .settings-scheme-list button {
     min-height: 56px;
     flex: 1;
     margin-bottom: 0 !important;

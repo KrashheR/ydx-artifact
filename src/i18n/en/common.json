@@ -63,7 +63,7 @@
     "rewardedHintConfirm": "Watch a short ad to reveal one difference?",
     "rewardedHintEyebrow": "FREE HINT",
     "rewardedHintTitle": "Watch a video to reveal a hint",
-    "rewardedHintBody": "A short video highlights one of the remaining differences. The ad is about 15 seconds.",
+    "rewardedHintBody": "A short video highlights one of the remaining differences.",
     "rewardedHintValue": "+1 hint",
     "rewardedHintValueScope": "for this level",
     "rewardedHintWatch": "Watch video",
@@ -126,8 +126,20 @@
     "eyebrow": "EXPEDITION GEAR",
     "languageSection": "INTERFACE LANGUAGE",
     "savedToProfile": "Selection saved to profile",
+    "schemeSection": "COMPARE MODE",
     "done": "Done",
     "closeLabel": "Close"
+  },
+  "controlScheme": {
+    "eyebrow": "FIELD INSTRUMENT",
+    "title": "How do you want to compare?",
+    "sliderTitle": "Slider",
+    "sliderDescription": "Drag the handle across the frame to reveal and hide the second version of the photo.",
+    "sliderShort": "Drag a handle across the frame",
+    "flipTitle": "Flip",
+    "flipDescription": "Tap the button to instantly switch between the two photos.",
+    "flipShort": "Switch photos with a button",
+    "changeLaterHint": "You can change this anytime in the settings."
   },
   "reviewPrompt": {
     "eyebrow": "EXPEDITION LOG",

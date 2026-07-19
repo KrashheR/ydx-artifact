@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Fixed broken campaign level select layout on small landscape phones (e.g. iPhone SE, 667x375): the landscape media query force-shows the desktop journal rail but the Tailwind `md:hidden` mobile level list stayed visible below the 768px breakpoint, so both lists rendered at once and split the screen height; the mobile list is now explicitly hidden in the landscape phone block.
+
+- Fixed black frames in the mobile A/B flip compare mode: `PhotoComparator` now keeps both scene images mounted in the flipping canvas and toggles their visibility instead of swapping the single `<img src>`, so switching sides no longer shows the empty dark frame while the other image loads/decodes; also gave the landscape flip photo column an explicit width so the frame cannot collapse.
+
+- Added a selectable mobile compare scheme: a first-launch modal on mobile devices asks the player to choose between the before/after slider (previous behavior) and a new single-frame A/B flip mode for landscape gameplay; the choice is stored in the save (`settings.comparatorScheme`), applied by `PhotoComparator`, and can be changed later from a new "Compare mode" section in the settings modal (mobile only).
+
 - Refreshed `docs/GAME_OVERVIEW.md` into an up-to-date game summary covering the current Archive Hub, 39 campaign levels, 7 Daily Archive cases, collection, campaign reports, save/platform systems and remaining product decisions.
 
 - Moved the in-game artifact discovery toast lower so it no longer overlaps the gameplay header.

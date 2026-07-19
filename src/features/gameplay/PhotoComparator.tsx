@@ -7,6 +7,7 @@ import type {
   LevelDefinition,
 } from "@/entities/level/schema";
 import { hitTest, shapeCenter } from "@/shared/lib/hitTesting";
+import { useGameStore } from "@/shared/store/gameStore";
 
 type PhotoComparatorProps = {
   level: LevelDefinition;
@@ -81,6 +82,9 @@ export function PhotoComparator({
   debugEnableHitboxEditor = false,
 }: PhotoComparatorProps) {
   const { t } = useTranslation();
+  const comparatorScheme = useGameStore(
+    (s) => s.saveData.settings.comparatorScheme,
+  );
   const [version, setVersion] = useState<"A" | "B">("A");
   const [comparePosition, setComparePosition] = useState(50);
   const [zoom, setZoom] = useState(1);
@@ -231,6 +235,9 @@ export function PhotoComparator({
 
   function renderPhoto(side: "A" | "B", mobile = false) {
     const src = getSceneSource(level, side, debugUseMarkupReference);
+    const inactiveSrc = mobile
+      ? getSceneSource(level, side === "A" ? "B" : "A", debugUseMarkupReference)
+      : undefined;
     const label = side === "A" ? labelA : labelB;
     const wrongClicks = side === "A" ? wrongClicksA : wrongClicksB;
     const displaySide = side;
@@ -272,6 +279,7 @@ export function PhotoComparator({
             mobile={mobile}
             version={version}
             src={src}
+            inactiveSrc={inactiveSrc}
             zoom={zoom}
             pan={pan}
             imageAspectRatio={imageAspectRatio}
@@ -403,8 +411,38 @@ export function PhotoComparator({
         {renderPhoto("B")}
       </div>
 
+      {/* Mobile landscape: one full 16:10 frame that flips between A and B */}
+      {comparatorScheme === "flip" && (
+        <div className="comparator-landscape-flip hidden flex-1 flex-col items-center justify-center gap-[10px]">
+          {renderPhoto(version, true)}
+          <button
+            className="comparator-flip-button flex min-h-[44px] w-full max-w-[560px] items-center justify-center gap-2 rounded-xl font-manrope text-[13px] font-bold text-exp-brass2"
+            style={{
+              border: "1px solid rgba(184,138,69,.45)",
+              background: "rgba(184,138,69,.1)",
+            }}
+            onClick={() => setVersion((v) => (v === "A" ? "B" : "A"))}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M8 7l-4 5 4 5M16 7l4 5-4 5" />
+            </svg>
+            {t("actions.compare")}
+          </button>
+        </div>
+      )}
+
       {/* Mobile landscape: one full 16:10 frame with before/after slider */}
-      <div className="comparator-landscape-slider hidden flex-1 flex-col items-center justify-center gap-[11px]">
+      {comparatorScheme !== "flip" && (
+        <div className="comparator-landscape-slider hidden flex-1 flex-col items-center justify-center gap-[11px]">
         <SceneAspectFrame aspectRatio={imageAspectRatio}>
           <div
             ref={sliderFrameRef}
@@ -488,16 +526,17 @@ export function PhotoComparator({
             </div>
           </div>
         </SceneAspectFrame>
-        <input
-          className="comparator-slider-range"
-          type="range"
-          min="0"
-          max="100"
-          value={comparePosition}
-          aria-label={t("actions.compare")}
-          onChange={(event) => setComparePosition(Number(event.target.value))}
-        />
-      </div>
+          <input
+            className="comparator-slider-range"
+            type="range"
+            min="0"
+            max="100"
+            value={comparePosition}
+            aria-label={t("actions.compare")}
+            onChange={(event) => setComparePosition(Number(event.target.value))}
+          />
+        </div>
+      )}
 
       {/* Mobile: single image + toggle */}
       <div className="comparator-mobile-portrait flex flex-1 flex-col md:hidden">
@@ -607,6 +646,7 @@ function PhotoCanvas({
   mobile,
   version,
   src,
+  inactiveSrc,
   zoom,
   pan,
   imageAspectRatio,
@@ -633,6 +673,7 @@ function PhotoCanvas({
   mobile: boolean;
   version: "A" | "B";
   src: string;
+  inactiveSrc?: string;
   zoom: number;
   pan: { x: number; y: number };
   imageAspectRatio: number;
@@ -870,18 +911,29 @@ function PhotoCanvas({
             height: imageRect.height,
           }}
         >
-          <img
-            src={src}
-            alt=""
-            draggable={false}
-            className="h-full w-full object-contain"
-            onLoad={(event) => {
-              const image = event.currentTarget;
-              if (image.naturalHeight > 0) {
-                onImageAspectRatio(image.naturalWidth / image.naturalHeight);
-              }
-            }}
-          />
+          {/* Both sources stay mounted so flipping never shows an empty frame
+              while the other image loads/decodes */}
+          {(inactiveSrc
+            ? [src, inactiveSrc].sort((a, b) => a.localeCompare(b))
+            : [src]
+          ).map((source) => (
+            <img
+              key={source}
+              src={source}
+              alt=""
+              draggable={false}
+              className="absolute inset-0 h-full w-full object-contain"
+              style={{ opacity: source === src ? 1 : 0 }}
+              aria-hidden={source === src ? undefined : true}
+              onLoad={(event) => {
+                if (source !== src) return;
+                const image = event.currentTarget;
+                if (image.naturalHeight > 0) {
+                  onImageAspectRatio(image.naturalWidth / image.naturalHeight);
+                }
+              }}
+            />
+          ))}
 
           {visibleMarkers.map((d) => {
             const debugOnly =
