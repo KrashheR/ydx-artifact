@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Added `pnpm dev:align`, a mobile landscape A/B registration dashboard with per-level, per-image 0.5px X/Y controls, local draft persistence, source Apply support, and runtime alignment shared by flip/slider images and their interaction overlays.
+
+- Expanded `docs/GAME_OVERVIEW.md` into a current AI review brief with the complete implemented mechanics matrix, screen flow, scoring/timer/hint rules, partial systems, explicit non-features, extension constraints, and a reusable external-review prompt.
+
+- Fixed the artifact reveal modal on short mobile landscape screens: it now uses a compact two-column layout with the artifact image kept fully visible, tighter copy spacing and 44px action buttons instead of forcing the player to scroll past the reveal image.
+
 - Fixed broken campaign level select layout on small landscape phones (e.g. iPhone SE, 667x375): the landscape media query force-shows the desktop journal rail but the Tailwind `md:hidden` mobile level list stayed visible below the 768px breakpoint, so both lists rendered at once and split the screen height; the mobile list is now explicitly hidden in the landscape phone block.
 
 - Fixed black frames in the mobile A/B flip compare mode: `PhotoComparator` now keeps both scene images mounted in the flipping canvas and toggles their visibility instead of swapping the single `<img src>`, so switching sides no longer shows the empty dark frame while the other image loads/decodes; also gave the landscape flip photo column an explicit width so the frame cannot collapse.

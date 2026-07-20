@@ -3,7 +3,10 @@ import { useTranslation } from "react-i18next";
 import { getChapter, getLevelById } from "@/content/chapters";
 import { dailyArchiveLevels } from "@/content/dailyArchive";
 import { PhotoComparator } from "@/features/gameplay/PhotoComparator";
-import { ArtifactFoundToast, type ArtifactToastVariant } from "@/features/gameplay/ArtifactFoundToast";
+import {
+  ArtifactFoundToast,
+  type ArtifactToastVariant,
+} from "@/features/gameplay/ArtifactFoundToast";
 import { ArtifactRevealOverlay } from "@/features/collection/ArtifactRevealOverlay";
 import { CampaignCaseReportModal } from "@/features/campaign-report/CampaignCaseReportModal";
 import { LevelCompleteOverlay } from "@/features/gameplay/LevelCompleteOverlay";
@@ -29,6 +32,8 @@ const COMPLETE_OVERLAY_DELAY_MS = 200;
 const HINT_PIP_COUNT = 5;
 const DEBUG_LAYOUT_MODE = import.meta.env.VITE_LAYOUT_DEBUG === "true";
 const FINAL_VALIDATE_MODE = import.meta.env.VITE_FINAL_VALIDATE === "true";
+const SCENE_ALIGNMENT_DEBUG_MODE =
+  import.meta.env.VITE_SCENE_ALIGNMENT_DEBUG === "true";
 const ARCHIVE_VALIDATE_MODE = import.meta.env.VITE_ARCHIVE_VALIDATE === "true";
 const noop = () => undefined;
 
@@ -345,20 +350,28 @@ export function GameScreen({
   const setInterstitialNativeRequestInFlight = useGameStore(
     (s) => s.setInterstitialNativeRequestInFlight,
   );
-  const setInterstitialResolved = useGameStore((s) => s.setInterstitialResolved);
+  const setInterstitialResolved = useGameStore(
+    (s) => s.setInterstitialResolved,
+  );
   const markReviewPromptShown = useGameStore((s) => s.markReviewPromptShown);
   const dismissReviewPrompt = useGameStore((s) => s.dismissReviewPrompt);
   const setReviewNativeRequestInFlight = useGameStore(
     (s) => s.setReviewNativeRequestInFlight,
   );
-  const setReviewNativeResolved = useGameStore((s) => s.setReviewNativeResolved);
+  const setReviewNativeResolved = useGameStore(
+    (s) => s.setReviewNativeResolved,
+  );
   const setReviewUnavailableReason = useGameStore(
     (s) => s.setReviewUnavailableReason,
   );
   const artifactRevealQueue = useGameStore((s) => s.artifactRevealQueue);
   const dismissArtifactReveal = useGameStore((s) => s.dismissArtifactReveal);
-  const markCampaignReportViewed = useGameStore((s) => s.markCampaignReportViewed);
-  const shouldShowCampaignReport = useGameStore((s) => s.shouldShowCampaignReport);
+  const markCampaignReportViewed = useGameStore(
+    (s) => s.markCampaignReportViewed,
+  );
+  const shouldShowCampaignReport = useGameStore(
+    (s) => s.shouldShowCampaignReport,
+  );
   const getCampaignReportForCompletedCampaign = useGameStore(
     (s) => s.getCampaignReportForCompletedCampaign,
   );
@@ -385,8 +398,10 @@ export function GameScreen({
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [isInterstitialActive, setIsInterstitialActive] = useState(false);
   const [postLevelActionInFlight, setPostLevelActionInFlight] = useState(false);
-  const [startupOnboardingOpen, setStartupOnboardingOpen] = useState(showOnboarding);
-  const [artifactToast, setArtifactToast] = useState<ArtifactToastVariant | null>(null);
+  const [startupOnboardingOpen, setStartupOnboardingOpen] =
+    useState(showOnboarding);
+  const [artifactToast, setArtifactToast] =
+    useState<ArtifactToastVariant | null>(null);
   const artifactToastTimerRef = useRef<number | null>(null);
   const completeOverlayDelayRef = useRef<number | null>(null);
   const activeTimerSaveCounterRef = useRef(0);
@@ -412,7 +427,9 @@ export function GameScreen({
   const completionPending = pendingFinalStats !== null;
   const showComplete = finalStats !== null;
   const pendingRevealArtifact =
-    artifactRevealQueue.length > 0 ? getArtifactById(artifactRevealQueue[0]) ?? null : null;
+    artifactRevealQueue.length > 0
+      ? (getArtifactById(artifactRevealQueue[0]) ?? null)
+      : null;
   const showArtifactReveal = showComplete && pendingRevealArtifact !== null;
   const campaignReport =
     level &&
@@ -426,9 +443,15 @@ export function GameScreen({
       : null;
   const showCampaignReport = campaignReport !== null;
   const showRewardedHintModal = rewardedHintModal !== null;
-  const showStartupOnboarding = mode === "campaign" && startupOnboardingOpen && !showComplete && !timedOut;
+  const showStartupOnboarding =
+    mode === "campaign" && startupOnboardingOpen && !showComplete && !timedOut;
   const showOverlay =
-    showComplete || timedOut || showRewardedHintModal || isReviewPromptOpen || showStartupOnboarding || showCampaignReport;
+    showComplete ||
+    timedOut ||
+    showRewardedHintModal ||
+    isReviewPromptOpen ||
+    showStartupOnboarding ||
+    showCampaignReport;
   const gameplayBlocked =
     platformPaused ||
     !pageVisible ||
@@ -456,7 +479,12 @@ export function GameScreen({
       language: saveData.settings.locale,
       promptOrdinal,
     }),
-    [completedLevelsCount, level?.chapterId, promptOrdinal, saveData.settings.locale],
+    [
+      completedLevelsCount,
+      level?.chapterId,
+      promptOrdinal,
+      saveData.settings.locale,
+    ],
   );
 
   useEffect(() => subscribePlatformPause(setPlatformPaused), []);
@@ -597,8 +625,10 @@ export function GameScreen({
           reviewState: saveData.reviewPrompt,
           isCampaignMapActive: false,
           isPostLevelVictoryActive: true,
-          isDocumentVisible: pageVisible && document.visibilityState === "visible",
-          hasBlockingOverlay: isReviewPromptOpen || showArtifactReveal || showCampaignReport,
+          isDocumentVisible:
+            pageVisible && document.visibilityState === "visible",
+          hasBlockingOverlay:
+            isReviewPromptOpen || showArtifactReveal || showCampaignReport,
           isAdActive:
             isInterstitialActive ||
             interstitialRuntime.nativeRequestInFlight ||
@@ -684,11 +714,14 @@ export function GameScreen({
 
   const reportShownRef = useRef<string | null>(null);
   const reportRestoredLevels =
-    chapter?.levels.filter((candidate) => saveData.completedLevels.includes(candidate.id)).length ?? 0;
+    chapter?.levels.filter((candidate) =>
+      saveData.completedLevels.includes(candidate.id),
+    ).length ?? 0;
   const reportTotalLevels = chapter?.levels.length ?? 0;
   const reportUnlockedArtifactCount =
-    campaignReport?.artifactIds.filter((artifactId) => (saveData.artifacts[artifactId] ?? "locked") !== "locked")
-      .length ?? 0;
+    campaignReport?.artifactIds.filter(
+      (artifactId) => (saveData.artifacts[artifactId] ?? "locked") !== "locked",
+    ).length ?? 0;
   const reportTotalArtifactCount = campaignReport?.artifactIds.length ?? 0;
 
   useEffect(() => {
@@ -699,7 +732,7 @@ export function GameScreen({
       campaignId: campaignReport.campaignId,
       reportId: campaignReport.id,
       restoredLevels: reportRestoredLevels,
-      artifactCount: reportUnlockedArtifactCount
+      artifactCount: reportUnlockedArtifactCount,
     });
   }, [
     campaignReport,
@@ -712,7 +745,7 @@ export function GameScreen({
 
   const nextLevel =
     mode === "campaign"
-      ? chapter.levels.find((l) => l.order === level.order + 1) ?? null
+      ? (chapter.levels.find((l) => l.order === level.order + 1) ?? null)
       : null;
   const magnifiers = saveData.magnifiers;
   const displayFoundIds = showComplete
@@ -727,7 +760,8 @@ export function GameScreen({
   function showArtifactToast(differenceId: string) {
     if (levelArtifact?.differenceId !== differenceId) return;
     const artifactState = saveData.artifacts[levelArtifact.id] ?? "locked";
-    const variant: ArtifactToastVariant = artifactState === "locked" ? "new" : "replay";
+    const variant: ArtifactToastVariant =
+      artifactState === "locked" ? "new" : "replay";
     setArtifactToast(variant);
     if (artifactToastTimerRef.current !== null) {
       window.clearTimeout(artifactToastTimerRef.current);
@@ -745,7 +779,15 @@ export function GameScreen({
   }
 
   function handleDifference(differenceId: string) {
-    if (completionPending || showComplete || timedOut || platformPaused || isSettingsOpen || showStartupOnboarding) return;
+    if (
+      completionPending ||
+      showComplete ||
+      timedOut ||
+      platformPaused ||
+      isSettingsOpen ||
+      showStartupOnboarding
+    )
+      return;
     if (hintId === differenceId) setHintId(undefined);
     showArtifactToast(differenceId);
     recordDiff(levelId, differenceId);
@@ -1002,7 +1044,9 @@ export function GameScreen({
     navigate({ kind: "collection" });
   }
 
-  function completeCampaignReportAction(action: "next_campaign" | "collection" | "archive" | "close") {
+  function completeCampaignReportAction(
+    action: "next_campaign" | "collection" | "archive" | "close",
+  ) {
     if (!campaignReport) return;
     markCampaignReportViewed(campaignReport.id);
     clearPendingInterstitialCheck();
@@ -1010,7 +1054,7 @@ export function GameScreen({
     trackAnalyticsEvent("campaign_report_cta_clicked", {
       campaignId: campaignReport.campaignId,
       reportId: campaignReport.id,
-      action
+      action,
     });
     void save({ flush: true });
   }
@@ -1151,12 +1195,14 @@ export function GameScreen({
       levelId,
       campaignId: chapterId,
       mode,
-      requiredDifferences: level!.requiredDifferences
+      requiredDifferences: level!.requiredDifferences,
     });
   }
 
   const campaignTitle =
-    mode === "daily" ? t("actions.daily").toUpperCase() : t(chapter.titleKey).toUpperCase();
+    mode === "daily"
+      ? t("actions.daily").toUpperCase()
+      : t(chapter.titleKey).toUpperCase();
   const levelBadgeTotal = mode === "daily" ? 7 : chapter.levels.length;
   const hasRewardedAreaHintTarget = level.differences.some(
     (d) => !liveFoundIds.includes(d.id) && d.id !== hintId,
@@ -1308,9 +1354,9 @@ export function GameScreen({
                   </span>
                 </div>
               </div>
-              <span className="hidden font-manrope text-[10.5px] font-semibold tracking-[.12em] text-exp-muted sm:block md:text-[12px]">
+              {/* <span className="hidden font-manrope text-[10.5px] font-semibold tracking-[.12em] text-exp-muted sm:block md:text-[12px]">
                 {t("game.diffCount")}
-              </span>
+              </span> */}
               <div className="hidden gap-[5px] xl:flex">
                 {Array.from({ length: level.requiredDifferences }).map(
                   (_, i) => (
@@ -1528,7 +1574,9 @@ export function GameScreen({
                           }
                     }
                     aria-current={active ? "page" : undefined}
-                    onClick={() => handleArchiveValidationLevel(archiveLevel.id)}
+                    onClick={() =>
+                      handleArchiveValidationLevel(archiveLevel.id)
+                    }
                   >
                     {archiveLevel.order}
                   </button>
@@ -1607,13 +1655,15 @@ export function GameScreen({
             hintId={hintId}
             onDifference={handleDifference}
             onMisclick={() => {
-              if (!completionPending && !platformPaused && !isSettingsOpen) recordMiss(levelId);
+              if (!completionPending && !platformPaused && !isSettingsOpen)
+                recordMiss(levelId);
             }}
             labelA={t("game.labelOriginal")}
             labelB={t("game.labelCopy")}
             debugShowAllDifferences={DEBUG_LAYOUT_MODE || FINAL_VALIDATE_MODE}
             debugUseMarkupReference={DEBUG_LAYOUT_MODE}
             debugEnableHitboxEditor={DEBUG_LAYOUT_MODE || FINAL_VALIDATE_MODE}
+            debugEnableSceneAlignmentEditor={SCENE_ALIGNMENT_DEBUG_MODE}
           />
         </div>
 

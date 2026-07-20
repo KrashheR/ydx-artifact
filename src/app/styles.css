@@ -1691,6 +1691,90 @@ select {
     flex-direction: column !important;
   }
 
+  .artifact-reveal-dialog {
+    display: grid !important;
+    grid-template-columns: minmax(150px, 190px) minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    column-gap: 24px;
+    align-items: center;
+    width: min(760px, calc(100vw - 28px)) !important;
+    padding: 18px 22px !important;
+    text-align: left !important;
+  }
+
+  .artifact-reveal-eyebrow,
+  .artifact-reveal-title,
+  .artifact-reveal-sealing,
+  .artifact-reveal-content {
+    grid-column: 2;
+  }
+
+  .artifact-reveal-eyebrow {
+    align-self: end;
+    font-size: 9.5px !important;
+    letter-spacing: 0.24em !important;
+  }
+
+  .artifact-reveal-title {
+    margin-top: 4px !important;
+    font-size: 26px !important;
+  }
+
+  .artifact-reveal-card {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    width: min(42dvh, 168px) !important;
+    height: min(42dvh, 168px) !important;
+    margin-top: 0 !important;
+    justify-self: center;
+  }
+
+  .artifact-reveal-sealing {
+    margin-top: 12px !important;
+  }
+
+  .artifact-reveal-content {
+    min-width: 0;
+    align-items: flex-start !important;
+  }
+
+  .artifact-reveal-name {
+    margin-top: 10px !important;
+    font-size: 20px !important;
+    line-height: 1.1 !important;
+  }
+
+  .artifact-reveal-clue {
+    margin-top: 3px !important;
+    font-size: 12.5px !important;
+    line-height: 1.3 !important;
+  }
+
+  .artifact-reveal-body {
+    margin-top: 8px !important;
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+  }
+
+  .artifact-reveal-footer {
+    margin-top: 7px !important;
+    font-size: 9.5px !important;
+  }
+
+  .artifact-reveal-actions {
+    margin-top: 12px !important;
+    gap: 8px !important;
+    flex-direction: row !important;
+  }
+
+  .artifact-reveal-actions button {
+    height: 44px !important;
+    min-height: 44px;
+    padding: 0 10px;
+    font-size: 12.5px !important;
+    line-height: 1.1;
+  }
+
   .result-dialog {
     width: min(760px, calc(100vw - 28px)) !important;
     max-width: none !important;
@@ -1846,6 +1930,12 @@ select {
       grid-template-columns: minmax(190px, 0.72fr) minmax(0, 1fr);
       gap: 0 16px;
       padding: 16px 18px !important;
+    }
+
+    .artifact-reveal-dialog {
+      grid-template-columns: minmax(132px, 156px) minmax(0, 1fr);
+      column-gap: 16px;
+      padding: 14px 16px !important;
     }
 
     .result-icon {

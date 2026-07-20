@@ -4,6 +4,7 @@ import type { Dirent } from "node:fs";
 import { readdir, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { writeHitboxesToSource } from "./scripts/hitbox-source-writer";
+import { writeSceneAlignmentToSource } from "./scripts/scene-alignment-source-writer";
 import { defineConfig } from "vite";
 import type { Plugin, ResolvedConfig } from "vite";
 
@@ -102,6 +103,40 @@ function hitboxSourceWriter(): Plugin {
   };
 }
 
+function sceneAlignmentSourceWriter(): Plugin {
+  let resolvedConfig: ResolvedConfig;
+
+  return {
+    name: "scene-alignment-source-writer",
+    apply: "serve",
+    configResolved(config) {
+      resolvedConfig = config;
+    },
+    configureServer(server) {
+      if (process.env.VITE_SCENE_ALIGNMENT_DEBUG !== "true") return;
+
+      server.middlewares.use("/__dev/scene-alignment/apply", async (req, res) => {
+        if (req.method !== "POST") {
+          res.statusCode = 405;
+          res.end("Method Not Allowed");
+          return;
+        }
+
+        try {
+          const payload = JSON.parse(await readRequestBody(req));
+          const result = await writeSceneAlignmentToSource(resolvedConfig.root, payload);
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify({ ok: true, result }));
+        } catch (error) {
+          res.statusCode = 400;
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify({ ok: false, error: error instanceof Error ? error.message : String(error) }));
+        }
+      });
+    }
+  };
+}
+
 function readRequestBody(req: import("node:http").IncomingMessage) {
   return new Promise<string>((resolve, reject) => {
     const chunks: Buffer[] = [];
@@ -120,6 +155,7 @@ export default defineConfig(({ command }) => ({
       modernPolyfills: true
     }),
     hitboxSourceWriter(),
+    sceneAlignmentSourceWriter(),
     excludeNonRuntimeSceneAssetsFromBuild()
   ],
   resolve: {

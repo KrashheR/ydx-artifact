@@ -7,6 +7,7 @@ Local vertical-slice scaffold based on `docs/`.
 ```bash
 pnpm install
 pnpm dev
+pnpm dev:align
 ```
 
 Open the Vite URL printed by the command. The default platform mode is local mock and does not require Yandex SDK.
@@ -52,6 +53,7 @@ pnpm test:e2e
 
 For broad agent edits, `pnpm agent:check` runs lint, typecheck and content validation. For pre-release agent validation, use `pnpm agent:release-check`.
 `pnpm dev:validate` starts the Vite dev server with gameplay scenes swapped to each level's `3.*` markup reference and all difference hitboxes visible for live alignment checks.
+`pnpm dev:align` starts an all-content-unlocked dev server with a mobile scene-alignment dashboard. In a phone landscape viewport, adjust each level's A/B image with 0.5px X/Y controls; drafts persist per level in localStorage, and Apply writes the offsets to `src/content/sceneAlignment.json` for use in normal gameplay.
 `pnpm assets:optimize` dry-runs conservative WebP recompression for runtime gameplay scene pairs; pass `-- --apply` to replace only candidates that keep dimensions and pass the pixel-difference gates.
 `pnpm dev:validate:cheat` starts the same validation server and automatically unlocks all currently implemented campaigns and levels in the local dev save.
 `pnpm dev --cheat` starts the plain dev server (no hitbox debug overlay) with that same all-content unlock applied to the local dev save.

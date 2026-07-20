@@ -4,6 +4,7 @@ declare global {
   interface ImportMetaEnv {
     readonly VITE_LAYOUT_DEBUG?: string;
     readonly VITE_FINAL_VALIDATE?: string;
+    readonly VITE_SCENE_ALIGNMENT_DEBUG?: string;
     readonly VITE_DEV_VALIDATE_CHEAT?: string;
     readonly VITE_YANDEX_METRICA_ID?: string;
     readonly VITE_ANALYTICS_DEBUG?: string;

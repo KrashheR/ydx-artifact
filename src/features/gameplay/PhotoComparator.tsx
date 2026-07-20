@@ -1,5 +1,11 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import {
+  getMobileSceneAlignment,
+  ZERO_SCENE_OFFSET,
+  type MobileSceneAlignment,
+  type SceneOffset,
+} from "@/content/sceneAlignment";
 import { getSceneMarkupAsset } from "@/content/sceneAssets";
 import type {
   DifferenceDefinition,
@@ -20,6 +26,7 @@ type PhotoComparatorProps = {
   debugShowAllDifferences?: boolean;
   debugUseMarkupReference?: boolean;
   debugEnableHitboxEditor?: boolean;
+  debugEnableSceneAlignmentEditor?: boolean;
 };
 
 type PointerState = {
@@ -60,11 +67,19 @@ type ApplyStatus = "idle" | "saving" | "saved" | "error";
 
 let wrongClickSeq = 0;
 const HITBOX_EDITOR_STORAGE_PREFIX = "artifact.hitboxEditor.";
+const SCENE_ALIGNMENT_STORAGE_PREFIX = "artifact.sceneAlignmentEditor.";
 const PAN_OVERSCROLL_PX = 160;
 const HitboxEditorControls = import.meta.env.DEV
   ? lazy(() =>
       import("./dev/HitboxEditorControls").then((module) => ({
         default: module.HitboxEditorControls,
+      })),
+    )
+  : null;
+const SceneAlignmentEditorControls = import.meta.env.DEV
+  ? lazy(() =>
+      import("./dev/SceneAlignmentEditorControls").then((module) => ({
+        default: module.SceneAlignmentEditorControls,
       })),
     )
   : null;
@@ -80,6 +95,7 @@ export function PhotoComparator({
   debugShowAllDifferences = false,
   debugUseMarkupReference = false,
   debugEnableHitboxEditor = false,
+  debugEnableSceneAlignmentEditor = false,
 }: PhotoComparatorProps) {
   const { t } = useTranslation();
   const comparatorScheme = useGameStore(
@@ -99,9 +115,14 @@ export function PhotoComparator({
   const [wrongClicksA, setWrongClicksA] = useState<WrongClick[]>([]);
   const [wrongClicksB, setWrongClicksB] = useState<WrongClick[]>([]);
   const [applyStatus, setApplyStatus] = useState<ApplyStatus>("idle");
+  const [alignmentApplyStatus, setAlignmentApplyStatus] =
+    useState<ApplyStatus>("idle");
+  const [mobileSceneAlignment, setMobileSceneAlignment] =
+    useState<MobileSceneAlignment>(() => getMobileSceneAlignment(level.id));
   const hitboxEditorEnabled =
     debugShowAllDifferences && debugEnableHitboxEditor;
   const editorStorageKey = `${HITBOX_EDITOR_STORAGE_PREFIX}${level.id}`;
+  const alignmentStorageKey = `${SCENE_ALIGNMENT_STORAGE_PREFIX}${level.id}`;
 
   useEffect(() => {
     setEditableDifferences(
@@ -109,6 +130,16 @@ export function PhotoComparator({
     );
     setApplyStatus("idle");
   }, [editorStorageKey, level.differences]);
+
+  useEffect(() => {
+    const sourceAlignment = getMobileSceneAlignment(level.id);
+    setMobileSceneAlignment(
+      debugEnableSceneAlignmentEditor
+        ? loadEditedSceneAlignment(alignmentStorageKey, sourceAlignment)
+        : sourceAlignment,
+    );
+    setAlignmentApplyStatus("idle");
+  }, [alignmentStorageKey, debugEnableSceneAlignmentEditor, level.id]);
 
   const found = useMemo(
     () => editableDifferences.filter((d) => foundIds.includes(d.id)),
@@ -233,6 +264,29 @@ export function PhotoComparator({
     setApplyStatus("idle");
   }
 
+  function updateSceneAlignment(
+    side: "A" | "B",
+    axis: keyof SceneOffset,
+    value: number,
+  ) {
+    if (!Number.isFinite(value)) return;
+    setAlignmentApplyStatus("idle");
+    setMobileSceneAlignment((current) => {
+      const next = {
+        ...current,
+        [side]: { ...current[side], [axis]: clampSceneOffset(value) },
+      };
+      window.localStorage.setItem(alignmentStorageKey, JSON.stringify(next));
+      return next;
+    });
+  }
+
+  function resetSceneAlignment() {
+    window.localStorage.removeItem(alignmentStorageKey);
+    setMobileSceneAlignment(getMobileSceneAlignment(level.id));
+    setAlignmentApplyStatus("idle");
+  }
+
   function renderPhoto(side: "A" | "B", mobile = false) {
     const src = getSceneSource(level, side, debugUseMarkupReference);
     const inactiveSrc = mobile
@@ -306,6 +360,7 @@ export function PhotoComparator({
             compareLabel={
               version === "A" ? t("game.labelOriginal") : t("game.labelCopy")
             }
+            sceneOffset={mobile ? mobileSceneAlignment[side] : ZERO_SCENE_OFFSET}
           />
         </SceneAspectFrame>
       </div>
@@ -347,6 +402,7 @@ export function PhotoComparator({
         compareLabel={
           side === "A" ? t("game.labelOriginal") : t("game.labelCopy")
         }
+        sceneOffset={mobileSceneAlignment[side]}
       />
     );
   }
@@ -580,6 +636,20 @@ export function PhotoComparator({
           />
         </Suspense>
       ) : null}
+
+      {debugEnableSceneAlignmentEditor && SceneAlignmentEditorControls ? (
+        <Suspense fallback={null}>
+          <SceneAlignmentEditorControls
+            levelId={level.id}
+            alignment={mobileSceneAlignment}
+            storageKey={alignmentStorageKey}
+            applyStatus={alignmentApplyStatus}
+            onApplyStatus={setAlignmentApplyStatus}
+            onChange={updateSceneAlignment}
+            onReset={resetSceneAlignment}
+          />
+        </Suspense>
+      ) : null}
     </div>
   );
 }
@@ -667,6 +737,7 @@ function PhotoCanvas({
   onHitboxRotate,
   onHitboxDelete,
   compareLabel,
+  sceneOffset,
 }: {
   levelId: string;
   side: "A" | "B";
@@ -709,10 +780,16 @@ function PhotoCanvas({
   ) => void;
   onHitboxDelete: (differenceId: string) => void;
   compareLabel: string;
+  sceneOffset: SceneOffset;
 }) {
   const frameRef = useRef<HTMLDivElement | null>(null);
   const [frameSize, setFrameSize] = useState<Size>({ width: 0, height: 0 });
-  const imageRect = getContainedImageRect(frameSize, imageAspectRatio);
+  const containedImageRect = getContainedImageRect(frameSize, imageAspectRatio);
+  const imageRect = {
+    ...containedImageRect,
+    left: containedImageRect.left + sceneOffset.x,
+    top: containedImageRect.top + sceneOffset.y,
+  };
 
   useEffect(() => {
     const element = frameRef.current;
@@ -1515,6 +1592,29 @@ function loadEditedDifferences(
   } catch {
     return cloneDifferences(fallback);
   }
+}
+
+function loadEditedSceneAlignment(
+  storageKey: string,
+  fallback: MobileSceneAlignment,
+) {
+  const stored = window.localStorage.getItem(storageKey);
+  if (!stored) return fallback;
+  try {
+    const parsed = JSON.parse(stored) as MobileSceneAlignment;
+    for (const side of ["A", "B"] as const) {
+      if (!Number.isFinite(parsed?.[side]?.x) || !Number.isFinite(parsed?.[side]?.y)) {
+        return fallback;
+      }
+    }
+    return parsed;
+  } catch {
+    return fallback;
+  }
+}
+
+function clampSceneOffset(value: number) {
+  return Math.max(-32, Math.min(32, Number(value.toFixed(2))));
 }
 
 function createNewDifference(

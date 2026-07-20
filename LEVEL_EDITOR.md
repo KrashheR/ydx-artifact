@@ -2,6 +2,8 @@
 
 The local dev-only hitbox editor is available through `pnpm dev:validate` for markup-reference review and `pnpm validate:final` for final A/B scene review. Hitbox data is authored in `src/content/*` and can be written back with the editor's Apply action.
 
+Mobile A/B image registration is authored separately with `pnpm dev:align`. Open the game in a landscape phone viewport, select the target campaign level, then nudge either image on X/Y in 0.5 CSS-pixel increments. The draft is stored per level in localStorage. `Apply` writes the pair to `src/content/sceneAlignment.json`; normal gameplay applies it to both the visible image and its marker/hit-test plane in flip and slider comparison modes. Desktop scene placement is unchanged. Set all four values to zero and Apply to remove an override.
+
 Until an editor exists, new level markup uses the three-image intake documented in `CONTENT_PIPELINE.md`:
 
 - `1.webp` is the left gameplay scene.

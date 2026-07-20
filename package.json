@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx scripts/dev.ts",
+    "dev:align": "tsx scripts/dev-align.ts",
     "dev:validate": "tsx scripts/dev-validate.ts",
     "dev:validate:cheat": "tsx scripts/dev-validate.ts --cheat",
     "validate:final": "tsx scripts/dev-validate.ts --final --cheat",

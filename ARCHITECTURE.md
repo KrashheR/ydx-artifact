@@ -2,7 +2,7 @@
 
 React owns screens and UI state. Gameplay hit testing is isolated in `src/shared/lib/hitTesting.ts`; level hit shapes support circles, axis-aligned or rotated ellipses, and polygons through `src/entities/level/schema.ts`.
 
-`src/features/gameplay/PhotoComparator.tsx` displays scene images with `object-fit: contain`. The comparator measures the contained image plane inside each photo panel and converts pointer, found-marker, hint-marker and wrong-click coordinates through that plane, so normalized hitboxes stay aligned when the panel aspect ratio adds letterbox space.
+`src/features/gameplay/PhotoComparator.tsx` displays scene images with `object-fit: contain`. The comparator measures the contained image plane inside each photo panel and converts pointer, found-marker, hint-marker and wrong-click coordinates through that plane, so normalized hitboxes stay aligned when the panel aspect ratio adds letterbox space. Optional mobile-only A/B registration offsets come from the validated `src/content/sceneAlignment.json`; the offset moves that complete image/interaction plane in both flip and slider modes while desktop remains unchanged. `pnpm dev:align` is the dev-only authoring surface and writes this source through a serve-only Vite endpoint.
 
 Playable campaign content is chapter-driven:
 
