@@ -8,7 +8,10 @@ import {
   type ArtifactToastVariant,
 } from "@/features/gameplay/ArtifactFoundToast";
 import { ArtifactRevealOverlay } from "@/features/collection/ArtifactRevealOverlay";
-import { CampaignCaseReportModal } from "@/features/campaign-report/CampaignCaseReportModal";
+import {
+  CampaignCaseReportModal,
+  type SettingInterest,
+} from "@/features/campaign-report/CampaignCaseReportModal";
 import { LevelCompleteOverlay } from "@/features/gameplay/LevelCompleteOverlay";
 import { LevelFailedOverlay } from "@/features/gameplay/LevelFailedOverlay";
 import { getArtifactById } from "@/content/artifacts";
@@ -1156,6 +1159,15 @@ export function GameScreen({
     navigate({ kind: "collection" });
   }
 
+  function handleSettingInterestSelected(setting: SettingInterest) {
+    if (!campaignReport) return;
+    trackAnalyticsEvent("setting_interest_selected", {
+      campaignId: campaignReport.campaignId,
+      reportId: campaignReport.id,
+      setting,
+    });
+  }
+
   function handleCampaignReportClose() {
     if (!campaignReport) return;
     completeCampaignReportAction("close");
@@ -1845,6 +1857,7 @@ export function GameScreen({
           artifactIds={campaignReport.artifactIds}
           onPrimary={handleCampaignReportPrimary}
           onOpenCollection={handleCampaignReportCollection}
+          onSettingInterestSelected={handleSettingInterestSelected}
           onClose={handleCampaignReportClose}
         />
       )}

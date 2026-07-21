@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added an optional, unrewarded four-option setting-interest survey to campaign reports. Selections emit the typed `setting_interest_selected` event for later comparison with campaign depth and retention.
+
+- Fixed automatic startup locale selection: it now follows the Yandex Games priority of a manual saved choice, SDK language, browser language, then Russian fallback, instead of defaulting a missing SDK language to English.
+
 - Rebuilt product analytics around persisted level attempts: every attempt now has an ID/number and one terminal outcome, onboarding and background abandonment are observable, hints/misclicks/time grants are summarized correctly, and active duration remains monotonic across timer extensions.
 
 - Added typed analytics registry-driven Metrica goal sync, common build/content/locale/device dimensions, save/scene/fatal-error telemetry, campaign exposure/entry/completion events, consecutive daily streak semantics, and release validation that rejects missing counters or registry/docs/build drift.

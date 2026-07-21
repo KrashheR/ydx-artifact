@@ -22,7 +22,7 @@ import { mockPlatform } from "@/services/platform/mockPlatform";
 import { notifyGameReady } from "@/services/platform/platformLifecycle";
 import { isMobileGameplayDevice } from "@/shared/lib/device";
 import { preloadImage } from "@/shared/lib/imagePreload";
-import { resolveInitialLocale } from "@/shared/lib/locale";
+import { getBrowserLanguage, resolveInitialLocale } from "@/shared/lib/locale";
 import { prefetchHomeIdleAssets } from "@/shared/lib/scenePrefetch";
 import { useGameStore } from "@/shared/store/gameStore";
 
@@ -220,7 +220,7 @@ export function App() {
         const nextLocale =
           savedSettings.localeSource === "manual"
             ? savedSettings.locale
-            : resolveInitialLocale(sdkLanguage);
+            : resolveInitialLocale(sdkLanguage, getBrowserLanguage());
         if (savedSettings.localeSource !== "manual") {
           setAutoLocale(nextLocale);
         }

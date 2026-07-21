@@ -73,6 +73,7 @@ extensions increment `timeGrantedSeconds`; they never subtract active duration.
 | `settings_closed`                    | Settings closed.                                                    |
 | `settings_language_changed`          | Selected locale changed.                                            |
 | `settings_comparator_scheme_changed` | Compare scheme changed.                                             |
+| `setting_interest_selected`          | Optional post-campaign preference answer; `setting` is one of four proposed settings and receives no reward. |
 | `campaign_card_impression`           | Campaign exposure denominator with status, position and `eligible`. |
 | `campaign_selected`                  | Campaign card/continue action.                                      |
 | `locked_campaign_clicked`            | Locked campaign action.                                             |

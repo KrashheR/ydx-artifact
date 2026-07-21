@@ -3,14 +3,19 @@ import { resolveInitialLocale } from "@/shared/lib/locale";
 
 describe("resolveInitialLocale", () => {
   it.each([
-    ["ru", "ru"],
-    ["ru-RU", "ru"],
-    ["kk", "ru"],
-    ["uk-UA", "ru"],
-    ["en", "en"],
-    ["tr", "en"],
-    [undefined, "en"]
-  ] as const)("maps %s to %s", (sdkLanguage, expected) => {
-    expect(resolveInitialLocale(sdkLanguage)).toBe(expected);
-  });
+    ["ru", undefined, "ru"],
+    ["en", "ru-RU", "en"],
+    ["ru-RU", "en-US", "ru"],
+    [undefined, "ru-RU", "ru"],
+    [undefined, "en-US", "en"],
+    ["kk", "en-US", "en"],
+    ["tr", "de-DE", "ru"],
+    [undefined, undefined, "ru"],
+  ] as const)(
+    "maps platform %s and browser %s to %s",
+    (platformLanguage, browserLanguage, expected) => {
+      expect(resolveInitialLocale(platformLanguage, browserLanguage)).toBe(expected);
+    },
+  );
+
 });

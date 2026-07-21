@@ -10,7 +10,7 @@
 - `mockPlatform.requestReview()` normalizes the documented `feedbackSent` response and tolerates the older `sentFeedback` example payload.
 - `mockPlatform.showRewarded()` calls `ysdk.adv.showRewardedVideo()` when available, grants only after `onRewarded` followed by close, and falls back to an immediate local mock reward in Vite/local mode.
 - `mockPlatform.showInterstitial()` calls `ysdk.adv.showFullscreenAdv()` when available and falls back to a short local mock open/close cycle in Vite/local mode.
-- `mockPlatform.getEnvironmentLanguage()` reads `ysdk.environment.i18n.lang` through the platform seam. On first/default saves the app maps this to `ru` or `en`; a manual Settings language choice is persisted and is not overwritten by SDK language on later launches.
+- `mockPlatform.getEnvironmentLanguage()` reads `ysdk.environment.i18n.lang` through the platform seam. On first/default saves locale selection follows the Yandex flow: persisted manual choice, then SDK `ru`/`en`, then browser `ru`/`en`, then Russian fallback. A manual Settings language choice is persisted and is not overwritten by later automatic detection.
 - SDK initialization is cached via a singleton promise and reuses `window.ysdk` when the host already initialized the SDK.
 - Production Vite builds use `@vitejs/plugin-legacy` for `Safari >= 9`, `iOS >= 9` and `Android >= 5`, producing both modern module scripts and legacy `nomodule` scripts/polyfills for the declared Yandex platform range.
 

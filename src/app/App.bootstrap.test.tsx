@@ -107,6 +107,17 @@ describe("App bootstrap", () => {
     expect(screen.queryByLabelText("Loading")).not.toBeInTheDocument();
   });
 
+  it("uses the browser locale when the Yandex SDK does not provide one", async () => {
+    vi.spyOn(navigator, "language", "get").mockReturnValue("ru-RU");
+
+    render(<App />);
+
+    await waitFor(() =>
+      expect(screen.queryByLabelText("Loading")).not.toBeInTheDocument(),
+    );
+    expect(document.documentElement.lang).toBe("ru");
+  });
+
   it("keeps the settings button available inside the gameplay HUD", async () => {
     const level = getChapterLevels("northern-route")[0];
     useGameStore.setState({

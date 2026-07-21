@@ -67,6 +67,7 @@ export const ANALYTICS_EVENT_NAMES = [
   "settings_comparator_scheme_changed",
   "settings_language_changed",
   "settings_opened",
+  "setting_interest_selected",
 ] as const;
 
 export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];

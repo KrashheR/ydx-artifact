@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getArtifactById } from "@/content/artifacts";
 import type { CampaignReport, CollectibleId } from "@/data/campaignReports";
@@ -12,8 +13,13 @@ type CampaignCaseReportModalProps = {
   artifactIds: CollectibleId[];
   onPrimary: () => void;
   onOpenCollection: () => void;
+  onSettingInterestSelected: (setting: SettingInterest) => void;
   onClose?: () => void;
 };
+
+const SETTING_INTERESTS = ["coastal", "mountain", "city", "space"] as const;
+
+export type SettingInterest = (typeof SETTING_INTERESTS)[number];
 
 function ReportDivider() {
   return (
@@ -36,6 +42,7 @@ export function CampaignCaseReportModal({
   artifactIds,
   onPrimary,
   onOpenCollection,
+  onSettingInterestSelected,
   onClose
 }: CampaignCaseReportModalProps) {
   const { t } = useTranslation();
@@ -45,6 +52,13 @@ export function CampaignCaseReportModal({
   const allFindingsUnlocked = unlockedArtifactCount >= totalArtifactCount;
   const hookTitleKey = report.futureHookTitleKey ?? "campaignReport.nextHookLabel";
   const hookTextKey = report.futureHookTextKey ?? report.nextHookKey;
+  const [selectedSetting, setSelectedSetting] = useState<SettingInterest | null>(null);
+
+  function selectSetting(setting: SettingInterest) {
+    if (selectedSetting) return;
+    setSelectedSetting(setting);
+    onSettingInterestSelected(setting);
+  }
 
   return (
     <div className="absolute inset-0 z-[70] flex items-end justify-center bg-[#070908]/75 p-0 font-manrope sm:items-center sm:p-4">
@@ -244,6 +258,36 @@ export function CampaignCaseReportModal({
               </div>
             </article>
           </div>
+
+          <section className="mt-5 rounded-[8px] border border-[#5f4a2d]/16 bg-[#f4eedd]/52 p-4">
+            <h3 className="text-[11px] font-extrabold uppercase tracking-[.22em] text-[#8c6430]">
+              {t("settingInterestSurvey.title")}
+            </h3>
+            <p className="mt-2 text-[14px] leading-[1.55] text-[#625a4f]">
+              {selectedSetting ? t("settingInterestSurvey.thanks") : t("settingInterestSurvey.description")}
+            </p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {SETTING_INTERESTS.map((setting) => {
+                const selected = selectedSetting === setting;
+                return (
+                  <button
+                    key={setting}
+                    type="button"
+                    onClick={() => selectSetting(setting)}
+                    disabled={selectedSetting !== null}
+                    className="min-h-11 rounded-[7px] border px-3 py-2 text-left text-[13px] font-bold transition enabled:hover:bg-[#fff7e8] disabled:cursor-default"
+                    style={{
+                      borderColor: selected ? "rgba(184,138,69,.7)" : "rgba(95,74,45,.2)",
+                      background: selected ? "rgba(184,138,69,.16)" : "rgba(255,247,232,.36)",
+                      color: "#4d3d25"
+                    }}
+                  >
+                    {t(`settingInterestSurvey.options.${setting}`)}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
 
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
             <button

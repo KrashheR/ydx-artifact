@@ -552,6 +552,17 @@
       }
     }
   },
+  "settingInterestSurvey": {
+    "title": "Where should the archive go next?",
+    "description": "Optional and unrewarded: which new setting interests you most?",
+    "thanks": "Your answer is recorded. Thank you — it will help choose the next route.",
+    "options": {
+      "coastal": "A sunken coast",
+      "mountain": "A high-altitude observatory",
+      "city": "A nocturnal city archive",
+      "space": "An orbital station"
+    }
+  },
   "artifacts": {
     "white-compass": {
       "name": "White Gull Compass",
