@@ -1,5 +1,9 @@
-export type RewardedResult = "rewarded" | "closed" | "failed";
-export type InterstitialResult = "closed" | "failed";
+/** @deprecated Compatibility seam for older tests; application code uses platform.ts. */
+export type { RewardedResult, InterstitialResult, CanReviewResult, RequestReviewResult, GameReviewGateway, InterstitialCallbacks } from "./types";
+export { getYandexSdk } from "./yandexPlatform";
+import { getTestablePlatformAdapter } from "./platform";
+export const mockPlatform = getTestablePlatformAdapter() as import("./types").PlatformAdapter & Required<Pick<import("./types").TestablePlatformAdapter, "setReviewGatewayOverride" | "setInterstitialGatewayOverride" | "setRewardedGatewayOverride">>;
+/*
 
 import type { ReviewUnavailableReason } from "@/entities/save/schema";
 
@@ -290,3 +294,4 @@ export const mockPlatform = {
     rewardedGatewayOverride = gateway;
   }
 };
+*/

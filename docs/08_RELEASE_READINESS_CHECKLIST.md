@@ -2,6 +2,15 @@
 
 Использовать перед каждой отправкой на модерацию и перед ручной публикацией.
 
+## CrazyGames supplement
+
+- [ ] Basic Launch is playable with all ad UI and requests disabled while the CrazyGames SDK remains enabled for lifecycle and Data Module.
+- [ ] Full Launch sends SDK v3 `loadingStart`/one `loadingStop` and level-driven gameplay start/stop.
+- [ ] Data Module is enabled in Developer Portal; guest reload and account sync have been checked.
+- [ ] Rewarded grants exactly once after ad finish; ad error grants nothing.
+- [ ] Midgame is between levels only and respects the three-minute cooldown.
+- [ ] `dist-crazygames.zip` has root `index.html`, relative paths, ≤250 MB, ≤1500 files and ≤50 MB initial download.
+
 ---
 
 ## A. Product

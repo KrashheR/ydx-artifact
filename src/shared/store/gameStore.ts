@@ -294,7 +294,7 @@ function getAttemptAnalyticsPayload(saveData: SaveData) {
     ),
     totalTimeExtensionsUsed: attempt.timeExtensionsUsed,
     timeGrantedSeconds: attempt.timeGrantedSeconds,
-    compareScheme: saveData.settings.comparatorScheme ?? "none",
+    compareScheme: saveData.settings.comparatorScheme ?? "flip",
     isReplay: saveData.completedLevels.includes(attempt.levelId),
     onboarding: attempt.onboarding,
   };

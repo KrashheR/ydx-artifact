@@ -1,7 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { INITIAL_MAGNIFIERS, migrateSaveData } from "@/entities/save/schema";
+import {
+  createDefaultSave,
+  INITIAL_MAGNIFIERS,
+  migrateSaveData,
+} from "@/entities/save/schema";
 
 describe("migrateSaveData", () => {
+  it("defaults the comparator to flip and upgrades an unset current save", () => {
+    expect(createDefaultSave().settings.comparatorScheme).toBe("flip");
+
+    const save = createDefaultSave();
+    save.settings.comparatorScheme = null;
+
+    expect(migrateSaveData(save).settings.comparatorScheme).toBe("flip");
+  });
+
   it("migrates v1 elapsedSeconds into the v3 attempt model", () => {
     const save = migrateSaveData({
       version: 1,

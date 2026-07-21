@@ -69,6 +69,19 @@ function excludeNonRuntimeSceneAssetsFromBuild(): Plugin {
   };
 }
 
+function platformSdkHtml(): Plugin {
+  return {
+    name: "platform-sdk-html",
+    transformIndexHtml(html) {
+      const platform = process.env.VITE_PLATFORM ?? process.env.VITE_PLATFORM_MODE;
+      const source = platform === "crazygames"
+        ? "https://sdk.crazygames.com/crazygames-sdk-v3.js"
+        : platform === "yandex" ? "/sdk.js" : null;
+      return html.replace("<!-- platform-sdk -->", source ? `<script src="${source}"></script>` : "");
+    },
+  };
+}
+
 function hitboxSourceWriter(): Plugin {
   let resolvedConfig: ResolvedConfig;
 
@@ -156,12 +169,16 @@ export default defineConfig(({ command }) => ({
     }),
     hitboxSourceWriter(),
     sceneAlignmentSourceWriter(),
+    platformSdkHtml(),
     excludeNonRuntimeSceneAssetsFromBuild()
   ],
   resolve: {
     alias: {
       "@": "/src"
     }
+  },
+  define: {
+    __YANDEX_METRICA_URL__: JSON.stringify((process.env.VITE_PLATFORM ?? process.env.VITE_PLATFORM_MODE) === "crazygames" ? "" : "https://mc.yandex.ru/metrika/tag.js"),
   },
   build: {
     sourcemap: process.env.BUILD_SOURCEMAP === "true"

@@ -1,10 +1,12 @@
 import { createDefaultSave, migrateSaveData, type SaveData } from "@/entities/save/schema";
-import { getYandexSdk, type YandexPlayer, type YandexStorage } from "@/services/platform/mockPlatform";
+import { getPlatformAdapter, getPlatformId } from "@/services/platform/platform";
+import type { StorageLike } from "@/services/platform/types";
 
 const SAVE_KEY = "anomaly-archive-save-v1";
 const CLOUD_LOAD_TIMEOUT_MS = 4_000;
 
 type SaveSource = "cloud" | "local" | "default";
+type LocalMirrorSource = "platform" | "browser";
 
 export type LoadSaveResult = {
   saveData: SaveData;
@@ -43,46 +45,72 @@ function getBrowserLocalStorage(): Storage | null {
   }
 }
 
-async function getSafeStorage(): Promise<YandexStorage | null> {
+function browserStorageLike(): StorageLike | null {
+  const storage = getBrowserLocalStorage();
+  return storage ? { getItem: async (key) => storage.getItem(key), setItem: async (key, value) => storage.setItem(key, value), removeItem: async (key) => storage.removeItem(key) } : null;
+}
+
+async function getPlatformStorage(): Promise<StorageLike | null> {
+  return getPlatformAdapter().getStorage();
+}
+
+async function readLocalMirror(): Promise<{ saveData: SaveData | null; source: LocalMirrorSource | null }> {
+  const platformStorage = await getPlatformStorage();
+  if (platformStorage) {
+    try {
+      return {
+        saveData: parseSerializedSave(await platformStorage.getItem(SAVE_KEY)),
+        source: "platform",
+      };
+    } catch {
+      // Data Module can be present but disabled in the Developer Portal.
+      // Browser storage keeps the guest save usable in that case.
+    }
+  }
+
+  const browserStorage = browserStorageLike();
+  if (!browserStorage) return { saveData: null, source: null };
+
   try {
-    const ysdk = await getYandexSdk();
-    return ysdk?.getStorage?.() ?? null;
+    return {
+      saveData: parseSerializedSave(await browserStorage.getItem(SAVE_KEY)),
+      source: "browser",
+    };
   } catch {
-    return null;
+    return { saveData: null, source: null };
   }
 }
 
-async function getLocalStorageMirror(): Promise<YandexStorage | Storage | null> {
-  return (await getSafeStorage()) ?? getBrowserLocalStorage();
-}
-
-async function readLocalMirror(): Promise<SaveData | null> {
-  const storage = await getLocalStorageMirror();
-  return parseSerializedSave(storage?.getItem?.(SAVE_KEY) ?? null);
-}
-
-async function writeLocalMirror(save: SaveData): Promise<void> {
-  const storage = await getLocalStorageMirror();
-
-  if (!storage?.setItem) {
-    throw new Error("Local save storage is unavailable");
+async function writeLocalMirror(save: SaveData): Promise<LocalMirrorSource> {
+  const serializedSave = JSON.stringify(save);
+  const platformStorage = await getPlatformStorage();
+  if (platformStorage) {
+    try {
+      await platformStorage.setItem(SAVE_KEY, serializedSave);
+      return "platform";
+    } catch {
+      // Fall through to browser storage when platform storage rejects a write
+      // (for example CrazyGames' dataModuleDisabled error).
+    }
   }
 
-  storage.setItem(SAVE_KEY, JSON.stringify(save));
+  const browserStorage = browserStorageLike();
+  if (!browserStorage) throw new Error("Local save storage is unavailable");
+  await browserStorage.setItem(SAVE_KEY, serializedSave);
+  return "browser";
 }
 
 async function removeLocalMirror(): Promise<void> {
-  const storage = await getLocalStorageMirror();
-  storage?.removeItem?.(SAVE_KEY);
-}
-
-async function getCloudPlayer(): Promise<YandexPlayer | null> {
-  try {
-    const ysdk = await getYandexSdk();
-    return await (ysdk?.getPlayer?.() ?? null);
-  } catch {
-    return null;
+  const platformStorage = await getPlatformStorage();
+  if (platformStorage) {
+    try {
+      await platformStorage.removeItem(SAVE_KEY);
+      return;
+    } catch {
+      // Fall through to the browser mirror if platform storage is unavailable.
+    }
   }
+  await browserStorageLike()?.removeItem(SAVE_KEY);
 }
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T | null> {
@@ -97,13 +125,12 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T | nul
 }
 
 async function readCloudSave(): Promise<{ saveData: SaveData | null; available: boolean }> {
-  const player = await getCloudPlayer();
-
-  if (!player?.getData) {
+  const read = getPlatformAdapter().getCloudSave;
+  if (!read) {
     return { saveData: null, available: false };
   }
 
-  const data = await withTimeout(player.getData(), CLOUD_LOAD_TIMEOUT_MS);
+  const data = await withTimeout(read(), CLOUD_LOAD_TIMEOUT_MS);
 
   if (!data) {
     return { saveData: null, available: false };
@@ -113,18 +140,7 @@ async function readCloudSave(): Promise<{ saveData: SaveData | null; available: 
 }
 
 async function writeCloudSave(save: SaveData, flush: boolean): Promise<boolean> {
-  const player = await getCloudPlayer();
-
-  if (!player?.setData) {
-    return false;
-  }
-
-  try {
-    await player.setData(save, flush);
-    return true;
-  } catch {
-    return false;
-  }
+  return (await getPlatformAdapter().setCloudSave?.(save, flush)) ?? false;
 }
 
 function chooseNewestSave(localSave: SaveData | null, cloudSave: SaveData | null): {
@@ -147,8 +163,19 @@ export async function loadLocalSave(): Promise<SaveData> {
 }
 
 export async function loadPersistentSave(): Promise<LoadSaveResult> {
+  await getPlatformAdapter().init();
+  if (getPlatformId() === "crazygames") {
+    const stored = await readLocalMirror();
+    return {
+      saveData: stored.saveData ?? createDefaultSave(),
+      source: stored.saveData
+        ? stored.source === "platform" ? "cloud" : "local"
+        : "default",
+      cloudAvailable: stored.source === "platform",
+    };
+  }
   const [localSave, cloudResult] = await Promise.all([readLocalMirror(), readCloudSave()]);
-  const selected = chooseNewestSave(localSave, cloudResult.saveData);
+  const selected = chooseNewestSave(localSave.saveData, cloudResult.saveData);
 
   try {
     await writeLocalMirror(selected.saveData);
@@ -167,16 +194,20 @@ export async function loadPersistentSave(): Promise<LoadSaveResult> {
 }
 
 export async function savePersistentSave(save: SaveData, options: { flush?: boolean } = {}): Promise<SaveResult> {
+  await getPlatformAdapter().init();
   const payload: SaveData = { ...save, updatedAt: Date.now() };
   let localError: unknown = null;
+  let localMirrorSource: LocalMirrorSource | null = null;
 
   try {
-    await writeLocalMirror(payload);
+    localMirrorSource = await writeLocalMirror(payload);
   } catch (error) {
     localError = error;
   }
 
-  const cloudSynced = await writeCloudSave(payload, options.flush ?? false);
+  const cloudSynced = getPlatformId() === "crazygames"
+    ? localMirrorSource === "platform"
+    : await writeCloudSave(payload, options.flush ?? false);
 
   if (localError && !cloudSynced) {
     throw localError;
@@ -186,6 +217,7 @@ export async function savePersistentSave(save: SaveData, options: { flush?: bool
 }
 
 export async function clearPersistentSave(): Promise<void> {
+  await getPlatformAdapter().init();
   const defaultSave = createDefaultSave();
   await removeLocalMirror();
   await writeCloudSave(defaultSave, true);

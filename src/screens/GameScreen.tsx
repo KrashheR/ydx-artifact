@@ -20,7 +20,8 @@ import { GameReviewPrePromptModal } from "@/features/review/GameReviewPrePromptM
 import { runNativeReviewFlow } from "@/features/review/reviewFlow";
 import { isReviewPrePromptLocallyEligible } from "@/features/review/reviewPrompt";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
-import { mockPlatform } from "@/services/platform/mockPlatform";
+import { areAdsEnabled } from "@/services/platform/ads";
+import { getPlatformAdapter } from "@/services/platform/platform";
 import {
   getIsPlatformPaused,
   setGameplayActive,
@@ -573,6 +574,11 @@ export function GameScreen({
   }, [gameplayBlocked]);
 
   useEffect(() => {
+    getPlatformAdapter().setGameContext?.({ level: levelId });
+    return () => getPlatformAdapter().setGameContext?.({});
+  }, [levelId]);
+
+  useEffect(() => {
     const preventBrowserGameGesture = (event: Event) => event.preventDefault();
     const listenerOptions = { capture: true };
 
@@ -713,7 +719,7 @@ export function GameScreen({
 
         if (!locallyEligible) return;
 
-        const availability = await mockPlatform.canReview();
+        const availability = await getPlatformAdapter().canReview();
         const currentScreen = useGameStore.getState().screen;
 
         if (
@@ -934,6 +940,8 @@ export function GameScreen({
       return;
     }
 
+    if (!adsEnabled) return;
+
     setRewardedHintModal("offer");
     trackAnalyticsEvent("rewarded_hint_offer_opened", {
       levelId,
@@ -955,6 +963,7 @@ export function GameScreen({
       platformPaused ||
       isSettingsOpen ||
       magnifiers > 0 ||
+      !adsEnabled ||
       !hasRewardedAreaHintTarget
     )
       return;
@@ -971,7 +980,7 @@ export function GameScreen({
       elapsedActiveSeconds: liveElapsedActiveSeconds,
     });
     try {
-      const result = await mockPlatform.showRewarded();
+      const result = await getPlatformAdapter().showRewarded();
       if (result === "rewarded") {
         revealNextAreaHint({
           spendMagnifier: false,
@@ -1020,6 +1029,11 @@ export function GameScreen({
     const completedLevels = runtime.pendingMapCheckCompletedLevels;
     if (completedLevels === null) return;
 
+    if (!adsEnabled) {
+      clearPendingInterstitialCheck();
+      return;
+    }
+
     if (saveData.purchases.noForcedInterstitials) {
       clearPendingInterstitialCheck();
       return;
@@ -1043,7 +1057,7 @@ export function GameScreen({
     });
     setInterstitialNativeRequestInFlight(true);
 
-    const result = await mockPlatform.showInterstitial({
+    const result = await getPlatformAdapter().showInterstitial({
       onOpen: () => {
         setIsInterstitialActive(true);
         trackAnalyticsEvent("interstitial_open", {
@@ -1218,7 +1232,7 @@ export function GameScreen({
     setReviewNativeRequestInFlight(true);
     trackAnalyticsEvent("review_prompt_review_clicked", postLevelPromptPayload);
 
-    const availability = await mockPlatform.canReview();
+    const availability = await getPlatformAdapter().canReview();
 
     if (!availability.value) {
       setReviewUnavailableReason(availability.reason);
@@ -1236,7 +1250,7 @@ export function GameScreen({
     setIsReviewPromptOpen(false);
     trackAnalyticsEvent("review_native_requested", postLevelPromptPayload);
 
-    const result = await runNativeReviewFlow(mockPlatform);
+    const result = await runNativeReviewFlow(getPlatformAdapter());
 
     if (result.status === "sent") {
       setReviewNativeResolved(true);
@@ -1295,6 +1309,7 @@ export function GameScreen({
       ? t("actions.daily").toUpperCase()
       : t(chapter.titleKey).toUpperCase();
   const levelBadgeTotal = mode === "daily" ? 7 : chapter.levels.length;
+  const adsEnabled = areAdsEnabled();
   const hasRewardedAreaHintTarget = level.differences.some(
     (d) => !liveFoundIds.includes(d.id) && d.id !== hintId,
   );
@@ -1303,7 +1318,9 @@ export function GameScreen({
     !completionPending &&
     !rewardedHintInFlight &&
     liveFoundIds.length < level.requiredDifferences &&
-    (magnifiers > 0 ? !activeHintIsUnfound : hasRewardedAreaHintTarget);
+    (magnifiers > 0
+      ? !activeHintIsUnfound
+      : adsEnabled && hasRewardedAreaHintTarget);
   const displayStreak = Math.max(0, liveFoundIds.length - liveMistakes);
   const showArchiveValidationNav =
     import.meta.env.DEV && ARCHIVE_VALIDATE_MODE && mode === "daily";
@@ -1493,12 +1510,12 @@ export function GameScreen({
               }}
               aria-busy={rewardedHintInFlight}
               aria-label={
-                magnifiers > 0
+                magnifiers > 0 || !adsEnabled
                   ? t("game.hintLabel")
                   : t("game.rewardedHintLabel")
               }
               title={
-                magnifiers > 0
+                magnifiers > 0 || !adsEnabled
                   ? t("game.hintLabel")
                   : t("game.rewardedHintLabel")
               }
@@ -1525,7 +1542,7 @@ export function GameScreen({
                   >
                     {magnifiers}
                   </span>
-                ) : (
+                ) : adsEnabled ? (
                   <>
                     <span
                       className="inline-flex min-w-[20px] items-center justify-center rounded-[6px] px-[5px] font-manrope text-[11px] font-bold text-[#1a130a]"
@@ -1558,11 +1575,18 @@ export function GameScreen({
                       </svg>
                     </span>
                   </>
+                ) : (
+                  <span
+                    className="inline-flex min-w-[20px] items-center justify-center rounded-[6px] px-[5px] font-manrope text-[11px] font-bold text-[#1a130a]"
+                    style={{ height: "20px", background: "#d8af63" }}
+                  >
+                    0
+                  </span>
                 )}
               </span>
               <span
                 className={
-                  magnifiers > 0
+                  magnifiers > 0 || !adsEnabled
                     ? "game-hint-fab-ring game-hint-fab-ring--charged"
                     : "game-hint-fab-ring game-hint-fab-ring--ad"
                 }
@@ -1603,7 +1627,7 @@ export function GameScreen({
                     {t("game.hintChargesLeft", { value: magnifiers })}
                   </span>
                 </>
-              ) : (
+              ) : adsEnabled ? (
                 <>
                   <span className="game-hint-ad-badge">
                     {t("game.rewardedHintBadge")}
@@ -1612,7 +1636,7 @@ export function GameScreen({
                     {t("game.hintLabel")}
                   </span>
                 </>
-              )}
+              ) : null}
             </div>
 
             <button

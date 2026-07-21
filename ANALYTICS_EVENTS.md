@@ -129,3 +129,6 @@ Review funnel: `review_prompt_eligible`, `review_prompt_shown`,
   gate; record it in the release checklist.
 
 Production analytics debug logging must remain disabled.
+# Platform transport
+
+Product events and the debug buffer are platform-neutral. The Yandex build sends the registered events to Metrica when configured; the CrazyGames build keeps debug-buffer telemetry but does not load Metrica or require a counter.

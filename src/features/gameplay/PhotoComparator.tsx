@@ -99,7 +99,7 @@ export function PhotoComparator({
 }: PhotoComparatorProps) {
   const { t } = useTranslation();
   const comparatorScheme = useGameStore(
-    (s) => s.saveData.settings.comparatorScheme,
+    (s) => s.saveData.settings.comparatorScheme ?? "flip",
   );
   const [version, setVersion] = useState<"A" | "B">("A");
   const [comparePosition, setComparePosition] = useState(50);

@@ -1,4 +1,6 @@
-# Monetization, i18n and Yandex cloud-save specification
+# Monetization, i18n and platform cloud-save specification
+
+> Yandex-specific implementation remains below. CrazyGames implementation and SDK contract are in [`CRAZYGAMES_INTEGRATION.md`](../CRAZYGAMES_INTEGRATION.md): SDK v3 Data Module replaces Player Data/local merge, Yandex review prompts are unavailable, and Metrica is not loaded.
 
 Версия: 1.0  
 Дата фиксации: 2026-06-25

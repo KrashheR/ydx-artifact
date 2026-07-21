@@ -83,8 +83,8 @@ Production builds do not emit sourcemaps by default to keep the Yandex upload sm
 - `pnpm validate:archive` reuses the final A/B hitbox editor for Daily Archive cases and can Apply edits back into `src/content/dailyArchive.ts`; the validation bar exposes all seven archive cases in one session.
 - Responsive photo comparator with desktop side-by-side and mobile landscape A/B flip; mobile portrait is blocked by a rotate-device gate and is not a playable layout.
 - Circle/polygon hit testing, found markers, hints, misclicks and completion. New saves start with 1 hint, campaign progression grants +1 hint after every second newly completed campaign level, and hints can accumulate through rewards.
-- Yandex Player Data cloud saves with a `ysdk.getStorage()` / `localStorage` mirror fallback and versioned schema.
-- Yandex Games SDK lifecycle: `/sdk.js` bootstrap, early pause/resume subscription, one-shot `LoadingAPI.ready()` after hydration, and centralized `GameplayAPI.start()` / `stop()` for active gameplay.
+- Platform adapters for Yandex Games, CrazyGames and local development. CrazyGames uses SDK v3/Data Module with the same versioned save schema; Yandex retains Player Data and its local mirror fallback.
+- Platform lifecycle is centralized: Yandex uses LoadingAPI/GameplayAPI while CrazyGames uses SDK v3 loading and gameplay events.
 - First-run locale auto-detection through `ysdk.environment.i18n.lang`, with persisted manual RU/EN override.
 - Mock platform adapter and diagnostics copy.
 - Post-victory review pre-prompt wired to the Yandex Games feedback API seam with local dev mocks; the first prompt is eligible after the fourth newly completed campaign level.

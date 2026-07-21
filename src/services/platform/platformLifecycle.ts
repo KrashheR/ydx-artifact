@@ -1,4 +1,4 @@
-import { getYandexSdk } from "@/services/platform/mockPlatform";
+import { getPlatformAdapter } from "./platform";
 
 type PauseListener = (paused: boolean) => void;
 
@@ -6,7 +6,6 @@ let lifecycleInitPromise: Promise<void> | null = null;
 let loadingReadySent = false;
 let platformPaused = false;
 let gameplayRequested = false;
-let gameplayStarted = false;
 const pauseListeners = new Set<PauseListener>();
 
 function notifyPauseListeners() {
@@ -18,18 +17,8 @@ function notifyPauseListeners() {
 async function applyGameplayState() {
   const shouldRun = gameplayRequested && !platformPaused;
 
-  if (shouldRun === gameplayStarted) return;
-
-  const ysdk = await getYandexSdk();
-  const gameplayApi = ysdk?.features?.GameplayAPI;
-
   try {
-    if (shouldRun) {
-      gameplayApi?.start?.();
-    } else {
-      gameplayApi?.stop?.();
-    }
-    gameplayStarted = shouldRun;
+    getPlatformAdapter().setGameplayActive(shouldRun);
   } catch (error) {
     console.error("[platform:gameplay-api]", error);
   }
@@ -44,9 +33,8 @@ function setPlatformPaused(nextPaused: boolean) {
 
 export function initPlatformLifecycle(): Promise<void> {
   lifecycleInitPromise ??= (async () => {
-    const ysdk = await getYandexSdk();
-    ysdk?.on?.("game_api_pause", () => setPlatformPaused(true));
-    ysdk?.on?.("game_api_resume", () => setPlatformPaused(false));
+    await getPlatformAdapter().init();
+    getPlatformAdapter().subscribePause?.(setPlatformPaused);
   })();
 
   return lifecycleInitPromise;
@@ -56,10 +44,8 @@ export async function notifyGameReady(): Promise<void> {
   if (loadingReadySent) return;
 
   await initPlatformLifecycle();
-  const ysdk = await getYandexSdk();
-
   try {
-    ysdk?.features?.LoadingAPI?.ready?.();
+    await getPlatformAdapter().notifyLoadingReady();
     loadingReadySent = true;
   } catch (error) {
     console.error("[platform:loading-ready]", error);

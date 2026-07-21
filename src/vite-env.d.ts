@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 
 declare global {
+  const __YANDEX_METRICA_URL__: string;
   interface ImportMetaEnv {
     readonly VITE_LAYOUT_DEBUG?: string;
     readonly VITE_FINAL_VALIDATE?: string;
@@ -9,6 +10,7 @@ declare global {
     readonly VITE_YANDEX_METRICA_ID?: string;
     readonly VITE_ANALYTICS_DEBUG?: string;
     readonly VITE_PLATFORM_MODE?: string;
+    readonly VITE_PLATFORM?: "yandex" | "crazygames" | "local";
     readonly VITE_APP_VERSION?: string;
     readonly VITE_BUILD_ID?: string;
     readonly VITE_CONTENT_VERSION?: string;

@@ -18,9 +18,8 @@ import {
   getSafeErrorFingerprint,
   trackAnalyticsEvent,
 } from "@/services/analytics/analytics";
-import { mockPlatform } from "@/services/platform/mockPlatform";
+import { getPlatformAdapter } from "@/services/platform/platform";
 import { notifyGameReady } from "@/services/platform/platformLifecycle";
-import { isMobileGameplayDevice } from "@/shared/lib/device";
 import { preloadImage } from "@/shared/lib/imagePreload";
 import { getBrowserLanguage, resolveInitialLocale } from "@/shared/lib/locale";
 import { prefetchHomeIdleAssets } from "@/shared/lib/scenePrefetch";
@@ -51,11 +50,6 @@ const DailyScreen = lazy(() =>
 const SettingsModal = lazy(() =>
   import("@/screens/SettingsScreen").then((module) => ({
     default: module.SettingsModal,
-  })),
-);
-const ControlSchemeModal = lazy(() =>
-  import("@/screens/ControlSchemeModal").then((module) => ({
-    default: module.ControlSchemeModal,
   })),
 );
 
@@ -139,9 +133,6 @@ export function App() {
   const save = useGameStore((state) => state.save);
   const setAutoLocale = useGameStore((state) => state.setAutoLocale);
   const locale = useGameStore((state) => state.saveData.settings.locale);
-  const comparatorScheme = useGameStore(
-    (state) => state.saveData.settings.comparatorScheme,
-  );
   const [settingsOpen, setSettingsOpen] = useState(false);
   // Keeps the lazy settings chunk out of the initial load: the modal is
   // mounted on first open and stays mounted so close animations still play.
@@ -213,7 +204,7 @@ export function App() {
       // so the three run in parallel instead of serially.
       const applyLocale = async () => {
         await hydrate();
-        const sdkLanguage = await mockPlatform.getEnvironmentLanguage();
+        const sdkLanguage = await getPlatformAdapter().getEnvironmentLanguage();
         if (cancelled) return i18n.resolvedLanguage ?? i18n.language;
 
         const savedSettings = useGameStore.getState().saveData.settings;
@@ -417,11 +408,6 @@ export function App() {
       {settingsMounted && (
         <Suspense fallback={null}>
           <SettingsModal isOpen={settingsOpen} onClose={closeSettings} />
-        </Suspense>
-      )}
-      {comparatorScheme === null && isMobileGameplayDevice() && (
-        <Suspense fallback={null}>
-          <ControlSchemeModal />
         </Suspense>
       )}
       <OrientationGate />

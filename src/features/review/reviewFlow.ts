@@ -1,4 +1,4 @@
-import type { GameReviewGateway } from "@/services/platform/mockPlatform";
+import type { GameReviewGateway } from "@/services/platform/types";
 import type { ReviewUnavailableReason } from "@/entities/save/schema";
 
 export type NativeReviewFlowResult =

@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { resolveInitialLocale } from "@/shared/lib/locale";
+import {
+  getPlatformLocaleFallback,
+  resolveInitialLocale,
+} from "@/shared/lib/locale";
 
 describe("resolveInitialLocale", () => {
   it.each([
@@ -18,4 +21,8 @@ describe("resolveInitialLocale", () => {
     },
   );
 
+  it("uses English as the CrazyGames fallback locale", () => {
+    expect(getPlatformLocaleFallback("crazygames")).toBe("en");
+    expect(resolveInitialLocale("tr", "de-DE", "en")).toBe("en");
+  });
 });

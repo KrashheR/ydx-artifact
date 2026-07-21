@@ -6,6 +6,7 @@ import { loadProductionViteEnv } from "./vite-env";
 const root = process.cwd();
 const release = process.argv.includes("--release");
 const verifyDist = process.argv.includes("--dist");
+const crazyGames = process.argv.includes("--crazygames");
 const registry = new Set<string>(ANALYTICS_EVENT_NAMES);
 const errors: string[] = [];
 
@@ -43,7 +44,7 @@ for (const event of registry) {
 
 loadProductionViteEnv();
 const counterId = process.env.VITE_YANDEX_METRICA_ID ?? "";
-if (release && !/^\d+$/.test(counterId)) {
+if (release && !crazyGames && !/^\d+$/.test(counterId)) {
   errors.push("Release requires a numeric VITE_YANDEX_METRICA_ID");
 }
 
@@ -56,7 +57,9 @@ if (verifyDist) {
       .filter((file) => [".js", ".html"].includes(extname(file)))
       .map((file) => readFileSync(file, "utf8"))
       .join("\n");
-    if (!output.includes("mc.yandex.ru/metrika/tag.js")) {
+    if (crazyGames && output.includes("mc.yandex.ru/metrika/tag.js")) {
+      errors.push("CrazyGames output must not contain the Metrica tag");
+    } else if (!crazyGames && !output.includes("mc.yandex.ru/metrika/tag.js")) {
       errors.push(
         "Production output does not contain the Metrica tag initialization",
       );

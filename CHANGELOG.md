@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- Added `docs/SFX_PRODUCTION_PLAN.md`: a senior SFX audit, detailed cue briefs and generation/search prompts, audio architecture, CrazyGames mute/ad/iOS requirements, asset budgets, staged roadmap, QA matrix and release criteria.
+
+- Fixed CrazyGames saves when the Developer Portal Data Module is disabled: `dataModuleDisabled` now falls back to browser storage and survives reload. Successful Data Module writes now show as synced instead of misleadingly showing “Local only”.
+
+- Removed the first-launch mobile compare-mode modal. Flip is now the default for new and legacy unset saves; players can still switch between Flip and Slider in mobile settings.
+
+- Added a CrazyGames Basic Launch ad profile: `build:crazygames` now disables all rewarded/midgame UI and requests while retaining SDK lifecycle and Data Module; `build:crazygames:full` is the explicit future monetization profile. Added Basic Launch regression coverage.
+- Fixed CrazyGames locale handling to read `SDK.user.systemInfo.locale` and use English rather than Russian as its automatic fallback. Fixed the Vite SDK-script lint error.
+
+- Added `docs/CRAZYGAMES_MIGRATION_PLAN.md`, an implementation-ready staged plan for maintaining the Yandex build while porting the game to CrazyGames Basic and Full Launch requirements.
+
 - Added an optional, unrewarded four-option setting-interest survey to campaign reports. Selections emit the typed `setting_interest_selected` event for later comparison with campaign depth and retention.
 
 - Fixed automatic startup locale selection: it now follows the Yandex Games priority of a manual saved choice, SDK language, browser language, then Russian fallback, instead of defaulting a missing SDK language to English.
@@ -306,3 +317,7 @@
 - Connected campaign scenes 2, 3 and 4 from the provided image folders, exported their runtime WebP assets and authored hitboxes for all marked differences.
 - Exported runtime WebP assets for campaign scenes 5-12 and wired those levels to their real scene pairs instead of placeholder images.
 - Added campaign scene 13 with runtime WebP assets, localized title, map/UI support and authored hitboxes from the provided markup image.
+# 2026-07-21 — CrazyGames platform profile
+
+- Added isolated `local`, `yandex`, and `crazygames` platform adapters with CrazyGames SDK v3 lifecycle, Data Module persistence and ad mappings.
+- Added CrazyGames build/release commands and ZIP size/file validation while retaining the Yandex package flow.

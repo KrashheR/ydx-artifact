@@ -392,7 +392,7 @@ export function SettingsModal({ isOpen, onClose }: Props) {
                 <div className="settings-scheme-list px-[22px] pb-1.5 pt-2">
                   {schemeOptions.map((option) => {
                     const selected =
-                      (comparatorScheme ?? "slider") === option.scheme;
+                      (comparatorScheme ?? "flip") === option.scheme;
                     return (
                       <button
                         key={option.scheme}

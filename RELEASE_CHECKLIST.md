@@ -1,5 +1,14 @@
 # Release Checklist
 
+## CrazyGames
+
+- [ ] Run `pnpm release:crazygames:validate` without Yandex/Metrica variables.
+- [ ] Verify Basic Launch: no SDK/ad failure blocks gameplay or saving.
+- [ ] Verify SDK v3 loading and gameplay events, Data Module guest reload, rewarded error/success and midgame cooldown in the CrazyGames sandbox.
+- [ ] Upload `dist-crazygames.zip`; confirm root `index.html`, relative bundles and portal size/file limits.
+
+## Yandex Games
+
 - [ ] Replace placeholder assets.
 - [ ] Run `pnpm release:validate`.
 - [ ] Confirm `VITE_YANDEX_METRICA_ID` is numeric; release validation must pass registry/runtime/docs and built-counter checks.

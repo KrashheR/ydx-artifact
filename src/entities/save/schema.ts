@@ -181,6 +181,10 @@ export function migrateSaveData(value: unknown): SaveData {
   if (v2.success) {
     return {
       ...v2.data,
+      settings: {
+        ...v2.data.settings,
+        comparatorScheme: v2.data.settings.comparatorScheme ?? "flip",
+      },
       artifacts: {
         ...Object.fromEntries(
           ARTIFACT_IDS.map((artifactId) => [artifactId, "locked" as const]),
@@ -257,7 +261,7 @@ export function migrateSaveData(value: unknown): SaveData {
       vibration: source.settings?.vibration ?? fallback.settings.vibration,
       reducedMotion:
         source.settings?.reducedMotion ?? fallback.settings.reducedMotion,
-      comparatorScheme: source.settings?.comparatorScheme ?? null,
+      comparatorScheme: source.settings?.comparatorScheme ?? "flip",
     },
     reviewPrompt: source.reviewPrompt ?? fallback.reviewPrompt,
     purchases: {
@@ -289,7 +293,7 @@ export function createDefaultSave(): SaveData {
       localeSource: "auto",
       vibration: true,
       reducedMotion: false,
-      comparatorScheme: null,
+      comparatorScheme: "flip",
     },
     reviewPrompt: initialReviewPromptState,
     purchases: {

@@ -9,13 +9,20 @@ export function getBrowserLanguage(): string | undefined {
   return typeof navigator === "undefined" ? undefined : navigator.language;
 }
 
+export function getPlatformLocaleFallback(
+  platform = import.meta.env.VITE_PLATFORM ?? import.meta.env.VITE_PLATFORM_MODE,
+): SupportedLocale {
+  return platform === "crazygames" ? "en" : "ru";
+}
+
 export function resolveInitialLocale(
   platformLanguage?: string,
   browserLanguage?: string,
+  fallback: SupportedLocale = getPlatformLocaleFallback(),
 ): SupportedLocale {
   return (
     toSupportedLocale(platformLanguage) ??
     toSupportedLocale(browserLanguage) ??
-    "ru"
+    fallback
   );
 }

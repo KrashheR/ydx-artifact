@@ -4,11 +4,12 @@ import { App } from "@/app/App";
 import "@/app/styles.css";
 import "@/i18n";
 import { getChapterLevels } from "@/content/chapters";
-import { mockPlatform } from "@/services/platform/mockPlatform";
+import { getTestablePlatformAdapter } from "@/services/platform/platform";
 import { initPlatformLifecycle } from "@/services/platform/platformLifecycle";
 import { useGameStore } from "@/shared/store/gameStore";
 
 void initPlatformLifecycle();
+void getTestablePlatformAdapter().notifyLoadingStart();
 
 if (import.meta.env.DEV) {
   window.__artifactDev = {
@@ -28,11 +29,11 @@ if (import.meta.env.DEV) {
     },
     setReviewMock: (mode) => {
       if (!mode) {
-        mockPlatform.setReviewGatewayOverride(null);
+        getTestablePlatformAdapter().setReviewGatewayOverride?.(null);
         return;
       }
 
-      mockPlatform.setReviewGatewayOverride({
+      getTestablePlatformAdapter().setReviewGatewayOverride?.({
         async canReview() {
           if (mode === "unavailable") {
             return { value: false, reason: "NO_AUTH" };

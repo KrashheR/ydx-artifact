@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import "@/i18n";
 import { dailyArchiveLevels } from "@/content/dailyArchive";
 import { getChapterLevels } from "@/content/chapters";
@@ -56,6 +56,10 @@ describe("GameScreen", () => {
       },
       artifactRevealQueue: [],
     });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   async function completeRenderedLevel(level: ReturnType<typeof getChapterLevels>[number]) {
@@ -249,6 +253,25 @@ describe("GameScreen", () => {
       level.differences[0].id,
     );
     expect(useGameStore.getState().saveData.magnifiers).toBe(0);
+  });
+
+  it("hides rewarded UI and does not request an ad for adsDisabledBasicLaunch", () => {
+    vi.stubEnv("VITE_PLATFORM", "crazygames");
+    vi.stubEnv("VITE_CRAZYGAMES_LAUNCH", "basic");
+    const level = getChapterLevels("northern-route")[0];
+    const showRewarded = vi.fn(async () => "rewarded" as const);
+    mockPlatform.setRewardedGatewayOverride({ showRewarded });
+    useGameStore.setState((state) => ({
+      saveData: { ...state.saveData, magnifiers: 0 },
+    }));
+    useGameStore.getState().startLevel(level.id, "campaign");
+
+    render(<GameScreen levelId={level.id} mode="campaign" />);
+
+    const hintButton = screen.getByRole("button", { name: /Подсказка|Hint/ });
+    expect(hintButton).toBeDisabled();
+    expect(screen.queryByText(/реклама|watch ad/i)).not.toBeInTheDocument();
+    expect(showRewarded).not.toHaveBeenCalled();
   });
 
   it("closes the rewarded hint modal from the top-right close button", async () => {

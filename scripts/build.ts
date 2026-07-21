@@ -41,6 +41,7 @@ const contentHash = contentHasher.digest("hex").slice(0, 12);
 const buildTimestamp = new Date().toISOString().replace(/[-:.TZ]/g, "");
 
 process.env.VITE_APP_VERSION ??= packageJson.version;
+process.env.VITE_PLATFORM ??= process.env.VITE_PLATFORM_MODE ?? "yandex";
 process.env.VITE_CONTENT_VERSION ??= contentHash;
 process.env.VITE_BUILD_ID ??= `${packageJson.version}-${contentHash}-${buildTimestamp}`;
 

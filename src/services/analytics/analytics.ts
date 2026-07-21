@@ -118,6 +118,7 @@ function getLocale() {
 }
 
 function getCounterId() {
+  if (import.meta.env.VITE_PLATFORM === "crazygames") return null;
   const raw = import.meta.env.VITE_YANDEX_METRICA_ID;
   if (!raw || !/^\d+$/.test(raw)) return null;
   return Number(raw);
@@ -140,7 +141,9 @@ function ensureYandexMetrica(counterId: number) {
 
   const script = document.createElement("script");
   script.async = true;
-  script.src = "https://mc.yandex.ru/metrika/tag.js";
+  script.src = typeof __YANDEX_METRICA_URL__ === "string"
+    ? __YANDEX_METRICA_URL__
+    : "https://mc.yandex.ru/metrika/tag.js";
   document.head.append(script);
 
   window.ym(counterId, "init", {
@@ -185,7 +188,7 @@ export function trackAnalyticsEvent(
     platformDeviceType: getPlatformDeviceType(),
     viewportWidth: typeof window === "undefined" ? 0 : window.innerWidth,
     viewportHeight: typeof window === "undefined" ? 0 : window.innerHeight,
-    platformMode: import.meta.env.VITE_PLATFORM_MODE ?? "auto",
+    platformMode: import.meta.env.VITE_PLATFORM ?? import.meta.env.VITE_PLATFORM_MODE ?? "local",
     gameVersion: import.meta.env.VITE_APP_VERSION ?? "0.1.0",
     ...payload,
   });

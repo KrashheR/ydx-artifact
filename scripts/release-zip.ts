@@ -11,7 +11,8 @@ import { deflateRawSync } from "node:zlib";
 
 const root = process.cwd();
 const distDir = join(root, "dist");
-const archivePath = resolve(root, "dist-yandex.zip");
+const crazyGames = process.argv.includes("--crazygames");
+const archivePath = resolve(root, crazyGames ? "dist-crazygames.zip" : "dist-yandex.zip");
 const utf8FileNameFlag = 0x0800;
 const dosEpochDate = 0x0021;
 const dosEpochTime = 0x0000;
@@ -229,7 +230,7 @@ const absoluteAssetReferences = indexHtml.match(/\b(?:src|href|data-src)="\/asse
 
 if (absoluteAssetReferences.length > 0) {
   throw new Error(
-    "dist/index.html contains root-relative /assets references. Use a relative Vite base for Yandex ZIP uploads."
+    "dist/index.html contains root-relative /assets references. Use a relative Vite base for portal ZIP uploads."
   );
 }
 
@@ -255,6 +256,15 @@ if (!entries.includes("index.html")) {
 
 if (forbidden.length > 0) {
   throw new Error(`ZIP contains forbidden entries:\n${forbidden.join("\n")}`);
+}
+
+if (crazyGames) {
+  const totalBytes = collectFiles(distDir).reduce((total, file) => total + statSync(file).size, 0);
+  if (entries.length > 1500) throw new Error(`CrazyGames file limit exceeded: ${entries.length} > 1500`);
+  if (totalBytes > 250 * 1024 * 1024) throw new Error(`CrazyGames total size limit exceeded: ${totalBytes} bytes`);
+  const initialBytes = collectFiles(distDir).filter((file) => /(?:index\.html|\.js|\.css)$/.test(file)).reduce((total, file) => total + statSync(file).size, 0);
+  if (initialBytes > 50 * 1024 * 1024) throw new Error(`CrazyGames initial download limit exceeded: ${initialBytes} bytes`);
+  console.log(`CrazyGames limits OK: ${totalBytes} total bytes, ${initialBytes} initial bytes`);
 }
 
 console.log(`Created ${archivePath}`);
