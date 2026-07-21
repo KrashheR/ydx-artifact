@@ -415,14 +415,6 @@ function CurrentCaseCard({
         boxShadow: "0 14px 32px rgba(0,0,0,.32)",
       }}
     >
-      <div
-        className="absolute inset-x-0 top-0 h-[3px]"
-        style={{
-          background: complete
-            ? "linear-gradient(90deg,#6FC69E,#2F6A57)"
-            : "linear-gradient(90deg,#D8AF63,#A9762F)",
-        }}
-      />
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-[10px] font-bold uppercase tracking-[.26em] text-exp-brass">
           {complete

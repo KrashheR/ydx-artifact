@@ -4,6 +4,8 @@
 
 ## Unreleased
 
+- Fixed the mobile landscape flip comparator on short viewports: its scene wrapper can now shrink within the available play area, keeping the compare button on-screen.
+
 - Added a third mobile landscape comparison mode: side-by-side photos with shared zoom and pan. Its HUD moves above and below the scenes to preserve their usable width.
 
 - Fixed first-run onboarding on phones: level 01 now opens with the investigation briefing unobscured, then presents the mobile compare-control choice after the player starts the level.
