@@ -4,10 +4,9 @@ Updated: 2026-07-21
 
 ## Release blockers requiring external access
 
-- [ ] Run `pnpm metrika:goals`, review the missing goals from the 68-event typed
-      registry, then run `pnpm metrika:goals:publish` with the production counter and
-      OAuth token. The code and sync source are fixed, but newly added goals do not
-      exist in Yandex Metrica until this external publish succeeds.
+- [x] Published all 30 missing goals from the 68-event typed registry to the
+  configured production counter on 2026-07-21. Re-run `pnpm metrika:goals`
+  before release and require `Missing: 0`.
 - [ ] Run a draft/production smoke session and verify ingestion of at least
       `game_open`, `game_ready`, `onboarding_impression`, `level_attempt_start`,
       `difference_found`, and `level_attempt_end` in the target counter. Record the
