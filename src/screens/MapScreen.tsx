@@ -277,7 +277,7 @@ export function MapScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
             onClick={onOpenSettings}
             aria-label={t("actions.settings")}
             title={t("actions.settings")}
-            className="map-settings-button flex h-11 w-11 shrink-0 items-center justify-center rounded-[9px] text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+            className="vfx-press map-settings-button flex h-11 w-11 shrink-0 items-center justify-center rounded-[9px] text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
             style={{
               border: "1px solid rgba(213,195,154,.14)",
               background: "rgba(213,195,154,.05)",
@@ -307,7 +307,7 @@ export function MapScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
                     disabled={level.locked}
                     onClick={() => handleStartLevelFromCard(level, "map_desktop_card")}
                     aria-label={`${t("campaigns.levelCode", { order: level.order })} ${level.title}`}
-                    className={`map-level-card group flex h-[338px] flex-col overflow-hidden rounded-[14px] bg-[#222A25] text-left transition-all duration-300 hover:-translate-y-0.5 ${
+                    className={`vfx-press map-level-card group flex h-[338px] flex-col overflow-hidden rounded-[14px] bg-[#222A25] text-left transition-all duration-300 hover:-translate-y-0.5 ${level.completed ? "vfx-map-completed" : ""} ${level.current ? "vfx-map-current" : ""} ${
                       level.current
                         ? "border-[1.5px] border-[#D8AF63] shadow-[0_22px_50px_rgba(0,0,0,.5),0_0_0_4px_rgba(184,138,69,.12)]"
                         : level.completed
@@ -445,7 +445,7 @@ export function MapScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
                 disabled={level.locked}
                 onClick={() => handleStartLevelFromCard(level, "map_mobile_card")}
                 aria-label={`${t("campaigns.levelCode", { order: level.order })} ${level.title}`}
-                className={`flex h-[152px] flex-col overflow-hidden rounded-[12px] bg-[#222A25] text-left transition-all duration-300 hover:-translate-y-0.5 ${
+                className={`vfx-press flex h-[152px] flex-col overflow-hidden rounded-[12px] bg-[#222A25] text-left transition-all duration-300 hover:-translate-y-0.5 ${level.completed ? "vfx-map-completed" : ""} ${level.current ? "vfx-map-current" : ""} ${
                   level.current
                     ? "border-[1.5px] border-[#D8AF63] shadow-[0_22px_50px_rgba(0,0,0,.5)]"
                     : level.completed
@@ -548,7 +548,7 @@ export function MapScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
               </div>
               <button
                 onClick={() => handleStartLevelFromCard(currentLevel, "map_mobile_sticky_cta")}
-                className="flex h-[50px] flex-shrink-0 items-center justify-center gap-2 rounded-[11px] bg-[linear-gradient(180deg,#D8AF63,#B3812F)] px-5 text-[14px] font-bold text-[#1A130A] shadow-[0_8px_20px_rgba(184,138,69,.32)]"
+                className="vfx-press flex h-[50px] flex-shrink-0 items-center justify-center gap-2 rounded-[11px] bg-[linear-gradient(180deg,#D8AF63,#B3812F)] px-5 text-[14px] font-bold text-[#1A130A] shadow-[0_8px_20px_rgba(184,138,69,.32)]"
               >
                 {t("actions.play")}
                 <PlayIcon size={14} />

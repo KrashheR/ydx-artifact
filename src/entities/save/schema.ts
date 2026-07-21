@@ -68,7 +68,7 @@ const inProgressV3Schema = z.object({
   timeExtensionsUsed: z.number().int().nonnegative(),
 });
 
-export const comparatorSchemeSchema = z.enum(["slider", "flip"]);
+export const comparatorSchemeSchema = z.enum(["slider", "flip", "side-by-side"]);
 
 export type ComparatorScheme = z.infer<typeof comparatorSchemeSchema>;
 

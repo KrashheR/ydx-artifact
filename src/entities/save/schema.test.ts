@@ -15,6 +15,15 @@ describe("migrateSaveData", () => {
     expect(migrateSaveData(save).settings.comparatorScheme).toBe("flip");
   });
 
+  it("keeps the side-by-side mobile comparator choice", () => {
+    const save = createDefaultSave();
+    save.settings.comparatorScheme = "side-by-side";
+
+    expect(migrateSaveData(save).settings.comparatorScheme).toBe(
+      "side-by-side",
+    );
+  });
+
   it("migrates v1 elapsedSeconds into the v3 attempt model", () => {
     const save = migrateSaveData({
       version: 1,

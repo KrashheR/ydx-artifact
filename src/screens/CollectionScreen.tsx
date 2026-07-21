@@ -9,6 +9,7 @@ import {
 import { chapterList, getChapter, type ChapterId } from "@/content/chapters";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
 import { getArtifactLevel } from "@/shared/lib/progression";
+import { useReducedEffects } from "@/shared/motion/useReducedEffects";
 import { useGameStore } from "@/shared/store/gameStore";
 
 type ArtifactState = "locked" | "newly-unlocked" | "viewed";
@@ -106,7 +107,9 @@ function ArtifactCard({
     <button
       type="button"
       onClick={onOpen}
-      className="relative flex min-h-[44px] flex-col overflow-hidden rounded-[12px] text-left transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+      className={`vfx-press relative flex min-h-[44px] flex-col overflow-hidden rounded-[12px] text-left transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass ${
+        state === "newly-unlocked" ? "vfx-new-artifact-card" : ""
+      }`}
       style={{
         background: unlocked ? "#222A25" : "rgba(34,42,37,.6)",
         border: unlocked
@@ -122,7 +125,7 @@ function ArtifactCard({
     >
       {state === "newly-unlocked" && (
         <span
-          className="absolute left-2.5 top-2.5 z-[2] flex h-5 items-center rounded-[5px] px-2 text-[9.5px] font-extrabold tracking-[.08em]"
+          className="vfx-new-artifact-tag absolute left-2.5 top-2.5 z-[2] flex h-5 items-center rounded-[5px] px-2 text-[9.5px] font-extrabold tracking-[.08em]"
           style={{ background: "#c0533a", color: "#fbe9df" }}
         >
           {t("collection.newBadge")}
@@ -213,7 +216,7 @@ function ArtifactDetailModal({
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
       <button
         type="button"
-        className="absolute inset-0 cursor-default"
+        className="vfx-dialog-backdrop absolute inset-0 cursor-default"
         style={{ background: "rgba(0,0,0,.55)" }}
         aria-label={t("collection.closeLabel")}
         onClick={onClose}
@@ -222,7 +225,7 @@ function ArtifactDetailModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="artifact-detail-title"
-        className="relative z-10 grid w-[900px] max-w-[calc(100vw-32px)] grid-cols-1 overflow-hidden rounded-[16px] sm:grid-cols-[minmax(240px,340px)_1fr]"
+        className="vfx-collection-detail relative z-10 grid w-[900px] max-w-[calc(100vw-32px)] grid-cols-1 overflow-hidden rounded-[16px] sm:grid-cols-[minmax(240px,340px)_1fr]"
         style={{
           background: "#222A25",
           border: "1px solid rgba(184,138,69,.35)",
@@ -232,7 +235,7 @@ function ArtifactDetailModal({
       >
         {/* Image column */}
         <div
-          className="flex items-center justify-center p-6 sm:p-[30px]"
+          className="vfx-collection-detail-image flex items-center justify-center p-6 sm:p-[30px]"
           style={{
             background:
               "repeating-linear-gradient(45deg, rgba(213,195,154,.03) 0 14px, transparent 14px 28px)",
@@ -268,7 +271,7 @@ function ArtifactDetailModal({
         </div>
 
         {/* Text column */}
-        <div className="flex flex-col overflow-y-auto px-6 py-6 sm:px-8 sm:py-8">
+        <div className="vfx-collection-detail-content flex flex-col overflow-y-auto px-6 py-6 sm:px-8 sm:py-8">
           <div className="flex items-start justify-between gap-3">
             <span
               className="inline-flex h-6 items-center gap-1.5 rounded-[6px] px-2.5 text-[10.5px] font-bold tracking-[.06em]"
@@ -396,6 +399,7 @@ function ArtifactDetailModal({
 
 export function CollectionScreen() {
   const { t } = useTranslation();
+  const reducedEffects = useReducedEffects();
   const navigate = useGameStore((state) => state.navigate);
   const startLevel = useGameStore((state) => state.startLevel);
   const markArtifactViewed = useGameStore((state) => state.markArtifactViewed);
@@ -529,7 +533,7 @@ export function CollectionScreen() {
                   key={tab.key}
                   type="button"
                   onClick={() => setFilter(tab.key)}
-                  className="flex h-11 md:h-8 items-center rounded-[8px] px-[18px] text-[12.5px] font-semibold transition"
+                  className="vfx-press flex h-11 md:h-8 items-center rounded-[8px] px-[18px] text-[12.5px] font-semibold transition"
                   style={
                     active
                       ? {
@@ -554,7 +558,11 @@ export function CollectionScreen() {
         </div>
 
         {/* Campaign sections */}
-        <div className="map-scroll-area relative flex min-h-0 flex-1 flex-col gap-[26px] overflow-y-auto px-5 pb-[34px] pt-3 sm:px-[34px]">
+        <div className="map-scroll-area relative min-h-0 flex-1 overflow-y-auto px-5 pb-[34px] pt-3 sm:px-[34px]">
+          <div
+            key={filter}
+            className={`flex flex-col gap-[26px] ${reducedEffects ? "" : "vfx-collection-filter"}`}
+          >
           {visibleChapters.map((chapter) => {
             const chapterArtifacts = getChapterArtifacts(chapter.id);
             const unlockedCount = chapterArtifacts.filter(
@@ -620,6 +628,7 @@ export function CollectionScreen() {
               </section>
             );
           })}
+          </div>
         </div>
       </div>
 

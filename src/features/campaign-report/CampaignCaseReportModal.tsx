@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getArtifactById } from "@/content/artifacts";
 import type { CampaignReport, CollectibleId } from "@/data/campaignReports";
+import { useReducedEffects } from "@/shared/motion/useReducedEffects";
 import { useGameStore } from "@/shared/store/gameStore";
 
 type CampaignCaseReportModalProps = {
@@ -47,7 +48,7 @@ export function CampaignCaseReportModal({
 }: CampaignCaseReportModalProps) {
   const { t } = useTranslation();
   const artifactStates = useGameStore((state) => state.saveData.artifacts);
-  const reducedMotion = useGameStore((state) => state.saveData.settings.reducedMotion);
+  const reducedMotion = useReducedEffects();
   const restoredPercent = Math.round((restoredLevels / Math.max(totalLevels, 1)) * 100);
   const allFindingsUnlocked = unlockedArtifactCount >= totalArtifactCount;
   const hookTitleKey = report.futureHookTitleKey ?? "campaignReport.nextHookLabel";
@@ -73,13 +74,10 @@ export function CampaignCaseReportModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="campaign-report-title"
-        className="relative z-10 max-h-[100dvh] w-full overflow-hidden rounded-t-[18px] border border-[#B88A45]/35 text-[#2f3231] shadow-[0_44px_110px_rgba(0,0,0,.68)] sm:max-h-[calc(100vh-32px)] sm:w-[min(960px,calc(100vw-32px))] sm:rounded-[18px]"
+        className={`${reducedMotion ? "" : "vfx-campaign-report"} relative z-10 max-h-[100dvh] w-full overflow-hidden rounded-t-[18px] border border-[#B88A45]/35 text-[#2f3231] shadow-[0_44px_110px_rgba(0,0,0,.68)] sm:max-h-[calc(100vh-32px)] sm:w-[min(960px,calc(100vw-32px))] sm:rounded-[18px]`}
         style={{
           background:
-            "radial-gradient(110% 70% at 50% -10%, rgba(244,238,221,.98), rgba(231,221,200,.98) 56%, rgba(208,192,160,.98)), repeating-linear-gradient(45deg, rgba(95,78,45,.035) 0 8px, rgba(255,255,255,.025) 8px 16px)",
-          animation: reducedMotion
-            ? undefined
-            : "campaign-report-in .56s cubic-bezier(.2,.8,.25,1)"
+            "radial-gradient(110% 70% at 50% -10%, rgba(244,238,221,.98), rgba(231,221,200,.98) 56%, rgba(208,192,160,.98)), repeating-linear-gradient(45deg, rgba(95,78,45,.035) 0 8px, rgba(255,255,255,.025) 8px 16px)"
         }}
       >
         <div
@@ -175,7 +173,7 @@ export function CampaignCaseReportModal({
               <span className="hidden h-px flex-1 bg-[#B88A45]/25 sm:block" />
             </div>
             <div className="-mx-5 flex gap-3 overflow-x-auto px-5 pb-1 sm:mx-0 sm:px-0">
-              {artifactIds.map((artifactId, index) => {
+              {artifactIds.map((artifactId) => {
                 const artifact = getArtifactById(artifactId);
                 const artifactState = artifactStates[artifactId] ?? "locked";
                 const unlocked = artifactState !== "locked";
@@ -184,13 +182,7 @@ export function CampaignCaseReportModal({
                 return (
                   <div
                     key={artifactId}
-                    className="relative w-[118px] shrink-0 rounded-[8px] border border-[#6b5431]/18 bg-[#2d2519] p-1.5 shadow-[0_10px_24px_rgba(57,43,24,.24)] sm:w-[150px]"
-                    style={{
-                      animation: reducedMotion
-                        ? undefined
-                        : "campaign-report-artifact-in .48s cubic-bezier(.2,.8,.25,1) both",
-                      animationDelay: `${120 + index * 70}ms`
-                    }}
+                    className={`${reducedMotion ? "" : "vfx-campaign-report-artifact"} relative w-[118px] shrink-0 rounded-[8px] border border-[#6b5431]/18 bg-[#2d2519] p-1.5 shadow-[0_10px_24px_rgba(57,43,24,.24)] sm:w-[150px]`}
                   >
                     <div className="relative aspect-square overflow-hidden rounded-[6px]">
                       <img
@@ -247,12 +239,7 @@ export function CampaignCaseReportModal({
                 </p>
               )}
               <div
-                className="mt-4 inline-flex rotate-[-3deg] rounded-[5px] border-2 border-[#B88A45]/55 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[.18em] text-[#D8AF63]/85"
-                style={{
-                  animation: reducedMotion
-                    ? undefined
-                    : "campaign-report-stamp-in .5s ease-out .32s both"
-                }}
+                className={`${reducedMotion ? "" : "vfx-campaign-report-stamp"} mt-4 inline-flex rotate-[-3deg] rounded-[5px] border-2 border-[#B88A45]/55 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[.18em] text-[#D8AF63]/85`}
               >
                 {t("campaignReport.stamp")}
               </div>
@@ -275,7 +262,7 @@ export function CampaignCaseReportModal({
                     type="button"
                     onClick={() => selectSetting(setting)}
                     disabled={selectedSetting !== null}
-                    className="min-h-11 rounded-[7px] border px-3 py-2 text-left text-[13px] font-bold transition enabled:hover:bg-[#fff7e8] disabled:cursor-default"
+                    className="vfx-press min-h-11 rounded-[7px] border px-3 py-2 text-left text-[13px] font-bold transition enabled:hover:bg-[#fff7e8] disabled:cursor-default"
                     style={{
                       borderColor: selected ? "rgba(184,138,69,.7)" : "rgba(95,74,45,.2)",
                       background: selected ? "rgba(184,138,69,.16)" : "rgba(255,247,232,.36)",
@@ -293,7 +280,7 @@ export function CampaignCaseReportModal({
             <button
               type="button"
               onClick={onOpenCollection}
-              className="min-h-[52px] rounded-[10px] border border-[#5f4a2d]/22 bg-[#fff7e8]/45 px-5 text-[14px] font-extrabold text-[#4d3d25] transition hover:bg-[#fff7e8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b88a45] sm:min-w-[210px]"
+              className="vfx-press min-h-[52px] rounded-[10px] border border-[#5f4a2d]/22 bg-[#fff7e8]/45 px-5 text-[14px] font-extrabold text-[#4d3d25] transition hover:bg-[#fff7e8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b88a45] sm:min-w-[210px]"
             >
               {t(report.secondaryCtaKey)}
             </button>
@@ -301,28 +288,13 @@ export function CampaignCaseReportModal({
               type="button"
               autoFocus
               onClick={onPrimary}
-              className="min-h-[52px] rounded-[10px] border-none bg-[linear-gradient(180deg,#D8AF63,#B3812F)] px-6 text-[15px] font-extrabold text-[#1a130a] shadow-[0_12px_28px_rgba(184,138,69,.32),inset_0_1px_0_rgba(255,255,255,.3)] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7e5b2a] sm:min-w-[240px]"
+              className="vfx-press min-h-[52px] rounded-[10px] border-none bg-[linear-gradient(180deg,#D8AF63,#B3812F)] px-6 text-[15px] font-extrabold text-[#1a130a] shadow-[0_12px_28px_rgba(184,138,69,.32),inset_0_1px_0_rgba(255,255,255,.3)] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7e5b2a] sm:min-w-[240px]"
             >
               {t(report.primaryCtaKey)}
             </button>
           </div>
         </div>
       </section>
-
-      <style>{`
-        @keyframes campaign-report-in {
-          from { opacity: 0; transform: translateY(24px) scale(.985); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes campaign-report-artifact-in {
-          from { opacity: 0; transform: translateY(12px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes campaign-report-stamp-in {
-          from { opacity: 0; transform: translateY(8px) rotate(-3deg) scale(.94); }
-          to { opacity: 1; transform: translateY(0) rotate(-3deg) scale(1); }
-        }
-      `}</style>
     </div>
   );
 }

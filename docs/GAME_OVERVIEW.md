@@ -60,7 +60,7 @@
 | Artifact toast/reveal | Неблокирующий toast при находке связанного отличия, затем отдельная reveal-церемония после победы. |
 | Campaign report | Одноразовый финал после уровня 13: восстановленные кадры, пять находок, вывод и переход дальше/в коллекцию. |
 | Collection | Прогресс X/15, фильтры all/кампания, locked/open карточки, detail, снятие new badge, replay уровня. |
-| Settings | RU/EN; на mobile — выбор slider или flip. |
+| Settings | RU/EN; выбор slider, flip или side-by-side для mobile gameplay. |
 | Review pre-prompt | После подходящей campaign-победы: оценить сейчас, позже или закрыть. |
 
 ## Игроковый Flow
@@ -69,7 +69,7 @@
 2. Любой не новый save открывает Archive Hub, а не принудительный auto-resume.
 3. Из Archive Hub игрок может продолжить активную кампанию, открыть журнал уровней кампании, пройти Daily Archive или перейти в коллекцию.
 4. Campaign progression линейная: Белый меридиан -> Песчаный меридиан -> Изумрудный меридиан; внутри кампании уровни тоже открываются по порядку.
-5. Уровень показывает пару снимков A/B. Desktop использует side-by-side сравнение. На mobile при первом запуске выбирается одна из двух схем: 16:10 before/after slider или один кадр с кнопкой A/B flip. Mobile portrait блокируется rotate-device gate, поэтому игровой layout рассчитан на landscape.
+5. Уровень показывает пару снимков A/B. Desktop использует side-by-side сравнение. На mobile доступны три схемы: 16:10 before/after slider, один кадр с кнопкой A/B flip или два снимка рядом с общими масштабом и панорамированием. Mobile portrait блокируется rotate-device gate, поэтому игровой layout рассчитан на landscape.
 6. Игрок находит все отличия (`requiredDifferences` равно количеству authored differences), ошибки снижают accuracy, подсказка подсвечивает `hintArea`.
 7. После нахождения всех отличий показывается victory/result flow: статистика, clue текущего уровня, награды, next/retry/map actions.
 8. Если уровень является milestone, поверх victory показывается artifact reveal ceremony; затем артефакт остается в Collection со статусом `newly-unlocked`, пока игрок его не просмотрит.
@@ -192,7 +192,7 @@ Save хранит:
 
 - Production locales: только `ru` и `en`, fallback — `ru`.
 - На первом запуске язык берется из Yandex environment; ручной выбор сохраняется и больше не перезаписывается auto-detection.
-- Mobile compare scheme (`slider` / `flip`) выбирается одноразовым modal при `null` и затем меняется в settings.
+- Mobile compare scheme (`slider` / `flip` / `side-by-side`) выбирается одноразовым modal при `null` и затем меняется в settings.
 - `reducedMotion` влияет как минимум на artifact reveal и campaign report, но пользовательского переключателя сейчас нет.
 - `vibration` хранится в схеме, но runtime haptics и UI-переключатель отсутствуют.
 

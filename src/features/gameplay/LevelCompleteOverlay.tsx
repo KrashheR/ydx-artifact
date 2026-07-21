@@ -28,7 +28,7 @@ function Stars({ count }: { count: 1 | 2 | 3 }) {
   return (
     <div className="flex items-center justify-center gap-0.5">
       {([1, 2, 3] as const).map((i) => (
-        <svg key={i} width="17" height="17" viewBox="0 0 24 24"
+        <svg className={i <= count ? "vfx-result-star" : ""} style={{ animationDelay: `${(i - 1) * 110 + 320}ms` }} key={i} width="17" height="17" viewBox="0 0 24 24"
           fill={i <= count ? "#d8af63" : "none"}
           stroke={i <= count ? "#d8af63" : "rgba(213,195,154,.3)"}
           strokeWidth="1.2"
@@ -67,18 +67,17 @@ export function LevelCompleteOverlay({
       />
 
       <div
-        className="modal-panel result-dialog relative z-10 w-[560px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[18px] font-manrope"
+        className="modal-panel result-dialog vfx-result-dialog relative z-10 w-[560px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[18px] font-manrope"
         style={{
           background: "linear-gradient(180deg, #27302b, #1c241e)",
           border: "1px solid rgba(184,138,69,.35)",
           boxShadow: "0 50px 120px rgba(0,0,0,.7), inset 0 1px 0 rgba(213,195,154,.08)",
-          animation: "game-pop .5s cubic-bezier(.2,.8,.3,1.2)"
         }}
       >
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: "linear-gradient(90deg, transparent, #d8af63, transparent)" }} />
 
         <div className="result-dialog-content relative px-12 py-10 text-center">
-          <div className="result-hero">
+          <div className="result-hero vfx-result-hero">
           <div
             className="result-icon mx-auto mb-[18px] flex h-24 w-24 items-center justify-center rounded-full"
             style={{
