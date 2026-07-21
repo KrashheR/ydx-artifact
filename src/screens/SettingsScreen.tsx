@@ -114,6 +114,11 @@ export function SettingsModal({ isOpen, onClose }: Props) {
       title: t("controlScheme.flipTitle"),
       description: t("controlScheme.flipShort"),
     },
+    {
+      scheme: "side-by-side",
+      title: t("controlScheme.sideBySideTitle"),
+      description: t("controlScheme.sideBySideShort"),
+    },
   ];
 
   useEffect(() => {

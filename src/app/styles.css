@@ -627,7 +627,8 @@ select {
 
 .comparator-desktop,
 .comparator-mobile-portrait,
-.comparator-landscape-flip {
+.comparator-landscape-flip,
+.comparator-landscape-side-by-side {
   min-height: 0;
 }
 
@@ -1431,6 +1432,74 @@ select {
     position: relative;
   }
 
+  /* Two photos need the available width, so this mobile landscape mode moves
+     HUD context above the comparator and its actions below it. */
+  .game-screen--side-by-side .game-hud > div:first-child {
+    bottom: auto;
+    top: 0;
+    width: auto;
+    max-width: 48%;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: max(8px, env(safe-area-inset-top)) 12px 8px max(12px, env(safe-area-inset-left));
+    border-right: 0;
+    background: linear-gradient(180deg, rgba(21, 27, 24, 0.88), transparent);
+  }
+
+  .game-screen--side-by-side .game-hud > div:first-child > div:last-child { min-width: 0; }
+  .game-screen--side-by-side .game-hud > div:first-child > div:last-child > div:last-child { max-width: min(30vw, 220px); }
+
+  .game-screen--side-by-side .game-hud > div:nth-child(2) {
+    bottom: auto;
+    left: auto;
+    top: max(8px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    width: auto;
+    flex-direction: row;
+    gap: 6px !important;
+  }
+
+  .game-screen--side-by-side .game-hud > div:nth-child(2) > div {
+    width: auto;
+    height: 40px !important;
+    min-height: 40px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .game-screen--side-by-side .game-hud > div:last-child {
+    bottom: max(8px, env(safe-area-inset-bottom));
+    right: max(12px, env(safe-area-inset-right));
+    top: auto;
+    width: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px !important;
+    padding: 0;
+    border-left: 0;
+    background: transparent;
+  }
+
+  .game-screen--side-by-side .game-hud > div:last-child .game-hint-button {
+    order: 0;
+    width: 52px !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    margin: 0;
+  }
+
+  .game-screen--side-by-side .game-hud > div:last-child button:last-child { order: 0; align-self: auto; }
+  .game-screen--side-by-side .game-hud > div:last-child .game-hint-rail-meta { display: none !important; }
+
+  .game-screen--side-by-side .game-play-area {
+    bottom: calc(68px + env(safe-area-inset-bottom));
+    left: 0;
+    right: 0;
+    top: calc(56px + env(safe-area-inset-top));
+    padding: 8px 12px !important;
+  }
+
   .game-hud {
     position: absolute;
     inset: 0;
@@ -1688,7 +1757,8 @@ select {
   }
 
   .comparator-landscape-slider,
-  .comparator-landscape-flip {
+  .comparator-landscape-flip,
+  .comparator-landscape-side-by-side {
     display: flex !important;
     width: 100%;
     min-width: 0;
@@ -1703,6 +1773,17 @@ select {
   .comparator-landscape-flip .comparator-photo-column {
     width: 100%;
     min-height: 0;
+  }
+
+  .comparator-landscape-side-by-side .comparator-photo-column {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .comparator-side-by-side-zoom {
+    border: 1px solid rgba(184, 138, 69, 0.45);
+    background: rgba(12, 16, 14, 0.82);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.32);
   }
 
   .comparator-landscape-flip .comparator-flip-button {

@@ -444,7 +444,17 @@ export function App() {
           <SettingsModal isOpen={settingsOpen} onClose={closeSettings} />
         </Suspense>
       )}
-      {comparatorScheme === null && isMobileGameplayDevice() && (
+      {/*
+       * The first-run briefing is the first modal a new player must see.
+       * Showing the control picker globally used to put its higher z-index
+       * above that briefing on phones, effectively hiding onboarding. Once
+       * the player starts the first level, the picker is shown immediately
+       * before gameplay can begin.
+       */}
+      {screen.kind === "game" &&
+        !screen.showOnboarding &&
+        comparatorScheme === null &&
+        isMobileGameplayDevice() && (
         <Suspense fallback={null}>
           <ControlSchemeModal />
         </Suspense>

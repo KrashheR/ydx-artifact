@@ -4,6 +4,10 @@
 
 ## Unreleased
 
+- Added a third mobile landscape comparison mode: side-by-side photos with shared zoom and pan. Its HUD moves above and below the scenes to preserve their usable width.
+
+- Fixed first-run onboarding on phones: level 01 now opens with the investigation briefing unobscured, then presents the mobile compare-control choice after the player starts the level.
+
 - Added an optional, unrewarded four-option setting-interest survey to campaign reports. Selections emit the typed `setting_interest_selected` event for later comparison with campaign depth and retention.
 
 - Fixed automatic startup locale selection: it now follows the Yandex Games priority of a manual saved choice, SDK language, browser language, then Russian fallback, instead of defaulting a missing SDK language to English.

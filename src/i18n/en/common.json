@@ -20,7 +20,9 @@
     "pause": "Pause",
     "resume": "Resume",
     "resetSave": "Reset save",
-    "copyDiagnostics": "Copy diagnostics"
+    "copyDiagnostics": "Copy diagnostics",
+    "zoomOut": "Zoom out",
+    "zoomIn": "Zoom in"
   },
   "home": {
     "new": "New archive",
@@ -140,6 +142,10 @@
     "flipTitle": "Flip",
     "flipDescription": "Tap the button to instantly switch between the two photos.",
     "flipShort": "Switch photos with a button",
+    "sideBySideTitle": "Side by side",
+    "sideBySideDescription": "Keep both photos visible and zoom them together.",
+    "sideBySideShort": "Two photos with shared zoom",
+    "useDefaultFlip": "Continue with Flip",
     "changeLaterHint": "You can change this anytime in the settings."
   },
   "reviewPrompt": {

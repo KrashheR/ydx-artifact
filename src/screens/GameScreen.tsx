@@ -1347,6 +1347,7 @@ export function GameScreen({
       ? t("actions.daily").toUpperCase()
       : t(chapter.titleKey).toUpperCase();
   const levelBadgeTotal = mode === "daily" ? 7 : chapter.levels.length;
+  const comparatorScheme = saveData.settings.comparatorScheme;
   const hasRewardedAreaHintTarget = level.differences.some(
     (d) => !liveFoundIds.includes(d.id) && d.id !== hintId,
   );
@@ -1361,7 +1362,13 @@ export function GameScreen({
     import.meta.env.DEV && ARCHIVE_VALIDATE_MODE && mode === "daily";
 
   return (
-    <div className="game-screen fixed inset-0 flex flex-col overflow-hidden bg-exp-bg font-manrope text-exp-parch">
+    <div
+      className={`game-screen fixed inset-0 flex flex-col overflow-hidden bg-exp-bg font-manrope text-exp-parch${
+        comparatorScheme === "side-by-side"
+          ? " game-screen--side-by-side"
+          : ""
+      }`}
+    >
       {/* ── Game content (blurred when overlay active) ─────────────────── */}
       <div
         className="flex flex-1 flex-col"

@@ -45,6 +45,26 @@ function FlipIcon() {
   );
 }
 
+function SideBySideIcon() {
+  return (
+    <svg
+      width="30"
+      height="30"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="2.5" y="5" width="8.5" height="14" rx="2" />
+      <rect x="13" y="5" width="8.5" height="14" rx="2" />
+      <path d="M10.5 12h3" />
+    </svg>
+  );
+}
+
 function SchemeCard({
   scheme,
   title,
@@ -170,6 +190,13 @@ export function ControlSchemeModal() {
               icon={<FlipIcon />}
               onSelect={setComparatorScheme}
             />
+            <SchemeCard
+              scheme="side-by-side"
+              title={t("controlScheme.sideBySideTitle")}
+              description={t("controlScheme.sideBySideDescription")}
+              icon={<SideBySideIcon />}
+              onSelect={setComparatorScheme}
+            />
           </div>
 
           <p
@@ -178,6 +205,13 @@ export function ControlSchemeModal() {
           >
             {t("controlScheme.changeLaterHint")}
           </p>
+          <button
+            type="button"
+            className="mx-auto mt-2 block min-h-[44px] px-4 text-[12px] font-semibold text-exp-brass2 underline-offset-4 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+            onClick={() => setComparatorScheme("flip")}
+          >
+            {t("controlScheme.useDefaultFlip")}
+          </button>
         </div>
       </motion.div>
     </motion.div>,

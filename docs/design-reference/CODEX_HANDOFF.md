@@ -152,7 +152,7 @@ See `tokens.json` for full values.
 ### Gameplay
 - **≥768px landscape / ≥1280px:** Two photos side-by-side, sync zoom/pan, click on either.
 - **<768px portrait:** Rotate-device gate only; do not add or maintain a portrait A/B gameplay layout.
-- **<768px landscape (844×390, 640×360):** A/B flip-card mobile gameplay. Safe-area insets respected.
+- **<768px landscape (844×390, 640×360):** A/B flip-card is the default mobile gameplay. Settings also provide slider and side-by-side modes; the latter keeps both scenes visible with a shared camera. Safe-area insets respected.
 
 ### Minimum sizes
 - Body text mobile: 16px

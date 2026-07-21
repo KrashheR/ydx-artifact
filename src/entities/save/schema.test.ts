@@ -1,7 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { INITIAL_MAGNIFIERS, migrateSaveData } from "@/entities/save/schema";
+import {
+  createDefaultSave,
+  INITIAL_MAGNIFIERS,
+  migrateSaveData,
+} from "@/entities/save/schema";
 
 describe("migrateSaveData", () => {
+  it("keeps the side-by-side mobile comparator choice", () => {
+    const save = createDefaultSave();
+    save.settings.comparatorScheme = "side-by-side";
+
+    expect(migrateSaveData(save).settings.comparatorScheme).toBe(
+      "side-by-side",
+    );
+  });
+
   it("migrates v1 elapsedSeconds into the v3 attempt model", () => {
     const save = migrateSaveData({
       version: 1,

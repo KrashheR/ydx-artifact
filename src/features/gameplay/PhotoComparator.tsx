@@ -569,8 +569,27 @@ export function PhotoComparator({
         </div>
       )}
 
+      {/* Mobile landscape: both photos stay visible with a shared camera. */}
+      {comparatorScheme === "side-by-side" && (
+        <div className="comparator-landscape-side-by-side relative hidden flex-1 gap-2">
+          {renderPhoto("A", true)}
+          {renderPhoto("B", true)}
+          <div className="comparator-side-by-side-zoom absolute bottom-2 left-1/2 z-40 flex -translate-x-1/2 overflow-hidden rounded-lg">
+            <button type="button" className="flex h-9 w-9 items-center justify-center text-lg font-bold text-exp-brass2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass" aria-label={t("actions.zoomOut")} onClick={() => setZoom((value) => Math.max(1, value - 0.25))}>
+              −
+            </button>
+            <span className="flex min-w-11 items-center justify-center border-x border-[rgba(213,195,154,.16)] px-1 font-jetbrains text-[10px] text-exp-brass2" aria-live="polite">
+              {Math.round(zoom * 100)}%
+            </span>
+            <button type="button" className="flex h-9 w-9 items-center justify-center text-lg font-bold text-exp-brass2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass" aria-label={t("actions.zoomIn")} onClick={() => setZoom((value) => Math.min(2.5, value + 0.25))}>
+              +
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Mobile landscape: one full 16:10 frame with before/after slider */}
-      {comparatorScheme !== "flip" && (
+      {comparatorScheme !== "flip" && comparatorScheme !== "side-by-side" && (
         <div className="comparator-landscape-slider hidden flex-1 flex-col items-center justify-center gap-[11px]">
         <SceneAspectFrame aspectRatio={imageAspectRatio}>
           <div
