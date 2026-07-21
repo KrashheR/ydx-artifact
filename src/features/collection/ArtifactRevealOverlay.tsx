@@ -4,6 +4,7 @@ import type { ArtifactDefinition } from "@/content/artifacts";
 import { getChapter, getChapterLevels } from "@/content/chapters";
 import { getChapterArtifacts } from "@/content/artifacts";
 import { useGameStore } from "@/shared/store/gameStore";
+import { useReducedEffects } from "@/shared/motion/useReducedEffects";
 
 const REVEAL_DELAY_MS = 1400;
 
@@ -60,15 +61,19 @@ export function ArtifactRevealOverlay({
   onOpenCollection: () => void;
 }) {
   const { t } = useTranslation();
-  const reducedMotion = useGameStore((s) => s.saveData.settings.reducedMotion);
+  const reducedMotion = useReducedEffects();
   const artifactStates = useGameStore((s) => s.saveData.artifacts);
   const [revealed, setRevealed] = useState(reducedMotion);
 
   useEffect(() => {
+    if (reducedMotion) {
+      setRevealed(true);
+      return;
+    }
     if (revealed) return;
     const id = window.setTimeout(() => setRevealed(true), REVEAL_DELAY_MS);
     return () => window.clearTimeout(id);
-  }, [revealed]);
+  }, [reducedMotion, revealed]);
 
   const chapter = getChapter(artifact.chapterId);
   const chapterArtifacts = getChapterArtifacts(artifact.chapterId);
@@ -100,14 +105,13 @@ export function ArtifactRevealOverlay({
         role="dialog"
         aria-modal="true"
         aria-labelledby="artifact-reveal-title"
-        className="artifact-reveal-dialog modal-panel result-dialog relative z-10 flex w-[600px] max-w-[calc(100vw-32px)] flex-col items-center overflow-hidden rounded-[16px] px-8 pb-8 pt-9 text-center font-manrope sm:px-11"
+        className="artifact-reveal-dialog modal-panel vfx-artifact-dialog result-dialog relative z-10 flex w-[600px] max-w-[calc(100vw-32px)] flex-col items-center overflow-hidden rounded-[16px] px-8 pb-8 pt-9 text-center font-manrope sm:px-11"
         style={{
           background: "#222A25",
           border: "1px solid rgba(184,138,69,.45)",
           boxShadow: "0 40px 90px rgba(0,0,0,.6)",
           maxHeight: "calc(100vh - 24px)",
           overflowY: "auto",
-          animation: "game-pop .5s cubic-bezier(.2,.8,.3,1.2)",
         }}
       >
         <div className="artifact-reveal-eyebrow text-[11px] font-bold tracking-[.32em] text-exp-brass">
@@ -143,7 +147,7 @@ export function ArtifactRevealOverlay({
 
           {/* Revealed state */}
           <div
-            className="artifact-revealed-card absolute inset-0 flex items-center justify-center rounded-[8px] transition-all duration-700"
+            className={`artifact-revealed-card vfx-artifact-revealed-card absolute inset-0 flex items-center justify-center rounded-[8px] transition-all duration-700 ${revealed ? "vfx-artifact-revealed-card--visible" : ""}`}
             style={{
               background: "linear-gradient(160deg, #2b2115, #1c150c)",
               border: "1px solid rgba(184,138,69,.5)",
@@ -163,7 +167,7 @@ export function ArtifactRevealOverlay({
               draggable={false}
             />
             <span
-              className="absolute -right-2 -top-2 rounded-[4px] border px-1.5 py-0.5 text-[9px] font-extrabold tracking-[.1em]"
+              className={`absolute -right-2 -top-2 rounded-[4px] border px-1.5 py-0.5 text-[9px] font-extrabold tracking-[.1em] ${revealed ? "vfx-artifact-collected-tag" : ""}`}
               style={{
                 transform: "rotate(10deg)",
                 color: "#6fc69e",
@@ -182,8 +186,7 @@ export function ArtifactRevealOverlay({
           </div>
         ) : (
           <div
-            className="artifact-reveal-content flex flex-col items-center"
-            style={{ animation: "game-pop .4s ease-out" }}
+            className="artifact-reveal-content vfx-artifact-content flex flex-col items-center"
           >
             <div className="artifact-reveal-name mt-5 font-cormorant text-[22px] font-semibold text-exp-parch">
               {t(`artifacts.${artifact.id}.name`)}
@@ -213,7 +216,7 @@ export function ArtifactRevealOverlay({
                 type="button"
                 autoFocus
                 onClick={onContinue}
-                className="h-[52px] w-full flex-1 rounded-[9px] border-none text-[14.5px] font-extrabold text-[#1a130a]"
+                className="vfx-press h-[52px] w-full flex-1 rounded-[9px] border-none text-[14.5px] font-extrabold text-[#1a130a]"
                 style={{
                   background: "linear-gradient(180deg, #d8af63, #b3812f)",
                   boxShadow:
@@ -225,7 +228,7 @@ export function ArtifactRevealOverlay({
               <button
                 type="button"
                 onClick={onOpenCollection}
-                className="h-[52px] w-full flex-1 rounded-[9px] text-[13.5px] font-bold text-exp-parch"
+                className="vfx-press h-[52px] w-full flex-1 rounded-[9px] text-[13.5px] font-bold text-exp-parch"
                 style={{
                   border: "1px solid rgba(213,195,154,.24)",
                   background: "rgba(213,195,154,.05)",

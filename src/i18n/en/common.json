@@ -87,6 +87,7 @@
     "timeoutDesc": "The trail went cold. Return to the photos and try again.",
     "statTimer": "TIMER",
     "statRemaining": "REMAINING",
+    "timerWarning": "Time remaining: {{seconds}} seconds.",
     "diffsOnLevel": "DIFFERENCES IN LEVEL",
     "retryAgain": "Try Again",
     "extendTime": "+30 sec"

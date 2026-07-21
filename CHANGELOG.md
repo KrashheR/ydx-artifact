@@ -1,5 +1,7 @@
 # Changelog
 
+- Added tactile A/B comparator feedback: flip mode now shifts and crossfades the photo card without blank frames or queued taps, while slider mode gives a throttled optical glint when crossing the midpoint. Added timer-warning VFX with one amber pulse at 30 seconds remaining and a calm rust rhythm during the final 10 seconds; both respect reduced motion and stop while gameplay is blocked.
+
 ## Unreleased
 
 - Added an optional, unrewarded four-option setting-interest survey to campaign reports. Selections emit the typed `setting_interest_selected` event for later comparison with campaign depth and retention.

@@ -296,7 +296,7 @@ function PrimaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[7px] px-5 text-[13.5px] font-bold text-[#1A130A] transition hover:brightness-105 active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass disabled:cursor-not-allowed disabled:opacity-45 ${className}`}
+          className={`vfx-press inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[7px] px-5 text-[13.5px] font-bold text-[#1A130A] transition hover:brightness-105 active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass disabled:cursor-not-allowed disabled:opacity-45 ${className}`}
       style={{
         background: "linear-gradient(180deg,#D8AF63,#B3812F)",
         boxShadow:
@@ -321,7 +321,7 @@ function SecondaryButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[7px] border border-exp-parch/[.2] bg-exp-parch/[.05] px-4 text-[13px] font-semibold text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass ${className}`}
+      className={`vfx-press inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[7px] border border-exp-parch/[.2] bg-exp-parch/[.05] px-4 text-[13px] font-semibold text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass ${className}`}
     >
       {children}
     </button>
@@ -404,7 +404,7 @@ function CurrentCaseCard({
 
   return (
     <section
-      className="home-case-card relative flex min-h-[320px] flex-col overflow-hidden rounded-[12px] border p-5 sm:p-6"
+      className="home-case-card vfx-home-current-card relative flex min-h-[320px] flex-col overflow-hidden rounded-[12px] border p-5 sm:p-6"
       style={{
         background: "#222A25",
         borderColor: almostComplete
@@ -511,7 +511,7 @@ function DailyArchiveCard({
   const { t } = useTranslation();
 
   return (
-    <section className="flex min-h-[168px] flex-col rounded-[12px] border border-exp-parch/[.14] bg-exp-panel p-4">
+    <section className="vfx-home-daily-card flex min-h-[168px] flex-col rounded-[12px] border border-exp-parch/[.14] bg-exp-panel p-4">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-exp-brass">
           <CalendarIcon size={15} />
@@ -709,7 +709,7 @@ function CampaignMiniList({
             key={campaign.id}
             type="button"
             onClick={() => onOpenCampaign(campaign.id)}
-            className="flex min-h-[56px] items-center gap-3 rounded-[9px] border px-3 py-2.5 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+            className="vfx-press vfx-home-campaign-item flex min-h-[56px] items-center gap-3 rounded-[9px] border px-3 py-2.5 text-left transition hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
             style={{
               background: locked
                 ? "rgba(213,195,154,.03)"
@@ -991,7 +991,7 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
       />
 
       <main className="home-hub-shell mx-auto flex h-[calc(100dvh-70px)] w-full max-w-[1440px] flex-col px-5 py-5 md:px-8 md:py-6">
-        <section className="home-hub-header mb-4">
+        <section className="home-hub-header vfx-home-enter mb-4">
           <p className="text-[10px] font-bold uppercase tracking-[.34em] text-exp-brass">
             {t("homeHub.eyebrow")}
           </p>
@@ -1016,7 +1016,7 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
           </div>
         </section>
 
-        <div className="home-hub-grid grid min-h-0 flex-1 grid-cols-1 gap-4 md:grid-cols-[minmax(0,1.25fr)_minmax(260px,.72fr)_minmax(300px,.78fr)]">
+        <div className="home-hub-grid vfx-home-enter vfx-home-hub-grid grid min-h-0 flex-1 grid-cols-1 gap-4 md:grid-cols-[minmax(0,1.25fr)_minmax(260px,.72fr)_minmax(300px,.78fr)]">
           <CurrentCaseCard
             campaign={activeCampaign}
             onContinue={() => continueCampaign(activeCampaign)}

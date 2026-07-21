@@ -87,6 +87,7 @@
     "timeoutDesc": "Вернитесь к снимкам и попробуйте пройти уровень ещё раз.",
     "statTimer": "ТАЙМЕР",
     "statRemaining": "ОСТАЛОСЬ",
+    "timerWarning": "Осталось времени: {{seconds}} сек.",
     "diffsOnLevel": "ОТЛИЧИЯ НА УРОВНЕ",
     "retryAgain": "Попробовать снова",
     "extendTime": "+30 сек"

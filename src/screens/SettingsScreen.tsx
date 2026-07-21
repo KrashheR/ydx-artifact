@@ -376,21 +376,21 @@ export function SettingsModal({ isOpen, onClose }: Props) {
 
             {showSchemeSection && (
               <>
-                {/* Compare scheme section label */}
-                <div className="settings-section-label settings-scheme-label flex flex-shrink-0 items-center gap-2.5 px-7 pb-2 pt-3">
-                  <span className="text-[11px] font-bold uppercase tracking-[.2em] text-exp-muted">
-                    {t("settings.schemeSection")}
-                  </span>
-                  <div
-                    className="h-px flex-1"
-                    aria-hidden="true"
-                    style={{ background: "rgba(213,195,154,.1)" }}
-                  />
-                </div>
+            {/* Compare scheme section label */}
+            <div className="settings-section-label settings-scheme-label flex flex-shrink-0 items-center gap-2.5 px-7 pb-2 pt-3">
+              <span className="text-[11px] font-bold uppercase tracking-[.2em] text-exp-muted">
+                {t("settings.schemeSection")}
+              </span>
+              <div
+                className="h-px flex-1"
+                aria-hidden="true"
+                style={{ background: "rgba(213,195,154,.1)" }}
+              />
+            </div>
 
-                {/* Compare scheme options */}
-                <div className="settings-scheme-list px-[22px] pb-1.5 pt-2">
-                  {schemeOptions.map((option) => {
+            {/* Compare scheme options */}
+            <div className="settings-scheme-list px-[22px] pb-1.5 pt-2">
+              {schemeOptions.map((option) => {
                     const selected =
                       (comparatorScheme ?? "slider") === option.scheme;
                     return (
@@ -447,8 +447,8 @@ export function SettingsModal({ isOpen, onClose }: Props) {
                         </span>
                       </button>
                     );
-                  })}
-                </div>
+              })}
+            </div>
               </>
             )}
             </div>
