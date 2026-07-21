@@ -540,7 +540,7 @@ export function PhotoComparator({
       {/* Mobile landscape: one full 16:10 frame that flips between A and B */}
       {comparatorScheme === "flip" && (
         <div className="comparator-landscape-flip hidden flex-1 flex-col items-center justify-center gap-[10px]">
-          <div className={isFlipping ? `vfx-compare-flip vfx-compare-flip--${flipDirection} vfx-compare-flip--${flipPhase} w-full flex-1` : "w-full flex-1"}>
+          <div className={isFlipping ? `vfx-compare-flip vfx-compare-flip--${flipDirection} vfx-compare-flip--${flipPhase} flex min-h-0 w-full flex-1` : "flex min-h-0 w-full flex-1"}>
             {renderPhoto(version, true)}
           </div>
           <button

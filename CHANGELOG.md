@@ -4,6 +4,8 @@
 
 ## Unreleased
 
+- Fixed the mobile landscape flip comparator on short viewports: its scene wrapper now constrains the scene layer to the available play area, keeping the flip button unobscured.
+
 - Improved the mobile landscape side-by-side comparison layout: the level HUD now sits above the photos and hint/settings actions below them, so neither side rail takes width away from the two scenes.
 
 - Added a third mobile compare mode: side-by-side photos with shared zoom and pan. The before/after slider and A/B flip are selectable alongside it in settings; the choice applies to mobile gameplay.
