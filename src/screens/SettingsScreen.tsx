@@ -3,7 +3,6 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import type { ComparatorScheme } from "@/entities/save/schema";
-import { isMobileGameplayDevice } from "@/shared/lib/device";
 import { useGameStore } from "@/shared/store/gameStore";
 
 const LANGS = [
@@ -98,7 +97,6 @@ export function SettingsModal({ isOpen, onClose }: Props) {
     (s) => s.saveData.settings.comparatorScheme,
   );
   const setComparatorScheme = useGameStore((s) => s.setComparatorScheme);
-  const showSchemeSection = isMobileGameplayDevice();
   const schemeOptions: {
     scheme: ComparatorScheme;
     title: string;
@@ -113,6 +111,11 @@ export function SettingsModal({ isOpen, onClose }: Props) {
       scheme: "flip",
       title: t("controlScheme.flipTitle"),
       description: t("controlScheme.flipShort"),
+    },
+    {
+      scheme: "side-by-side",
+      title: t("controlScheme.sideBySideTitle"),
+      description: t("controlScheme.sideBySideShort"),
     },
   ];
 
@@ -374,23 +377,21 @@ export function SettingsModal({ isOpen, onClose }: Props) {
               })}
             </div>
 
-            {showSchemeSection && (
-              <>
-                {/* Compare scheme section label */}
-                <div className="settings-section-label settings-scheme-label flex flex-shrink-0 items-center gap-2.5 px-7 pb-2 pt-3">
-                  <span className="text-[11px] font-bold uppercase tracking-[.2em] text-exp-muted">
-                    {t("settings.schemeSection")}
-                  </span>
-                  <div
-                    className="h-px flex-1"
-                    aria-hidden="true"
-                    style={{ background: "rgba(213,195,154,.1)" }}
-                  />
-                </div>
+            {/* Compare scheme section label */}
+            <div className="settings-section-label settings-scheme-label flex flex-shrink-0 items-center gap-2.5 px-7 pb-2 pt-3">
+              <span className="text-[11px] font-bold uppercase tracking-[.2em] text-exp-muted">
+                {t("settings.schemeSection")}
+              </span>
+              <div
+                className="h-px flex-1"
+                aria-hidden="true"
+                style={{ background: "rgba(213,195,154,.1)" }}
+              />
+            </div>
 
-                {/* Compare scheme options */}
-                <div className="settings-scheme-list px-[22px] pb-1.5 pt-2">
-                  {schemeOptions.map((option) => {
+            {/* Compare scheme options */}
+            <div className="settings-scheme-list px-[22px] pb-1.5 pt-2">
+              {schemeOptions.map((option) => {
                     const selected =
                       (comparatorScheme ?? "flip") === option.scheme;
                     return (
@@ -447,10 +448,8 @@ export function SettingsModal({ isOpen, onClose }: Props) {
                         </span>
                       </button>
                     );
-                  })}
-                </div>
-              </>
-            )}
+              })}
+            </div>
             </div>
 
             {/* Footer */}

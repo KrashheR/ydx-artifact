@@ -19,11 +19,17 @@ import {
   trackAnalyticsEvent,
 } from "@/services/analytics/analytics";
 import { getPlatformAdapter } from "@/services/platform/platform";
-import { notifyGameReady } from "@/services/platform/platformLifecycle";
+import {
+  getIsPlatformPaused,
+  notifyGameReady,
+  subscribePlatformPause,
+} from "@/services/platform/platformLifecycle";
 import { preloadImage } from "@/shared/lib/imagePreload";
 import { getBrowserLanguage, resolveInitialLocale } from "@/shared/lib/locale";
 import { prefetchHomeIdleAssets } from "@/shared/lib/scenePrefetch";
 import { useGameStore } from "@/shared/store/gameStore";
+import { motion as motionSpec, motionDuration } from "@/shared/motion/motion";
+import { useReducedEffects } from "@/shared/motion/useReducedEffects";
 
 function nextFrame() {
   return new Promise<void>((resolve) => {
@@ -133,6 +139,10 @@ export function App() {
   const save = useGameStore((state) => state.save);
   const setAutoLocale = useGameStore((state) => state.setAutoLocale);
   const locale = useGameStore((state) => state.saveData.settings.locale);
+  const reducedEffects = useReducedEffects();
+  const [effectsPaused, setEffectsPaused] = useState(
+    () => getIsPlatformPaused() || document.visibilityState === "hidden",
+  );
   const [settingsOpen, setSettingsOpen] = useState(false);
   // Keeps the lazy settings chunk out of the initial load: the modal is
   // mounted on first open and stays mounted so close animations still play.
@@ -338,6 +348,21 @@ export function App() {
     };
   }, [save]);
 
+  // Decorative effects pause with the platform and background tab. Gameplay
+  // state keeps its own lifecycle contract; this only prevents idle CSS loops.
+  useEffect(() => {
+    const syncVisibility = () =>
+      setEffectsPaused(
+        getIsPlatformPaused() || document.visibilityState === "hidden",
+      );
+    const unsubscribe = subscribePlatformPause(syncVisibility);
+    document.addEventListener("visibilitychange", syncVisibility);
+    return () => {
+      unsubscribe();
+      document.removeEventListener("visibilitychange", syncVisibility);
+    };
+  }, []);
+
   const current = useMemo(() => {
     switch (screen.kind) {
       case "home":
@@ -376,15 +401,15 @@ export function App() {
   }
 
   return (
-    <main className="min-h-screen bg-exp-bg text-graphite">
+    <main className={`min-h-screen bg-exp-bg text-graphite ${reducedEffects ? "vfx-reduced" : ""} ${effectsPaused ? "vfx-paused" : ""}`}>
       <AnimatePresence mode="wait">
         <motion.div
           key={`${screen.kind}-${"chapterId" in screen ? screen.chapterId : ""}-${"levelId" in screen ? screen.levelId : ""}`}
           className="min-h-screen"
           initial={false}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.18 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: reducedEffects ? 0 : -4 }}
+          transition={{ duration: motionDuration(motionSpec.base, reducedEffects), ease: motionSpec.easeStandard }}
         >
           {current}
         </motion.div>

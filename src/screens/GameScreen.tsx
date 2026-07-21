@@ -30,9 +30,10 @@ import {
 import { preloadImages } from "@/shared/lib/imagePreload";
 import { useGameStore } from "@/shared/store/gameStore";
 import { getNextCampaignReportChapterId } from "@/data/campaignReports";
+import { useReducedEffects } from "@/shared/motion/useReducedEffects";
 
 const TIME_LIMIT = 300; // 5 minutes
-const COMPLETE_OVERLAY_DELAY_MS = 200;
+const COMPLETE_OVERLAY_DELAY_MS = 700;
 const HINT_PIP_COUNT = 5;
 const DEBUG_LAYOUT_MODE = import.meta.env.VITE_LAYOUT_DEBUG === "true";
 const FINAL_VALIDATE_MODE = import.meta.env.VITE_FINAL_VALIDATE === "true";
@@ -332,8 +333,12 @@ export function GameScreen({
   isSettingsOpen?: boolean;
 }) {
   const { t } = useTranslation();
+  const reducedEffects = useReducedEffects();
 
   const saveData = useGameStore((s) => s.saveData);
+  const comparatorScheme = useGameStore(
+    (s) => s.saveData.settings.comparatorScheme ?? "flip",
+  );
   const navigate = useGameStore((s) => s.navigate);
   const startLevel = useGameStore((s) => s.startLevel);
   const recordDiff = useGameStore((s) => s.recordDifference);
@@ -410,8 +415,12 @@ export function GameScreen({
     useState(showOnboarding);
   const [artifactToast, setArtifactToast] =
     useState<ArtifactToastVariant | null>(null);
+  const [timerWarningPulse, setTimerWarningPulse] = useState(false);
   const artifactToastTimerRef = useRef<number | null>(null);
   const completeOverlayDelayRef = useRef<number | null>(null);
+  const timerWarningPulseTimerRef = useRef<number | null>(null);
+  const timerThirtySecondWarningRef = useRef(false);
+  const timerTenSecondWarningRef = useRef(false);
   const activeTimerSaveCounterRef = useRef(0);
   const timeoutTrackedRef = useRef(false);
   const onboardingImpressionTrackedRef = useRef(false);
@@ -483,6 +492,12 @@ export function GameScreen({
     showComplete ||
     completionPending ||
     timedOut;
+  const timerWarningClass =
+    !gameplayBlocked && timeLeft > 0 && timeLeft <= 10
+      ? "vfx-timer-critical"
+      : timerWarningPulse
+        ? "vfx-timer-warning"
+        : "";
   const completedLevelsCount = saveData.completedLevels.length;
   const promptOrdinal = Math.min(
     saveData.reviewPrompt.prePromptShownCount + 1,
@@ -660,6 +675,46 @@ export function GameScreen({
     }, 1000);
     return () => window.clearInterval(id);
   }, [addActiveLevelTime, gameplayBlocked, levelId]);
+
+  useEffect(() => {
+    timerThirtySecondWarningRef.current = false;
+    timerTenSecondWarningRef.current = false;
+    setTimerWarningPulse(false);
+    if (timerWarningPulseTimerRef.current !== null) {
+      window.clearTimeout(timerWarningPulseTimerRef.current);
+      timerWarningPulseTimerRef.current = null;
+    }
+  }, [levelId]);
+
+  // Time warnings are visual-only: their thresholds never affect the timer,
+  // save flow, or timeout state. The critical loop is removed by gameplayBlocked.
+  useEffect(() => {
+    if (gameplayBlocked || timeLeft <= 0) return;
+    const crossedThreshold =
+      (timeLeft <= 30 && !timerThirtySecondWarningRef.current) ||
+      (timeLeft <= 10 && !timerTenSecondWarningRef.current);
+    if (!crossedThreshold) return;
+
+    if (timeLeft <= 30) timerThirtySecondWarningRef.current = true;
+    if (timeLeft <= 10) timerTenSecondWarningRef.current = true;
+    setTimerWarningPulse(true);
+    if (timerWarningPulseTimerRef.current !== null) {
+      window.clearTimeout(timerWarningPulseTimerRef.current);
+    }
+    timerWarningPulseTimerRef.current = window.setTimeout(() => {
+      setTimerWarningPulse(false);
+      timerWarningPulseTimerRef.current = null;
+    }, reducedEffects ? 20 : 350);
+  }, [gameplayBlocked, reducedEffects, timeLeft]);
+
+  useEffect(
+    () => () => {
+      if (timerWarningPulseTimerRef.current !== null) {
+        window.clearTimeout(timerWarningPulseTimerRef.current);
+      }
+    },
+    [],
+  );
 
   // Detect timeout
   useEffect(() => {
@@ -880,7 +935,7 @@ export function GameScreen({
         setFinalStats(stats);
         completeLevel(levelId, elapsed, mode);
         completeOverlayDelayRef.current = null;
-      }, COMPLETE_OVERLAY_DELAY_MS);
+      }, reducedEffects ? 60 : COMPLETE_OVERLAY_DELAY_MS);
     }
   }
 
@@ -1326,7 +1381,13 @@ export function GameScreen({
     import.meta.env.DEV && ARCHIVE_VALIDATE_MODE && mode === "daily";
 
   return (
-    <div className="game-screen fixed inset-0 flex flex-col overflow-hidden bg-exp-bg font-manrope text-exp-parch">
+    <div
+      className={`game-screen fixed inset-0 flex flex-col overflow-hidden bg-exp-bg font-manrope text-exp-parch${
+        comparatorScheme === "side-by-side"
+          ? " game-screen--side-by-side"
+          : ""
+      }`}
+    >
       {/* ── Game content (blurred when overlay active) ─────────────────── */}
       <div
         className="flex flex-1 flex-col"
@@ -1398,18 +1459,26 @@ export function GameScreen({
           <div className="flex items-center gap-[14px]">
             {/* Timer */}
             <div
-              className="flex h-[48px] items-center gap-[9px] rounded-[11px] px-[18px]"
+              className={`flex h-[48px] items-center gap-[9px] rounded-[11px] px-[18px] ${timerWarningClass}`}
               style={{
-                border: "1px solid rgba(213,195,154,.14)",
+                border:
+                  timeLeft > 0 && timeLeft <= 10
+                    ? "1px solid rgba(154,78,63,.38)"
+                    : "1px solid rgba(213,195,154,.14)",
                 background: "rgba(21,27,24,.6)",
               }}
+              aria-label={
+                timeLeft <= 30
+                  ? t("game.timerWarning", { seconds: timeLeft })
+                  : undefined
+              }
             >
               <svg
                 width="17"
                 height="17"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#879087"
+                stroke={timeLeft > 0 && timeLeft <= 10 ? "#c96955" : "#879087"}
                 strokeWidth="1.8"
               >
                 <circle cx="12" cy="13" r="8" />
@@ -1418,7 +1487,7 @@ export function GameScreen({
               </svg>
               <span
                 className="font-jetbrains text-[16px] font-semibold tracking-[.04em] sm:text-[22px]"
-                style={{ color: "#D5C39A" }}
+                style={{ color: timeLeft > 0 && timeLeft <= 10 ? "#e0a092" : "#D5C39A" }}
               >
                 {formatTime(liveElapsedActiveSeconds)}
               </span>
@@ -1470,7 +1539,7 @@ export function GameScreen({
                   (_, i) => (
                     <span
                       key={i}
-                      className="flex h-5 w-5 items-center justify-center rounded-[6px]"
+                      className={`flex h-5 w-5 items-center justify-center rounded-[6px] ${i === liveFoundIds.length - 1 ? "vfx-progress-pip" : ""}`}
                       style={
                         i < liveFoundIds.length
                           ? { background: "#D8AF63" }
@@ -1736,7 +1805,7 @@ export function GameScreen({
             {Array.from({ length: level.requiredDifferences }).map((_, i) => (
               <span
                 key={i}
-                className="flex h-[18px] w-[18px] items-center justify-center rounded-[5px]"
+                className={`flex h-[18px] w-[18px] items-center justify-center rounded-[5px] ${i === liveFoundIds.length - 1 ? "vfx-progress-pip" : ""}`}
                 style={
                   i < liveFoundIds.length
                     ? { background: "#d8af63" }
@@ -1815,7 +1884,7 @@ export function GameScreen({
             </span>
           </div>
 
-          <div className="flex h-10 items-center gap-2.5 rounded-[11px] border border-[#B88A45]/35 bg-[#B88A45]/10 px-4">
+          <div className={`flex h-10 items-center gap-2.5 rounded-[11px] border border-[#B88A45]/35 bg-[#B88A45]/10 px-4 ${[2, 3, 5].includes(displayStreak) ? "vfx-streak-milestone" : ""}`}>
             <svg
               width="16"
               height="16"

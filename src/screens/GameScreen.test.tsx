@@ -101,6 +101,27 @@ describe("GameScreen", () => {
     });
   });
 
+  it("marks the two-photo compare layout for the mobile landscape HUD", () => {
+    const level = getChapterLevels("northern-route")[0];
+    useGameStore.setState((state) => ({
+      saveData: {
+        ...state.saveData,
+        settings: {
+          ...state.saveData.settings,
+          comparatorScheme: "side-by-side",
+        },
+      },
+    }));
+
+    const { container } = render(
+      <GameScreen levelId={level.id} mode="campaign" />,
+    );
+
+    expect(container.querySelector(".game-screen")).toHaveClass(
+      "game-screen--side-by-side",
+    );
+  });
+
   it("shows a queued interstitial only when the player clicks next level", async () => {
     const levels = getChapterLevels("northern-route");
     const level = levels[2];

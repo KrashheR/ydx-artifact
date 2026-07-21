@@ -36,7 +36,7 @@
 Обязательные layouts:
 
 - mobile portrait — только rotate-device gate, игровой layout не поддерживается;
-- mobile landscape — компактный landscape UI с A/B flip-card;
+- mobile landscape — компактный landscape UI с selectable A/B flip-card, before/after slider или side-by-side снимками с общими масштабом и панорамированием;
 - tablet portrait — допускается только если область не попадает в phone portrait gate; phone-sized portrait всегда блокируется;
 - tablet landscape — side-by-side;
 - desktop — side-by-side.

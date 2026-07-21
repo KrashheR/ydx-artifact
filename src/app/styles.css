@@ -3,6 +3,15 @@
 @tailwind utilities;
 
 :root {
+  --motion-instant: 80ms;
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 350ms;
+  --motion-reveal: 500ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   color: #2f3231;
   background: #d8ccb4;
   font-family: "Trebuchet MS", Verdana, sans-serif;
@@ -58,6 +67,154 @@ svg {
 button,
 select {
   font: inherit;
+}
+
+.vfx-press {
+  transition: transform var(--motion-fast) var(--ease-standard), filter var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard);
+}
+
+.vfx-press:active:not(:disabled) {
+  transform: scale(.97);
+  filter: brightness(1.04);
+}
+
+.vfx-found-ring { animation: vfx-found-ring 420ms var(--ease-out) both; }
+.vfx-found-check { animation: vfx-found-check 280ms var(--ease-spring) 90ms both; }
+.vfx-found-fleck {
+  position: absolute;
+  left: 50%; top: 50%; width: 3px; height: 7px;
+  border-radius: 2px; background: #d8af63;
+  transform: translate(-50%, -50%);
+  animation: vfx-found-fleck 440ms var(--ease-out) both;
+}
+.vfx-hint-sequence { animation: vfx-hint-sequence 2.8s var(--ease-out) both; }
+.vfx-wrong-marker { animation: vfx-wrong-marker 560ms var(--ease-out) forwards; }
+.vfx-progress-pip { animation: vfx-progress-pip 320ms var(--ease-spring) both; }
+.vfx-streak-milestone { animation: vfx-streak-milestone 440ms var(--ease-out) both; }
+.vfx-compare-flip .comparator-photo {
+  animation: vfx-compare-flip 190ms var(--ease-out) both;
+}
+.vfx-compare-flip .comparator-photo img {
+  transition: opacity 120ms var(--ease-out), transform 120ms var(--ease-out);
+  will-change: opacity, transform;
+}
+.vfx-compare-flip--to-b.vfx-compare-flip--out .comparator-scene-layer--a {
+  opacity: .42 !important;
+  transform: translateX(-1.25%);
+}
+.vfx-compare-flip--to-b.vfx-compare-flip--out .comparator-scene-layer--b {
+  transform: translateX(1.25%);
+}
+.vfx-compare-flip--to-a.vfx-compare-flip--out .comparator-scene-layer--b {
+  opacity: .42 !important;
+  transform: translateX(1.25%);
+}
+.vfx-compare-flip--to-a.vfx-compare-flip--out .comparator-scene-layer--a {
+  transform: translateX(-1.25%);
+}
+.vfx-compare-flip--to-b.vfx-compare-flip--in .comparator-scene-layer--a {
+  opacity: 0 !important;
+  transform: translateX(-1.25%);
+}
+.vfx-compare-flip--to-a.vfx-compare-flip--in .comparator-scene-layer--b {
+  opacity: 0 !important;
+  transform: translateX(1.25%);
+}
+.vfx-compare-slider-glint {
+  background: linear-gradient(90deg, transparent, rgba(255,244,204,.56), transparent);
+  animation: vfx-compare-slider-glint 260ms var(--ease-out) both;
+}
+.vfx-timer-warning { animation: vfx-timer-warning 350ms var(--ease-out) both; }
+.vfx-timer-critical { animation: vfx-timer-critical 2s var(--ease-out) infinite; }
+.vfx-dialog, .vfx-result-dialog, .vfx-artifact-dialog { animation: vfx-dialog-enter var(--motion-base) var(--ease-out) both; }
+.vfx-result-hero { animation: vfx-result-hero 500ms var(--ease-spring) 120ms both; }
+.vfx-result-star { animation: vfx-result-star 360ms var(--ease-spring) both; }
+.vfx-dialog-backdrop { animation: vfx-dialog-backdrop var(--motion-fast) var(--ease-standard) both; }
+.vfx-collection-filter { animation: vfx-collection-filter 200ms var(--ease-out) both; }
+.vfx-new-artifact-card::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(192, 83, 58, .72);
+  border-radius: 9px;
+  pointer-events: none;
+  animation: vfx-new-artifact-seal 760ms var(--ease-out) both;
+}
+.vfx-new-artifact-tag { animation: vfx-new-artifact-tag 350ms var(--ease-spring) 120ms both; }
+.vfx-collection-detail { animation: vfx-dialog-enter var(--motion-base) var(--ease-out) both; }
+.vfx-collection-detail-image { animation: vfx-collection-image 350ms var(--ease-out) 70ms both; }
+.vfx-collection-detail-content { animation: vfx-collection-content var(--motion-base) var(--ease-out) 140ms both; }
+.vfx-campaign-report { animation: vfx-campaign-report-in var(--motion-reveal) var(--ease-out) both; }
+.vfx-campaign-report-artifact { animation: vfx-campaign-report-artifact 480ms var(--ease-out) 120ms both; }
+.vfx-campaign-report-stamp { animation: vfx-campaign-report-stamp var(--motion-reveal) var(--ease-spring) 320ms both; }
+.vfx-home-enter { animation: vfx-home-enter var(--motion-base) var(--ease-out) both; }
+.vfx-home-hub-grid { animation-delay: 60ms; }
+.vfx-home-current-card::after {
+  position: absolute;
+  inset: 3px;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 9px;
+  background: linear-gradient(110deg, transparent 34%, rgba(216,175,99,.18) 50%, transparent 66%);
+  content: "";
+  opacity: 0;
+  transform: translateX(-32%);
+  animation: vfx-home-light-sweep 10s var(--ease-out) 600ms infinite;
+}
+.vfx-home-current-card > * { position: relative; z-index: 1; }
+.vfx-home-daily-card { animation: vfx-home-daily-sweep 520ms var(--ease-out) 180ms both; }
+.vfx-map-completed { animation: vfx-map-completed 420ms var(--ease-spring) both; }
+.vfx-map-current { animation: vfx-map-current 2.4s var(--ease-out) 3 both; }
+.vfx-artifact-revealed-card--visible::after {
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(216,175,99,.7);
+  border-radius: 5px;
+  content: "";
+  pointer-events: none;
+  animation: vfx-artifact-contour 620ms var(--ease-out) both;
+}
+.vfx-artifact-collected-tag { animation: vfx-artifact-tag 350ms var(--ease-spring) 120ms both; }
+.vfx-artifact-content { animation: vfx-artifact-content var(--motion-slow) var(--ease-out) 80ms both; }
+.vfx-paused *, .vfx-paused *::before, .vfx-paused *::after { animation-play-state: paused !important; }
+
+@keyframes vfx-found-ring { from { opacity: 0; transform: scale(.58); } to { opacity: 1; transform: scale(1); } }
+@keyframes vfx-found-check { from { opacity: 0; transform: translate(-50%, -50%) scale(.5); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+@keyframes vfx-found-fleck { from { opacity: .95; transform: translate(-50%, -50%) rotate(-18deg); } to { opacity: 0; transform: translate(calc(-50% + var(--fleck-x)), calc(-50% + var(--fleck-y))) rotate(24deg); } }
+@keyframes vfx-hint-sequence { 0%, 16%, 32% { opacity: 1; } 8%, 24% { opacity: .44; } 100% { opacity: .8; } }
+@keyframes vfx-wrong-marker { 0% { opacity: 1; transform: scale(.72); } 38% { opacity: 1; transform: scale(1.06); } 100% { opacity: 0; transform: scale(.62); } }
+@keyframes vfx-progress-pip { from { transform: scale(.55); opacity: .2; } to { transform: scale(1); opacity: 1; } }
+@keyframes vfx-streak-milestone { 0%,100% { box-shadow: 0 0 0 rgba(216,175,99,0); } 45% { box-shadow: 0 7px 0 -5px rgba(216,175,99,.9); } }
+@keyframes vfx-compare-flip { from { filter: brightness(1.02); } to { filter: brightness(1); } }
+@keyframes vfx-compare-slider-glint { from { opacity: 0; transform: translateX(-50%) scaleX(.45); } 45% { opacity: 1; } to { opacity: 0; transform: translateX(-50%) scaleX(1.35); } }
+@keyframes vfx-timer-warning { 0% { box-shadow: 0 0 0 rgba(216,175,99,0); } 45% { border-color: rgba(216,175,99,.76); box-shadow: 0 0 0 4px rgba(216,175,99,.12), 0 0 18px rgba(216,175,99,.22); } 100% { box-shadow: 0 0 0 rgba(216,175,99,0); } }
+@keyframes vfx-timer-critical { 0%, 100% { border-color: rgba(154,78,63,.38); box-shadow: 0 0 0 rgba(154,78,63,0); } 18% { border-color: rgba(201,105,85,.8); box-shadow: 0 0 0 4px rgba(154,78,63,.13), 0 0 20px rgba(154,78,63,.24); } 34% { border-color: rgba(154,78,63,.38); box-shadow: 0 0 0 rgba(154,78,63,0); } }
+@keyframes vfx-dialog-enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes vfx-result-hero { from { opacity: 0; transform: scale(.72); } to { opacity: 1; transform: scale(1); } }
+@keyframes vfx-result-star { from { opacity: 0; transform: scale(.35); } to { opacity: 1; transform: scale(1); } }
+@keyframes vfx-dialog-backdrop { from { opacity: 0; } to { opacity: 1; } }
+@keyframes vfx-collection-filter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes vfx-new-artifact-seal { 0% { opacity: 0; transform: scale(.9); } 48% { opacity: 1; transform: scale(1); } 100% { opacity: .48; transform: scale(1); } }
+@keyframes vfx-new-artifact-tag { from { opacity: 0; transform: translateY(-5px) scale(.72); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes vfx-collection-image { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes vfx-collection-content { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes vfx-campaign-report-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes vfx-campaign-report-artifact { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes vfx-campaign-report-stamp { from { opacity: 0; transform: translateY(8px) rotate(-3deg) scale(.94); } to { opacity: 1; transform: translateY(0) rotate(-3deg) scale(1); } }
+@keyframes vfx-home-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes vfx-home-light-sweep { 0%, 86% { opacity: 0; transform: translateX(-32%); } 90% { opacity: .8; } 100% { opacity: 0; transform: translateX(32%); } }
+@keyframes vfx-home-daily-sweep { from { opacity: 0; box-shadow: inset 0 0 0 rgba(95,118,132,0); } 55% { opacity: 1; box-shadow: inset 0 0 0 1px rgba(95,118,132,.55), 0 0 18px rgba(95,118,132,.14); } to { opacity: 1; box-shadow: inset 0 0 0 rgba(95,118,132,0); } }
+@keyframes vfx-map-completed { from { opacity: .68; transform: scale(.985); } to { opacity: 1; transform: scale(1); } }
+@keyframes vfx-map-current { 0%, 100% { box-shadow: 0 0 0 rgba(216,175,99,0); } 18% { box-shadow: 0 0 0 4px rgba(216,175,99,.12); } 35% { box-shadow: 0 0 0 rgba(216,175,99,0); } }
+@keyframes vfx-artifact-contour { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
+@keyframes vfx-artifact-tag { from { opacity: 0; transform: rotate(10deg) scale(.72); } to { opacity: 1; transform: rotate(10deg) scale(1); } }
+@keyframes vfx-artifact-content { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.vfx-reduced *, .vfx-reduced *::before, .vfx-reduced *::after {
+  animation-duration: .01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .01ms !important;
+  scroll-behavior: auto !important;
 }
 
 .app-bootstrap-screen {
@@ -451,11 +608,11 @@ select {
 }
 
 .map-current-badge {
-  animation: current-card-breathe 3.4s ease-in-out infinite;
+  animation: current-card-breathe 3.4s ease-in-out 3;
 }
 
 .map-current-pulse {
-  animation: softglow 1.8s ease-in-out infinite;
+  animation: softglow 1.8s ease-in-out 3;
 }
 
 .rewarded-hint-backdrop-image {
@@ -470,7 +627,8 @@ select {
 
 .comparator-desktop,
 .comparator-mobile-portrait,
-.comparator-landscape-flip {
+.comparator-landscape-flip,
+.comparator-landscape-side-by-side {
   min-height: 0;
 }
 
@@ -1521,6 +1679,87 @@ select {
     padding: 14px !important;
   }
 
+  /* In the two-photo mode, side rails waste the width that makes both scenes
+     readable. Keep the level context in the top strip and the actions below
+     the comparator instead. This only changes the mobile landscape option. */
+  .game-screen--side-by-side .game-hud > div:first-child {
+    bottom: auto;
+    top: 0;
+    width: auto;
+    max-width: 48%;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: max(8px, env(safe-area-inset-top)) 12px 8px
+      max(12px, env(safe-area-inset-left));
+    border-right: 0;
+    background: linear-gradient(180deg, rgba(21, 27, 24, 0.88), transparent);
+  }
+
+  .game-screen--side-by-side .game-hud > div:first-child > div:last-child {
+    min-width: 0;
+  }
+
+  .game-screen--side-by-side .game-hud > div:first-child > div:last-child > div:last-child {
+    max-width: min(30vw, 220px);
+  }
+
+  .game-screen--side-by-side .game-hud > div:nth-child(2) {
+    bottom: auto;
+    left: auto;
+    top: max(8px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    width: auto;
+    flex-direction: row;
+    gap: 6px !important;
+  }
+
+  .game-screen--side-by-side .game-hud > div:nth-child(2) > div {
+    width: auto;
+    height: 40px !important;
+    min-height: 40px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .game-screen--side-by-side .game-hud > div:last-child {
+    bottom: max(8px, env(safe-area-inset-bottom));
+    right: max(12px, env(safe-area-inset-right));
+    top: auto;
+    width: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px !important;
+    padding: 0;
+    border-left: 0;
+    background: transparent;
+  }
+
+  .game-screen--side-by-side .game-hud > div:last-child .game-hint-button {
+    order: 0;
+    width: 52px !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    margin: 0;
+  }
+
+  .game-screen--side-by-side .game-hud > div:last-child button:last-child {
+    order: 0;
+    align-self: auto;
+  }
+
+  .game-screen--side-by-side .game-hud > div:last-child .game-hint-rail-meta {
+    display: none !important;
+  }
+
+  .game-screen--side-by-side .game-play-area {
+    bottom: calc(68px + env(safe-area-inset-bottom));
+    left: 0;
+    right: 0;
+    top: calc(56px + env(safe-area-inset-top));
+    padding: 8px 12px !important;
+  }
+
   .photo-comparator {
     min-height: 0;
   }
@@ -1531,7 +1770,8 @@ select {
   }
 
   .comparator-landscape-slider,
-  .comparator-landscape-flip {
+  .comparator-landscape-flip,
+  .comparator-landscape-side-by-side {
     display: flex !important;
     width: 100%;
     min-width: 0;
@@ -1546,6 +1786,17 @@ select {
   .comparator-landscape-flip .comparator-photo-column {
     width: 100%;
     min-height: 0;
+  }
+
+  .comparator-landscape-side-by-side .comparator-photo-column {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .comparator-side-by-side-zoom {
+    border: 1px solid rgba(184, 138, 69, 0.45);
+    background: rgba(12, 16, 14, 0.82);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.32);
   }
 
   .comparator-landscape-flip .comparator-flip-button {

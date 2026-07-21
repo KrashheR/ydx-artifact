@@ -20,7 +20,9 @@
     "pause": "Pause",
     "resume": "Resume",
     "resetSave": "Reset save",
-    "copyDiagnostics": "Copy diagnostics"
+    "copyDiagnostics": "Copy diagnostics",
+    "zoomOut": "Zoom out",
+    "zoomIn": "Zoom in"
   },
   "home": {
     "new": "New archive",
@@ -87,6 +89,7 @@
     "timeoutDesc": "The trail went cold. Return to the photos and try again.",
     "statTimer": "TIMER",
     "statRemaining": "REMAINING",
+    "timerWarning": "Time remaining: {{seconds}} seconds.",
     "diffsOnLevel": "DIFFERENCES IN LEVEL",
     "retryAgain": "Try Again",
     "extendTime": "+30 sec"
@@ -139,6 +142,9 @@
     "flipTitle": "Flip",
     "flipDescription": "Tap the button to instantly switch between the two photos.",
     "flipShort": "Switch photos with a button",
+    "sideBySideTitle": "Side by side",
+    "sideBySideDescription": "Keep both photos visible and zoom them together.",
+    "sideBySideShort": "Two photos with shared zoom",
     "changeLaterHint": "You can change this anytime in the settings."
   },
   "reviewPrompt": {

@@ -26,12 +26,11 @@ export function LevelFailedOverlay({ level, found, canExtend, onRetry, onExtend,
       />
 
       <div
-        className="modal-panel result-dialog relative z-10 w-[560px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[18px] font-manrope"
+        className="modal-panel result-dialog vfx-dialog relative z-10 w-[560px] max-w-[calc(100vw-32px)] overflow-hidden rounded-[18px] font-manrope"
         style={{
           background: "linear-gradient(180deg, #2c2622, #1f1b18)",
           border: "1px solid rgba(176,86,66,.4)",
           boxShadow: "0 50px 120px rgba(0,0,0,.7), inset 0 1px 0 rgba(213,195,154,.06)",
-          animation: "game-pop .5s cubic-bezier(.2,.8,.3,1.2)"
         }}
       >
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: "linear-gradient(90deg, transparent, #c9684f, transparent)" }} />

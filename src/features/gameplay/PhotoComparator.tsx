@@ -14,6 +14,7 @@ import type {
 } from "@/entities/level/schema";
 import { hitTest, shapeCenter } from "@/shared/lib/hitTesting";
 import { useGameStore } from "@/shared/store/gameStore";
+import { useReducedEffects } from "@/shared/motion/useReducedEffects";
 
 type PhotoComparatorProps = {
   level: LevelDefinition;
@@ -64,11 +65,15 @@ type HitboxEdit = {
   lastAngle?: number;
 };
 type ApplyStatus = "idle" | "saving" | "saved" | "error";
+type FlipDirection = "to-a" | "to-b";
+type FlipPhase = "out" | "in";
 
 let wrongClickSeq = 0;
 const HITBOX_EDITOR_STORAGE_PREFIX = "artifact.hitboxEditor.";
 const SCENE_ALIGNMENT_STORAGE_PREFIX = "artifact.sceneAlignmentEditor.";
 const PAN_OVERSCROLL_PX = 160;
+const FLIP_OUT_MS = 70;
+const FLIP_TRANSITION_MS = 190;
 const HitboxEditorControls = import.meta.env.DEV
   ? lazy(() =>
       import("./dev/HitboxEditorControls").then((module) => ({
@@ -98,6 +103,7 @@ export function PhotoComparator({
   debugEnableSceneAlignmentEditor = false,
 }: PhotoComparatorProps) {
   const { t } = useTranslation();
+  const reducedEffects = useReducedEffects();
   const comparatorScheme = useGameStore(
     (s) => s.saveData.settings.comparatorScheme ?? "flip",
   );
@@ -112,8 +118,17 @@ export function PhotoComparator({
   const pointer = useRef<PointerState | null>(null);
   const hitboxEdit = useRef<HitboxEdit | null>(null);
   const sliderFrameRef = useRef<HTMLDivElement | null>(null);
+  const flipTimerRef = useRef<number | null>(null);
+  const flipFinishTimerRef = useRef<number | null>(null);
+  const sliderGlintTimerRef = useRef<number | null>(null);
+  const previousSliderSideRef = useRef<"left" | "right">("right");
+  const lastSliderGlintRef = useRef(0);
   const [wrongClicksA, setWrongClicksA] = useState<WrongClick[]>([]);
   const [wrongClicksB, setWrongClicksB] = useState<WrongClick[]>([]);
+  const [isFlipping, setIsFlipping] = useState(false);
+  const [flipDirection, setFlipDirection] = useState<FlipDirection>("to-b");
+  const [flipPhase, setFlipPhase] = useState<FlipPhase>("out");
+  const [sliderGlint, setSliderGlint] = useState(false);
   const [applyStatus, setApplyStatus] = useState<ApplyStatus>("idle");
   const [alignmentApplyStatus, setAlignmentApplyStatus] =
     useState<ApplyStatus>("idle");
@@ -141,6 +156,15 @@ export function PhotoComparator({
     setAlignmentApplyStatus("idle");
   }, [alignmentStorageKey, debugEnableSceneAlignmentEditor, level.id]);
 
+  useEffect(
+    () => () => {
+      if (flipTimerRef.current !== null) window.clearTimeout(flipTimerRef.current);
+      if (flipFinishTimerRef.current !== null) window.clearTimeout(flipFinishTimerRef.current);
+      if (sliderGlintTimerRef.current !== null) window.clearTimeout(sliderGlintTimerRef.current);
+    },
+    [],
+  );
+
   const found = useMemo(
     () => editableDifferences.filter((d) => foundIds.includes(d.id)),
     [editableDifferences, foundIds],
@@ -151,7 +175,7 @@ export function PhotoComparator({
     const key = wrongClickSeq++;
     const setter = side === "A" ? setWrongClicksA : setWrongClicksB;
     setter((prev) => [...prev, { key, x, y }]);
-    setTimeout(() => setter((prev) => prev.filter((w) => w.key !== key)), 700);
+    setTimeout(() => setter((prev) => prev.filter((w) => w.key !== key)), 560);
   }
 
   function handlePointerUp(point: NormalizedPoint) {
@@ -411,7 +435,53 @@ export function PhotoComparator({
     const rect = sliderFrameRef.current?.getBoundingClientRect();
     if (!rect || rect.width <= 0) return;
     const next = ((clientX - rect.left) / rect.width) * 100;
-    setComparePosition(Math.max(0, Math.min(100, Math.round(next))));
+    updateComparePosition(Math.max(0, Math.min(100, Math.round(next))));
+  }
+
+  function updateComparePosition(next: number) {
+    const side = next < 50 ? "left" : "right";
+    const crossedCenter = side !== previousSliderSideRef.current;
+    previousSliderSideRef.current = side;
+    setComparePosition(next);
+
+    if (
+      !crossedCenter ||
+      reducedEffects ||
+      Date.now() - lastSliderGlintRef.current < 900
+    )
+      return;
+
+    lastSliderGlintRef.current = Date.now();
+    setSliderGlint(true);
+    if (sliderGlintTimerRef.current !== null) {
+      window.clearTimeout(sliderGlintTimerRef.current);
+    }
+    sliderGlintTimerRef.current = window.setTimeout(() => {
+      setSliderGlint(false);
+      sliderGlintTimerRef.current = null;
+    }, 260);
+  }
+
+  function handleFlip() {
+    if (isFlipping) return;
+    if (reducedEffects) {
+      setVersion((current) => (current === "A" ? "B" : "A"));
+      return;
+    }
+
+    const nextVersion = version === "A" ? "B" : "A";
+    setFlipDirection(nextVersion === "A" ? "to-a" : "to-b");
+    setFlipPhase("out");
+    setIsFlipping(true);
+    flipTimerRef.current = window.setTimeout(() => {
+      setVersion(nextVersion);
+      setFlipPhase("in");
+      flipTimerRef.current = null;
+    }, FLIP_OUT_MS);
+    flipFinishTimerRef.current = window.setTimeout(() => {
+      setIsFlipping(false);
+      flipFinishTimerRef.current = null;
+    }, FLIP_TRANSITION_MS);
   }
 
   return (
@@ -470,14 +540,17 @@ export function PhotoComparator({
       {/* Mobile landscape: one full 16:10 frame that flips between A and B */}
       {comparatorScheme === "flip" && (
         <div className="comparator-landscape-flip hidden flex-1 flex-col items-center justify-center gap-[10px]">
-          {renderPhoto(version, true)}
+          <div className={isFlipping ? `vfx-compare-flip vfx-compare-flip--${flipDirection} vfx-compare-flip--${flipPhase} w-full flex-1` : "w-full flex-1"}>
+            {renderPhoto(version, true)}
+          </div>
           <button
-            className="comparator-flip-button flex min-h-[44px] w-full max-w-[560px] items-center justify-center gap-2 rounded-xl font-manrope text-[13px] font-bold text-exp-brass2"
+            className="vfx-press comparator-flip-button flex min-h-[44px] w-full max-w-[560px] items-center justify-center gap-2 rounded-xl font-manrope text-[13px] font-bold text-exp-brass2 disabled:opacity-70"
             style={{
               border: "1px solid rgba(184,138,69,.45)",
               background: "rgba(184,138,69,.1)",
             }}
-            onClick={() => setVersion((v) => (v === "A" ? "B" : "A"))}
+            onClick={handleFlip}
+            disabled={isFlipping}
           >
             <svg
               width="16"
@@ -496,8 +569,40 @@ export function PhotoComparator({
         </div>
       )}
 
+      {/* Mobile landscape: both photos stay visible with a shared camera. */}
+      {comparatorScheme === "side-by-side" && (
+        <div className="comparator-landscape-side-by-side relative hidden flex-1 gap-2">
+          {renderPhoto("A", true)}
+          {renderPhoto("B", true)}
+          <div className="comparator-side-by-side-zoom absolute bottom-2 left-1/2 z-40 flex -translate-x-1/2 overflow-hidden rounded-lg">
+            <button
+              type="button"
+              className="flex h-9 w-9 items-center justify-center text-lg font-bold text-exp-brass2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+              aria-label={t("actions.zoomOut")}
+              onClick={() => setZoom((value) => Math.max(1, value - 0.25))}
+            >
+              −
+            </button>
+            <span
+              className="flex min-w-11 items-center justify-center border-x border-[rgba(213,195,154,.16)] px-1 font-jetbrains text-[10px] text-exp-brass2"
+              aria-live="polite"
+            >
+              {Math.round(zoom * 100)}%
+            </span>
+            <button
+              type="button"
+              className="flex h-9 w-9 items-center justify-center text-lg font-bold text-exp-brass2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
+              aria-label={t("actions.zoomIn")}
+              onClick={() => setZoom((value) => Math.min(2.5, value + 0.25))}
+            >
+              +
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Mobile landscape: one full 16:10 frame with before/after slider */}
-      {comparatorScheme !== "flip" && (
+      {comparatorScheme === "slider" && (
         <div className="comparator-landscape-slider hidden flex-1 flex-col items-center justify-center gap-[11px]">
         <SceneAspectFrame aspectRatio={imageAspectRatio}>
           <div
@@ -518,6 +623,13 @@ export function PhotoComparator({
               style={{ left: `${comparePosition}%` }}
               aria-hidden="true"
             />
+            {sliderGlint ? (
+              <span
+                className="vfx-compare-slider-glint pointer-events-none absolute bottom-0 top-0 z-20 w-14 -translate-x-1/2"
+                style={{ left: `${comparePosition}%` }}
+                aria-hidden="true"
+              />
+            ) : null}
             <div
               className="absolute top-1/2 z-30 flex h-[34px] w-[34px] -translate-x-1/2 -translate-y-1/2 cursor-ew-resize touch-none items-center justify-center rounded-full bg-[#d8af63] text-[#1a130a] shadow-[0_6px_16px_rgba(0,0,0,.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass"
               style={{ left: `${comparePosition}%` }}
@@ -547,11 +659,11 @@ export function PhotoComparator({
               onKeyDown={(event) => {
                 if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
                   event.preventDefault();
-                  setComparePosition((value) => Math.max(0, value - 5));
+                  updateComparePosition(Math.max(0, comparePosition - 5));
                 }
                 if (event.key === "ArrowRight" || event.key === "ArrowUp") {
                   event.preventDefault();
-                  setComparePosition((value) => Math.min(100, value + 5));
+                  updateComparePosition(Math.min(100, comparePosition + 5));
                 }
               }}
             >
@@ -589,21 +701,24 @@ export function PhotoComparator({
             max="100"
             value={comparePosition}
             aria-label={t("actions.compare")}
-            onChange={(event) => setComparePosition(Number(event.target.value))}
+            onChange={(event) => updateComparePosition(Number(event.target.value))}
           />
         </div>
       )}
 
       {/* Mobile: single image + toggle */}
       <div className="comparator-mobile-portrait flex flex-1 flex-col md:hidden">
-        {renderPhoto(version, true)}
+        <div className={isFlipping ? `vfx-compare-flip vfx-compare-flip--${flipDirection} vfx-compare-flip--${flipPhase} flex-1` : "flex-1"}>
+          {renderPhoto(version, true)}
+        </div>
         <button
           className="comparator-portrait-flip-button mt-3 flex min-h-[50px] w-full items-center justify-center gap-2 rounded-xl font-manrope text-[13.5px] font-bold text-exp-brass2"
           style={{
             border: "1px solid rgba(184,138,69,.45)",
             background: "rgba(184,138,69,.1)",
           }}
-          onClick={() => setVersion((v) => (v === "A" ? "B" : "A"))}
+          onClick={handleFlip}
+          disabled={isFlipping}
         >
           <svg
             width="16"
@@ -782,6 +897,7 @@ function PhotoCanvas({
   compareLabel: string;
   sceneOffset: SceneOffset;
 }) {
+  const reducedEffects = useReducedEffects();
   const frameRef = useRef<HTMLDivElement | null>(null);
   const [frameSize, setFrameSize] = useState<Size>({ width: 0, height: 0 });
   const containedImageRect = getContainedImageRect(frameSize, imageAspectRatio);
@@ -993,13 +1109,15 @@ function PhotoCanvas({
           {(inactiveSrc
             ? [src, inactiveSrc].sort((a, b) => a.localeCompare(b))
             : [src]
-          ).map((source) => (
-            <img
+          ).map((source) => {
+            const sourceSide = source === src ? side : side === "A" ? "B" : "A";
+            return (
+              <img
               key={source}
               src={source}
               alt=""
               draggable={false}
-              className="absolute inset-0 h-full w-full object-contain"
+              className={`comparator-scene-layer comparator-scene-layer--${sourceSide.toLowerCase()} absolute inset-0 h-full w-full object-contain`}
               style={{ opacity: source === src ? 1 : 0 }}
               aria-hidden={source === src ? undefined : true}
               onLoad={(event) => {
@@ -1009,8 +1127,9 @@ function PhotoCanvas({
                   onImageAspectRatio(image.naturalWidth / image.naturalHeight);
                 }
               }}
-            />
-          ))}
+              />
+            );
+          })}
 
           {visibleMarkers.map((d) => {
             const debugOnly =
@@ -1084,6 +1203,7 @@ function PhotoCanvas({
             <HintMarker
               difference={hintDifference}
               aspectRatio={imageAspectRatio}
+              reducedEffects={reducedEffects}
             />
           ) : null}
 
@@ -1161,21 +1281,15 @@ function FoundMarker({
       onPointerDown={editable ? onEditStart : undefined}
       aria-hidden={editable ? undefined : true}
     >
-      {/* Outer ring */}
+      {/* Geometry and motion use separate wrappers so rotation is never
+          overwritten by an entrance transform. */}
       <span
-        className="absolute rounded-full"
+        className="absolute"
         style={{
           left: `${shapeFrame.left * 100}%`,
           top: `${shapeFrame.top * 100}%`,
           width: `${shapeFrame.width * 100}%`,
           height: `${shapeFrame.height * 100}%`,
-          border: debug
-            ? "2px dashed rgba(111,198,158,.95)"
-            : "2.5px solid #d8af63",
-          boxShadow: debug
-            ? "0 0 18px rgba(111,198,158,.45)"
-            : "0 0 14px rgba(216,175,99,.5)",
-          animation: "game-ring .4s ease-out",
           borderRadius:
             shape.kind === "circle" || shape.kind === "ellipse"
               ? "50%"
@@ -1184,7 +1298,15 @@ function FoundMarker({
             shape.kind === "polygon" ? polygonClipPath(shape) : undefined,
           transform: rotation ? `rotate(${rotation}deg)` : undefined,
         }}
-      />
+      >
+        <span
+          className={`absolute inset-0 rounded-[inherit] ${debug ? "" : "vfx-found-ring"}`}
+          style={{
+            border: debug ? "2px dashed rgba(111,198,158,.95)" : "2.5px solid #d8af63",
+            boxShadow: debug ? "0 0 18px rgba(111,198,158,.45)" : "0 0 14px rgba(216,175,99,.5)",
+          }}
+        />
+      </span>
       {debug ? (
         <span
           className="absolute left-1/2 top-1/2 h-[10px] w-[10px] -translate-x-1/2 -translate-y-1/2 rounded-full"
@@ -1195,7 +1317,7 @@ function FoundMarker({
         />
       ) : (
         <span
-          className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
+          className="vfx-found-check absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
           style={{
             width: "clamp(18px, 38%, 28px)",
             height: "clamp(18px, 38%, 28px)",
@@ -1214,6 +1336,7 @@ function FoundMarker({
           >
             <path d="M20 6L9 17l-5-5" />
           </svg>
+          <FoundFlecks />
         </span>
       )}
       {editable ? (
@@ -1293,9 +1416,11 @@ function FoundMarker({
 function HintMarker({
   difference,
   aspectRatio,
+  reducedEffects,
 }: {
   difference?: DifferenceDefinition;
   aspectRatio: number;
+  reducedEffects: boolean;
 }) {
   if (!difference) return null;
   const box = shapeBounds(difference.hintArea, aspectRatio);
@@ -1322,7 +1447,7 @@ function HintMarker({
       aria-hidden
     >
       <span
-        className="absolute"
+        className={`absolute ${reducedEffects ? "" : "vfx-hint-sequence"}`}
         style={{
           left: `${shapeFrame.left * 100}%`,
           top: `${shapeFrame.top * 100}%`,
@@ -1334,10 +1459,24 @@ function HintMarker({
             "radial-gradient(circle, rgba(216,175,99,.24), rgba(216,175,99,.08) 58%, transparent 74%)",
           boxShadow:
             "0 0 22px rgba(216,175,99,.5), inset 0 0 18px rgba(216,175,99,.18)",
-          animation: "game-pulse 2.2s ease-in-out infinite",
           transform: rotation ? `rotate(${rotation}deg)` : undefined,
         }}
       />
+    </span>
+  );
+}
+
+function FoundFlecks() {
+  const flecks = [["-18px", "-12px"], ["17px", "-11px"], ["20px", "6px"], ["-19px", "10px"], ["0", "-20px"], ["2px", "20px"]] as const;
+  return (
+    <span className="pointer-events-none absolute inset-0" aria-hidden>
+      {flecks.map(([x, y], index) => (
+        <span
+          key={index}
+          className="vfx-found-fleck"
+          style={{ "--fleck-x": x, "--fleck-y": y, animationDelay: `${index * 22}ms` } as React.CSSProperties}
+        />
+      ))}
     </span>
   );
 }
@@ -1351,33 +1490,34 @@ function WrongClickMarker({ x, y }: { x: number; y: number }) {
         top: `${y * 100}%`,
         width: "34px",
         height: "34px",
-        animation: "wrong-fade .7s ease-out forwards",
+        transform: "translate(-50%, -50%)",
       }}
       aria-hidden
     >
-      <span
-        className="absolute inset-0 rounded-full"
-        style={{
-          border: "2px solid rgba(208,94,74,.85)",
-          background: "rgba(208,94,74,.14)",
-          transform: "translate(-50%, -50%)",
-        }}
-      />
-      <span
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{ color: "#e08a78" }}
-      >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
+      <span className="vfx-wrong-marker absolute inset-0">
+        <span
+          className="absolute inset-0 rounded-full"
+          style={{
+            border: "2px solid rgba(208,94,74,.85)",
+            background: "rgba(208,94,74,.14)",
+          }}
+        />
+        <span
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{ color: "#e08a78" }}
         >
-          <path d="M6 6l12 12M18 6L6 18" />
-        </svg>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+          >
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </span>
       </span>
     </span>
   );

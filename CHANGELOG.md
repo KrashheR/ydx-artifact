@@ -1,6 +1,22 @@
 # Changelog
 
+- Added tactile A/B comparator feedback: flip mode now shifts and crossfades the photo card without blank frames or queued taps, while slider mode gives a throttled optical glint when crossing the midpoint. Added timer-warning VFX with one amber pulse at 30 seconds remaining and a calm rust rhythm during the final 10 seconds; both respect reduced motion and stop while gameplay is blocked.
+
 ## Unreleased
+
+- Improved the mobile landscape side-by-side comparison layout: the level HUD now sits above the photos and hint/settings actions below them, so neither side rail takes width away from the two scenes.
+
+- Added a third mobile compare mode: side-by-side photos with shared zoom and pan. The before/after slider and A/B flip are selectable alongside it in settings; the choice applies to mobile gameplay.
+
+- Smoothed the mobile A/B flip control: scenes now use a 190 ms directional slide-dissolve with a subtle settling exposure instead of a lateral card jerk. Camera state, input lock and reduced-effects behavior are unchanged.
+
+- Fixed the missed-click marker: its red cross now stays centered inside the circle even when visual animations are unavailable, and both fade out together faster.
+
+- Completed the VFX production pass for meta and rare-reward surfaces: Home/Map now have finite mobile-safe state accents, campaign reports use the shared motion grammar, artifact reveals stage their contour/tag/content beats, and decorative animation pauses on platform or tab backgrounding.
+
+- Added the first VFX foundation pass: shared motion timings, saved-or-system reduced-effects handling, tactile button press feedback, finite hint emphasis, dual-scene found markers with restrained brass flecks, HUD pip/streak response, calmer staged result entry and a 700 ms final-find beat before the victory overlay. The effects do not alter hit testing, rewards, saves or analytics.
+
+- Added Collection VFX polish: filters now crossfade without reflowing the screen, new artifacts receive a single restrained seal/tag beat, and artifact details stage the image before their text while respecting reduced-effects preferences.
 
 - Added `docs/SFX_PRODUCTION_PLAN.md`: a senior SFX audit, detailed cue briefs and generation/search prompts, audio architecture, CrazyGames mute/ad/iOS requirements, asset budgets, staged roadmap, QA matrix and release criteria.
 
