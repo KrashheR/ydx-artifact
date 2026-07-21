@@ -339,6 +339,10 @@ export function GameScreen({
   const addActiveLevelTime = useGameStore((s) => s.addActiveLevelTime);
   const save = useGameStore((s) => s.save);
   const resetLevelProgress = useGameStore((s) => s.resetLevelProgress);
+  const resumeLevelAttempt = useGameStore((s) => s.resumeLevelAttempt);
+  const endLevelAttempt = useGameStore((s) => s.endLevelAttempt);
+  const recordHintUsed = useGameStore((s) => s.recordHintUsed);
+  const grantLevelTime = useGameStore((s) => s.grantLevelTime);
   const reviewPromptRuntime = useGameStore((s) => s.reviewPromptRuntime);
   const interstitialRuntime = useGameStore((s) => s.interstitialRuntime);
   const clearPendingReviewPromptCheck = useGameStore(
@@ -406,6 +410,8 @@ export function GameScreen({
   const completeOverlayDelayRef = useRef<number | null>(null);
   const activeTimerSaveCounterRef = useRef(0);
   const timeoutTrackedRef = useRef(false);
+  const onboardingImpressionTrackedRef = useRef(false);
+  const onboardingAbandonedTrackedRef = useRef(false);
   const reviewCheckRunRef = useRef(0);
   const reviewSubmitGuardRef = useRef(false);
   const postLevelActionGuardRef = useRef(false);
@@ -423,7 +429,14 @@ export function GameScreen({
     saveData.inProgress?.levelId === levelId
       ? saveData.inProgress.elapsedActiveSeconds
       : 0;
-  const timeLeft = Math.max(0, TIME_LIMIT - liveElapsedActiveSeconds);
+  const liveTimeGrantedSeconds =
+    saveData.inProgress?.levelId === levelId
+      ? saveData.inProgress.timeGrantedSeconds
+      : 0;
+  const timeLeft = Math.max(
+    0,
+    TIME_LIMIT + liveTimeGrantedSeconds - liveElapsedActiveSeconds,
+  );
   const completionPending = pendingFinalStats !== null;
   const showComplete = finalStats !== null;
   const pendingRevealArtifact =
@@ -491,11 +504,46 @@ export function GameScreen({
 
   useEffect(() => {
     setStartupOnboardingOpen(showOnboarding);
+    onboardingImpressionTrackedRef.current = false;
+    onboardingAbandonedTrackedRef.current = false;
   }, [levelId, showOnboarding]);
 
   useEffect(() => {
-    const syncVisibility = () => {
-      setPageVisible(!document.hidden);
+    if (!showStartupOnboarding || onboardingImpressionTrackedRef.current)
+      return;
+    onboardingImpressionTrackedRef.current = true;
+    trackAnalyticsEvent("onboarding_impression", {
+      levelId,
+      campaignId: level?.chapterId,
+      mode,
+      requiredDifferences: level?.requiredDifferences,
+    });
+  }, [
+    level?.chapterId,
+    level?.requiredDifferences,
+    levelId,
+    mode,
+    showStartupOnboarding,
+  ]);
+
+  useEffect(() => {
+    const syncVisibility = (event: Event) => {
+      const leaving = event.type === "pagehide" || document.hidden;
+      setPageVisible(!leaving);
+      if (leaving) {
+        if (showStartupOnboarding && !onboardingAbandonedTrackedRef.current) {
+          onboardingAbandonedTrackedRef.current = true;
+          trackAnalyticsEvent("onboarding_abandoned", {
+            levelId,
+            campaignId: level?.chapterId,
+            mode,
+          });
+        } else {
+          endLevelAttempt(levelId, "background_abandon");
+        }
+      } else if (!showStartupOnboarding && !showComplete && !timedOut) {
+        resumeLevelAttempt(levelId);
+      }
       void save({ flush: true });
     };
     document.addEventListener("visibilitychange", syncVisibility);
@@ -504,7 +552,17 @@ export function GameScreen({
       document.removeEventListener("visibilitychange", syncVisibility);
       window.removeEventListener("pagehide", syncVisibility);
     };
-  }, [save]);
+  }, [
+    endLevelAttempt,
+    level?.chapterId,
+    levelId,
+    mode,
+    resumeLevelAttempt,
+    save,
+    showComplete,
+    showStartupOnboarding,
+    timedOut,
+  ]);
 
   useEffect(() => {
     setGameplayActive(!gameplayBlocked);
@@ -553,8 +611,26 @@ export function GameScreen({
   // portrait, so without this the B image starts downloading on first toggle.
   useEffect(() => {
     if (!level) return;
-    void preloadImages([level.imageA, level.imageB]);
-  }, [level]);
+    let cancelled = false;
+    void preloadImages([level.imageA, level.imageB]).then((results) => {
+      if (cancelled) return;
+      const failedAssets = results.filter(
+        (result) => result.status === "error",
+      ).length;
+      trackAnalyticsEvent("scene_load_result", {
+        levelId,
+        campaignId: level.chapterId,
+        mode,
+        result: failedAssets === 0 ? "success" : "error",
+        failedAssets,
+        assetCount: results.length,
+        durationMs: Math.max(...results.map((result) => result.durationMs), 0),
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [level, levelId, mode]);
 
   // While the completion overlay is open, prefetch the next level's pair so
   // "next level" starts with warm images.
@@ -582,18 +658,12 @@ export function GameScreen({
       setTimedOut(true);
       if (!timeoutTrackedRef.current) {
         timeoutTrackedRef.current = true;
-        trackAnalyticsEvent("level_failed_timeout", {
-          levelId,
-          campaignId: level?.chapterId,
-          mode,
-          foundDifferences: liveFoundIds.length,
-          mistakes: liveMistakes,
-          elapsedActiveSeconds: liveElapsedActiveSeconds,
-        });
+        endLevelAttempt(levelId, "timeout");
       }
     }
   }, [
     completionPending,
+    endLevelAttempt,
     level?.chapterId,
     levelId,
     liveElapsedActiveSeconds,
@@ -823,6 +893,8 @@ export function GameScreen({
     if (!next) return undefined;
     if (spendMagnifier && !spendMagnifiers(1)) return undefined;
     setHintId(next.id);
+    recordHintUsed(levelId, next.id, source === "rewarded");
+    const attempt = useGameStore.getState().saveData.inProgress;
     trackAnalyticsEvent("hint_revealed", {
       levelId,
       campaignId: level!.chapterId,
@@ -833,6 +905,9 @@ export function GameScreen({
       foundDifferences: liveFoundIds.length,
       mistakes: liveMistakes,
       elapsedActiveSeconds: liveElapsedActiveSeconds,
+      attemptId: attempt?.attemptId,
+      attemptNumber: attempt?.attemptNumber,
+      hintsUsed: attempt?.hintsUsed,
     });
     return next.id;
   }
@@ -906,7 +981,12 @@ export function GameScreen({
       } else if (result === "failed") {
         setRewardedHintModal("failed");
       }
-      trackAnalyticsEvent(`rewarded_hint_${result}`, {
+      const resultEvent = {
+        rewarded: "rewarded_hint_rewarded",
+        closed: "rewarded_hint_closed",
+        failed: "rewarded_hint_failed",
+      } as const;
+      trackAnalyticsEvent(resultEvent[result], {
         levelId,
         campaignId: level!.chapterId,
         levelOrder: level!.order,
@@ -1087,20 +1167,13 @@ export function GameScreen({
     void save({ flush: true });
     clearPendingInterstitialCheck();
     clearPendingReviewPromptCheck();
-    trackAnalyticsEvent("level_exit_to_map", {
-      levelId,
-      campaignId: chapterId,
-      mode,
-      foundDifferences: liveFoundIds.length,
-      mistakes: liveMistakes,
-      elapsedActiveSeconds: liveElapsedActiveSeconds,
-      completed: showComplete,
-    });
+    if (!showComplete) endLevelAttempt(levelId, "explicit_exit");
     navigate(mode === "daily" ? { kind: "home" } : { kind: "map", chapterId });
   }
 
   function handleArchiveValidationLevel(nextLevelId: string) {
     if (nextLevelId === levelId || completionPending) return;
+    endLevelAttempt(levelId, "explicit_exit");
     setPendingFinalStats(null);
     setFinalStats(null);
     setTimedOut(false);
@@ -1176,9 +1249,11 @@ export function GameScreen({
 
   function handleExtendTime() {
     if (!spendMagnifiers(2)) return;
+    resumeLevelAttempt(levelId);
+    grantLevelTime(levelId, 30);
     setTimedOut(false);
     timeoutTrackedRef.current = false;
-    addActiveLevelTime(levelId, -30, { save: true, flush: true });
+    const attempt = useGameStore.getState().saveData.inProgress;
     trackAnalyticsEvent("level_time_extended", {
       levelId,
       campaignId: chapterId,
@@ -1186,17 +1261,21 @@ export function GameScreen({
       foundDifferences: liveFoundIds.length,
       mistakes: liveMistakes,
       elapsedActiveSeconds: liveElapsedActiveSeconds,
+      timerRemainingSeconds: 30,
+      timeGrantedSeconds: attempt?.timeGrantedSeconds,
+      attemptId: attempt?.attemptId,
     });
   }
 
   function handleStartOnboarding() {
     setStartupOnboardingOpen(false);
-    trackAnalyticsEvent("first_run_onboarding_started", {
+    trackAnalyticsEvent("onboarding_start_clicked", {
       levelId,
       campaignId: chapterId,
       mode,
       requiredDifferences: level!.requiredDifferences,
     });
+    startLevel(levelId, mode, { onboarding: true });
   }
 
   const campaignTitle =

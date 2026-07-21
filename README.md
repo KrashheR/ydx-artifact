@@ -61,8 +61,8 @@ For broad agent edits, `pnpm agent:check` runs lint, typecheck and content valid
 `pnpm validate:archive` starts the final A/B hitbox editor directly on Daily Archive case 1 and adds an in-game 1-7 switcher so all `public/assets/scenes/archive/` cases can be reviewed without waiting for the calendar rotation.
 Production builds exclude scene markup reference files named `3.webp` from `dist/assets/scenes/**`; the source files stay in `public` for `pnpm validate:content`, `pnpm dev:validate`, and local hitbox review.
 Production builds also exclude unused scene placeholder SVGs, emit relative Vite asset links for Yandex ZIP hosting, and keep the Yandex Games SDK as the platform-provided `/sdk.js` script in `index.html`.
-Custom gameplay analytics can be enabled by adding `VITE_YANDEX_METRICA_ID=<counter id>` to `.env.production.local`; `pnpm dev`, `pnpm dev:validate`, `pnpm build` and release validation load that production-local Vite env automatically. Setup steps and the Metrica goal list are documented in `docs/YANDEX_METRICS_SETUP_GUIDE.md`.
-Use `pnpm metrika:goals` to dry-run Yandex Metrica goal setup, then `pnpm metrika:goals:publish` to create missing JavaScript-event goals through the Metrica Management API. The goals script reads the counter ID from `.env.metrica.local`, `.env.production.local` or `.env.local`.
+Custom gameplay analytics can be enabled locally by adding `VITE_YANDEX_METRICA_ID=<counter id>` to `.env.production.local`; production release validation requires a numeric ID and verifies it is embedded with Metrica initialization in `dist`. Setup steps are documented in `docs/YANDEX_METRICS_SETUP_GUIDE.md`.
+Use `pnpm validate:analytics` to compare the typed registry, runtime calls and `ANALYTICS_EVENTS.md`. Use `pnpm metrika:goals` to dry-run Yandex Metrica goal setup, then `pnpm metrika:goals:publish` to create missing JavaScript-event goals from that same registry.
 Production builds do not emit sourcemaps by default to keep the Yandex upload smaller. Use `BUILD_SOURCEMAP=true pnpm build` when a diagnostic build needs `.map` files.
 `pnpm release:zip` creates a fresh production build, then packages the contents of `dist/` into `dist-yandex.zip` with the Node-based release packager, verifies root `index.html`, rejects root-relative `/assets` script/style links, and excludes macOS/system junk plus sourcemaps. It does not require system `zip` / `unzip` binaries.
 
@@ -90,7 +90,7 @@ Production builds do not emit sourcemaps by default to keep the Yandex upload sm
 - Post-victory review pre-prompt wired to the Yandex Games feedback API seam with local dev mocks; the first prompt is eligible after the fourth newly completed campaign level.
 - Forced fullscreen interstitials are queued every third newly completed campaign level and shown only from the victory screen's next-level CTA, not when returning to the campaign map.
 - Startup routing opens White Meridian level 01 with a soft investigation onboarding overlay only for a brand-new save; returning players start from the archive hub/main menu.
-- Privacy-safe product analytics events for app readiness, campaign/map navigation, gameplay, hints, ads, daily rewards and review prompts, with optional Yandex Metrica `reachGoal` transport.
+- Privacy-safe attempt-level product analytics for activation, campaign exposure, gameplay outcomes, hints, ads, saves/scenes/errors, daily rewards and review prompts, with typed Yandex Metrica `reachGoal` registry and release gate.
 
 ## Agent Workflow
 

@@ -201,3 +201,12 @@
 - [ ] Save/ad/purchase errors reviewed.
 - [ ] Rating/reviews reviewed when available.
 - [ ] No simultaneous major creative and gameplay experiment.
+
+## M. Product analytics gate
+
+- [ ] `pnpm validate:analytics -- --release` passes with a numeric production counter ID.
+- [ ] `pnpm metrika:goals` reports no unexpected registry drift; missing goals are published deliberately.
+- [ ] Built `dist` passes `pnpm validate:analytics -- --release --dist`.
+- [ ] Production analytics debug logging is disabled.
+- [ ] A draft smoke session reaches the target counter with one complete attempt lifecycle.
+- [ ] Smoke evidence records build ID, content version, counter and test time.

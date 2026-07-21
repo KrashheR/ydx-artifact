@@ -1,5 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { GameScreen } from "@/screens/GameScreen";
 import { HomeScreen } from "@/screens/HomeScreen";
@@ -7,7 +14,10 @@ import { MapScreen } from "@/screens/MapScreen";
 import { campaignManifestList } from "@/content/campaignManifest";
 import { dailyArchiveLevels } from "@/content/dailyArchive";
 import { getChapterPreviewAsset } from "@/content/sceneAssets";
-import { trackAnalyticsEvent } from "@/services/analytics/analytics";
+import {
+  getSafeErrorFingerprint,
+  trackAnalyticsEvent,
+} from "@/services/analytics/analytics";
 import { mockPlatform } from "@/services/platform/mockPlatform";
 import { notifyGameReady } from "@/services/platform/platformLifecycle";
 import { isMobileGameplayDevice } from "@/shared/lib/device";
@@ -29,20 +39,32 @@ function nextFrame() {
 // Secondary surfaces load as separate chunks so they don't weigh down the
 // initial bundle; home/map/game stay in the entry chunk as the critical path.
 const CollectionScreen = lazy(() =>
-  import("@/screens/CollectionScreen").then((module) => ({ default: module.CollectionScreen }))
+  import("@/screens/CollectionScreen").then((module) => ({
+    default: module.CollectionScreen,
+  })),
 );
 const DailyScreen = lazy(() =>
-  import("@/screens/DailyScreen").then((module) => ({ default: module.DailyScreen }))
+  import("@/screens/DailyScreen").then((module) => ({
+    default: module.DailyScreen,
+  })),
 );
 const SettingsModal = lazy(() =>
-  import("@/screens/SettingsScreen").then((module) => ({ default: module.SettingsModal }))
+  import("@/screens/SettingsScreen").then((module) => ({
+    default: module.SettingsModal,
+  })),
 );
 const ControlSchemeModal = lazy(() =>
-  import("@/screens/ControlSchemeModal").then((module) => ({ default: module.ControlSchemeModal }))
+  import("@/screens/ControlSchemeModal").then((module) => ({
+    default: module.ControlSchemeModal,
+  })),
 );
 
 async function preloadCriticalImages() {
-  await Promise.all(campaignManifestList.map((campaign) => preloadImage(getChapterPreviewAsset(campaign.id))));
+  await Promise.all(
+    campaignManifestList.map((campaign) =>
+      preloadImage(getChapterPreviewAsset(campaign.id)),
+    ),
+  );
 }
 
 async function waitForFonts() {
@@ -51,7 +73,11 @@ async function waitForFonts() {
 
 function BootstrapScreen() {
   return (
-    <main className="app-bootstrap-screen" aria-busy="true" aria-label="Loading">
+    <main
+      className="app-bootstrap-screen"
+      aria-busy="true"
+      aria-label="Loading"
+    >
       <div className="app-bootstrap-mark" aria-hidden="true" />
     </main>
   );
@@ -91,12 +117,14 @@ function OrientationGate() {
           <rect x="11" y="7" width="22" height="30" rx="5" />
           <path d="M15 28h14" strokeLinecap="round" />
           <path d="M30 12c5 2 8 6 8 11" strokeLinecap="round" />
-          <path d="M36 20l2 3 2-3" strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d="M36 20l2 3 2-3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       </div>
-      <p className="orientation-gate__eyebrow">
-        {t("orientation.eyebrow")}
-      </p>
+      <p className="orientation-gate__eyebrow">{t("orientation.eyebrow")}</p>
       <h1>{t("orientation.title")}</h1>
       <p>{t("orientation.description")}</p>
     </aside>
@@ -111,7 +139,9 @@ export function App() {
   const save = useGameStore((state) => state.save);
   const setAutoLocale = useGameStore((state) => state.setAutoLocale);
   const locale = useGameStore((state) => state.saveData.settings.locale);
-  const comparatorScheme = useGameStore((state) => state.saveData.settings.comparatorScheme);
+  const comparatorScheme = useGameStore(
+    (state) => state.saveData.settings.comparatorScheme,
+  );
   const [settingsOpen, setSettingsOpen] = useState(false);
   // Keeps the lazy settings chunk out of the initial load: the modal is
   // mounted on first open and stays mounted so close animations still play.
@@ -122,21 +152,48 @@ export function App() {
     const preventBrowserGameGesture = (event: Event) => event.preventDefault();
     const listenerOptions = { capture: true };
 
-    window.addEventListener("contextmenu", preventBrowserGameGesture, listenerOptions);
-    document.addEventListener("selectstart", preventBrowserGameGesture, listenerOptions);
-    document.addEventListener("dragstart", preventBrowserGameGesture, listenerOptions);
+    window.addEventListener(
+      "contextmenu",
+      preventBrowserGameGesture,
+      listenerOptions,
+    );
+    document.addEventListener(
+      "selectstart",
+      preventBrowserGameGesture,
+      listenerOptions,
+    );
+    document.addEventListener(
+      "dragstart",
+      preventBrowserGameGesture,
+      listenerOptions,
+    );
     return () => {
-      window.removeEventListener("contextmenu", preventBrowserGameGesture, listenerOptions);
-      document.removeEventListener("selectstart", preventBrowserGameGesture, listenerOptions);
-      document.removeEventListener("dragstart", preventBrowserGameGesture, listenerOptions);
+      window.removeEventListener(
+        "contextmenu",
+        preventBrowserGameGesture,
+        listenerOptions,
+      );
+      document.removeEventListener(
+        "selectstart",
+        preventBrowserGameGesture,
+        listenerOptions,
+      );
+      document.removeEventListener(
+        "dragstart",
+        preventBrowserGameGesture,
+        listenerOptions,
+      );
     };
   }, []);
 
-  const openSettings = useCallback((source: string) => {
-    trackAnalyticsEvent("settings_opened", { source, screen: screen.kind });
-    setSettingsMounted(true);
-    setSettingsOpen(true);
-  }, [screen.kind]);
+  const openSettings = useCallback(
+    (source: string) => {
+      trackAnalyticsEvent("settings_opened", { source, screen: screen.kind });
+      setSettingsMounted(true);
+      setSettingsOpen(true);
+    },
+    [screen.kind],
+  );
 
   const closeSettings = useCallback(() => {
     trackAnalyticsEvent("settings_closed", { screen: screen.kind });
@@ -147,8 +204,9 @@ export function App() {
     let cancelled = false;
 
     async function bootstrap() {
+      const bootStartedAt = performance.now();
       trackAnalyticsEvent("game_open", {
-        language: i18n.resolvedLanguage ?? i18n.language
+        language: i18n.resolvedLanguage ?? i18n.language,
       });
 
       // Save hydration + locale resolution is independent from asset warmup,
@@ -159,7 +217,10 @@ export function App() {
         if (cancelled) return i18n.resolvedLanguage ?? i18n.language;
 
         const savedSettings = useGameStore.getState().saveData.settings;
-        const nextLocale = savedSettings.localeSource === "manual" ? savedSettings.locale : resolveInitialLocale(sdkLanguage);
+        const nextLocale =
+          savedSettings.localeSource === "manual"
+            ? savedSettings.locale
+            : resolveInitialLocale(sdkLanguage);
         if (savedSettings.localeSource !== "manual") {
           setAutoLocale(nextLocale);
         }
@@ -167,12 +228,20 @@ export function App() {
         document.documentElement.lang = nextLocale;
         document.title = i18n.t("app.title");
 
-        if (!cancelled && import.meta.env.DEV && import.meta.env.VITE_DEV_VALIDATE_CHEAT === "true") {
+        if (
+          !cancelled &&
+          import.meta.env.DEV &&
+          import.meta.env.VITE_DEV_VALIDATE_CHEAT === "true"
+        ) {
           const { unlockAllDevContent } = await import("@/dev/devContent");
           await unlockAllDevContent();
         }
 
-        if (!cancelled && import.meta.env.DEV && import.meta.env.VITE_ARCHIVE_VALIDATE === "true") {
+        if (
+          !cancelled &&
+          import.meta.env.DEV &&
+          import.meta.env.VITE_ARCHIVE_VALIDATE === "true"
+        ) {
           useGameStore.getState().startLevel(dailyArchiveLevels[0].id, "daily");
           return nextLocale;
         }
@@ -187,7 +256,7 @@ export function App() {
       const [nextLocale] = await Promise.all([
         applyLocale(),
         preloadCriticalImages(),
-        waitForFonts()
+        waitForFonts(),
       ]);
       if (cancelled) return;
 
@@ -197,7 +266,11 @@ export function App() {
       if (!cancelled) {
         await notifyGameReady();
         trackAnalyticsEvent("game_ready", {
-          language: nextLocale
+          language: nextLocale,
+        });
+        trackAnalyticsEvent("game_ready_timing", {
+          durationMs: Math.round(performance.now() - bootStartedAt),
+          language: nextLocale,
         });
       }
     }
@@ -209,12 +282,44 @@ export function App() {
     };
   }, [hydrate, i18n, openStartupScreen, setAutoLocale]);
 
+  useEffect(() => {
+    const reportFatalError = (
+      source: "window_error" | "unhandled_rejection",
+      error: unknown,
+    ) => {
+      const currentScreen = useGameStore.getState().screen;
+      trackAnalyticsEvent("fatal_error", {
+        source,
+        fingerprint: getSafeErrorFingerprint(error),
+        screen: currentScreen.kind,
+        levelId:
+          currentScreen.kind === "game" ? currentScreen.levelId : undefined,
+      });
+      if (currentScreen.kind === "game") {
+        useGameStore
+          .getState()
+          .endLevelAttempt(currentScreen.levelId, "technical_error");
+      }
+    };
+    const onError = (event: ErrorEvent) =>
+      reportFatalError("window_error", event.error ?? event.message);
+    const onUnhandledRejection = (event: PromiseRejectionEvent) =>
+      reportFatalError("unhandled_rejection", event.reason);
+    window.addEventListener("error", onError);
+    window.addEventListener("unhandledrejection", onUnhandledRejection);
+    return () => {
+      window.removeEventListener("error", onError);
+      window.removeEventListener("unhandledrejection", onUnhandledRejection);
+    };
+  }, []);
+
   // Once the home screen is visible, warm the map card previews and likely
   // next level scenes in the background, so opening a campaign shows
   // already-cached images. Idle-scheduled and non-blocking.
   useEffect(() => {
     if (!bootstrapped) return;
-    const start = () => void prefetchHomeIdleAssets(useGameStore.getState().saveData);
+    const start = () =>
+      void prefetchHomeIdleAssets(useGameStore.getState().saveData);
     if (typeof window.requestIdleCallback === "function") {
       const id = window.requestIdleCallback(start, { timeout: 3000 });
       return () => window.cancelIdleCallback(id);
@@ -245,7 +350,9 @@ export function App() {
   const current = useMemo(() => {
     switch (screen.kind) {
       case "home":
-        return <HomeScreen onOpenSettings={() => openSettings("home_topbar")} />;
+        return (
+          <HomeScreen onOpenSettings={() => openSettings("home_topbar")} />
+        );
       case "map":
         return <MapScreen onOpenSettings={() => openSettings("map_topbar")} />;
       case "game":
@@ -291,26 +398,25 @@ export function App() {
           {current}
         </motion.div>
       </AnimatePresence>
-      {screen.kind !== "game" && screen.kind !== "map" && screen.kind !== "home" && (
-        <button
-          type="button"
-          onClick={() => openSettings(`${screen.kind}_floating`)}
-          aria-label={t("actions.settings")}
-          className={`app-settings-button app-settings-button--${screen.kind} fixed z-[90] flex items-center justify-center text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass`}
-          style={{
-            border: "1px solid rgba(213,195,154,.14)",
-            background: "rgba(213,195,154,.05)",
-          }}
-        >
-          <SettingsGearIcon />
-        </button>
-      )}
+      {screen.kind !== "game" &&
+        screen.kind !== "map" &&
+        screen.kind !== "home" && (
+          <button
+            type="button"
+            onClick={() => openSettings(`${screen.kind}_floating`)}
+            aria-label={t("actions.settings")}
+            className={`app-settings-button app-settings-button--${screen.kind} fixed z-[90] flex items-center justify-center text-exp-parch transition hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass`}
+            style={{
+              border: "1px solid rgba(213,195,154,.14)",
+              background: "rgba(213,195,154,.05)",
+            }}
+          >
+            <SettingsGearIcon />
+          </button>
+        )}
       {settingsMounted && (
         <Suspense fallback={null}>
-          <SettingsModal
-            isOpen={settingsOpen}
-            onClose={closeSettings}
-          />
+          <SettingsModal isOpen={settingsOpen} onClose={closeSettings} />
         </Suspense>
       )}
       {comparatorScheme === null && isMobileGameplayDevice() && (

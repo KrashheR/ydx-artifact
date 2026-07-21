@@ -858,6 +858,30 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
       ...emeraldProgress,
     },
   ];
+  const campaignExposureSignature = campaigns
+    .map(
+      (campaign) =>
+        `${campaign.id}:${campaign.chapterId}:${campaign.status}:${campaign.done}:${campaign.total}`,
+    )
+    .join("|");
+
+  React.useEffect(() => {
+    campaignExposureSignature.split("|").forEach((entry, position) => {
+      const [campaignCardId, campaignId, campaignStatus, done, total] =
+        entry.split(":");
+      trackAnalyticsEvent("campaign_card_impression", {
+        campaignCardId,
+        campaignId,
+        campaignStatus,
+        position: position + 1,
+        eligible: campaignStatus !== "locked",
+        completedInCampaign: Number(done),
+        totalInCampaign: Number(total),
+      });
+    });
+    // The signature deliberately retriggers exposure when unlock/progress state
+    // changes while the hub remains mounted.
+  }, [campaignExposureSignature]);
 
   const activeCampaign =
     campaigns.find((campaign) => campaign.status === "in_progress") ??
@@ -903,6 +927,13 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
       return;
     }
 
+    trackAnalyticsEvent("campaign_entered", {
+      campaignId: selectedCampaign.chapterId,
+      campaignCardId: campaignId,
+      campaignStatus: selectedCampaign.status,
+      source: "campaign_card",
+    });
+
     navigate({
       kind: "map",
       chapterId: chapters[CAMPAIGN_BY_ID[campaignId]].id,
@@ -924,6 +955,12 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
       campaignStatus: campaign.status,
       completedInCampaign: campaign.done,
       totalInCampaign: campaign.total,
+      source: "home_continue",
+    });
+    trackAnalyticsEvent("campaign_entered", {
+      campaignId: campaign.chapterId,
+      campaignCardId: campaign.id,
+      campaignStatus: campaign.status,
       source: "home_continue",
     });
 

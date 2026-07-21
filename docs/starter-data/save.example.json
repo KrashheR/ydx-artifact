@@ -1,52 +1,32 @@
 {
-  "schemaVersion": 1,
-  "revision": 1,
+  "version": 3,
   "updatedAt": 0,
-  "deviceId": "generated-per-install",
-  "campaign": {
-    "completedLevelIds": [],
-    "unlockedLevelIds": [
-      "nr-01-night-train"
-    ],
-    "bestResults": {}
-  },
-  "inProgressLevel": null,
-  "inventory": {
-    "magnifiers": 1
-  },
-  "collection": {
-    "unlockedArtifactIds": [],
-    "viewedArtifactIds": [],
-    "viewedCampaignReportIds": []
-  },
+  "completedLevels": [],
+  "bestResults": {},
+  "inProgress": null,
+  "levelAttemptCounts": {},
+  "magnifiers": 1,
+  "artifacts": {},
+  "viewedCampaignReportIds": [],
   "daily": {
-    "lastClaimServerDate": null,
-    "streak": 0,
-    "records": {}
-  },
-  "purchases": {
-    "entitlements": [],
-    "processedPurchaseTokens": [],
-    "grantedOneTimeProductIds": []
+    "lastClaimDate": null,
+    "streak": 0
   },
   "settings": {
     "locale": "ru",
-    "localeWasSelectedManually": false,
-    "musicVolume": 0.7,
-    "sfxVolume": 0.8,
+    "localeSource": "auto",
     "vibration": true,
     "reducedMotion": false,
-    "mobilePhotoMode": "toggle"
+    "comparatorScheme": null
   },
   "reviewPrompt": {
     "schemaVersion": 1,
     "prePromptShownCount": 0,
-    "nextEligibleCompletedLevel": 3,
+    "nextEligibleCompletedLevel": 4,
     "nativeReviewResolved": false
   },
-  "sync": {
-    "lastCloudSyncAt": null,
-    "pendingCloudSync": false,
-    "source": "local"
+  "purchases": {
+    "noForcedInterstitials": false,
+    "productIds": []
   }
 }

@@ -3,7 +3,7 @@
 `src/services/platform/mockPlatform.ts` is the current adapter seam. It now wraps the Yandex review API, rewarded advertising API and fullscreen advertising API:
 
 - Production `index.html` loads the Yandex Games SDK from `/sdk.js`; local/dev runs still fall back safely when `window.YaGames` is absent.
-- `src/services/analytics/analytics.ts` also supports optional Yandex Metrica custom gameplay analytics. If `VITE_YANDEX_METRICA_ID` is set during build, the analytics adapter loads the Metrica tag on first event and sends `ym(counterId, "reachGoal", "aa_<event>", payload)` events. The Vite wrappers load `VITE_*` values from `.env.production.local` for `pnpm dev`, `pnpm dev:validate` and `pnpm build`, so the same local counter ID is used across dev, build and release validation flows. If the env var is absent, no external analytics script is loaded and events remain in the local debug buffer.
+- `src/services/analytics/analytics.ts` sends typed Yandex Metrica custom gameplay analytics. If `VITE_YANDEX_METRICA_ID` is set during build, the adapter loads the Metrica tag on first event and sends `ym(counterId, "reachGoal", "aa_<event>", payload)` events. Local builds may omit it and retain events only in the debug buffer; `release:validate`, `release:zip` and `agent:release-check` require a numeric ID and verify the built output. The source of truth for event/goal names is `src/services/analytics/eventRegistry.ts`.
 - `src/services/platform/platformLifecycle.ts` initializes the SDK lifecycle early, subscribes to `game_api_pause` / `game_api_resume`, sends `ysdk.features.LoadingAPI.ready()` once after the bootstrap gate has hydrated save data, applied the final locale/title, preloaded first-screen campaign previews, waited for fonts and rendered the interactive home screen, and centralizes `ysdk.features.GameplayAPI.start()` / `stop()`.
 - `GameScreen` routes active gameplay through that lifecycle controller: the timer, scene input and GameplayAPI are stopped while the game is paused, a rewarded/interstitial/native dialog is active, the level is completed/failed, or the platform sends `game_api_pause`.
 - `mockPlatform.canReview()` safely returns `{ value: false, reason: "UNKNOWN" }` when Yandex SDK or `ysdk.feedback` is unavailable.
@@ -45,7 +45,7 @@ Cloud save is wired through `src/services/storage/localSaveService.ts`:
 - `savePersistentSave()` writes the full save to the local mirror first, then best-effort syncs `ysdk.getPlayer().setData(save, flush)`.
 - The local mirror prefers `ysdk.getStorage()` and falls back to `window.localStorage`.
 - Cloud failures surface to the app as `saveStatus: "local-only"` and do not block gameplay.
-- In-progress level timer state is persisted as `elapsedActiveSeconds`, incremented only during visible, unpaused gameplay. Pauses, hidden tabs, SDK pause and rewarded ads do not reduce remaining level time.
+- In-progress level state uses save schema v3 with attempt ID/number, terminal marker, monotonic `elapsedActiveSeconds`, separate `timeGrantedSeconds`, hints and aggregated mistakes. Hidden tabs close the active attempt as `background_abandon`; returning creates a new resume segment while preserving gameplay progress.
 
 Local development remains safe:
 

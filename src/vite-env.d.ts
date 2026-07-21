@@ -10,6 +10,8 @@ declare global {
     readonly VITE_ANALYTICS_DEBUG?: string;
     readonly VITE_PLATFORM_MODE?: string;
     readonly VITE_APP_VERSION?: string;
+    readonly VITE_BUILD_ID?: string;
+    readonly VITE_CONTENT_VERSION?: string;
   }
 
   interface Window {

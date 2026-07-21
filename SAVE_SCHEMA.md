@@ -1,6 +1,6 @@
 # Save Schema
 
-Version: `2`
+Version: `3`
 
 Stored fields: completed levels, best results, in-progress level, magnifiers, artifacts, viewed campaign reports, daily streak, settings, review prompt state and purchase flags. Runtime validation and migration are in `src/entities/save/schema.ts`.
 
@@ -12,9 +12,11 @@ Storage flow:
 - Cloud load has a 4-second timeout. If cloud is unavailable, gameplay continues from the local mirror or a default save.
 - Frequent gameplay progress can use non-flushing cloud writes; important milestones and lifecycle exits request `flush: true`.
 - Replaying a completed level updates `bestResults[levelId]` only when the new attempt is better: higher star count from accuracy wins first, then higher accuracy, then shorter duration. Worse replays do not downgrade saved stars.
-- Daily Archive completions use standalone `daily-archive-*` level ids for in-progress and best-result data, but they do not append to campaign `completedLevels`, do not unlock campaign artifacts/reports/levels, and do not queue campaign review or interstitial checks. The daily reward path grants `+1` magnifier, records `daily.lastClaimDate` and increments `daily.streak` separately.
-- Version `2` stores in-progress timer state as `inProgress.elapsedActiveSeconds`; it increments only during active gameplay and is used to restore remaining time after reload.
-- Version `1` saves are migrated safely. Old `inProgress.elapsedSeconds` is treated as active elapsed time when present; missing or invalid values fall back to `0`.
+- Daily Archive completions use standalone `daily-archive-*` level ids for in-progress and best-result data, but they do not append to campaign `completedLevels`, do not unlock campaign artifacts/reports/levels, and do not queue campaign review or interstitial checks. The daily reward path grants `+1` magnifier, records `daily.lastClaimDate`, and maintains `daily.streak` as consecutive calendar days (a missed day resets it to `1`).
+- Version `3` persists the analytics attempt envelope in `inProgress`: `attemptId`, per-level `attemptNumber`, mode/start timestamps, terminal marker, onboarding flag, active-time baseline, monotonic `elapsedActiveSeconds`, `timeGrantedSeconds`, mistakes, hint/difference ids, rewarded hints and time-extension count. `levelAttemptCounts` keeps attempt numbering stable across completed/restarted attempts.
+- Background/timeout attempts retain gameplay progress with a terminal marker. A later resume creates a new attempt ID/number and active-time baseline while preserving found differences and total active timer state. Restart creates an empty attempt.
+- Timer extensions add to `timeGrantedSeconds`; they never reduce `elapsedActiveSeconds`.
+- Version `1` and `2` saves are migrated safely. Old `inProgress.elapsedSeconds` is treated as active elapsed time when present; missing attempt metadata receives a migration-safe attempt ID and zeroed counters.
 - `settings.localeSource` records whether locale came from SDK auto-detection or a manual settings choice. SDK language can update only auto-sourced locale.
 - `settings.comparatorScheme` stores the mobile compare scheme: `"slider"` (before/after slider), `"flip"` (single frame with an A/B flip button) or `null` (not chosen yet, defaults for older saves via zod `.default(null)`). While it is `null`, mobile devices see a one-time scheme picker modal on launch; choosing an option or changing it later in settings persists the value with a flushed save. Desktop layout ignores this field.
 - New saves start with `INITIAL_MAGNIFIERS = 1`.

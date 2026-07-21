@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { ANALYTICS_GOALS } from "../src/services/analytics/eventRegistry";
 
 type GoalDefinition = {
   name: string;
@@ -22,7 +23,7 @@ type GoalsResponse = {
   goals?: MetricaGoal[];
 };
 
-const GOALS: GoalDefinition[] = [
+const LEGACY_GOAL_NAMES: GoalDefinition[] = [
   { name: "Открытие игры", identifier: "aa_game_open" },
   { name: "Сохранение загружено", identifier: "aa_save_loaded" },
   { name: "Игра готова", identifier: "aa_game_ready" },
@@ -101,6 +102,14 @@ const GOALS: GoalDefinition[] = [
   },
   { name: "Native review ошибка", identifier: "aa_review_native_error" },
 ];
+
+const legacyGoalNameByIdentifier = new Map(
+  LEGACY_GOAL_NAMES.map((goal) => [goal.identifier, goal.name]),
+);
+const GOALS: GoalDefinition[] = ANALYTICS_GOALS.map((goal) => ({
+  identifier: goal.identifier,
+  name: legacyGoalNameByIdentifier.get(goal.identifier) ?? goal.name,
+}));
 
 const API_BASE = "https://api-metrika.yandex.net/management/v1";
 

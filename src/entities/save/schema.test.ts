@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { INITIAL_MAGNIFIERS, migrateSaveData } from "@/entities/save/schema";
 
 describe("migrateSaveData", () => {
-  it("migrates v1 elapsedSeconds to v2 elapsedActiveSeconds", () => {
+  it("migrates v1 elapsedSeconds into the v3 attempt model", () => {
     const save = migrateSaveData({
       version: 1,
       updatedAt: 123,
@@ -12,17 +12,23 @@ describe("migrateSaveData", () => {
         levelId: "nr-02-scene02",
         foundDifferenceIds: ["rolled-bedding-count-2"],
         elapsedSeconds: 42,
-        mistakes: 1
+        mistakes: 1,
       },
       magnifiers: 2,
       artifacts: {},
       daily: { lastClaimDate: null, streak: 0 },
       settings: { locale: "en", vibration: true, reducedMotion: false },
-      purchases: { noForcedInterstitials: false, productIds: [] }
+      purchases: { noForcedInterstitials: false, productIds: [] },
     });
 
-    expect(save.version).toBe(2);
+    expect(save.version).toBe(3);
     expect(save.inProgress?.elapsedActiveSeconds).toBe(42);
+    expect(save.inProgress).toMatchObject({
+      attemptNumber: 1,
+      mode: "campaign",
+      timeGrantedSeconds: 0,
+      hintsUsed: 0,
+    });
     expect(save.settings.locale).toBe("en");
     expect(save.settings.localeSource).toBe("manual");
   });
@@ -30,7 +36,7 @@ describe("migrateSaveData", () => {
   it("falls back safely for corrupt saves", () => {
     const save = migrateSaveData({ version: 2, magnifiers: -100 });
 
-    expect(save.version).toBe(2);
+    expect(save.version).toBe(3);
     expect(save.magnifiers).toBe(INITIAL_MAGNIFIERS);
     expect(save.inProgress).toBeNull();
   });
@@ -50,15 +56,15 @@ describe("migrateSaveData", () => {
         locale: "ru",
         localeSource: "auto",
         vibration: true,
-        reducedMotion: false
+        reducedMotion: false,
       },
       reviewPrompt: {
         schemaVersion: 1,
         prePromptShownCount: 0,
         nextEligibleCompletedLevel: 4,
-        nativeReviewResolved: false
+        nativeReviewResolved: false,
       },
-      purchases: { noForcedInterstitials: false, productIds: [] }
+      purchases: { noForcedInterstitials: false, productIds: [] },
     });
 
     expect(save.magnifiers).toBe(99);
@@ -78,15 +84,15 @@ describe("migrateSaveData", () => {
         locale: "ru",
         localeSource: "auto",
         vibration: true,
-        reducedMotion: false
+        reducedMotion: false,
       },
       reviewPrompt: {
         schemaVersion: 1,
         prePromptShownCount: 0,
         nextEligibleCompletedLevel: 4,
-        nativeReviewResolved: false
+        nativeReviewResolved: false,
       },
-      purchases: { noForcedInterstitials: false, productIds: [] }
+      purchases: { noForcedInterstitials: false, productIds: [] },
     });
 
     expect(save.viewedCampaignReportIds).toEqual([]);

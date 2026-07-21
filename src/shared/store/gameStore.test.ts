@@ -10,12 +10,12 @@ vi.mock("@/services/storage/localSaveService", () => ({
   loadPersistentSave: vi.fn(async () => ({
     saveData: null,
     source: "default",
-    cloudAvailable: false
+    cloudAvailable: false,
   })),
   savePersistentSave: vi.fn(async (saveData) => ({
     saveData,
-    cloudSynced: false
-  }))
+    cloudSynced: false,
+  })),
 }));
 
 function resetStore() {
@@ -28,19 +28,25 @@ function resetStore() {
     reviewPromptRuntime: {
       pendingMapCheckToken: 0,
       pendingMapCheckCompletedLevels: null,
-      nativeRequestInFlight: false
+      nativeRequestInFlight: false,
     },
     interstitialRuntime: {
       pendingMapCheckCompletedLevels: null,
       lastResolvedCompletedLevels: 0,
-      nativeRequestInFlight: false
+      nativeRequestInFlight: false,
     },
-    artifactRevealQueue: []
+    artifactRevealQueue: [],
   });
 }
 
-function completeAttempt(levelId: string, mistakes: number, durationSeconds: number) {
-  const level = getChapterLevels("northern-route").find((candidate) => candidate.id === levelId);
+function completeAttempt(
+  levelId: string,
+  mistakes: number,
+  durationSeconds: number,
+) {
+  const level = getChapterLevels("northern-route").find(
+    (candidate) => candidate.id === levelId,
+  );
   if (!level) throw new Error(`Unknown level: ${levelId}`);
 
   useGameStore.getState().startLevel(level.id, "campaign");
@@ -48,12 +54,15 @@ function completeAttempt(levelId: string, mistakes: number, durationSeconds: num
     saveData: {
       ...state.saveData,
       inProgress: {
+        ...state.saveData.inProgress!,
         levelId,
-        foundDifferenceIds: level.differences.map((difference) => difference.id),
+        foundDifferenceIds: level.differences.map(
+          (difference) => difference.id,
+        ),
         elapsedActiveSeconds: durationSeconds,
-        mistakes
-      }
-    }
+        mistakes,
+      },
+    },
   }));
   useGameStore.getState().completeLevel(level.id, durationSeconds, "campaign");
 }
@@ -68,7 +77,11 @@ describe("gameStore best results", () => {
     const level = getChapterLevels("northern-route")[0];
 
     completeAttempt(level.id, level.requiredDifferences + 1, 90);
-    expect(starsForAccuracy(useGameStore.getState().saveData.bestResults[level.id].accuracy)).toBe(1);
+    expect(
+      starsForAccuracy(
+        useGameStore.getState().saveData.bestResults[level.id].accuracy,
+      ),
+    ).toBe(1);
 
     completeAttempt(level.id, 0, 80);
 
@@ -103,15 +116,15 @@ describe("gameStore analytics", () => {
     completeAttempt(level.id, 1, 130);
 
     const completionEvent = window.__artifactAnalyticsEvents?.find(
-      (event) => event.event === "level_complete"
+      (event) => event.event === "level_complete",
     );
     expect(completionEvent?.goal).toBe("aa_level_complete");
     expect(completionEvent?.payload).toEqual(
       expect.objectContaining({
         levelId: level.id,
         durationSeconds: 130,
-        durationBucket: "120_179s"
-      })
+        durationBucket: "120_179s",
+      }),
     );
   });
 
@@ -119,19 +132,22 @@ describe("gameStore analytics", () => {
     const dailyLevel = dailyArchiveLevels[0];
 
     useGameStore.setState((state) => ({
-      saveData: { ...state.saveData, magnifiers: 0 }
+      saveData: { ...state.saveData, magnifiers: 0 },
     }));
     useGameStore.getState().startLevel(dailyLevel.id, "daily");
     useGameStore.setState((state) => ({
       saveData: {
         ...state.saveData,
         inProgress: {
+          ...state.saveData.inProgress!,
           levelId: dailyLevel.id,
-          foundDifferenceIds: dailyLevel.differences.map((difference) => difference.id),
+          foundDifferenceIds: dailyLevel.differences.map(
+            (difference) => difference.id,
+          ),
           elapsedActiveSeconds: 75,
-          mistakes: 0
-        }
-      }
+          mistakes: 0,
+        },
+      },
     }));
 
     useGameStore.getState().completeLevel(dailyLevel.id, 75, "daily");
@@ -140,21 +156,94 @@ describe("gameStore analytics", () => {
     expect(useGameStore.getState().saveData.magnifiers).toBe(1);
     expect(useGameStore.getState().saveData.daily).toMatchObject({
       lastClaimDate: expect.any(String),
-      streak: 1
+      streak: 1,
     });
     expect(
-      window.__artifactAnalyticsEvents?.some((event) => event.event === "campaign_progress")
+      window.__artifactAnalyticsEvents?.some(
+        (event) => event.event === "campaign_progress",
+      ),
     ).toBe(false);
   });
 
   it("adds daily reward magnifiers without a maximum cap", () => {
     useGameStore.setState((state) => ({
-      saveData: { ...state.saveData, magnifiers: 99 }
+      saveData: { ...state.saveData, magnifiers: 99 },
     }));
 
     useGameStore.getState().claimDailyReward("2026-07-07");
 
     expect(useGameStore.getState().saveData.magnifiers).toBe(100);
+  });
+
+  it("emits one terminal event and creates a new id for a restart", () => {
+    const level = getChapterLevels("northern-route")[0];
+    useGameStore.getState().startLevel(level.id, "campaign");
+    const firstAttemptId =
+      useGameStore.getState().saveData.inProgress?.attemptId;
+
+    useGameStore.getState().endLevelAttempt(level.id, "timeout");
+    useGameStore.getState().endLevelAttempt(level.id, "timeout");
+
+    const timeoutEnds = window.__artifactAnalyticsEvents?.filter(
+      (event) =>
+        event.event === "level_attempt_end" &&
+        event.payload.outcome === "timeout",
+    );
+    expect(timeoutEnds).toHaveLength(1);
+
+    useGameStore.getState().resetLevelProgress(level.id);
+    expect(useGameStore.getState().saveData.inProgress).toMatchObject({
+      attemptNumber: 2,
+      foundDifferenceIds: [],
+      elapsedActiveSeconds: 0,
+    });
+    expect(useGameStore.getState().saveData.inProgress?.attemptId).not.toBe(
+      firstAttemptId,
+    );
+  });
+
+  it("grants timer time without reducing monotonic active duration", () => {
+    const level = getChapterLevels("northern-route")[0];
+    useGameStore.getState().startLevel(level.id, "campaign");
+    useGameStore.getState().addActiveLevelTime(level.id, 300, { save: false });
+    useGameStore.getState().grantLevelTime(level.id, 30);
+
+    expect(useGameStore.getState().saveData.inProgress).toMatchObject({
+      elapsedActiveSeconds: 300,
+      timeGrantedSeconds: 30,
+      timeExtensionsUsed: 1,
+    });
+  });
+
+  it("stores used hints and withholds the no-intervention seal", () => {
+    const level = getChapterLevels("northern-route")[0];
+    useGameStore.getState().startLevel(level.id, "campaign");
+    useGameStore
+      .getState()
+      .recordHintUsed(level.id, level.differences[0].id, false);
+    completeAttempt(level.id, 0, 80);
+
+    expect(
+      useGameStore.getState().saveData.bestResults[level.id],
+    ).toMatchObject({
+      hintsUsed: 1,
+    });
+    expect(
+      useGameStore.getState().saveData.bestResults[level.id].seals,
+    ).not.toContain("no-intervention");
+  });
+
+  it("resets the daily streak after a missed calendar day", () => {
+    useGameStore.setState((state) => ({
+      saveData: {
+        ...state.saveData,
+        daily: { lastClaimDate: "2026-07-18", streak: 4 },
+      },
+    }));
+
+    useGameStore.getState().claimDailyReward("2026-07-21");
+
+    expect(useGameStore.getState().saveData.daily.streak).toBe(1);
   });
 });
 
@@ -167,7 +256,7 @@ describe("gameStore campaign hint rewards", () => {
   it("adds one magnifier after every second newly completed campaign level", () => {
     const levels = getChapterLevels("northern-route");
     useGameStore.setState((state) => ({
-      saveData: { ...state.saveData, magnifiers: 0 }
+      saveData: { ...state.saveData, magnifiers: 0 },
     }));
 
     completeAttempt(levels[0].id, 0, 80);
@@ -186,7 +275,7 @@ describe("gameStore campaign hint rewards", () => {
   it("does not grant the campaign cadence reward for replays", () => {
     const levels = getChapterLevels("northern-route");
     useGameStore.setState((state) => ({
-      saveData: { ...state.saveData, magnifiers: 0 }
+      saveData: { ...state.saveData, magnifiers: 0 },
     }));
 
     completeAttempt(levels[0].id, 0, 80);
@@ -213,13 +302,19 @@ describe("gameStore campaign reports", () => {
       .getCampaignReportForCompletedCampaign("northern-route");
 
     expect(report?.id).toBe("white-meridian-report");
-    expect(useGameStore.getState().shouldShowCampaignReport("northern-route")).toBe(true);
+    expect(
+      useGameStore.getState().shouldShowCampaignReport("northern-route"),
+    ).toBe(true);
 
     useGameStore.getState().markCampaignReportViewed("white-meridian-report");
 
-    expect(useGameStore.getState().shouldShowCampaignReport("northern-route")).toBe(false);
     expect(
-      useGameStore.getState().getCampaignReportForCompletedCampaign("northern-route")?.id
+      useGameStore.getState().shouldShowCampaignReport("northern-route"),
+    ).toBe(false);
+    expect(
+      useGameStore
+        .getState()
+        .getCampaignReportForCompletedCampaign("northern-route")?.id,
     ).toBe("white-meridian-report");
   });
 });

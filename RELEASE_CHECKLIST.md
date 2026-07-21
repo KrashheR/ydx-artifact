@@ -2,6 +2,10 @@
 
 - [ ] Replace placeholder assets.
 - [ ] Run `pnpm release:validate`.
+- [ ] Confirm `VITE_YANDEX_METRICA_ID` is numeric; release validation must pass registry/runtime/docs and built-counter checks.
+- [ ] Run `pnpm metrika:goals` / `pnpm metrika:goals:publish` and confirm all registry goals exist in the target counter.
+- [ ] Run one draft smoke session and verify `game_open`, `game_ready`, `level_attempt_start` and `level_attempt_end` ingestion in the target counter.
+- [ ] Confirm production analytics debug logging is disabled.
 - [ ] Verify Yandex SDK, cloud save, SDK language detection, rewarded ads and gameplay pause/resume in draft.
 - [ ] Verify `LoadingAPI.ready()` fires once only after the final localized home screen is rendered and first-screen preview images are loaded.
 - [ ] Verify production `dist/index.html` contains modern module scripts, legacy `nomodule` scripts and legacy polyfills.

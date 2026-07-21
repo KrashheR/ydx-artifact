@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Rebuilt product analytics around persisted level attempts: every attempt now has an ID/number and one terminal outcome, onboarding and background abandonment are observable, hints/misclicks/time grants are summarized correctly, and active duration remains monotonic across timer extensions.
+
+- Added typed analytics registry-driven Metrica goal sync, common build/content/locale/device dimensions, save/scene/fatal-error telemetry, campaign exposure/entry/completion events, consecutive daily streak semantics, and release validation that rejects missing counters or registry/docs/build drift.
+
 - Added `pnpm dev:align`, a mobile landscape A/B registration dashboard with per-level, per-image 0.5px X/Y controls, local draft persistence, source Apply support, and runtime alignment shared by flip/slider images and their interaction overlays.
 
 - Expanded `docs/GAME_OVERVIEW.md` into a current AI review brief with the complete implemented mechanics matrix, screen flow, scoring/timer/hint rules, partial systems, explicit non-features, extension constraints, and a reusable external-review prompt.

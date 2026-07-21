@@ -18,26 +18,30 @@ describe("trackAnalyticsEvent", () => {
   });
 
   it("sends a prefixed reachGoal event to Yandex Metrica", () => {
-    trackAnalyticsEvent("level_start", {
+    trackAnalyticsEvent("level_attempt_start", {
       levelId: "nr-01",
       campaignId: "northern-route",
-      skipped: undefined
+      skipped: undefined,
     });
 
     expect(window.ym).toHaveBeenCalledWith(
       12345678,
       "reachGoal",
-      "aa_level_start",
+      "aa_level_attempt_start",
       expect.objectContaining({
-        schemaVersion: 1,
+        schemaVersion: 2,
         sessionId: "session-test-id",
-        event: "level_start",
+        eventSequence: 1,
         levelId: "nr-01",
-        campaignId: "northern-route"
-      })
+        campaignId: "northern-route",
+      }),
     );
-    expect(window.__artifactAnalyticsEvents?.[0].goal).toBe("aa_level_start");
-    expect(window.__artifactAnalyticsEvents?.[0].payload.skipped).toBeUndefined();
+    expect(window.__artifactAnalyticsEvents?.[0].goal).toBe(
+      "aa_level_attempt_start",
+    );
+    expect(
+      window.__artifactAnalyticsEvents?.[0].payload.skipped,
+    ).toBeUndefined();
   });
 
   it("keeps a local debug buffer when the counter is not configured", () => {
@@ -49,8 +53,8 @@ describe("trackAnalyticsEvent", () => {
     expect(window.__artifactAnalyticsEvents?.[0]).toEqual(
       expect.objectContaining({
         event: "game_ready",
-        goal: "aa_game_ready"
-      })
+        goal: "aa_game_ready",
+      }),
     );
   });
 });

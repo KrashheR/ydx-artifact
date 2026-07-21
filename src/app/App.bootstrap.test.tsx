@@ -1,5 +1,11 @@
 import React from "react";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import i18n from "i18next";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@/app/App";
@@ -43,7 +49,7 @@ describe("App bootstrap", () => {
     useGameStore.setState({
       screen: { kind: "home" },
       saveData: createDefaultSave(),
-      saveStatus: "idle"
+      saveStatus: "idle",
     });
     vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => {
       window.setTimeout(() => callback(performance.now()), 0);
@@ -51,7 +57,7 @@ describe("App bootstrap", () => {
     });
     Object.defineProperty(document, "fonts", {
       configurable: true,
-      value: { ready: Promise.resolve() }
+      value: { ready: Promise.resolve() },
     });
     vi.stubGlobal("Image", LoadedImage);
   });
@@ -71,26 +77,32 @@ describe("App bootstrap", () => {
       expect(document.body).not.toHaveTextContent("Выберите экспедицию");
       expect(LoadedImage.instances.length).toBeGreaterThanOrEqual(3);
       expect(
-        LoadedImage.instances.slice(0, 3).every((image) => image.complete && image.naturalWidth > 0)
+        LoadedImage.instances
+          .slice(0, 3)
+          .every((image) => image.complete && image.naturalWidth > 0),
       ).toBe(true);
     });
 
     window.ysdk = {
       environment: { i18n: { lang: "en" } },
       features: { LoadingAPI: { ready } },
-      on: vi.fn()
+      on: vi.fn(),
     };
 
     render(
       <React.StrictMode>
         <App />
-      </React.StrictMode>
+      </React.StrictMode>,
     );
 
     expect(screen.queryByText("Выберите экспедицию")).not.toBeInTheDocument();
 
-    await expect(screen.findByRole("heading", { name: "Boreas Pier" })).resolves.toBeVisible();
-    await expect(screen.findByRole("button", { name: "Start investigation" })).resolves.toBeVisible();
+    await expect(
+      screen.findByRole("heading", { name: "Boreas Pier" }),
+    ).resolves.toBeVisible();
+    await expect(
+      screen.findByRole("button", { name: "Start investigation" }),
+    ).resolves.toBeVisible();
     await waitFor(() => expect(ready).toHaveBeenCalledTimes(1));
     expect(screen.queryByLabelText("Loading")).not.toBeInTheDocument();
   });
@@ -103,23 +115,40 @@ describe("App bootstrap", () => {
         ...createDefaultSave(),
         inProgress: {
           levelId: level.id,
+          mode: "campaign",
+          attemptId: "test-attempt",
+          attemptNumber: 1,
+          attemptStartedAt: 0,
+          attemptStartedActiveSeconds: 0,
+          attemptStartedFoundDifferences: 0,
+          attemptStartedMistakes: 0,
+          attemptStartedHints: 0,
+          attemptStartedRewardedHints: 0,
+          attemptStartedTimeExtensions: 0,
+          terminalAt: null,
+          onboarding: false,
           foundDifferenceIds: [],
           elapsedActiveSeconds: 0,
-          mistakes: 0
-        }
-      }
+          timeGrantedSeconds: 0,
+          mistakes: 0,
+          hintsUsed: 0,
+          hintedDifferenceIds: [],
+          rewardedHintsUsed: 0,
+          timeExtensionsUsed: 0,
+        },
+      },
     });
 
     render(<App />);
 
     const settingsButton = await screen.findByRole("button", {
-      name: /Настройки|Settings/
+      name: /Настройки|Settings/,
     });
     expect(settingsButton).not.toHaveClass("fixed");
     fireEvent.click(settingsButton);
 
     const dialog = await screen.findByRole("dialog", {
-      name: /Настройки|Settings/
+      name: /Настройки|Settings/,
     });
     await waitFor(() => expect(dialog).toBeVisible());
   });
@@ -130,7 +159,7 @@ describe("App bootstrap", () => {
     await waitFor(() => {
       const contextMenuEvent = new MouseEvent("contextmenu", {
         bubbles: true,
-        cancelable: true
+        cancelable: true,
       });
       window.dispatchEvent(contextMenuEvent);
       expect(contextMenuEvent.defaultPrevented).toBe(true);
@@ -138,14 +167,14 @@ describe("App bootstrap", () => {
 
     const selectStartEvent = new Event("selectstart", {
       bubbles: true,
-      cancelable: true
+      cancelable: true,
     });
     document.dispatchEvent(selectStartEvent);
     expect(selectStartEvent.defaultPrevented).toBe(true);
 
     const dragStartEvent = new Event("dragstart", {
       bubbles: true,
-      cancelable: true
+      cancelable: true,
     });
     document.dispatchEvent(dragStartEvent);
     expect(dragStartEvent.defaultPrevented).toBe(true);
@@ -154,20 +183,20 @@ describe("App bootstrap", () => {
   it("keeps the settings button inside the map topbar", async () => {
     useGameStore.setState({
       screen: { kind: "map", chapterId: "northern-route" },
-      saveData: createDefaultSave()
+      saveData: createDefaultSave(),
     });
 
     render(<App />);
 
     const settingsButton = await screen.findByRole("button", {
-      name: /Настройки|Settings/
+      name: /Настройки|Settings/,
     });
     expect(settingsButton).not.toHaveClass("fixed");
     expect(settingsButton.closest(".map-topbar")).not.toBeNull();
     fireEvent.click(settingsButton);
 
     const dialog = await screen.findByRole("dialog", {
-      name: /Настройки|Settings/
+      name: /Настройки|Settings/,
     });
     await waitFor(() => expect(dialog).toBeVisible());
   });
@@ -175,7 +204,7 @@ describe("App bootstrap", () => {
   it("keeps the settings button inside the campaign selection topbar", async () => {
     useGameStore.setState({
       screen: { kind: "map", chapterId: "northern-route" },
-      saveData: createDefaultSave()
+      saveData: createDefaultSave(),
     });
 
     render(<App />);
@@ -188,13 +217,13 @@ describe("App bootstrap", () => {
       return topbar as HTMLElement;
     });
     const settingsButton = within(homeTopbar).getByRole("button", {
-      name: /Настройки|Settings/
+      name: /Настройки|Settings/,
     });
     expect(settingsButton).not.toHaveClass("fixed");
     fireEvent.click(settingsButton);
 
     const dialog = await screen.findByRole("dialog", {
-      name: /Настройки|Settings/
+      name: /Настройки|Settings/,
     });
     await waitFor(() => expect(dialog).toBeVisible());
   });

@@ -10,7 +10,7 @@ import {
   isFirstLaunchSave,
   isLevelUnlocked,
   resolveStartupDestination,
-  unlockedArtifactsForCompleted
+  unlockedArtifactsForCompleted,
 } from "@/shared/lib/progression";
 
 describe("progression", () => {
@@ -28,7 +28,10 @@ describe("progression", () => {
   it("tracks unlock progression independently for each chapter", () => {
     const sandLevels = getChapterLevels("sand-meridian");
     const emeraldLevels = getChapterLevels("emerald-meridian");
-    const save = { ...createDefaultSave(), completedLevels: [sandLevels[0].id] };
+    const save = {
+      ...createDefaultSave(),
+      completedLevels: [sandLevels[0].id],
+    };
     expect(isLevelUnlocked(sandLevels[1].id, save)).toBe(true);
     expect(isLevelUnlocked(levels[1].id, save)).toBe(false);
     expect(isLevelUnlocked(emeraldLevels[1].id, save)).toBe(false);
@@ -39,7 +42,7 @@ describe("progression", () => {
     expect(resolveStartupDestination(createDefaultSave())).toEqual({
       kind: "game",
       levelId: levels[0].id,
-      showOnboarding: true
+      showOnboarding: true,
     });
   });
 
@@ -48,10 +51,27 @@ describe("progression", () => {
       ...createDefaultSave(),
       inProgress: {
         levelId: levels[0].id,
+        mode: "campaign" as const,
+        attemptId: "test-attempt",
+        attemptNumber: 1,
+        attemptStartedAt: 0,
+        attemptStartedActiveSeconds: 0,
+        attemptStartedFoundDifferences: 0,
+        attemptStartedMistakes: 0,
+        attemptStartedHints: 0,
+        attemptStartedRewardedHints: 0,
+        attemptStartedTimeExtensions: 0,
+        terminalAt: null,
+        onboarding: false,
         foundDifferenceIds: ["compass-removed-1"],
         elapsedActiveSeconds: 12,
-        mistakes: 1
-      }
+        timeGrantedSeconds: 0,
+        mistakes: 1,
+        hintsUsed: 0,
+        hintedDifferenceIds: [],
+        rewardedHintsUsed: 0,
+        timeExtensionsUsed: 0,
+      },
     };
 
     expect(isFirstLaunchSave(save)).toBe(false);
@@ -74,8 +94,10 @@ describe("progression", () => {
       expect(getArtifactForLevel(level!.id)?.id).toBe(artifact.id);
       if (artifact.differenceId) {
         expect(
-          level!.differences.some((difference) => difference.id === artifact.differenceId),
-          `${artifact.id} → ${artifact.differenceId}`
+          level!.differences.some(
+            (difference) => difference.id === artifact.differenceId,
+          ),
+          `${artifact.id} → ${artifact.differenceId}`,
         ).toBe(true);
       }
     }
@@ -89,10 +111,14 @@ describe("progression", () => {
     const regularLevel = northernLevels.find((level) => level.order === 4)!;
 
     expect(
-      unlockedArtifactsForCompleted([regularLevel.id]).map((artifact) => artifact.id)
+      unlockedArtifactsForCompleted([regularLevel.id]).map(
+        (artifact) => artifact.id,
+      ),
     ).toEqual([]);
     expect(
-      unlockedArtifactsForCompleted([milestoneLevel.id]).map((artifact) => artifact.id)
+      unlockedArtifactsForCompleted([milestoneLevel.id]).map(
+        (artifact) => artifact.id,
+      ),
     ).toEqual(["white-compass"]);
   });
 
@@ -100,9 +126,12 @@ describe("progression", () => {
     const allCampaignLevelIds = [
       ...getChapterLevels("northern-route"),
       ...getChapterLevels("sand-meridian"),
-      ...getChapterLevels("emerald-meridian")
+      ...getChapterLevels("emerald-meridian"),
     ].map((level) => level.id);
-    const save = { ...createDefaultSave(), completedLevels: allCampaignLevelIds };
+    const save = {
+      ...createDefaultSave(),
+      completedLevels: allCampaignLevelIds,
+    };
 
     expect(resolveStartupDestination(save)).toEqual({ kind: "home" });
   });

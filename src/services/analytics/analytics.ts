@@ -1,21 +1,34 @@
-export type AnalyticsPayloadValue = string | number | boolean | null | undefined;
+import { isAnalyticsEventName, type AnalyticsEventName } from "./eventRegistry";
+
+export type AnalyticsPayloadValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined;
 export type AnalyticsPayload = Record<string, AnalyticsPayloadValue>;
 
 export type AnalyticsEvent = {
-  event: string;
+  event: AnalyticsEventName;
   goal: string;
   payload: AnalyticsPayload;
 };
 
 type YandexMetrica = {
   (counterId: number, method: "init", options: Record<string, unknown>): void;
-  (counterId: number, method: "reachGoal", target: string, params?: AnalyticsPayload): void;
+  (
+    counterId: number,
+    method: "reachGoal",
+    target: string,
+    params?: AnalyticsPayload,
+  ): void;
   a?: unknown[];
   l?: number;
 };
 
-const ANALYTICS_SCHEMA_VERSION = 1;
+const ANALYTICS_SCHEMA_VERSION = 2;
 const SESSION_STORAGE_KEY = "artifact.analytics.sessionId";
+const EVENT_SEQUENCE_STORAGE_KEY = "artifact.analytics.eventSequence";
 const METRIKA_GOAL_PREFIX = "aa_";
 const SAFE_GOAL_PATTERN = /^[a-zA-Z0-9_]+$/;
 
@@ -27,6 +40,26 @@ declare global {
 }
 
 let metrikaInitialized = false;
+
+export function getSafeErrorFingerprint(error: unknown) {
+  const value =
+    error instanceof Error
+      ? `${error.name}:${error.message}`
+      : typeof error === "string"
+        ? error
+        : "unknown";
+  const normalized = value
+    .toLowerCase()
+    .replace(/https?:\/\/\S+/g, "<url>")
+    .replace(/\b\d+\b/g, "#")
+    .slice(0, 240);
+  let hash = 2166136261;
+  for (let index = 0; index < normalized.length; index += 1) {
+    hash ^= normalized.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return `e${(hash >>> 0).toString(16)}`;
+}
 
 function createSessionId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -51,11 +84,37 @@ function getSessionId() {
   }
 }
 
-function getDeviceType() {
-  if (typeof window === "undefined") return "unknown";
-  if (window.innerWidth < 768) return "mobile";
-  if (window.innerWidth < 1280) return "tablet";
+function getEventSequence() {
+  if (typeof window === "undefined") return 0;
+  try {
+    const next =
+      Number(window.sessionStorage.getItem(EVENT_SEQUENCE_STORAGE_KEY) ?? "0") +
+      1;
+    window.sessionStorage.setItem(EVENT_SEQUENCE_STORAGE_KEY, String(next));
+    return next;
+  } catch {
+    return 0;
+  }
+}
+
+function getPlatformDeviceType() {
+  if (typeof navigator === "undefined") return "unknown";
+  const navigatorWithUaData = navigator as Navigator & {
+    userAgentData?: { mobile?: boolean; platform?: string };
+  };
+  if (navigatorWithUaData.userAgentData?.mobile) return "mobile";
+
+  const userAgent = navigator.userAgent.toLowerCase();
+  if (/ipad|tablet|kindle|silk/.test(userAgent)) return "tablet";
+  if (/android/.test(userAgent) && !/mobile/.test(userAgent)) return "tablet";
+  if (/mobile|iphone|ipod|android/.test(userAgent)) return "mobile";
   return "desktop";
+}
+
+function getLocale() {
+  if (typeof document === "undefined") return "ru";
+  const locale = document.documentElement.lang.toLowerCase();
+  return locale.startsWith("en") ? "en" : "ru";
 }
 
 function getCounterId() {
@@ -87,22 +146,26 @@ function ensureYandexMetrica(counterId: number) {
   window.ym(counterId, "init", {
     clickmap: false,
     trackLinks: false,
-    accurateTrackBounce: true
+    accurateTrackBounce: true,
   });
 }
 
-function toGoalName(event: string) {
+function toGoalName(event: AnalyticsEventName) {
   const normalized = `${METRIKA_GOAL_PREFIX}${event}`;
   return SAFE_GOAL_PATTERN.test(normalized) ? normalized : null;
 }
 
 function sanitizePayload(payload: AnalyticsPayload) {
   return Object.fromEntries(
-    Object.entries(payload).filter(([, value]) => value !== undefined)
+    Object.entries(payload).filter(([, value]) => value !== undefined),
   ) as AnalyticsPayload;
 }
 
-export function trackAnalyticsEvent(event: string, payload: AnalyticsPayload = {}) {
+export function trackAnalyticsEvent(
+  event: AnalyticsEventName,
+  payload: AnalyticsPayload = {},
+) {
+  if (!isAnalyticsEventName(event)) return;
   const goal = toGoalName(event);
   if (!goal) {
     if (import.meta.env.DEV) {
@@ -114,19 +177,25 @@ export function trackAnalyticsEvent(event: string, payload: AnalyticsPayload = {
   const enrichedPayload = sanitizePayload({
     schemaVersion: ANALYTICS_SCHEMA_VERSION,
     sessionId: getSessionId(),
-    event,
-    timestamp: new Date().toISOString(),
-    deviceType: getDeviceType(),
+    eventSequence: getEventSequence(),
+    buildId: import.meta.env.VITE_BUILD_ID ?? "dev",
+    contentVersion: import.meta.env.VITE_CONTENT_VERSION ?? "dev",
+    environment: import.meta.env.PROD ? "production" : "development",
+    locale: getLocale(),
+    platformDeviceType: getPlatformDeviceType(),
+    viewportWidth: typeof window === "undefined" ? 0 : window.innerWidth,
+    viewportHeight: typeof window === "undefined" ? 0 : window.innerHeight,
     platformMode: import.meta.env.VITE_PLATFORM_MODE ?? "auto",
     gameVersion: import.meta.env.VITE_APP_VERSION ?? "0.1.0",
-    ...payload
+    ...payload,
   });
   const analyticsEvent = { event, goal, payload: enrichedPayload };
 
   if (typeof window !== "undefined") {
     window.__artifactAnalyticsEvents = window.__artifactAnalyticsEvents ?? [];
     window.__artifactAnalyticsEvents.push(analyticsEvent);
-    window.__artifactAnalyticsEvents = window.__artifactAnalyticsEvents.slice(-100);
+    window.__artifactAnalyticsEvents =
+      window.__artifactAnalyticsEvents.slice(-100);
   }
 
   const counterId = getCounterId();
