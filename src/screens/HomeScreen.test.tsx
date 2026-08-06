@@ -6,6 +6,8 @@ import { getChapterLevels } from "@/content/chapters";
 import { getDailyArchiveEntryForDate } from "@/content/dailyArchive";
 import { createDefaultSave } from "@/entities/save/schema";
 import { HomeScreen } from "@/screens/HomeScreen";
+import { createMockPaymentsGateway } from "@/services/platform/mockPayments";
+import { setPaymentsGatewayOverride } from "@/services/platform/payments";
 import { useGameStore } from "@/shared/store/gameStore";
 
 vi.mock("@/services/storage/localSaveService", () => ({
@@ -37,10 +39,13 @@ describe("HomeScreen", () => {
         nativeRequestInFlight: false
       },
       interstitialRuntime: {
-        pendingMapCheckCompletedLevels: null,
-        lastResolvedCompletedLevels: 0,
+        campaignCompletions: 0,
+        completionsSinceLastAd: 0,
+        pendingToken: null,
+        lastResolvedToken: 0,
         nativeRequestInFlight: false
       },
+      adRuntime: { lastRewardedShownAt: null },
       artifactRevealQueue: []
     });
   });
@@ -63,6 +68,23 @@ describe("HomeScreen", () => {
       });
     });
     expect(window.__artifactAnalyticsEvents?.some((event) => event.event === "daily_start_clicked")).toBe(true);
+  });
+
+  it("opens the archive shop from the hub top bar", async () => {
+    setPaymentsGatewayOverride(createMockPaymentsGateway());
+
+    render(<HomeScreen onOpenSettings={() => undefined} />);
+
+    const shopButton = screen.getByRole("button", { name: "Shop" });
+    expect(shopButton.className).toContain("min-h-[44px]");
+    expect(shopButton.className).toContain("min-w-[44px]");
+
+    fireEvent.click(shopButton);
+
+    expect(await screen.findByRole("dialog", { name: "Archive Shop" })).toBeInTheDocument();
+    expect(await screen.findByText("10 magnifiers")).toBeInTheDocument();
+
+    setPaymentsGatewayOverride(null);
   });
 
   it("continues the active campaign directly into the next unfinished level", async () => {

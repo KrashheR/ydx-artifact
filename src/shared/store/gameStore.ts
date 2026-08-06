@@ -23,6 +23,7 @@ import {
   trackAnalyticsEvent,
   type AnalyticsPayload,
 } from "@/services/analytics/analytics";
+import { isCampaignInterstitialCompletion } from "@/shared/lib/adPolicy";
 import {
   getArtifactForLevel,
   isBetterLevelResult,
@@ -50,10 +51,27 @@ type ReviewPromptRuntimeState = {
   nativeRequestInFlight: boolean;
 };
 
+/**
+ * Interstitial cadence state. Session-scoped on purpose: the cadence counts
+ * *completed* campaign levels including replays, which `completedLevels.length`
+ * cannot express. A reload restarts the count, matching the "first ad after the
+ * second completion of the session" rule.
+ */
 type InterstitialRuntimeState = {
-  pendingMapCheckCompletedLevels: number | null;
-  lastResolvedCompletedLevels: number;
+  /** Campaign levels completed this session, replays included. */
+  campaignCompletions: number;
+  /** Completions since the last resolved ad; drives the every-two cadence. */
+  completionsSinceLastAd: number;
+  /** Completion ordinal that queued an ad, or null when nothing is pending. */
+  pendingToken: number | null;
+  /** Highest ordinal already resolved (shown, declined, failed or skipped). */
+  lastResolvedToken: number;
   nativeRequestInFlight: boolean;
+};
+
+type AdRuntimeState = {
+  /** Wall clock of the last rewarded video that actually opened. */
+  lastRewardedShownAt: number | null;
 };
 
 type LevelCompletionAnalyticsPayload = AnalyticsPayload & {
@@ -74,6 +92,7 @@ type GameStore = {
   saveStatus: SaveStatus;
   reviewPromptRuntime: ReviewPromptRuntimeState;
   interstitialRuntime: InterstitialRuntimeState;
+  adRuntime: AdRuntimeState;
   // Artifact ids unlocked by the last level completion, waiting for the
   // post-level reveal ceremony. Runtime-only: a reload skips the ceremony but
   // the collection still shows the artifact with its "new" badge.
@@ -81,6 +100,15 @@ type GameStore = {
   startedAt: number;
   hydrate: () => Promise<void>;
   save: (options?: { flush?: boolean }) => Promise<void>;
+  /**
+   * Same write as `save`, but reports whether the data actually reached
+   * durable storage. Purchase grants must not be consumed before this is true.
+   */
+  persistSave: (options?: {
+    flush?: boolean;
+  }) => Promise<{ persisted: boolean }>;
+  /** Applies a save mutation without persisting; pair with `persistSave`. */
+  applySaveMutation: (updater: (saveData: SaveData) => SaveData) => void;
   navigate: (screen: Screen) => void;
   openStartupScreen: () => void;
   startLevel: (
@@ -113,10 +141,16 @@ type GameStore = {
     options?: { save?: boolean; flush?: boolean },
   ) => void;
   claimDailyReward: (date: string) => void;
+  /**
+   * Grants the single rewarded Daily magnifier for `date`. Idempotent: a second
+   * call for the same calendar date is a no-op and returns false.
+   */
+  grantDailyAdReward: (date: string) => boolean;
+  markRewardedTimeExtensionUsed: (levelId: string) => void;
+  markRewardedShown: () => void;
   clearPendingReviewPromptCheck: () => void;
-  clearPendingInterstitialCheck: () => void;
   setInterstitialNativeRequestInFlight: (value: boolean) => void;
-  setInterstitialResolved: (completedLevels: number) => void;
+  setInterstitialResolved: (token: number) => void;
   markReviewPromptShown: () => void;
   dismissReviewPrompt: () => void;
   setReviewNativeRequestInFlight: (value: boolean) => void;
@@ -182,6 +216,9 @@ function createLevelAttempt(
       hintedDifferenceIds: previous?.hintedDifferenceIds ?? [],
       rewardedHintsUsed: previous?.rewardedHintsUsed ?? 0,
       timeExtensionsUsed: previous?.timeExtensionsUsed ?? 0,
+      // Carried with the rest of the run so a tab switch, a reload or the
+      // implicit re-attempt behind a time extension cannot reopen the offer.
+      rewardedTimeExtensionUsed: previous?.rewardedTimeExtensionUsed ?? false,
     },
   };
 }
@@ -300,22 +337,10 @@ function getAttemptAnalyticsPayload(saveData: SaveData) {
   };
 }
 
-const CAMPAIGN_LEVELS_PER_HINT_REWARD = 2;
 const NEXT_CAMPAIGN_BY_ID: Partial<Record<ChapterId, ChapterId>> = {
   "northern-route": "sand-meridian",
   "sand-meridian": "emerald-meridian",
 };
-
-function getCampaignCompletionRewardMagnifiers(
-  completedCampaignLevels: number,
-  isNewCampaignCompletion: boolean,
-) {
-  if (!isNewCampaignCompletion) return 0;
-  return completedCampaignLevels > 0 &&
-    completedCampaignLevels % CAMPAIGN_LEVELS_PER_HINT_REWARD === 0
-    ? 1
-    : 0;
-}
 
 export const useGameStore = create<GameStore>((set, get) => ({
   screen: { kind: "home" },
@@ -327,10 +352,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     nativeRequestInFlight: false,
   },
   interstitialRuntime: {
-    pendingMapCheckCompletedLevels: null,
-    lastResolvedCompletedLevels: 0,
+    campaignCompletions: 0,
+    completionsSinceLastAd: 0,
+    pendingToken: null,
+    lastResolvedToken: 0,
     nativeRequestInFlight: false,
   },
+  adRuntime: { lastRewardedShownAt: null },
   artifactRevealQueue: [],
   startedAt: Date.now(),
   async hydrate() {
@@ -365,21 +393,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
   async save(options) {
+    await get().persistSave(options);
+  },
+  async persistSave(options) {
     const saveData = get().saveData;
     set({ saveStatus: "saving" });
     try {
       const result = await savePersistentSave(saveData, options);
-      set({
-        saveData: result.saveData,
+      set((state) => ({
+        // Only the timestamp comes back from the writer; merging keeps any
+        // mutation that landed while the write was in flight.
+        saveData:
+          state.saveData === saveData
+            ? result.saveData
+            : { ...state.saveData, updatedAt: result.saveData.updatedAt },
         saveStatus: result.cloudSynced ? "saved" : "local-only",
-      });
+      }));
+      return { persisted: true };
     } catch {
       set({ saveStatus: "local-only" });
       trackAnalyticsEvent("save_write_failed", {
         flush: options?.flush ?? false,
         saveStatus: "local-only",
       });
+      return { persisted: false };
     }
+  },
+  applySaveMutation(updater) {
+    set((state) => ({ saveData: updater(state.saveData) }));
   },
   navigate(screen) {
     set({ screen });
@@ -643,17 +684,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         !isCampaignCompletion || wasAlreadyCompleted
           ? state.saveData.completedLevels
           : [...state.saveData.completedLevels, levelId];
-      const campaignRewardMagnifiers = isCampaignCompletion
-        ? getCampaignCompletionRewardMagnifiers(
-            completedLevels.length,
-            !wasAlreadyCompleted,
-          )
-        : 0;
+      // The streak lands on completion; the magnifier is now rewarded-only and
+      // is granted separately by `grantDailyAdReward`.
       const shouldClaimDailyReward =
         dailyRewardDate !== null &&
         state.saveData.daily.lastClaimDate !== dailyRewardDate;
       const daily = shouldClaimDailyReward
         ? {
+            ...state.saveData.daily,
             lastClaimDate: dailyRewardDate,
             streak: getConsecutiveDailyStreak(
               state.saveData.daily.lastClaimDate,
@@ -666,10 +704,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ...state.saveData,
         completedLevels,
         inProgress: null,
-        magnifiers:
-          state.saveData.magnifiers +
-          campaignRewardMagnifiers +
-          (shouldClaimDailyReward ? 1 : 0),
         daily,
         bestResults,
       };
@@ -692,10 +726,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       artifactUnlockCount = newlyUnlockedArtifactIds.length;
       const shouldQueueReviewCheck =
         mode === "campaign" && !wasAlreadyCompleted;
+      // Replays count towards the ad cadence; unfinished attempts and Daily
+      // do not reach this branch at all.
+      const campaignCompletions = isCampaignCompletion
+        ? state.interstitialRuntime.campaignCompletions + 1
+        : state.interstitialRuntime.campaignCompletions;
+      const completionsSinceLastAd = isCampaignCompletion
+        ? state.interstitialRuntime.completionsSinceLastAd + 1
+        : state.interstitialRuntime.completionsSinceLastAd;
       const shouldQueueInterstitialCheck =
-        shouldQueueReviewCheck &&
-        completedLevels.length > 0 &&
-        completedLevels.length % 3 === 0;
+        isCampaignCompletion &&
+        isCampaignInterstitialCompletion(completionsSinceLastAd);
 
       completionEvents.push({
         ...getLevelAnalyticsPayload(levelId),
@@ -714,8 +755,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         accuracy: Number(accuracy.toFixed(4)),
         isReplay: wasAlreadyCompleted,
         completedLevels: completedLevels.length,
-        rewardMagnifiers: campaignRewardMagnifiers,
-        magnifiersAfterReward: nextSave.magnifiers,
+        magnifiers: nextSave.magnifiers,
+        campaignCompletionsInSession: campaignCompletions,
         artifactUnlockCount,
         queuedReviewCheck: shouldQueueReviewCheck,
         queuedInterstitialCheck: shouldQueueInterstitialCheck,
@@ -750,12 +791,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
               pendingMapCheckCompletedLevels: completedLevels.length,
             }
           : state.reviewPromptRuntime,
-        interstitialRuntime: shouldQueueInterstitialCheck
-          ? {
-              ...state.interstitialRuntime,
-              pendingMapCheckCompletedLevels: completedLevels.length,
-            }
-          : state.interstitialRuntime,
+        interstitialRuntime: {
+          ...state.interstitialRuntime,
+          campaignCompletions,
+          completionsSinceLastAd,
+          // A pending token survives a detour into the collection or the
+          // campaign report; it is only replaced by a newer cadence point.
+          pendingToken: shouldQueueInterstitialCheck
+            ? campaignCompletions
+            : state.interstitialRuntime.pendingToken,
+        },
       };
     });
     const completionPayload = completionEvents[0];
@@ -908,8 +953,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return {
         saveData: {
           ...state.saveData,
-          magnifiers: state.saveData.magnifiers + 1,
-          daily: { lastClaimDate: date, streak: nextStreak },
+          // No automatic magnifier: the Daily reward is rewarded-video only.
+          daily: {
+            ...state.saveData.daily,
+            lastClaimDate: date,
+            streak: nextStreak,
+          },
         },
       };
     });
@@ -920,18 +969,48 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
     void get().save({ flush: true });
   },
+  grantDailyAdReward(date) {
+    const previousDaily = get().saveData.daily;
+    if (previousDaily.lastAdRewardDate === date) return false;
+    const magnifiersBefore = get().saveData.magnifiers;
+    set((state) => ({
+      saveData: {
+        ...state.saveData,
+        magnifiers: state.saveData.magnifiers + 1,
+        daily: { ...state.saveData.daily, lastAdRewardDate: date },
+      },
+    }));
+    trackAnalyticsEvent("daily_ad_reward_granted", {
+      date,
+      placement: "daily_reward",
+      magnifiersBefore,
+      magnifiersAfter: magnifiersBefore + 1,
+      streak: previousDaily.streak,
+    });
+    void get().save({ flush: true });
+    return true;
+  },
+  markRewardedTimeExtensionUsed(levelId) {
+    set((state) => {
+      const attempt = state.saveData.inProgress;
+      if (!attempt || attempt.levelId !== levelId) return state;
+      if (attempt.rewardedTimeExtensionUsed) return state;
+      return {
+        saveData: {
+          ...state.saveData,
+          inProgress: { ...attempt, rewardedTimeExtensionUsed: true },
+        },
+      };
+    });
+    void get().save({ flush: true });
+  },
+  markRewardedShown() {
+    set({ adRuntime: { lastRewardedShownAt: Date.now() } });
+  },
   clearPendingReviewPromptCheck() {
     set((state) => ({
       reviewPromptRuntime: {
         ...state.reviewPromptRuntime,
-        pendingMapCheckCompletedLevels: null,
-      },
-    }));
-  },
-  clearPendingInterstitialCheck() {
-    set((state) => ({
-      interstitialRuntime: {
-        ...state.interstitialRuntime,
         pendingMapCheckCompletedLevels: null,
       },
     }));
@@ -944,14 +1023,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       },
     }));
   },
-  setInterstitialResolved(completedLevels) {
+  setInterstitialResolved(token) {
     set((state) => ({
       interstitialRuntime: {
         ...state.interstitialRuntime,
-        pendingMapCheckCompletedLevels: null,
-        lastResolvedCompletedLevels: Math.max(
-          state.interstitialRuntime.lastResolvedCompletedLevels,
-          completedLevels,
+        pendingToken: null,
+        // Restarting the cadence here is what keeps a deferred ad and the next
+        // scheduled one at least two completions apart.
+        completionsSinceLastAd: 0,
+        lastResolvedToken: Math.max(
+          state.interstitialRuntime.lastResolvedToken,
+          token,
         ),
         nativeRequestInFlight: false,
       },
@@ -1112,10 +1194,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         nativeRequestInFlight: false,
       },
       interstitialRuntime: {
-        pendingMapCheckCompletedLevels: null,
-        lastResolvedCompletedLevels: 0,
+        campaignCompletions: 0,
+        completionsSinceLastAd: 0,
+        pendingToken: null,
+        lastResolvedToken: 0,
         nativeRequestInFlight: false,
       },
+      adRuntime: { lastRewardedShownAt: null },
       artifactRevealQueue: [],
     });
   },

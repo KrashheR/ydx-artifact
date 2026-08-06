@@ -6,6 +6,11 @@ export const SAVE_VERSION = 3;
 
 export const INITIAL_MAGNIFIERS = 1;
 
+// Purchase tokens already granted into the save. Bounded so the blob cannot
+// grow without limit, but generous enough that a recently processed consumable
+// can never fall out of the ledger before its `consumePurchase` retry lands.
+export const PROCESSED_PURCHASE_TOKEN_LIMIT = 100;
+
 export const reviewUnavailableReasonSchema = z.enum([
   "NO_AUTH",
   "GAME_RATED",
@@ -66,6 +71,9 @@ const inProgressV3Schema = z.object({
   hintedDifferenceIds: z.array(z.string()),
   rewardedHintsUsed: z.number().int().nonnegative(),
   timeExtensionsUsed: z.number().int().nonnegative(),
+  // Carried across attempt restarts (see createLevelAttempt) so a tab switch or
+  // a reload cannot hand out a second rewarded extension for the same run.
+  rewardedTimeExtensionUsed: z.boolean().default(false),
 });
 
 export const comparatorSchemeSchema = z.enum([
@@ -95,6 +103,9 @@ export const saveSchema = z.object({
   daily: z.object({
     lastClaimDate: z.string().nullable(),
     streak: z.number().int().nonnegative(),
+    // Separate from lastClaimDate: the streak lands without watching an ad, the
+    // magnifier only after a rewarded view, and only once per calendar date.
+    lastAdRewardDate: z.string().nullable().default(null),
   }),
   settings: z.object({
     locale: z.enum(["ru", "en"]),
@@ -107,6 +118,12 @@ export const saveSchema = z.object({
   purchases: z.object({
     noForcedInterstitials: z.boolean(),
     productIds: z.array(z.string()),
+    // Idempotency ledger for consumables: a token lands here in the same write
+    // as its reward, before consumePurchase is attempted.
+    processedPurchaseTokens: z.array(z.string()).default([]),
+    // One-time payloads (starter pack magnifiers) that must never be re-granted
+    // when getPurchases() keeps returning the non-consumable purchase.
+    grantedOneTimeProductIds: z.array(z.string()).default([]),
   }),
 });
 
@@ -136,6 +153,7 @@ const legacySaveSchema = z.object({
     .object({
       lastClaimDate: z.string().nullable().optional(),
       streak: z.number().optional(),
+      lastAdRewardDate: z.string().nullable().optional(),
     })
     .optional(),
   settings: z
@@ -152,6 +170,8 @@ const legacySaveSchema = z.object({
     .object({
       noForcedInterstitials: z.boolean().optional(),
       productIds: z.array(z.string()).optional(),
+      processedPurchaseTokens: z.array(z.string()).optional(),
+      grantedOneTimeProductIds: z.array(z.string()).optional(),
     })
     .optional(),
 });
@@ -239,6 +259,7 @@ export function migrateSaveData(value: unknown): SaveData {
           hintedDifferenceIds: [],
           rewardedHintsUsed: 0,
           timeExtensionsUsed: 0,
+          rewardedTimeExtensionUsed: false,
         }
       : null,
     levelAttemptCounts: source.inProgress
@@ -254,6 +275,7 @@ export function migrateSaveData(value: unknown): SaveData {
     daily: {
       lastClaimDate: source.daily?.lastClaimDate ?? null,
       streak: clampNonNegativeInteger(source.daily?.streak, 0),
+      lastAdRewardDate: source.daily?.lastAdRewardDate ?? null,
     },
     settings: {
       locale: source.settings?.locale ?? fallback.settings.locale,
@@ -267,6 +289,9 @@ export function migrateSaveData(value: unknown): SaveData {
     purchases: {
       noForcedInterstitials: source.purchases?.noForcedInterstitials ?? false,
       productIds: source.purchases?.productIds ?? [],
+      processedPurchaseTokens: source.purchases?.processedPurchaseTokens ?? [],
+      grantedOneTimeProductIds:
+        source.purchases?.grantedOneTimeProductIds ?? [],
     },
   });
 }
@@ -287,6 +312,7 @@ export function createDefaultSave(): SaveData {
     daily: {
       lastClaimDate: null,
       streak: 0,
+      lastAdRewardDate: null,
     },
     settings: {
       locale: "ru",
@@ -299,6 +325,8 @@ export function createDefaultSave(): SaveData {
     purchases: {
       noForcedInterstitials: false,
       productIds: [],
+      processedPurchaseTokens: [],
+      grantedOneTimeProductIds: [],
     },
   };
 }

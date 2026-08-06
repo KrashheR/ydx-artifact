@@ -9,25 +9,26 @@ import { useGameStore } from "@/shared/store/gameStore";
 
 describe("MapScreen interstitial flow", () => {
   beforeEach(() => {
-    const firstThreeLevels = getChapterLevels("northern-route").slice(0, 3).map((level) => level.id);
-    const saveData = createDefaultSave();
+    const firstLevels = getChapterLevels("northern-route")
+      .slice(0, 2)
+      .map((level) => level.id);
 
     useGameStore.setState({
       screen: { kind: "map", chapterId: "northern-route" },
-      saveData: {
-        ...saveData,
-        completedLevels: firstThreeLevels
-      },
+      saveData: { ...createDefaultSave(), completedLevels: firstLevels },
       reviewPromptRuntime: {
         pendingMapCheckToken: 0,
         pendingMapCheckCompletedLevels: null,
         nativeRequestInFlight: false
       },
       interstitialRuntime: {
-        pendingMapCheckCompletedLevels: 3,
-        lastResolvedCompletedLevels: 0,
+        campaignCompletions: 2,
+        completionsSinceLastAd: 2,
+        pendingToken: 2,
+        lastResolvedToken: 0,
         nativeRequestInFlight: false
-      }
+      },
+      adRuntime: { lastRewardedShownAt: null }
     });
   });
 
@@ -46,32 +47,7 @@ describe("MapScreen interstitial flow", () => {
     });
 
     expect(showInterstitial).not.toHaveBeenCalled();
-    expect(useGameStore.getState().interstitialRuntime.pendingMapCheckCompletedLevels).toBe(3);
+    // The queued ad survives the detour and resolves at the next victory exit.
+    expect(useGameStore.getState().interstitialRuntime.pendingToken).toBe(2);
   });
-
-  it("queues the next interstitial check on each third new campaign completion", () => {
-    const campaignLevels = getChapterLevels("northern-route").slice(0, 3);
-    useGameStore.setState({
-      screen: { kind: "map", chapterId: "northern-route" },
-      saveData: createDefaultSave(),
-      interstitialRuntime: {
-        pendingMapCheckCompletedLevels: null,
-        lastResolvedCompletedLevels: 0,
-        nativeRequestInFlight: false
-      }
-    });
-
-    useGameStore.getState().completeLevel(campaignLevels[0].id, 42, "campaign");
-    expect(useGameStore.getState().interstitialRuntime.pendingMapCheckCompletedLevels).toBeNull();
-
-    useGameStore.getState().completeLevel(campaignLevels[1].id, 43, "campaign");
-    expect(useGameStore.getState().interstitialRuntime.pendingMapCheckCompletedLevels).toBeNull();
-
-    useGameStore.getState().completeLevel(campaignLevels[2].id, 44, "campaign");
-    expect(useGameStore.getState().interstitialRuntime.pendingMapCheckCompletedLevels).toBe(3);
-
-    useGameStore.getState().completeLevel(campaignLevels[2].id, 45, "campaign");
-    expect(useGameStore.getState().interstitialRuntime.pendingMapCheckCompletedLevels).toBe(3);
-  });
-
 });

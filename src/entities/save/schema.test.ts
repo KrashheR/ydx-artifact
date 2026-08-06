@@ -83,6 +83,54 @@ describe("migrateSaveData", () => {
     expect(save.magnifiers).toBe(99);
   });
 
+  it("keeps existing v3 balances and entitlements when the monetization fields are added", () => {
+    const save = migrateSaveData({
+      version: 3,
+      updatedAt: 123,
+      completedLevels: ["nr-01-scene01"],
+      bestResults: {},
+      inProgress: null,
+      levelAttemptCounts: { "nr-01-scene01": 2 },
+      magnifiers: 7,
+      artifacts: {},
+      viewedCampaignReportIds: [],
+      daily: { lastClaimDate: "2026-08-04", streak: 5 },
+      settings: {
+        locale: "ru",
+        localeSource: "auto",
+        vibration: true,
+        reducedMotion: false,
+        comparatorScheme: null,
+      },
+      reviewPrompt: {
+        schemaVersion: 1,
+        prePromptShownCount: 0,
+        nextEligibleCompletedLevel: 4,
+        nativeReviewResolved: false,
+      },
+      purchases: { noForcedInterstitials: true, productIds: ["no_forced_ads"] },
+    });
+
+    expect(save.magnifiers).toBe(7);
+    expect(save.completedLevels).toEqual(["nr-01-scene01"]);
+    expect(save.daily).toMatchObject({
+      lastClaimDate: "2026-08-04",
+      streak: 5,
+      lastAdRewardDate: null,
+    });
+    expect(save.purchases).toEqual({
+      noForcedInterstitials: true,
+      productIds: ["no_forced_ads"],
+      processedPurchaseTokens: [],
+      grantedOneTimeProductIds: [],
+    });
+  });
+
+  it("starts a brand new archive with exactly one magnifier", () => {
+    expect(createDefaultSave().magnifiers).toBe(1);
+    expect(INITIAL_MAGNIFIERS).toBe(1);
+  });
+
   it("adds viewed campaign report ids to older v2 saves", () => {
     const save = migrateSaveData({
       version: 2,

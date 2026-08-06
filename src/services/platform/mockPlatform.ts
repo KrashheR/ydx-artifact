@@ -19,7 +19,8 @@ export interface GameReviewGateway {
 
 export interface InterstitialCallbacks {
   onOpen?: () => void;
-  onClose?: () => void;
+  /** `wasShown` is false when Yandex silently declines (frequency cap, offline). */
+  onClose?: (wasShown: boolean) => void;
   onError?: (error?: unknown) => void;
 }
 
@@ -27,8 +28,16 @@ export interface InterstitialGateway {
   showInterstitial(callbacks?: InterstitialCallbacks): Promise<InterstitialResult>;
 }
 
+export interface RewardedCallbacks {
+  /** Fires when the video is actually on screen; drives the 90s suppression stamp. */
+  onOpen?: () => void;
+  onRewarded?: () => void;
+  onClose?: () => void;
+  onError?: (error?: unknown) => void;
+}
+
 export interface RewardedGateway {
-  showRewarded(): Promise<RewardedResult>;
+  showRewarded(callbacks?: RewardedCallbacks): Promise<RewardedResult>;
 }
 
 type YandexFeedbackApi = {
@@ -50,7 +59,31 @@ type YandexRewardedAdCallbacks = {
   onError?: (error: unknown) => void;
 };
 
+export type YandexCatalogProduct = {
+  id?: string;
+  title?: string;
+  description?: string;
+  imageURI?: string;
+  price?: string;
+  priceValue?: string;
+  priceCurrencyCode?: string;
+  getPriceCurrencyImage?: (size?: "small" | "medium" | "svg") => string;
+};
+
+export type YandexPurchase = {
+  productID?: string;
+  purchaseToken?: string;
+};
+
+export type YandexPaymentsApi = {
+  getCatalog?: () => Promise<YandexCatalogProduct[]>;
+  purchase?: (options: { id: string }) => Promise<YandexPurchase>;
+  getPurchases?: () => Promise<YandexPurchase[]>;
+  consumePurchase?: (purchaseToken: string) => Promise<void>;
+};
+
 type YandexGamesSdk = {
+  getPayments?: (options?: { signed?: boolean }) => Promise<YandexPaymentsApi>;
   adv?: {
     showFullscreenAdv?: (options: { callbacks?: YandexFullscreenAdCallbacks }) => void;
     showRewardedVideo?: (options: { callbacks?: YandexRewardedAdCallbacks }) => void;
@@ -150,16 +183,19 @@ export const mockPlatform = {
     const ysdk = await getYandexSdk();
     return ysdk?.environment?.i18n?.lang;
   },
-  async showRewarded(): Promise<RewardedResult> {
+  async showRewarded(callbacks: RewardedCallbacks = {}): Promise<RewardedResult> {
     if (rewardedGatewayOverride) {
-      return rewardedGatewayOverride.showRewarded();
+      return rewardedGatewayOverride.showRewarded(callbacks);
     }
 
     const ysdk = await getYandexSdk();
     const adv = ysdk?.adv;
 
     if (!adv?.showRewardedVideo) {
+      callbacks.onOpen?.();
       await new Promise((resolve) => window.setTimeout(resolve, 300));
+      callbacks.onRewarded?.();
+      callbacks.onClose?.();
       return "rewarded";
     }
     const showRewardedVideo = adv.showRewardedVideo.bind(adv);
@@ -176,20 +212,25 @@ export const mockPlatform = {
       try {
         showRewardedVideo({
           callbacks: {
+            onOpen: () => callbacks.onOpen?.(),
             onRewarded: () => {
               rewarded = true;
+              callbacks.onRewarded?.();
             },
             onClose: () => {
+              callbacks.onClose?.();
               settle(rewarded ? "rewarded" : "closed");
             },
             onError: (error) => {
               logPlatformError("showRewarded", error);
+              callbacks.onError?.(error);
               settle("failed");
             }
           }
         });
       } catch (error) {
         logPlatformError("showRewarded", error);
+        callbacks.onError?.(error);
         settle("failed");
       }
     });
@@ -205,7 +246,7 @@ export const mockPlatform = {
     if (!adv?.showFullscreenAdv) {
       callbacks.onOpen?.();
       await new Promise((resolve) => window.setTimeout(resolve, 300));
-      callbacks.onClose?.();
+      callbacks.onClose?.(true);
       return "closed";
     }
     const showFullscreenAdv = adv.showFullscreenAdv.bind(adv);
@@ -222,8 +263,8 @@ export const mockPlatform = {
         showFullscreenAdv({
           callbacks: {
             onOpen: callbacks.onOpen,
-            onClose: () => {
-              callbacks.onClose?.();
+            onClose: (wasShown) => {
+              callbacks.onClose?.(wasShown !== false);
               settle("closed");
             },
             onError: (error) => {

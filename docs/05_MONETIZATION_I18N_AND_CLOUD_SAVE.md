@@ -52,21 +52,28 @@ Sticky можно тестировать позднее только на кар
 
 ## Старт
 
-Новый игрок получает 3 лупы.
+Новый игрок получает ровно **1 лупу** (`INITIAL_MAGNIFIERS` в `src/entities/save/schema.ts`).
+
+Миграция сохранений не уменьшает уже накопленный баланс: существующие лупы переносятся как есть.
 
 ## Расход
 
-- «Ориентир» — 1 лупа.
+- «Ориентир» — 1 лупа;
+- продление времени на **60 секунд** — 2 лупы.
 
 Баланс не может стать отрицательным.
 
-## Бесплатные источники
+## Источники луп
 
-- 1 лупа после первого прохождения уровней 3, 6, 9 и 12;
-- streak day 1 — 1 лупа;
-- streak day 2 — 2 лупы;
-- добровольная post-level rewarded — 2 лупы;
-- daily rewarded — удвоение magnifier-награды дня.
+Автоматических бесплатных источников больше нет. Кампания, streak и daily
+**не начисляют лупы сами по себе**. Лупы попадают на баланс только:
+
+- после rewarded-просмотра в Daily Archive (ровно 1 лупа на календарную дату);
+- после успешной покупки в магазине (`magnifiers_10`, `archive_starter_pack`);
+- через dev-инструменты в development-режиме.
+
+При нулевом балансе rewarded-подсказка «Ориентир» выдаётся **непосредственно в
+уровне** и на баланс не зачисляется — её нельзя накопить на будущее.
 
 ## Ограничения
 
@@ -96,49 +103,105 @@ Sticky можно тестировать позднее только на кар
 - состояние уровня не теряется;
 - кнопка не остаётся бесконечно loading.
 
-## Placement: post_level_bonus
+## Placement: timeout_extension
 
-Точка входа: экран результата первого прохождения уровня.
+Точка входа: overlay «Время вышло».
 
-Награда: 2 лупы.
-
-Правила:
-
-- не показывать после tutorial;
-- один раз на конкретный уровень;
-- после получения кнопка заменяется состоянием «Получено»;
-- отказ не мешает продолжить.
-
-## Placement: daily_bonus
-
-Точка входа: результат daily.
-
-Награда: удвоить magnifier-награду daily.
+Награда: **+60 секунд** к текущей попытке.
 
 Правила:
 
-- один раз на серверную календарную дату;
-- повторное прохождение не создаёт вторую награду;
-- использовать Yandex server time;
-- результат сохранять в cloud до закрытия result flow.
+- максимум одно rewarded-продление на одну попытку уровня;
+- признак `inProgress.rewardedTimeExtensionUsed` сохраняется в save и переносится
+  через `createLevelAttempt`, поэтому перезагрузка страницы и возврат из фона не
+  открывают предложение повторно;
+- «Начать заново» создаёт новую попытку и сбрасывает признак;
+- награда выдаётся только после `onRewarded`;
+- найденные отличия, ошибки и активное время попытки сохраняются;
+- продление за 2 лупы остаётся доступным независимо от rewarded-продления.
+
+Overlay предлагает четыре действия: «Реклама → +60 секунд», «Продлить за 2 лупы»,
+«Начать заново», «Вернуться в архив».
+
+## Placement: daily_reward
+
+Точка входа: victory overlay первого за календарную дату прохождения Daily Archive.
+
+Награда: ровно 1 лупа.
+
+Правила:
+
+- автоматического начисления за Daily больше нет;
+- игрок выбирает «Получить 1 лупу за рекламу» или «Завершить без награды»;
+- лупа начисляется только после `onRewarded` и сразу сохраняется с flush;
+- дата фиксируется в `daily.lastAdRewardDate`, повторный клик и повторное
+  прохождение вторую лупу не выдают;
+- streak (`daily.lastClaimDate` / `daily.streak`) засчитывается независимо от рекламы;
+- ошибка rewarded не выдаёт награду и не сбрасывает streak; доступны повтор и отказ;
+- после rewarded interstitial не показывается;
+- отказ пытается показать interstitial и в любом случае возвращает игрока в Archive Hub;
+- `noForcedInterstitials` убирает interstitial при отказе, но не убирает саму
+  добровольную rewarded-кнопку.
 
 ---
 
 # 4. Interstitial-реклама
 
-Implementation note: current build queues forced interstitials after every third newly completed campaign level (`3, 6, 9, ...`). The call still happens only on the campaign map after gameplay, is skipped for replay and daily completions, and is disabled by `purchases.noForcedInterstitials`.
+## Каденция кампании
 
-Запрашивать interstitial только на карте после логического завершения действия.
+Interstitial запрашивается **после каждых двух успешно завершённых campaign-уровней**
+в рамках игровой сессии (placement `campaign_every_two_levels`).
 
-Все условия должны быть истинны:
+Считаются:
 
-- завершено минимум 4 уровня;
-- текущая сессия длится минимум 8 минут;
-- после прошлого interstitial прошло минимум 5 минут;
-- после прошлого interstitial завершено минимум 2 уровня;
-- пользователь находится на карте;
-- нет purchase flow, save conflict, artifact reveal, daily result или chapter finale;
-- entitlement `no_forced_ads` отсутствует.
+- новые прохождения campaign-уровней;
+- повторные прохождения campaign-уровней.
+
+Не считаются:
+
+- незавершённые попытки, выход из уровня, timeout без последующей победы;
+- Daily Archive — у него отдельная логика (`daily_reward`, `daily_exit_interstitial`).
+
+Схема внутри сессии: после 1-го завершения рекламы нет, после 2-го — запрос,
+после 4-го — следующий, далее каждый второй. Счётчик
+`interstitialRuntime.campaignCompletions` живёт в рамках сессии, потому что
+`completedLevels.length` не умеет считать реплеи.
+
+## Точка показа
+
+Только после экрана победы, перед выбранной навигацией:
+
+- перед переходом к следующему уровню;
+- либо перед возвращением на карту / в Archive Hub.
+
+Выбор «Вернуться на карту» **не отменяет** поставленный interstitial: сначала
+выполняется попытка показа, затем навигация. Переходы в коллекцию и в отчёт
+кампании откладывают рекламу (pending сохраняется), а не отменяют её.
+
+## Условия подавления
+
+Реализованы в `resolveInterstitialDecision` (`src/shared/lib/adPolicy.ts`); каждое
+отправляет `interstitial_suppressed` с полем `reason`:
+
+- `no_forced_ads` — `saveData.purchases.noForcedInterstitials === true`;
+- `recent_rewarded` — rewarded был фактически показан менее 90 секунд назад;
+- `in_flight` — реклама уже обрабатывается;
+- `already_resolved` — этот completion/navigation action уже обработан;
+- `not_eligible` — нет поставленной рекламы либо игрок внутри gameplay.
+
+## Отказ платформы
+
+Если interstitial не был показан из-за `wasShown === false`, ошибки, offline или
+рекламного cooldown Яндекса:
+
+- навигация не блокируется;
+- состояние игры не меняется;
+- реклама не считается фактически показанной;
+- следующая проверка происходит в следующей естественной точке после завершения
+  уровня; автоматических повторных вызовов нет.
+
+Защита от двойного запроса: `postLevelActionGuardRef` в `GameScreen`, флаг
+`interstitialRuntime.nativeRequestInFlight` и ordinal-леджер `lastResolvedToken`.
 
 Никогда не вызывать:
 
@@ -166,68 +229,119 @@ Implementation note: current build queues forced interstitials after every third
 
 # 5. IAP-каталог
 
-## Product: archive_supporter_pack
+Каталог из трёх товаров. Идентификаторы и стартовые цены **создаются вручную в
+Yandex Developer Console**; приложение их не хардкодит. Цены, обозначение валюты и
+иконка валюты в UI приходят исключительно из `payments.getCatalog()`.
 
-Тип: non-consumable.
+| Product ID             | Тип                     | Стартовая цена (гипотеза для консоли) |
+| ---------------------- | ----------------------- | ------------------------------------- |
+| `no_forced_ads`        | non-consumable          | 99 ЯН                                 |
+| `magnifiers_10`        | consumable              | 29 ЯН                                 |
+| `archive_starter_pack` | non-consumable, one-off | 129 ЯН                                |
 
-Русское название: «Архивный набор».
+## Product: no_forced_ads
 
-Содержимое:
+Содержимое: навсегда отключает все принудительные interstitial — и campaign, и
+Daily. Добровольные rewarded остаются доступны.
 
-- entitlement `no_forced_ads`;
-- 10 луп однократно;
-- entitlement `exclusive_archive_frame`.
+Названия в интерфейсе (не «Убрать всю рекламу»):
 
-Описание должно ясно сообщать:
+- RU: «Без принудительной рекламы»;
+- EN: «No forced ads».
 
-- принудительные внутриигровые объявления отключаются;
-- добровольные rewarded-подсказки остаются;
-- бонус луп выдаётся один раз.
-
-Стартовая ценовая гипотеза в Developer Console: 99 единиц портальной валюты.
-
-Это только гипотеза. UI обязан получать:
-
-- title;
-- description;
-- price;
-- priceCurrencyCode;
-- currency icon
-
-через `payments.getCatalog()`.
+Описание RU: «Убирает рекламу между уровнями. Добровольные награды за рекламу
+останутся доступны.»
 
 ## Product: magnifiers_10
 
-Тип: consumable.
+Consumable. Содержимое: 10 луп. Покупка может совершаться повторно.
 
-Русское название: «Набор из 10 луп».
+## Product: archive_starter_pack
 
-Содержимое: 10 луп.
+Одноразовый non-consumable набор: навсегда отключает принудительные interstitial
+и **один раз** начисляет 20 луп. Помечен бейджем «Лучший выбор» / «Best value».
+Без фальшивых таймеров, искусственной срочности и выдуманных скидок.
 
-Стартовая ценовая гипотеза: 29 единиц портальной валюты.
+- если `no_forced_ads` уже куплен — набор скрывается, чтобы игрок не заплатил
+  повторно за уже имеющееся преимущество;
+- если куплен набор — отдельный `no_forced_ads` отображается как «Уже приобретено»,
+  а принудительная реклама отключена;
+- бонус 20 луп начисляется только один раз: последующие `getPurchases()` лишь
+  восстанавливают entitlement `noForcedInterstitials` (защита —
+  `purchases.grantedOneTimeProductIds`).
 
-Порядок обработки:
+## Порядок обработки покупки
 
-1. `payments.purchase({ id: 'magnifiers_10' })`;
-2. добавить grant в PlayerSave;
-3. выполнить `player.setData(save, true)`;
-4. обновить локальное зеркало;
-5. только после подтверждённого сохранения вызвать `consumePurchase(token)`;
-6. при ошибке consumption повторить обработку на следующем запуске без повторной выдачи.
+Реализация: `src/services/platform/purchaseService.ts`. UI никогда не вызывает
+`ysdk.getPayments()`, `getCatalog()`, `purchase()`, `getPurchases()` или
+`consumePurchase()` напрямую — всё идёт через `src/services/platform/payments.ts`.
 
-Для защиты от двойной выдачи save хранит `processedPurchaseTokens` или эквивалентный idempotency ledger.
+1. `payments.purchase({ id })`;
+2. проверить product ID и purchase token;
+3. проверить idempotency ledger (`purchases.processedPurchaseTokens`) и
+   `purchases.grantedOneTimeProductIds`;
+4. начислить лупы и entitlement в save;
+5. записать token в ledger **тем же изменением**, что и награду;
+6. выполнить облачное сохранение с flush и убедиться, что оно прошло
+   (`persistSave` возвращает `{ persisted }`);
+7. только после успешного сохранения вызвать `consumePurchase(token)` — для
+   consumable-товаров;
+8. ошибка consume не фатальна: ledger уже блокирует повторную выдачу, а следующий
+   startup recovery повторит consume.
+
+Ledger ограничен `PROCESSED_PURCHASE_TOKEN_LIMIT = 100`; обрезаются самые старые
+записи. Для non-consumable товаров дополнительной защитой служит
+`grantedOneTimeProductIds`, поэтому вытеснение старого токена не приводит к
+повторной выдаче. `productIds` **не** используется как единственная защита
+consumable-покупок.
+
+Параллельные покупки блокируются флагом `purchaseInFlight` в сервисе плюс
+локальным состоянием кнопки в модалке.
 
 ## Startup purchase recovery
 
-На каждом запуске:
+На каждом запуске после инициализации платформы (`recoverPurchases`):
 
 1. вызвать `payments.getPurchases()`;
 2. восстановить non-consumable entitlements;
-3. найти unprocessed consumables;
-4. проверить idempotency ledger;
-5. при необходимости выдать grant и сохранить cloud;
-6. consume purchase;
-7. логировать результат.
+3. найти необработанные consumable-покупки;
+4. идемпотентно начислить их;
+5. сохранить данные с flush;
+6. consume только после успешного сохранения;
+7. логировать результат (`purchase_recovered`).
+
+Покупка доступна и неавторизованному игроку. Ошибки авторизации, закрытие окна,
+недостаток средств и отсутствие Payments API обрабатываются без падения игры:
+магазин показывает «Платежи сейчас недоступны» либо ошибку с кнопкой повтора.
+
+## Save-поля
+
+```jsonc
+"purchases": {
+  "noForcedInterstitials": false,
+  "productIds": [],
+  "processedPurchaseTokens": [],   // idempotency ledger, максимум 100 токенов
+  "grantedOneTimeProductIds": []   // одноразовые payload'ы, например бонус набора
+}
+```
+
+Существующие `noForcedInterstitials` и `productIds` сохранены и мигрируют без
+потерь. Новые поля добавлены через `.default([])`, поэтому `SAVE_VERSION` остаётся
+`3` и старые сохранения не сбрасываются.
+
+## Магазин
+
+Кнопка «Магазин» / «Shop» находится в верхней панели Archive Hub рядом с балансом
+луп (touch target 44x44, работает в mobile landscape и на desktop). Она открывает
+модалку «Архивная лавка» / «Archive Shop», собранную из существующих токенов
+проекта: те же градиенты, рамки, радиусы, тени и `game-pop` анимация, что и у
+остальных модалок. Модалка содержит заголовок, текущий баланс луп, три карточки
+товаров, кнопку закрытия и состояния loading / недоступности платежей / ошибки /
+выполняющейся покупки / подтверждения успеха.
+
+Интерфейсные строки, статусы и бейджи живут в `shop.*` в обеих локалях. Названия и
+описания товаров берутся из i18n, чтобы RU и EN гарантированно совпадали с
+требованиями; цена, код валюты и изображение приходят из каталога.
 
 ## No-ads semantics
 
@@ -242,45 +356,64 @@ Implementation note: current build queues forced interstitials after every third
 
 # 6. Аналитика монетизации
 
-События:
+Единый типизированный источник истины по именам событий —
+`src/services/analytics/eventRegistry.ts`. Полный список с payload'ами и
+placement'ами описан в `ANALYTICS_EVENTS.md`; ниже только монетизационный срез.
 
-- monetization_offer_view;
-- rewarded_request;
-- rewarded_open;
-- rewarded_reward_granted;
-- rewarded_close_without_reward;
-- rewarded_error;
-- interstitial_eligible;
-- interstitial_request;
-- interstitial_open;
-- interstitial_close;
-- interstitial_error;
-- shop_open;
-- product_view;
-- purchase_start;
-- purchase_cancel;
-- purchase_success;
-- purchase_grant_saved;
-- purchase_consumed;
-- purchase_recovery_start;
-- purchase_recovery_success;
-- purchase_recovery_error;
-- no_ads_entitlement_restored.
+Rewarded (общий для всех placement'ов, каждое событие несёт `placement` и `wasShown`):
 
-Параметры:
+- `rewarded_offer_opened`;
+- `rewarded_requested`;
+- `rewarded_opened`;
+- `rewarded_rewarded`;
+- `rewarded_closed`;
+- `rewarded_failed`.
 
-- placement;
-- productId;
-- levelId;
-- sessionDuration;
-- completedLevels;
-- magnifierBalanceBefore;
-- magnifierBalanceAfter;
-- platformMode;
-- locale;
-- deviceCategory.
+Legacy-воронка area hint (`rewarded_hint_*`) продолжает отправляться параллельно,
+чтобы не ломать существующие дашборды.
 
-Не отправлять персональные данные.
+Interstitial:
+
+- `interstitial_eligible`;
+- `interstitial_request`;
+- `interstitial_open`;
+- `interstitial_close`;
+- `interstitial_error`;
+- `interstitial_suppressed` с `reason`: `no_forced_ads`, `recent_rewarded`,
+  `in_flight`, `already_resolved`, `not_eligible`.
+
+Daily:
+
+- `daily_reward_claimed` (streak, без луп);
+- `daily_ad_reward_offered`;
+- `daily_ad_reward_granted`;
+- `daily_ad_reward_declined`.
+
+Магазин и покупки:
+
+- `shop_opened`;
+- `shop_closed`;
+- `shop_catalog_loaded`;
+- `shop_catalog_failed`;
+- `purchase_requested`;
+- `purchase_succeeded`;
+- `purchase_cancelled`;
+- `purchase_failed`;
+- `purchase_reward_granted`;
+- `purchase_consumed`;
+- `purchase_recovered`;
+- `purchase_already_owned`.
+
+Placement'ы: `campaign_every_two_levels`, `daily_reward`,
+`daily_exit_interstitial`, `timeout_extension`, `area_hint_rewarded`
+(`src/shared/lib/adPolicy.ts`).
+
+Параметры, где уместно: `placement`, `productId`, `priceValue`,
+`priceCurrencyCode`, `source`, `magnifiersBefore`, `magnifiersAfter`, `resultType`
+или безопасная категория ошибки, `levelId`, `completedLevels`, `wasShown`.
+
+Не отправлять персональные данные. **Purchase token и другие чувствительные
+данные в аналитику не попадают.**
 
 ---
 

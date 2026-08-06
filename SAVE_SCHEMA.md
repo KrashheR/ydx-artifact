@@ -2,7 +2,7 @@
 
 Version: `3`
 
-Stored fields: completed levels, best results, in-progress level, magnifiers, artifacts, viewed campaign reports, daily streak, settings, review prompt state and purchase flags. Runtime validation and migration are in `src/entities/save/schema.ts`.
+Stored fields: completed levels, best results, in-progress level, magnifiers, artifacts, viewed campaign reports, daily streak and daily ad-reward date, settings, review prompt state, and purchase flags including the idempotency ledger. Runtime validation and migration are in `src/entities/save/schema.ts`.
 
 Storage flow:
 
@@ -12,7 +12,7 @@ Storage flow:
 - Cloud load has a 4-second timeout. If cloud is unavailable, gameplay continues from the local mirror or a default save.
 - Frequent gameplay progress can use non-flushing cloud writes; important milestones and lifecycle exits request `flush: true`.
 - Replaying a completed level updates `bestResults[levelId]` only when the new attempt is better: higher star count from accuracy wins first, then higher accuracy, then shorter duration. Worse replays do not downgrade saved stars.
-- Daily Archive completions use standalone `daily-archive-*` level ids for in-progress and best-result data, but they do not append to campaign `completedLevels`, do not unlock campaign artifacts/reports/levels, and do not queue campaign review or interstitial checks. The daily reward path grants `+1` magnifier, records `daily.lastClaimDate`, and maintains `daily.streak` as consecutive calendar days (a missed day resets it to `1`).
+- Daily Archive completions use standalone `daily-archive-*` level ids for in-progress and best-result data, but they do not append to campaign `completedLevels`, do not unlock campaign artifacts/reports/levels, and do not queue campaign review or interstitial checks. Completing a Daily records `daily.lastClaimDate` and maintains `daily.streak` as consecutive calendar days (a missed day resets it to `1`) but grants no magnifier. The single daily magnifier is rewarded-video only: it is granted once per calendar date and stamped into `daily.lastAdRewardDate`.
 - Version `3` persists the analytics attempt envelope in `inProgress`: `attemptId`, per-level `attemptNumber`, mode/start timestamps, terminal marker, onboarding flag, active-time baseline, monotonic `elapsedActiveSeconds`, `timeGrantedSeconds`, mistakes, hint/difference ids, rewarded hints and time-extension count. `levelAttemptCounts` keeps attempt numbering stable across completed/restarted attempts.
 - Background/timeout attempts retain gameplay progress with a terminal marker. A later resume creates a new attempt ID/number and active-time baseline while preserving found differences and total active timer state. Restart creates an empty attempt.
 - Timer extensions add to `timeGrantedSeconds`; they never reduce `elapsedActiveSeconds`.

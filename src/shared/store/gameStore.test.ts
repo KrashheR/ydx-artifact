@@ -31,10 +31,13 @@ function resetStore() {
       nativeRequestInFlight: false,
     },
     interstitialRuntime: {
-      pendingMapCheckCompletedLevels: null,
-      lastResolvedCompletedLevels: 0,
+      campaignCompletions: 0,
+      completionsSinceLastAd: 0,
+      pendingToken: null,
+      lastResolvedToken: 0,
       nativeRequestInFlight: false,
     },
+    adRuntime: { lastRewardedShownAt: null },
     artifactRevealQueue: [],
   });
 }
@@ -153,10 +156,12 @@ describe("gameStore analytics", () => {
     useGameStore.getState().completeLevel(dailyLevel.id, 75, "daily");
 
     expect(useGameStore.getState().saveData.completedLevels).toEqual([]);
-    expect(useGameStore.getState().saveData.magnifiers).toBe(1);
+    // Daily no longer hands out a free magnifier: only the rewarded video does.
+    expect(useGameStore.getState().saveData.magnifiers).toBe(0);
     expect(useGameStore.getState().saveData.daily).toMatchObject({
       lastClaimDate: expect.any(String),
       streak: 1,
+      lastAdRewardDate: null,
     });
     expect(
       window.__artifactAnalyticsEvents?.some(
@@ -165,14 +170,30 @@ describe("gameStore analytics", () => {
     ).toBe(false);
   });
 
-  it("adds daily reward magnifiers without a maximum cap", () => {
+  it("records the daily streak without granting a magnifier", () => {
     useGameStore.setState((state) => ({
       saveData: { ...state.saveData, magnifiers: 99 },
     }));
 
     useGameStore.getState().claimDailyReward("2026-07-07");
 
-    expect(useGameStore.getState().saveData.magnifiers).toBe(100);
+    expect(useGameStore.getState().saveData.magnifiers).toBe(99);
+    expect(useGameStore.getState().saveData.daily.streak).toBe(1);
+  });
+
+  it("grants the rewarded daily magnifier exactly once per calendar date", () => {
+    useGameStore.setState((state) => ({
+      saveData: { ...state.saveData, magnifiers: 0 },
+    }));
+
+    expect(useGameStore.getState().grantDailyAdReward("2026-07-07")).toBe(true);
+    expect(useGameStore.getState().saveData.magnifiers).toBe(1);
+
+    expect(useGameStore.getState().grantDailyAdReward("2026-07-07")).toBe(false);
+    expect(useGameStore.getState().saveData.magnifiers).toBe(1);
+
+    expect(useGameStore.getState().grantDailyAdReward("2026-07-08")).toBe(true);
+    expect(useGameStore.getState().saveData.magnifiers).toBe(2);
   });
 
   it("emits one terminal event and creates a new id for a restart", () => {
@@ -237,7 +258,11 @@ describe("gameStore analytics", () => {
     useGameStore.setState((state) => ({
       saveData: {
         ...state.saveData,
-        daily: { lastClaimDate: "2026-07-18", streak: 4 },
+        daily: {
+          lastClaimDate: "2026-07-18",
+          streak: 4,
+          lastAdRewardDate: null,
+        },
       },
     }));
 
@@ -247,42 +272,119 @@ describe("gameStore analytics", () => {
   });
 });
 
-describe("gameStore campaign hint rewards", () => {
+describe("gameStore magnifier economy", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     resetStore();
   });
 
-  it("adds one magnifier after every second newly completed campaign level", () => {
+  it("never grants magnifiers automatically for campaign completions", () => {
     const levels = getChapterLevels("northern-route");
     useGameStore.setState((state) => ({
       saveData: { ...state.saveData, magnifiers: 0 },
     }));
 
-    completeAttempt(levels[0].id, 0, 80);
-    expect(useGameStore.getState().saveData.magnifiers).toBe(0);
-
-    completeAttempt(levels[1].id, 0, 80);
-    expect(useGameStore.getState().saveData.magnifiers).toBe(1);
-
-    completeAttempt(levels[2].id, 0, 80);
-    expect(useGameStore.getState().saveData.magnifiers).toBe(1);
-
-    completeAttempt(levels[3].id, 0, 80);
-    expect(useGameStore.getState().saveData.magnifiers).toBe(2);
+    for (const level of levels.slice(0, 4)) {
+      completeAttempt(level.id, 0, 80);
+      expect(useGameStore.getState().saveData.magnifiers).toBe(0);
+    }
   });
 
-  it("does not grant the campaign cadence reward for replays", () => {
-    const levels = getChapterLevels("northern-route");
+  it("spends two magnifiers for a paid time extension", () => {
     useGameStore.setState((state) => ({
-      saveData: { ...state.saveData, magnifiers: 0 },
+      saveData: { ...state.saveData, magnifiers: 2 },
     }));
+
+    expect(useGameStore.getState().spendMagnifiers(2)).toBe(true);
+    expect(useGameStore.getState().saveData.magnifiers).toBe(0);
+    expect(useGameStore.getState().spendMagnifiers(2)).toBe(false);
+  });
+});
+
+describe("gameStore interstitial cadence", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    resetStore();
+  });
+
+  it("queues the first interstitial only after the second campaign completion", () => {
+    const levels = getChapterLevels("northern-route");
+
+    completeAttempt(levels[0].id, 0, 80);
+    expect(useGameStore.getState().interstitialRuntime.pendingToken).toBeNull();
+
+    completeAttempt(levels[1].id, 0, 80);
+    expect(useGameStore.getState().interstitialRuntime.pendingToken).toBe(2);
+  });
+
+  it("queues the next interstitial after two further completions", () => {
+    const levels = getChapterLevels("northern-route");
 
     completeAttempt(levels[0].id, 0, 80);
     completeAttempt(levels[1].id, 0, 80);
-    completeAttempt(levels[1].id, 0, 70);
+    useGameStore.getState().setInterstitialResolved(2);
 
-    expect(useGameStore.getState().saveData.magnifiers).toBe(1);
+    completeAttempt(levels[2].id, 0, 80);
+    expect(useGameStore.getState().interstitialRuntime.pendingToken).toBeNull();
+
+    completeAttempt(levels[3].id, 0, 80);
+    expect(useGameStore.getState().interstitialRuntime.pendingToken).toBe(4);
+  });
+
+  it("keeps a deferred ad and the next scheduled one two completions apart", () => {
+    const levels = getChapterLevels("northern-route");
+
+    completeAttempt(levels[0].id, 0, 80);
+    completeAttempt(levels[1].id, 0, 80);
+    expect(useGameStore.getState().interstitialRuntime.pendingToken).toBe(2);
+
+    // The player detours into the collection, so the queued ad is postponed
+    // rather than cancelled and still pending after the next completion.
+    completeAttempt(levels[2].id, 0, 80);
+    expect(useGameStore.getState().interstitialRuntime.pendingToken).toBe(2);
+
+    // It resolves at that exit; the cadence restarts from there.
+    useGameStore.getState().setInterstitialResolved(2);
+
+    completeAttempt(levels[3].id, 0, 80);
+    expect(useGameStore.getState().interstitialRuntime.pendingToken).toBeNull();
+
+    completeAttempt(levels[4].id, 0, 80);
+    expect(useGameStore.getState().interstitialRuntime.pendingToken).toBe(5);
+  });
+
+  it("counts campaign replays towards the cadence", () => {
+    const levels = getChapterLevels("northern-route");
+
+    completeAttempt(levels[0].id, 0, 80);
+    completeAttempt(levels[0].id, 0, 70);
+
+    expect(useGameStore.getState().interstitialRuntime).toMatchObject({
+      campaignCompletions: 2,
+      completionsSinceLastAd: 2,
+      pendingToken: 2,
+    });
+  });
+
+  it("ignores unfinished attempts and daily completions", () => {
+    const levels = getChapterLevels("northern-route");
+    const dailyLevel = dailyArchiveLevels[0];
+
+    completeAttempt(levels[0].id, 0, 80);
+
+    useGameStore.getState().startLevel(levels[1].id, "campaign");
+    useGameStore.getState().endLevelAttempt(levels[1].id, "timeout");
+    useGameStore.getState().startLevel(levels[1].id, "campaign");
+    useGameStore.getState().endLevelAttempt(levels[1].id, "explicit_exit");
+
+    useGameStore.getState().startLevel(dailyLevel.id, "daily");
+    useGameStore.getState().completeLevel(dailyLevel.id, 60, "daily");
+
+    expect(useGameStore.getState().interstitialRuntime).toMatchObject({
+      campaignCompletions: 1,
+      completionsSinceLastAd: 1,
+      pendingToken: null,
+    });
   });
 });
 

@@ -95,16 +95,76 @@ extensions increment `timeGrantedSeconds`; they never subtract active duration.
 | `artifact_toast_shown`               | Difference-linked artifact toast shown.                             |
 | `daily_opened`                       | Daily hub entry exposed/opened.                                     |
 | `daily_start_clicked`                | Daily case start clicked.                                           |
-| `daily_reward_claimed`               | Daily completion/reward; `streak` is consecutive calendar days.     |
+| `daily_reward_claimed`               | Daily completion; `streak` is consecutive calendar days. Grants no magnifier. |
+| `daily_ad_reward_offered`            | Rewarded Daily magnifier offer shown on the victory overlay.        |
+| `daily_ad_reward_granted`            | Rewarded Daily magnifier granted; once per calendar date.           |
+| `daily_ad_reward_declined`           | Player finished the Daily without a reward, or a duplicate grant was blocked. |
 | `magnifiers_spent`                   | Hint currency spend.                                                |
 
 ## Ads and reviews
 
-Rewarded funnel: `rewarded_hint_offer_opened`, `rewarded_hint_requested`,
-`rewarded_hint_rewarded`, `rewarded_hint_closed`, `rewarded_hint_failed`.
+### Placements
 
-Interstitial funnel: `interstitial_eligible`, `interstitial_request`,
-`interstitial_open`, `interstitial_close`, `interstitial_error`.
+Every ad event carries a `placement` discriminator. Valid values live in
+`src/shared/lib/adPolicy.ts`:
+
+| Placement                  | Type         | Trigger                                            |
+| -------------------------- | ------------ | -------------------------------------------------- |
+| `campaign_every_two_levels`| interstitial | Every second completed campaign level (replays included). |
+| `daily_exit_interstitial`  | interstitial | Player finished the Daily without taking the reward. |
+| `daily_reward`             | rewarded     | Optional +1 magnifier on the first Daily win of the date. |
+| `timeout_extension`        | rewarded     | Optional +60 s after the timer ran out.            |
+| `area_hint_rewarded`       | rewarded     | Optional area hint at a zero magnifier balance.    |
+
+### Rewarded funnel
+
+Shared across all rewarded placements: `rewarded_offer_opened`,
+`rewarded_requested`, `rewarded_opened`, `rewarded_rewarded`, `rewarded_closed`,
+`rewarded_failed`. Each carries `placement` and `wasShown`.
+
+The legacy area-hint funnel (`rewarded_hint_offer_opened`,
+`rewarded_hint_requested`, `rewarded_hint_rewarded`, `rewarded_hint_closed`,
+`rewarded_hint_failed`) still fires alongside it so existing dashboards keep
+working.
+
+### Interstitial funnel
+
+`interstitial_eligible`, `interstitial_request`, `interstitial_open`,
+`interstitial_close`, `interstitial_error`, `interstitial_suppressed`.
+`interstitial_open` and `interstitial_close` carry `wasShown`; Yandex reports
+`wasShown: false` when it declines the request (frequency cap, offline).
+
+`interstitial_suppressed` carries a `reason`:
+
+| Reason             | Meaning                                                    |
+| ------------------ | ---------------------------------------------------------- |
+| `no_forced_ads`    | `purchases.noForcedInterstitials` is set.                  |
+| `recent_rewarded`  | A rewarded video opened less than 90 s ago.                |
+| `in_flight`        | Another ad request is already running.                     |
+| `already_resolved` | This completion's ad was already resolved.                 |
+| `not_eligible`     | No queued ad, or the request landed during active gameplay. |
+
+### Purchases
+
+| Event                     | Meaning                                                            |
+| ------------------------- | ------------------------------------------------------------------ |
+| `shop_opened`             | Archive Shop modal opened; `source`, `magnifiers`.                 |
+| `shop_closed`             | Modal closed.                                                       |
+| `shop_catalog_loaded`     | `getCatalog()` returned; `productCount`, `productIds`.             |
+| `shop_catalog_failed`     | Catalog load failed; safe `errorKind` only.                        |
+| `purchase_requested`      | `productId`, `source`, `priceValue`, `priceCurrencyCode`, `magnifiersBefore`. |
+| `purchase_succeeded`      | Purchase completed; `resultType` is `granted` or `already_owned`.  |
+| `purchase_cancelled`      | Player closed the payment window.                                   |
+| `purchase_failed`         | `resultType` (`purchase_error`, `not_persisted`, `consume_failed`, `invalid_receipt`) and safe `errorKind`. |
+| `purchase_reward_granted` | Reward written to the save; `magnifiersBefore`, `magnifiersAfter`. |
+| `purchase_consumed`       | `consumePurchase()` succeeded after a durable save.                |
+| `purchase_recovered`      | Startup reconciliation processed a purchase; `resultType`.         |
+| `purchase_already_owned`  | Idempotency ledger blocked a duplicate grant.                      |
+
+Purchase tokens are never sent. Prices come from the catalog and are reported as
+`priceValue` plus `priceCurrencyCode`.
+
+### Review funnel
 
 Review funnel: `review_prompt_eligible`, `review_prompt_shown`,
 `review_prompt_review_clicked`, `review_prompt_later_clicked`,

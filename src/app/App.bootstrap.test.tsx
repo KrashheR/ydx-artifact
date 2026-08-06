@@ -146,6 +146,7 @@ describe("App bootstrap", () => {
           hintedDifferenceIds: [],
           rewardedHintsUsed: 0,
           timeExtensionsUsed: 0,
+          rewardedTimeExtensionUsed: false,
         },
       },
     });

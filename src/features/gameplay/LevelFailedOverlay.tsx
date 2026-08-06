@@ -5,6 +5,10 @@ type Props = {
   level: LevelDefinition;
   found: number;
   canExtend: boolean;
+  /** False once the single rewarded extension of this attempt was used. */
+  canRewardedExtend: boolean;
+  rewardedStatus: "idle" | "loading" | "failed";
+  onRewardedExtend: () => void;
   onRetry: () => void;
   onExtend: () => void;
   onMap: () => void;
@@ -14,9 +18,21 @@ type Props = {
 const statCard = "result-stat-card flex flex-1 flex-col items-center rounded-xl border border-exp-parch/[.12] py-4";
 const statLabel = "mt-[5px] text-[9.5px] font-semibold tracking-[.14em] text-exp-muted";
 
-export function LevelFailedOverlay({ level, found, canExtend, onRetry, onExtend, onMap, mapLabel }: Props) {
+export function LevelFailedOverlay({
+  level,
+  found,
+  canExtend,
+  canRewardedExtend,
+  rewardedStatus,
+  onRewardedExtend,
+  onRetry,
+  onExtend,
+  onMap,
+  mapLabel
+}: Props) {
   const { t } = useTranslation();
   const remaining = level.requiredDifferences - found;
+  const rewardedLoading = rewardedStatus === "loading";
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center p-3">
@@ -114,37 +130,75 @@ export function LevelFailedOverlay({ level, found, canExtend, onRetry, onExtend,
             </div>
           </div>
 
-          <button
-            onClick={onRetry}
-            className="result-primary flex w-full items-center justify-center gap-[9px] rounded-[10px] border-none py-[17px] text-[16px] font-bold text-[#1a130a]"
-            style={{
-              background: "linear-gradient(180deg, #d8af63, #b3812f)",
-              boxShadow: "0 12px 28px rgba(184,138,69,.32), inset 0 1px 0 rgba(255,255,255,.3)"
-            }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a130a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
-              <path d="M3 3v5h5" />
-            </svg>
-            {t("game.retryAgain")}
-          </button>
+          {rewardedStatus === "failed" && (
+            <p className="mb-3 text-[12.5px] font-semibold leading-[1.45]" style={{ color: "#e08a78" }}>
+              {t("game.rewardedExtendFailed")}
+            </p>
+          )}
 
-          <div className="result-actions mt-[11px] flex gap-[11px]">
+          {canRewardedExtend ? (
+            <button
+              onClick={onRewardedExtend}
+              disabled={rewardedLoading}
+              className="result-primary flex min-h-[52px] w-full items-center justify-center gap-[9px] rounded-[10px] border-none px-4 py-[15px] text-center text-[15px] font-bold leading-[1.2] text-[#1a130a] disabled:opacity-60"
+              style={{
+                background: "linear-gradient(180deg, #d8af63, #b3812f)",
+                boxShadow: "0 12px 28px rgba(184,138,69,.32), inset 0 1px 0 rgba(255,255,255,.3)"
+              }}
+            >
+              <svg className="shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a130a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="3" y="6" width="18" height="12" rx="2" />
+                <path d="m10 9 5 3-5 3V9Z" fill="#1a130a" stroke="none" />
+              </svg>
+              {rewardedLoading
+                ? t("game.rewardedHintLoading")
+                : rewardedStatus === "failed"
+                  ? t("game.rewardedExtendRetry")
+                  : t("game.rewardedExtend")}
+            </button>
+          ) : (
+            <button
+              onClick={onRetry}
+              className="result-primary flex w-full items-center justify-center gap-[9px] rounded-[10px] border-none py-[17px] text-[16px] font-bold text-[#1a130a]"
+              style={{
+                background: "linear-gradient(180deg, #d8af63, #b3812f)",
+                boxShadow: "0 12px 28px rgba(184,138,69,.32), inset 0 1px 0 rgba(255,255,255,.3)"
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a130a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+                <path d="M3 3v5h5" />
+              </svg>
+              {t("game.retryAgain")}
+            </button>
+          )}
+
+          <div className="result-actions mt-[11px] flex flex-wrap gap-[11px]">
             <button
               onClick={onExtend}
-              disabled={!canExtend}
-              className="flex flex-1 items-center justify-center gap-[7px] rounded-[10px] py-3 text-[13.5px] font-semibold disabled:opacity-40"
+              disabled={!canExtend || rewardedLoading}
+              className="flex min-h-[44px] flex-1 basis-[45%] items-center justify-center gap-[7px] rounded-[10px] px-3 py-3 text-center text-[13px] font-semibold leading-[1.25] disabled:opacity-40"
               style={{ border: "1px solid rgba(184,138,69,.4)", background: "rgba(184,138,69,.08)", color: "#d8af63" }}
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+              <svg className="shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
                 <path d="M12 8v5l3 1.5" />
                 <circle cx="12" cy="12" r="9" />
               </svg>
-              {t("game.extendTime")}
+              {t("game.extendTimeForMagnifiers")}
             </button>
+            {canRewardedExtend && (
+              <button
+                onClick={onRetry}
+                disabled={rewardedLoading}
+                className="min-h-[44px] flex-1 basis-[45%] rounded-[10px] border border-exp-parch/[.14] bg-transparent px-3 py-3 text-center text-[13px] font-semibold leading-[1.25] text-exp-parch disabled:opacity-40"
+              >
+                {t("game.retryAgain")}
+              </button>
+            )}
             <button
               onClick={onMap}
-              className="flex-1 rounded-[10px] border border-exp-parch/[.14] bg-transparent py-3 text-[13.5px] font-semibold text-exp-parch"
+              disabled={rewardedLoading}
+              className="min-h-[44px] flex-1 basis-[45%] rounded-[10px] border border-exp-parch/[.14] bg-transparent px-3 py-3 text-center text-[13px] font-semibold leading-[1.25] text-exp-parch disabled:opacity-40"
             >
               {mapLabel ?? t("game.toMap")}
             </button>

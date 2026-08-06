@@ -18,6 +18,15 @@ type Props = {
   onMap: () => void;
   isDaily?: boolean;
   returnLabel?: string;
+  /**
+   * Present only for the first Daily completion of a calendar date. Replaces
+   * the fixed reward banner with an explicit rewarded-video choice.
+   */
+  dailyRewardOffer?: {
+    status: "idle" | "loading" | "failed" | "granted";
+    onWatchAd: () => void;
+    onFinishWithoutReward: () => void;
+  } | null;
 };
 
 function formatTime(s: number) {
@@ -47,9 +56,10 @@ const secondaryBtn = "flex-1 rounded-[10px] border border-exp-parch/[.14] bg-tra
 export function LevelCompleteOverlay({
   level, chapter, found, required, mistakes, elapsedSeconds,
   completedLevelIds, nextLevelOrder, nextLevelTitle, onNext, onRetry, onMap,
-  isDaily = false, returnLabel
+  isDaily = false, returnLabel, dailyRewardOffer = null
 }: Props) {
   const { t } = useTranslation();
+  const rewardLoading = dailyRewardOffer?.status === "loading";
   const accuracy = found / Math.max(found + mistakes, 1);
   const stars = starsForAccuracy(accuracy);
   const chapterDone = isDaily
@@ -154,7 +164,74 @@ export function LevelCompleteOverlay({
             </div>
           </div>
 
-          {isDaily && (
+          {isDaily && dailyRewardOffer && (
+            <div
+              className="mb-6 rounded-xl border border-exp-brass/[.35] px-4 py-4 text-left"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(184,138,69,.16), rgba(184,138,69,.06))"
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <span
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
+                  style={{
+                    background: "radial-gradient(circle at 40% 34%, #d8af63, #8e642c 72%)",
+                    boxShadow: "0 8px 22px rgba(0,0,0,.35)"
+                  }}
+                  aria-hidden="true"
+                >
+                  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#1a130a" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 18h6M10 21h4" />
+                    <path d="M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3Z" />
+                  </svg>
+                </span>
+                <div className="min-w-0">
+                  <div className="text-[13px] font-bold text-exp-brass2">
+                    {dailyRewardOffer.status === "granted"
+                      ? t("game.dailyRewardGranted")
+                      : t("game.dailyRewardOfferTitle")}
+                  </div>
+                  <div className="mt-0.5 text-[12px] font-semibold leading-[1.4] text-exp-muted">
+                    {dailyRewardOffer.status === "failed"
+                      ? t("game.dailyRewardFailed")
+                      : t("game.dailyRewardOfferBody")}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-col gap-2">
+                <button
+                  onClick={dailyRewardOffer.onWatchAd}
+                  disabled={rewardLoading || dailyRewardOffer.status === "granted"}
+                  className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[10px] border-none px-4 py-3 text-center text-[14px] font-bold leading-[1.2] text-[#1a130a] disabled:opacity-60"
+                  style={{
+                    background: "linear-gradient(180deg, #d8af63, #b3812f)",
+                    boxShadow: "0 12px 28px rgba(184,138,69,.32), inset 0 1px 0 rgba(255,255,255,.3)"
+                  }}
+                >
+                  <svg className="shrink-0" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a130a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <rect x="3" y="6" width="18" height="12" rx="2" />
+                    <path d="m10 9 5 3-5 3V9Z" fill="#1a130a" stroke="none" />
+                  </svg>
+                  {rewardLoading
+                    ? t("game.rewardedHintLoading")
+                    : dailyRewardOffer.status === "failed"
+                      ? t("game.dailyRewardRetry")
+                      : t("game.dailyRewardWatchAd")}
+                </button>
+                <button
+                  onClick={dailyRewardOffer.onFinishWithoutReward}
+                  disabled={rewardLoading}
+                  className="min-h-[44px] w-full rounded-[10px] border border-exp-parch/[.14] bg-transparent px-4 py-3 text-center text-[13px] font-semibold leading-[1.25] text-exp-parch disabled:opacity-45"
+                >
+                  {t("game.dailyRewardSkip")}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {isDaily && !dailyRewardOffer && (
             <div
               className="mb-6 flex items-center justify-center gap-3 rounded-xl border border-exp-brass/[.35] px-4 py-3 text-left"
               style={{

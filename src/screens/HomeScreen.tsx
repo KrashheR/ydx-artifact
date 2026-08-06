@@ -11,6 +11,7 @@ import {
   getDailyArchiveEntryForDate,
 } from "@/content/dailyArchive";
 import { getChapterPreviewAsset } from "@/content/sceneAssets";
+import { ShopModal } from "@/features/shop/ShopModal";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
 import { useGameStore } from "@/shared/store/gameStore";
 
@@ -328,14 +329,35 @@ function SecondaryButton({
   );
 }
 
+function ShopBagIcon({ size = 17 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 8h14l-1 12H6L5 8Z" />
+      <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+    </svg>
+  );
+}
+
 function TopBar({
   magnifiers,
   saveState,
   onOpenSettings,
+  onOpenShop,
 }: {
   magnifiers: number;
   saveState: "idle" | "saving" | "saved" | "local-only";
   onOpenSettings: () => void;
+  onOpenShop: () => void;
 }) {
   const { t } = useTranslation();
   const saveKey = saveState === "local-only" ? "localOnly" : saveState;
@@ -374,6 +396,22 @@ function TopBar({
             {t("homeHub.hintsShort")}
           </span>
         </div>
+        {/* Sits directly next to the magnifier balance: the shop is where that
+            balance is topped up, and it stays clear of the case/daily CTAs. */}
+        <button
+          type="button"
+          onClick={onOpenShop}
+          title={t("shop.openLabel")}
+          className="vfx-press inline-flex h-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center gap-2 rounded-[8px] px-2.5 text-[13px] font-bold text-[#1A130A] transition hover:brightness-105 active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-exp-brass sm:px-4"
+          style={{
+            background: "linear-gradient(180deg,#D8AF63,#B3812F)",
+            boxShadow:
+              "0 8px 18px rgba(184,138,69,.25), inset 0 1px 0 rgba(255,255,255,.3)",
+          }}
+        >
+          <ShopBagIcon />
+          <span className="hidden sm:inline">{t("shop.openLabel")}</span>
+        </button>
         <button
           type="button"
           onClick={onOpenSettings}
@@ -787,6 +825,7 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
   const daily = useGameStore((state) => state.saveData.daily);
   const magnifiers = useGameStore((state) => state.saveData.magnifiers);
   const saveStatus = useGameStore((state) => state.saveStatus);
+  const [isShopOpen, setIsShopOpen] = React.useState(false);
 
   const whiteProgress = getCampaignProgress(
     "northern-route",
@@ -980,6 +1019,7 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
         magnifiers={magnifiers}
         saveState={saveStatus}
         onOpenSettings={onOpenSettings}
+        onOpenShop={() => setIsShopOpen(true)}
       />
 
       <main className="home-hub-shell mx-auto flex h-[calc(100dvh-70px)] w-full max-w-[1440px] flex-col px-5 py-5 md:px-8 md:py-6">
@@ -1036,6 +1076,10 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings: () => void }) {
           />
         </div>
       </main>
+
+      {isShopOpen && (
+        <ShopModal source="home_hub" onClose={() => setIsShopOpen(false)} />
+      )}
     </div>
   );
 }

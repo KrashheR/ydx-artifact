@@ -19,6 +19,8 @@ import {
   trackAnalyticsEvent,
 } from "@/services/analytics/analytics";
 import { mockPlatform } from "@/services/platform/mockPlatform";
+import { recoverPurchases } from "@/services/platform/purchaseService";
+import { setPaymentsGatewayOverride } from "@/services/platform/payments";
 import {
   getIsPlatformPaused,
   notifyGameReady,
@@ -75,6 +77,19 @@ async function preloadCriticalImages() {
 
 async function waitForFonts() {
   await document.fonts?.ready;
+}
+
+/**
+ * Local development has no Yandex Payments API, so the shop would always render
+ * its "payments unavailable" state. In mock mode only, install the in-memory
+ * gateway. Production builds never reach this branch.
+ */
+async function installDevPaymentsMock() {
+  if (import.meta.env.VITE_PLATFORM_MODE !== "mock") return;
+  const { createMockPaymentsGateway } = await import(
+    "@/services/platform/mockPayments"
+  );
+  setPaymentsGatewayOverride(createMockPaymentsGateway());
 }
 
 function BootstrapScreen() {
@@ -223,6 +238,19 @@ export function App() {
       // so the three run in parallel instead of serially.
       const applyLocale = async () => {
         await hydrate();
+
+        // Purchase reconciliation runs after the save is in memory: it restores
+        // non-consumable entitlements and finishes any consumable that was paid
+        // for but never granted or never consumed. Never blocks the boot.
+        if (!cancelled) {
+          try {
+            await installDevPaymentsMock();
+            await recoverPurchases();
+          } catch {
+            // Payments are optional; a failure must not stop the game.
+          }
+        }
+
         const sdkLanguage = await mockPlatform.getEnvironmentLanguage();
         if (cancelled) return i18n.resolvedLanguage ?? i18n.language;
 

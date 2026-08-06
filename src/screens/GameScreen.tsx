@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getChapter, getLevelById } from "@/content/chapters";
-import { dailyArchiveLevels } from "@/content/dailyArchive";
+import {
+  dailyArchiveLevels,
+  getDailyArchiveDateKey,
+} from "@/content/dailyArchive";
 import { PhotoComparator } from "@/features/gameplay/PhotoComparator";
 import {
   ArtifactFoundToast,
@@ -21,6 +24,16 @@ import { runNativeReviewFlow } from "@/features/review/reviewFlow";
 import { isReviewPrePromptLocallyEligible } from "@/features/review/reviewPrompt";
 import { trackAnalyticsEvent } from "@/services/analytics/analytics";
 import { mockPlatform } from "@/services/platform/mockPlatform";
+import {
+  runInterstitial,
+  runRewardedAd,
+  trackRewardedOffer,
+} from "@/services/platform/adService";
+import {
+  MAGNIFIER_TIME_EXTENSION_COST,
+  MAGNIFIER_TIME_EXTENSION_SECONDS,
+  REWARDED_TIME_EXTENSION_SECONDS,
+} from "@/shared/lib/adPolicy";
 import {
   getIsPlatformPaused,
   setGameplayActive,
@@ -348,19 +361,14 @@ export function GameScreen({
   const endLevelAttempt = useGameStore((s) => s.endLevelAttempt);
   const recordHintUsed = useGameStore((s) => s.recordHintUsed);
   const grantLevelTime = useGameStore((s) => s.grantLevelTime);
+  const grantDailyAdReward = useGameStore((s) => s.grantDailyAdReward);
+  const markRewardedTimeExtensionUsed = useGameStore(
+    (s) => s.markRewardedTimeExtensionUsed,
+  );
   const reviewPromptRuntime = useGameStore((s) => s.reviewPromptRuntime);
   const interstitialRuntime = useGameStore((s) => s.interstitialRuntime);
   const clearPendingReviewPromptCheck = useGameStore(
     (s) => s.clearPendingReviewPromptCheck,
-  );
-  const clearPendingInterstitialCheck = useGameStore(
-    (s) => s.clearPendingInterstitialCheck,
-  );
-  const setInterstitialNativeRequestInFlight = useGameStore(
-    (s) => s.setInterstitialNativeRequestInFlight,
-  );
-  const setInterstitialResolved = useGameStore(
-    (s) => s.setInterstitialResolved,
   );
   const markReviewPromptShown = useGameStore((s) => s.markReviewPromptShown);
   const dismissReviewPrompt = useGameStore((s) => s.dismissReviewPrompt);
@@ -407,6 +415,12 @@ export function GameScreen({
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [isInterstitialActive, setIsInterstitialActive] = useState(false);
   const [postLevelActionInFlight, setPostLevelActionInFlight] = useState(false);
+  const [rewardedExtendStatus, setRewardedExtendStatus] = useState<
+    "idle" | "loading" | "failed"
+  >("idle");
+  const [dailyRewardStatus, setDailyRewardStatus] = useState<
+    "idle" | "loading" | "failed" | "granted"
+  >("idle");
   const [startupOnboardingOpen, setStartupOnboardingOpen] =
     useState(showOnboarding);
   const [artifactToast, setArtifactToast] =
@@ -424,6 +438,8 @@ export function GameScreen({
   const reviewCheckRunRef = useRef(0);
   const reviewSubmitGuardRef = useRef(false);
   const postLevelActionGuardRef = useRef(false);
+  const rewardedExtendGuardRef = useRef(false);
+  const dailyRewardGuardRef = useRef(false);
 
   const level = getLevelById(levelId);
   const chapter = level ? getChapter(level.chapterId) : null;
@@ -816,6 +832,34 @@ export function GameScreen({
     showComplete,
   ]);
 
+  // Daily reward offer exposure: once per completion overlay.
+  const dailyOfferTrackedRef = useRef(false);
+  useEffect(() => {
+    if (!showComplete || mode !== "daily") {
+      dailyOfferTrackedRef.current = false;
+      return;
+    }
+    if (
+      dailyOfferTrackedRef.current ||
+      saveData.daily.lastAdRewardDate === getDailyArchiveDateKey()
+    )
+      return;
+    dailyOfferTrackedRef.current = true;
+    trackAnalyticsEvent("daily_ad_reward_offered", {
+      levelId,
+      placement: "daily_reward",
+      date: getDailyArchiveDateKey(),
+      streak: saveData.daily.streak,
+    });
+    trackRewardedOffer("daily_reward", { levelId, mode });
+  }, [
+    levelId,
+    mode,
+    saveData.daily.lastAdRewardDate,
+    saveData.daily.streak,
+    showComplete,
+  ]);
+
   // Reveal ceremony analytics: once per queued artifact.
   const revealShownRef = useRef<string | null>(null);
   useEffect(() => {
@@ -873,6 +917,15 @@ export function GameScreen({
       ? (chapter.levels.find((l) => l.order === level.order + 1) ?? null)
       : null;
   const magnifiers = saveData.magnifiers;
+  const dailyDateKey = getDailyArchiveDateKey();
+  // The rewarded magnifier is once per calendar date and independent of the
+  // streak, so replaying an already-rewarded Daily shows the plain exit path.
+  const dailyRewardOffered =
+    mode === "daily" && saveData.daily.lastAdRewardDate !== dailyDateKey;
+  const rewardedExtensionUsed =
+    saveData.inProgress?.levelId === levelId
+      ? saveData.inProgress.rewardedTimeExtensionUsed
+      : false;
   const displayFoundIds = showComplete
     ? level.differences.map((d) => d.id)
     : liveFoundIds;
@@ -987,7 +1040,7 @@ export function GameScreen({
     }
 
     setRewardedHintModal("offer");
-    trackAnalyticsEvent("rewarded_hint_offer_opened", {
+    const offerPayload = {
       levelId,
       campaignId: level!.chapterId,
       levelOrder: level!.order,
@@ -995,7 +1048,9 @@ export function GameScreen({
       foundDifferences: liveFoundIds.length,
       mistakes: liveMistakes,
       elapsedActiveSeconds: liveElapsedActiveSeconds,
-    });
+    };
+    trackAnalyticsEvent("rewarded_hint_offer_opened", offerPayload);
+    trackRewardedOffer("area_hint_rewarded", offerPayload);
   }
 
   async function handleRewardedHintWatch() {
@@ -1023,7 +1078,12 @@ export function GameScreen({
       elapsedActiveSeconds: liveElapsedActiveSeconds,
     });
     try {
-      const result = await mockPlatform.showRewarded();
+      const result = await runRewardedAd("area_hint_rewarded", {
+        levelId,
+        campaignId: level!.chapterId,
+        levelOrder: level!.order,
+        mode,
+      });
       if (result === "rewarded") {
         revealNextAreaHint({
           spendMagnifier: false,
@@ -1065,94 +1125,67 @@ export function GameScreen({
     setFinalStats(null);
     setTimedOut(false);
     setHintId(undefined);
+    setRewardedExtendStatus("idle");
   }
 
-  async function showQueuedInterstitialBeforeNextLevel() {
-    const runtime = useGameStore.getState().interstitialRuntime;
-    const completedLevels = runtime.pendingMapCheckCompletedLevels;
-    if (completedLevels === null) return;
+  /**
+   * Single resolution point for the campaign cadence ad. Every post-victory
+   * exit (next level, back to map) funnels through it, so choosing "back to
+   * map" no longer cancels a queued interstitial — it only changes where the
+   * player lands afterwards. A suppressed, failed or offline ad never blocks
+   * the navigation that follows.
+   */
+  async function resolvePostVictoryInterstitial() {
+    const pendingToken =
+      useGameStore.getState().interstitialRuntime.pendingToken;
+    if (pendingToken === null) return;
 
-    if (saveData.purchases.noForcedInterstitials) {
-      clearPendingInterstitialCheck();
-      return;
-    }
-
-    if (
-      completedLevels % 3 !== 0 ||
-      completedLevels <= runtime.lastResolvedCompletedLevels
-    ) {
-      clearPendingInterstitialCheck();
-      return;
-    }
-
-    trackAnalyticsEvent("interstitial_eligible", {
-      ...postLevelPromptPayload,
-      completedLevels,
+    await runInterstitial({
+      placement: "campaign_every_two_levels",
+      token: pendingToken,
+      inGameplay: false,
+      adInFlight: isInterstitialActive,
+      payload: { ...postLevelPromptPayload, levelId, mode },
+      onOpen: () => setIsInterstitialActive(true),
+      onClose: () => setIsInterstitialActive(false),
     });
-    trackAnalyticsEvent("interstitial_request", {
-      ...postLevelPromptPayload,
-      completedLevels,
-    });
-    setInterstitialNativeRequestInFlight(true);
-
-    const result = await mockPlatform.showInterstitial({
-      onOpen: () => {
-        setIsInterstitialActive(true);
-        trackAnalyticsEvent("interstitial_open", {
-          ...postLevelPromptPayload,
-          completedLevels,
-        });
-      },
-      onClose: () => {
-        setIsInterstitialActive(false);
-        trackAnalyticsEvent("interstitial_close", {
-          ...postLevelPromptPayload,
-          completedLevels,
-        });
-      },
-      onError: () => {
-        setIsInterstitialActive(false);
-        trackAnalyticsEvent("interstitial_error", {
-          ...postLevelPromptPayload,
-          completedLevels,
-        });
-      },
-    });
-
-    if (result === "failed") {
-      setIsInterstitialActive(false);
-    }
-    setInterstitialResolved(completedLevels);
+    setIsInterstitialActive(false);
   }
 
-  async function handleNext() {
+  /** Shared double-click / rerender guard for post-victory navigation. */
+  async function runPostLevelAction(action: () => Promise<void> | void) {
     if (
-      !nextLevel ||
       postLevelActionGuardRef.current ||
       isReviewPromptOpen ||
       isSubmittingReview ||
-      interstitialRuntime.nativeRequestInFlight
+      useGameStore.getState().interstitialRuntime.nativeRequestInFlight
     )
       return;
 
     postLevelActionGuardRef.current = true;
     setPostLevelActionInFlight(true);
-    trackAnalyticsEvent("level_next_clicked", {
-      levelId,
-      nextLevelId: nextLevel.id,
-      campaignId: chapterId,
-      mode,
-    });
-    void save({ flush: true });
-
     try {
-      await showQueuedInterstitialBeforeNextLevel();
+      await action();
     } finally {
       postLevelActionGuardRef.current = false;
       setPostLevelActionInFlight(false);
     }
+  }
 
-    startLevel(nextLevel.id, "campaign");
+  async function handleNext() {
+    if (!nextLevel) return;
+
+    await runPostLevelAction(async () => {
+      trackAnalyticsEvent("level_next_clicked", {
+        levelId,
+        nextLevelId: nextLevel.id,
+        campaignId: chapterId,
+        mode,
+      });
+      void save({ flush: true });
+      await resolvePostVictoryInterstitial();
+      startLevel(nextLevel.id, "campaign");
+    });
   }
 
   function handleArtifactRevealContinue() {
@@ -1174,7 +1207,8 @@ export function GameScreen({
     });
     dismissArtifactReveal(pendingRevealArtifact.id);
     void save({ flush: true });
-    clearPendingInterstitialCheck();
+    // The queued interstitial stays pending: detouring into the collection
+    // should postpone the ad, not cancel it.
     clearPendingReviewPromptCheck();
     navigate({ kind: "collection" });
   }
@@ -1184,7 +1218,8 @@ export function GameScreen({
   ) {
     if (!campaignReport) return;
     markCampaignReportViewed(campaignReport.id);
-    clearPendingInterstitialCheck();
+    // Same as the artifact detour: the campaign report defers the ad instead
+    // of consuming its cadence slot.
     clearPendingReviewPromptCheck();
     trackAnalyticsEvent("campaign_report_cta_clicked", {
       campaignId: campaignReport.campaignId,
@@ -1226,13 +1261,99 @@ export function GameScreen({
     navigate({ kind: "map", chapterId });
   }
 
+  function navigateAwayFromLevel() {
+    navigate(mode === "daily" ? { kind: "home" } : { kind: "map", chapterId });
+  }
+
   function handleMap() {
     if (completionPending) return;
     void save({ flush: true });
-    clearPendingInterstitialCheck();
     clearPendingReviewPromptCheck();
-    if (!showComplete) endLevelAttempt(levelId, "explicit_exit");
-    navigate(mode === "daily" ? { kind: "home" } : { kind: "map", chapterId });
+
+    if (!showComplete) {
+      // Mid-level exit: forced ads never interrupt gameplay, and the queued
+      // completion (if any) stays pending for the next natural break.
+      endLevelAttempt(levelId, "explicit_exit");
+      navigateAwayFromLevel();
+      return;
+    }
+
+    if (mode === "daily") {
+      void handleDailyFinishWithoutReward();
+      return;
+    }
+
+    void runPostLevelAction(async () => {
+      await resolvePostVictoryInterstitial();
+      navigateAwayFromLevel();
+    });
+  }
+
+  async function handleDailyWatchRewardAd() {
+    if (dailyRewardGuardRef.current || !dailyRewardOffered) return;
+    dailyRewardGuardRef.current = true;
+    setDailyRewardStatus("loading");
+    void save({ flush: true });
+
+    try {
+      const result = await runRewardedAd("daily_reward", {
+        levelId,
+        mode,
+        streak: saveData.daily.streak,
+      });
+
+      if (result === "rewarded") {
+        const granted = grantDailyAdReward(dailyDateKey);
+        setDailyRewardStatus("granted");
+        if (!granted) {
+          trackAnalyticsEvent("daily_ad_reward_declined", {
+            levelId,
+            date: dailyDateKey,
+            reason: "already_granted",
+          });
+        }
+        // Rewarded and interstitial are never chained: return straight to the hub.
+        navigate({ kind: "home" });
+        return;
+      }
+
+      setDailyRewardStatus(result === "failed" ? "failed" : "idle");
+    } finally {
+      dailyRewardGuardRef.current = false;
+    }
+  }
+
+  async function handleDailyFinishWithoutReward() {
+    if (dailyRewardGuardRef.current) return;
+    dailyRewardGuardRef.current = true;
+
+    try {
+      // Only a real decline counts: replaying an already-rewarded Daily never
+      // rendered the choice, so it must not pollute the offer/conversion ratio.
+      if (dailyRewardOffered) {
+        trackAnalyticsEvent("daily_ad_reward_declined", {
+          levelId,
+          date: dailyDateKey,
+          reason: "player_declined",
+        });
+      }
+      void save({ flush: true });
+      await runInterstitial({
+        placement: "daily_exit_interstitial",
+        // Daily has its own rule and must not consume a campaign cadence slot.
+        token: null,
+        inGameplay: false,
+        adInFlight: isInterstitialActive,
+        payload: { levelId, mode, date: dailyDateKey },
+        onOpen: () => setIsInterstitialActive(true),
+        onClose: () => setIsInterstitialActive(false),
+      });
+    } finally {
+      setIsInterstitialActive(false);
+      dailyRewardGuardRef.current = false;
+      // Errors, offline and frequency caps must never strand the player here.
+      navigate({ kind: "home" });
+    }
   }
 
   function handleArchiveValidationLevel(nextLevelId: string) {
@@ -1311,10 +1432,17 @@ export function GameScreen({
     reviewSubmitGuardRef.current = false;
   }
 
-  function handleExtendTime() {
-    if (!spendMagnifiers(2)) return;
+  /**
+   * Resumes the timed-out attempt with extra time. The found differences,
+   * mistakes and elapsed time of the run are carried over by
+   * `resumeLevelAttempt`, so the player continues the same attempt.
+   */
+  function applyTimeExtension(seconds: number, source: "magnifier" | "rewarded") {
     resumeLevelAttempt(levelId);
-    grantLevelTime(levelId, 30);
+    grantLevelTime(levelId, seconds);
+    if (source === "rewarded") {
+      markRewardedTimeExtensionUsed(levelId);
+    }
     setTimedOut(false);
     timeoutTrackedRef.current = false;
     const attempt = useGameStore.getState().saveData.inProgress;
@@ -1322,13 +1450,53 @@ export function GameScreen({
       levelId,
       campaignId: chapterId,
       mode,
+      source,
       foundDifferences: liveFoundIds.length,
       mistakes: liveMistakes,
       elapsedActiveSeconds: liveElapsedActiveSeconds,
-      timerRemainingSeconds: 30,
+      timerRemainingSeconds: seconds,
       timeGrantedSeconds: attempt?.timeGrantedSeconds,
       attemptId: attempt?.attemptId,
     });
+  }
+
+  function handleExtendTime() {
+    if (!spendMagnifiers(MAGNIFIER_TIME_EXTENSION_COST)) return;
+    applyTimeExtension(MAGNIFIER_TIME_EXTENSION_SECONDS, "magnifier");
+  }
+
+  async function handleRewardedExtendTime() {
+    if (
+      rewardedExtendGuardRef.current ||
+      rewardedExtensionUsed ||
+      !timedOut ||
+      showComplete
+    )
+      return;
+
+    rewardedExtendGuardRef.current = true;
+    setRewardedExtendStatus("loading");
+    void save({ flush: true });
+
+    try {
+      const result = await runRewardedAd("timeout_extension", {
+        levelId,
+        campaignId: chapterId,
+        mode,
+        foundDifferences: liveFoundIds.length,
+      });
+
+      if (result === "rewarded") {
+        setRewardedExtendStatus("idle");
+        applyTimeExtension(REWARDED_TIME_EXTENSION_SECONDS, "rewarded");
+        return;
+      }
+
+      // Closing early grants nothing; a failure keeps the retry affordance.
+      setRewardedExtendStatus(result === "failed" ? "failed" : "idle");
+    } finally {
+      rewardedExtendGuardRef.current = false;
+    }
   }
 
   function handleStartOnboarding() {
@@ -1902,6 +2070,16 @@ export function GameScreen({
           onMap={handleMap}
           isDaily={mode === "daily"}
           returnLabel={mode === "daily" ? t("game.toArchiveHub") : undefined}
+          dailyRewardOffer={
+            dailyRewardOffered
+              ? {
+                  status: dailyRewardStatus,
+                  onWatchAd: () => void handleDailyWatchRewardAd(),
+                  onFinishWithoutReward: () =>
+                    void handleDailyFinishWithoutReward(),
+                }
+              : null
+          }
         />
       )}
 
@@ -1942,7 +2120,10 @@ export function GameScreen({
         <LevelFailedOverlay
           level={level}
           found={liveFoundIds.length}
-          canExtend={magnifiers >= 2}
+          canExtend={magnifiers >= MAGNIFIER_TIME_EXTENSION_COST}
+          canRewardedExtend={!rewardedExtensionUsed}
+          rewardedStatus={rewardedExtendStatus}
+          onRewardedExtend={() => void handleRewardedExtendTime()}
           onRetry={handleRetry}
           onExtend={handleExtendTime}
           onMap={handleMap}

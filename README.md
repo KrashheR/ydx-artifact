@@ -88,7 +88,7 @@ Production builds do not emit sourcemaps by default to keep the Yandex upload sm
 - First-run locale auto-detection through `ysdk.environment.i18n.lang`, with persisted manual RU/EN override.
 - Mock platform adapter and diagnostics copy.
 - Post-victory review pre-prompt wired to the Yandex Games feedback API seam with local dev mocks; the first prompt is eligible after the fourth newly completed campaign level.
-- Forced fullscreen interstitials are queued every third newly completed campaign level and shown only from the victory screen's next-level CTA, not when returning to the campaign map.
+- Forced fullscreen interstitials are queued after every second completed campaign level of the session (replays included) and shown from the victory screen before either navigation — next level or back to the map. They are suppressed by the `no_forced_ads` entitlement, by a rewarded video shown less than 90 seconds ago, and never interrupt gameplay.
 - Startup routing opens White Meridian level 01 with a soft investigation onboarding overlay only for a brand-new save; on phones, the compare-control choice follows the briefing before gameplay begins. Returning players start from the archive hub/main menu.
 - Privacy-safe attempt-level product analytics for activation, campaign exposure, gameplay outcomes, hints, ads, saves/scenes/errors, daily rewards and review prompts, with typed Yandex Metrica `reachGoal` registry and release gate.
 

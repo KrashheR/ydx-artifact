@@ -75,8 +75,15 @@
     "completedBadge": "LEVEL {{order}} COMPLETE",
     "completedTitle": "All differences found",
     "completedDesc": "The archive photo has been restored. One more edit is lifted from the route, and the case leads to the next expedition point.",
-    "dailyRewardTitle": "Daily reward: +1 hint",
-    "dailyRewardBody": "You won one hint for completing today's case.",
+    "dailyRewardTitle": "Daily case closed",
+    "dailyRewardBody": "Streak counted. Today's reward has already been collected.",
+    "dailyRewardOfferTitle": "Daily reward",
+    "dailyRewardOfferBody": "Watch a short video to get 1 magnifier. Your streak counts either way.",
+    "dailyRewardWatchAd": "Get 1 magnifier for an ad",
+    "dailyRewardSkip": "Finish without a reward",
+    "dailyRewardRetry": "Try the video again",
+    "dailyRewardFailed": "Ad unavailable. Try again or finish without a reward.",
+    "dailyRewardGranted": "Magnifier added",
     "statTime": "TIME",
     "statFound": "FOUND",
     "statRating": "RATING",
@@ -91,8 +98,11 @@
     "statRemaining": "REMAINING",
     "timerWarning": "Time remaining: {{seconds}} seconds.",
     "diffsOnLevel": "DIFFERENCES IN LEVEL",
-    "retryAgain": "Try Again",
-    "extendTime": "+30 sec"
+    "retryAgain": "Start Over",
+    "extendTimeForMagnifiers": "Extend for 2 magnifiers",
+    "rewardedExtend": "Ad → +60 seconds",
+    "rewardedExtendRetry": "Retry: ad → +60 seconds",
+    "rewardedExtendFailed": "Ad unavailable. Try again or choose another action."
   },
   "save": {
     "saved": "Saved",
@@ -724,7 +734,7 @@
     "daily": {
       "eyebrow": "DAILY ARCHIVE",
       "streak": "{{count}} DAYS",
-      "reward": "Reward: +1 hint",
+      "reward": "Ad reward: +1 magnifier",
       "claimed": "Daily archive already checked",
       "open": "Open",
       "claimedCta": "Collected"
@@ -795,6 +805,41 @@
       "available": "NEW EXPEDITION",
       "completed": "EXPEDITION COMPLETE",
       "locked": "LOCKED"
+    }
+  },
+  "shop": {
+    "openLabel": "Shop",
+    "title": "Archive Shop",
+    "eyebrow": "EXPEDITION SUPPLIES",
+    "subtitle": "Restock magnifiers or remove the ads between levels.",
+    "balance": "Your magnifiers",
+    "close": "Close",
+    "loading": "Loading the shelf...",
+    "unavailable": "Payments are unavailable right now",
+    "unavailableBody": "Try again later: purchases return as soon as payments are back.",
+    "error": "Could not complete the purchase",
+    "catalogError": "Could not load the shelf",
+    "retry": "Try again",
+    "buy": "Buy",
+    "owned": "Already owned",
+    "purchasing": "Processing purchase...",
+    "success": "Purchase complete",
+    "cancelled": "Purchase cancelled",
+    "bestValue": "Best value",
+    "priceUnavailable": "Price unavailable",
+    "products": {
+      "no_forced_ads": {
+        "title": "No forced ads",
+        "description": "Removes the ads between levels. Optional rewarded videos stay available."
+      },
+      "magnifiers_10": {
+        "title": "10 magnifiers",
+        "description": "Adds 10 magnifiers for hints and time extensions."
+      },
+      "archive_starter_pack": {
+        "title": "Archivist pack",
+        "description": "No forced ads and 20 magnifiers"
+      }
     }
   }
 }

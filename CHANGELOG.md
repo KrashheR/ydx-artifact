@@ -4,6 +4,14 @@
 
 ## Unreleased
 
+- Reworked monetization end to end. Forced interstitials now fire after every second completed campaign level of the session (replays included) and run before either post-victory navigation, so returning to the map no longer cancels a queued ad; they are suppressed with a logged reason for the `no_forced_ads` entitlement, a rewarded video shown less than 90 seconds ago, an in-flight request, an already-resolved completion, or active gameplay, and a failed or declined ad never blocks navigation.
+
+- Replaced every automatic magnifier source with explicit ones. New saves start with exactly one magnifier, campaign completions and daily streaks grant none, and existing balances migrate untouched. Daily Archive now offers a rewarded video for its single magnifier per calendar date instead of granting it automatically, and the timeout overlay offers a rewarded +60-second extension (one per attempt, persisted so a reload cannot farm it) alongside the paid extension, which moved from +30 to +60 seconds for 2 magnifiers.
+
+- Added the Archive Shop: a hub top-bar button opens an in-style modal with three catalog-driven products (`no_forced_ads`, `magnifiers_10`, `archive_starter_pack`), covering loading, payments-unavailable, error/retry, in-flight purchase and success states. Prices, currency and product images come from `payments.getCatalog()`; nothing is hardcoded.
+
+- Added a typed Yandex Payments seam (`src/services/platform/payments.ts`, `purchaseService.ts`, `mockPayments.ts`) with idempotent consumable grants, a bounded purchase-token ledger written in the same save as the reward, `consumePurchase` only after a confirmed durable save, one-time payload protection for the starter pack, and startup purchase recovery that restores entitlements without ever double-granting.
+
 - Fixed the mobile landscape flip comparator on short viewports: its scene wrapper can now shrink within the available play area, keeping the compare button on-screen.
 
 - Added a third mobile landscape comparison mode: side-by-side photos with shared zoom and pan. Its HUD moves above and below the scenes to preserve their usable width.

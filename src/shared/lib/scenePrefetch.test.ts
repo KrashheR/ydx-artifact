@@ -68,6 +68,7 @@ describe("scenePrefetch", () => {
         hintedDifferenceIds: [],
         rewardedHintsUsed: 0,
         timeExtensionsUsed: 0,
+        rewardedTimeExtensionUsed: false,
       },
     });
     expect(getUnlockedChapters(save)[0].id).toBe("sand-meridian");

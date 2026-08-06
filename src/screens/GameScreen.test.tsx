@@ -1,7 +1,10 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@/i18n";
-import { dailyArchiveLevels } from "@/content/dailyArchive";
+import {
+  dailyArchiveLevels,
+  getDailyArchiveDateKey,
+} from "@/content/dailyArchive";
 import { getChapterLevels } from "@/content/chapters";
 import { createDefaultSave } from "@/entities/save/schema";
 import { GameScreen } from "@/screens/GameScreen";
@@ -50,12 +53,16 @@ describe("GameScreen", () => {
         nativeRequestInFlight: false,
       },
       interstitialRuntime: {
-        pendingMapCheckCompletedLevels: null,
-        lastResolvedCompletedLevels: 0,
+        campaignCompletions: 0,
+        completionsSinceLastAd: 0,
+        pendingToken: null,
+        lastResolvedToken: 0,
         nativeRequestInFlight: false,
       },
+      adRuntime: { lastRewardedShownAt: null },
       artifactRevealQueue: [],
     });
+    window.__artifactAnalyticsEvents = [];
   });
 
   async function completeRenderedLevel(level: ReturnType<typeof getChapterLevels>[number]) {
@@ -120,13 +127,17 @@ describe("GameScreen", () => {
 
   it("shows a queued interstitial only when the player clicks next level", async () => {
     const levels = getChapterLevels("northern-route");
-    const level = levels[2];
+    const level = levels[1];
     const showInterstitial = vi.fn(async () => "closed" as const);
     mockPlatform.setInterstitialGatewayOverride({ showInterstitial });
     useGameStore.setState((state) => ({
-      saveData: {
-        ...state.saveData,
-        completedLevels: [levels[0].id, levels[1].id],
+      saveData: { ...state.saveData, completedLevels: [levels[0].id] },
+      interstitialRuntime: {
+        campaignCompletions: 1,
+        completionsSinceLastAd: 1,
+        pendingToken: null,
+        lastResolvedToken: 0,
+        nativeRequestInFlight: false,
       },
     }));
     useGameStore.getState().startLevel(level.id, "campaign");
@@ -135,24 +146,125 @@ describe("GameScreen", () => {
 
     await completeRenderedLevel(level);
 
-    expect(useGameStore.getState().interstitialRuntime.pendingMapCheckCompletedLevels).toBe(3);
+    expect(useGameStore.getState().interstitialRuntime.pendingToken).toBe(2);
     expect(showInterstitial).not.toHaveBeenCalled();
 
-    fireEvent.click(await screen.findByRole("button", { name: /4/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /3/ }));
 
     await waitFor(() => expect(showInterstitial).toHaveBeenCalledTimes(1));
     await waitFor(() => {
       expect(useGameStore.getState().screen).toEqual({
         kind: "game",
-        levelId: levels[3].id,
+        levelId: levels[2].id,
         mode: "campaign",
       });
     });
     expect(useGameStore.getState().interstitialRuntime).toMatchObject({
-      pendingMapCheckCompletedLevels: null,
-      lastResolvedCompletedLevels: 3,
+      pendingToken: null,
+      lastResolvedToken: 2,
       nativeRequestInFlight: false,
     });
+  });
+
+  it("still shows the queued interstitial when the player returns to the map", async () => {
+    const levels = getChapterLevels("northern-route");
+    const level = levels[1];
+    const showInterstitial = vi.fn(async () => "closed" as const);
+    mockPlatform.setInterstitialGatewayOverride({ showInterstitial });
+    useGameStore.setState((state) => ({
+      saveData: { ...state.saveData, completedLevels: [levels[0].id] },
+      interstitialRuntime: {
+        campaignCompletions: 1,
+        completionsSinceLastAd: 1,
+        pendingToken: null,
+        lastResolvedToken: 0,
+        nativeRequestInFlight: false,
+      },
+    }));
+    useGameStore.getState().startLevel(level.id, "campaign");
+
+    render(<GameScreen levelId={level.id} mode="campaign" />);
+    await completeRenderedLevel(level);
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: /К выбору уровней|Level Select/ }),
+    );
+
+    await waitFor(() => expect(showInterstitial).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      expect(useGameStore.getState().screen).toEqual({
+        kind: "map",
+        chapterId: "northern-route",
+      });
+    });
+  });
+
+  it("skips the campaign interstitial for the no forced ads entitlement", async () => {
+    const levels = getChapterLevels("northern-route");
+    const level = levels[1];
+    const showInterstitial = vi.fn(async () => "closed" as const);
+    mockPlatform.setInterstitialGatewayOverride({ showInterstitial });
+    useGameStore.setState((state) => ({
+      saveData: {
+        ...state.saveData,
+        completedLevels: [levels[0].id],
+        purchases: { ...state.saveData.purchases, noForcedInterstitials: true },
+      },
+      interstitialRuntime: {
+        campaignCompletions: 1,
+        completionsSinceLastAd: 1,
+        pendingToken: null,
+        lastResolvedToken: 0,
+        nativeRequestInFlight: false,
+      },
+    }));
+    useGameStore.getState().startLevel(level.id, "campaign");
+
+    render(<GameScreen levelId={level.id} mode="campaign" />);
+    await completeRenderedLevel(level);
+
+    fireEvent.click(await screen.findByRole("button", { name: /3/ }));
+
+    await waitFor(() => {
+      expect(useGameStore.getState().screen).toMatchObject({ kind: "game" });
+    });
+    expect(showInterstitial).not.toHaveBeenCalled();
+  });
+
+  it("suppresses the campaign interstitial right after a rewarded video", async () => {
+    const levels = getChapterLevels("northern-route");
+    const level = levels[1];
+    const showInterstitial = vi.fn(async () => "closed" as const);
+    mockPlatform.setInterstitialGatewayOverride({ showInterstitial });
+    useGameStore.setState((state) => ({
+      saveData: { ...state.saveData, completedLevels: [levels[0].id] },
+      interstitialRuntime: {
+        campaignCompletions: 1,
+        completionsSinceLastAd: 1,
+        pendingToken: null,
+        lastResolvedToken: 0,
+        nativeRequestInFlight: false,
+      },
+      adRuntime: { lastRewardedShownAt: Date.now() - 1_000 },
+    }));
+    useGameStore.getState().startLevel(level.id, "campaign");
+
+    render(<GameScreen levelId={level.id} mode="campaign" />);
+    await completeRenderedLevel(level);
+
+    fireEvent.click(await screen.findByRole("button", { name: /3/ }));
+
+    await waitFor(() => {
+      expect(useGameStore.getState().screen).toMatchObject({ kind: "game" });
+    });
+    expect(showInterstitial).not.toHaveBeenCalled();
+    expect(
+      window.__artifactAnalyticsEvents?.some(
+        (event) =>
+          event.event === "interstitial_suppressed" &&
+          event.payload.reason === "recent_rewarded",
+      ),
+    ).toBe(true);
   });
 
   it("shows the review pre-prompt after the fourth campaign victory and keeps its buttons clickable", async () => {
@@ -186,10 +298,124 @@ describe("GameScreen", () => {
     });
   });
 
-  it("shows the earned hint reward on the daily completion overlay", async () => {
+  async function completeRenderedDaily(level: (typeof dailyArchiveLevels)[number]) {
+    for (const difference of level.differences) {
+      fireEvent.click(
+        screen.getByRole("button", { name: `find ${difference.id}` }),
+      );
+      await waitFor(() => {
+        expect(
+          useGameStore.getState().saveData.inProgress?.foundDifferenceIds ?? [],
+        ).toContain(difference.id);
+      });
+    }
+    await screen.findByText(/Награда дня|Daily reward/i);
+  }
+
+  it("grants exactly one daily magnifier after the rewarded video and skips the interstitial", async () => {
     const level = dailyArchiveLevels[0];
+    const showRewarded = vi.fn(async () => "rewarded" as const);
+    const showInterstitial = vi.fn(async () => "closed" as const);
+    mockPlatform.setRewardedGatewayOverride({ showRewarded });
+    mockPlatform.setInterstitialGatewayOverride({ showInterstitial });
     useGameStore.setState((state) => ({
       saveData: { ...state.saveData, magnifiers: 0 },
+    }));
+    useGameStore.getState().startLevel(level.id, "daily");
+
+    render(<GameScreen levelId={level.id} mode="daily" />);
+    await completeRenderedDaily(level);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /за рекламу|for an ad/i }),
+    );
+
+    await waitFor(() => {
+      expect(useGameStore.getState().saveData.magnifiers).toBe(1);
+    });
+    await waitFor(() => {
+      expect(useGameStore.getState().screen).toEqual({ kind: "home" });
+    });
+    expect(showRewarded).toHaveBeenCalledTimes(1);
+    expect(showInterstitial).not.toHaveBeenCalled();
+    expect(useGameStore.getState().saveData.daily.streak).toBe(1);
+  });
+
+  it("shows the interstitial when the daily reward is declined and still returns to the hub", async () => {
+    const level = dailyArchiveLevels[0];
+    const showInterstitial = vi.fn(async () => "closed" as const);
+    mockPlatform.setInterstitialGatewayOverride({ showInterstitial });
+    useGameStore.setState((state) => ({
+      saveData: { ...state.saveData, magnifiers: 0 },
+    }));
+    useGameStore.getState().startLevel(level.id, "daily");
+
+    render(<GameScreen levelId={level.id} mode="daily" />);
+    await completeRenderedDaily(level);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /без награды|without a reward/i }),
+    );
+
+    await waitFor(() => expect(showInterstitial).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      expect(useGameStore.getState().screen).toEqual({ kind: "home" });
+    });
+    expect(useGameStore.getState().saveData.magnifiers).toBe(0);
+    // The streak lands regardless of the ad choice.
+    expect(useGameStore.getState().saveData.daily.streak).toBe(1);
+  });
+
+  it("returns to the archive hub even when the daily interstitial fails", async () => {
+    const level = dailyArchiveLevels[0];
+    const showInterstitial = vi.fn(async () => "failed" as const);
+    mockPlatform.setInterstitialGatewayOverride({ showInterstitial });
+    useGameStore.getState().startLevel(level.id, "daily");
+
+    render(<GameScreen levelId={level.id} mode="daily" />);
+    await completeRenderedDaily(level);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /без награды|without a reward/i }),
+    );
+
+    await waitFor(() => {
+      expect(useGameStore.getState().screen).toEqual({ kind: "home" });
+    });
+  });
+
+  it("keeps the daily reward failure recoverable without granting a magnifier", async () => {
+    const level = dailyArchiveLevels[0];
+    const showRewarded = vi.fn(async () => "failed" as const);
+    mockPlatform.setRewardedGatewayOverride({ showRewarded });
+    useGameStore.setState((state) => ({
+      saveData: { ...state.saveData, magnifiers: 0 },
+    }));
+    useGameStore.getState().startLevel(level.id, "daily");
+
+    render(<GameScreen levelId={level.id} mode="daily" />);
+    await completeRenderedDaily(level);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /за рекламу|for an ad/i }),
+    );
+
+    await screen.findByText(/недоступна|unavailable/i);
+    expect(useGameStore.getState().saveData.magnifiers).toBe(0);
+    expect(useGameStore.getState().saveData.daily.streak).toBe(1);
+    expect(useGameStore.getState().screen).not.toEqual({ kind: "home" });
+  });
+
+  it("hides the daily reward offer once the day's magnifier was already granted", async () => {
+    const level = dailyArchiveLevels[0];
+    useGameStore.setState((state) => ({
+      saveData: {
+        ...state.saveData,
+        daily: {
+          ...state.saveData.daily,
+          lastAdRewardDate: getDailyArchiveDateKey(),
+        },
+      },
     }));
     useGameStore.getState().startLevel(level.id, "daily");
 
@@ -206,10 +432,10 @@ describe("GameScreen", () => {
       });
     }
 
+    await screen.findByText(/Дело дня закрыто|Daily case closed/i);
     expect(
-      await screen.findByText(/Награда дня|Daily reward/i),
-    ).toBeInTheDocument();
-    expect(useGameStore.getState().saveData.magnifiers).toBe(1);
+      screen.queryByRole("button", { name: /за рекламу|for an ad/i }),
+    ).not.toBeInTheDocument();
   });
 
   it("does not spend another magnifier while an area hint is already active", async () => {
@@ -346,6 +572,119 @@ describe("GameScreen", () => {
     await waitFor(() => expect(showRewarded).toHaveBeenCalledTimes(1));
     expect(screen.queryByTestId("active-hint")).not.toBeInTheDocument();
     expect(useGameStore.getState().saveData.magnifiers).toBe(0);
+  });
+
+  function timeOutCurrentLevel(levelId: string) {
+    useGameStore.getState().addActiveLevelTime(levelId, 300, { save: false });
+  }
+
+  it("grants exactly sixty seconds for one rewarded timeout extension per attempt", async () => {
+    const level = getChapterLevels("northern-route")[0];
+    const showRewarded = vi.fn(async () => "rewarded" as const);
+    mockPlatform.setRewardedGatewayOverride({ showRewarded });
+    useGameStore.getState().startLevel(level.id, "campaign");
+
+    render(<GameScreen levelId={level.id} mode="campaign" />);
+    timeOutCurrentLevel(level.id);
+
+    const adButton = await screen.findByRole("button", {
+      name: /\+60|60 seconds|60 секунд/i,
+    });
+    const foundBefore =
+      useGameStore.getState().saveData.inProgress?.foundDifferenceIds.length ?? 0;
+    fireEvent.click(adButton);
+
+    await waitFor(() => {
+      expect(
+        useGameStore.getState().saveData.inProgress?.timeGrantedSeconds,
+      ).toBe(60);
+    });
+    const attempt = useGameStore.getState().saveData.inProgress;
+    expect(attempt?.rewardedTimeExtensionUsed).toBe(true);
+    // Attempt progress is carried into the extended run.
+    expect(attempt?.foundDifferenceIds).toHaveLength(foundBefore);
+    expect(showRewarded).toHaveBeenCalledTimes(1);
+  });
+
+  it("offers the rewarded extension only once per attempt", async () => {
+    const level = getChapterLevels("northern-route")[0];
+    mockPlatform.setRewardedGatewayOverride({
+      showRewarded: vi.fn(async () => "rewarded" as const),
+    });
+    useGameStore.getState().startLevel(level.id, "campaign");
+
+    render(<GameScreen levelId={level.id} mode="campaign" />);
+    timeOutCurrentLevel(level.id);
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: /\+60|60 seconds|60 секунд/i }),
+    );
+    await waitFor(() => {
+      expect(
+        useGameStore.getState().saveData.inProgress?.rewardedTimeExtensionUsed,
+      ).toBe(true);
+    });
+
+    // Run the clock out again on the same attempt.
+    timeOutCurrentLevel(level.id);
+
+    await screen.findByRole("button", { name: /Начать заново|Start Over/i });
+    expect(
+      screen.queryByRole("button", { name: /\+60|60 seconds|60 секунд/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("keeps the used-extension flag after a reload of the same attempt", async () => {
+    const level = getChapterLevels("northern-route")[0];
+    mockPlatform.setRewardedGatewayOverride({
+      showRewarded: vi.fn(async () => "rewarded" as const),
+    });
+    useGameStore.getState().startLevel(level.id, "campaign");
+
+    const view = render(<GameScreen levelId={level.id} mode="campaign" />);
+    timeOutCurrentLevel(level.id);
+    fireEvent.click(
+      await screen.findByRole("button", { name: /\+60|60 seconds|60 секунд/i }),
+    );
+    await waitFor(() => {
+      expect(
+        useGameStore.getState().saveData.inProgress?.rewardedTimeExtensionUsed,
+      ).toBe(true);
+    });
+    view.unmount();
+
+    // A reload rehydrates the same persisted attempt and remounts the screen.
+    render(<GameScreen levelId={level.id} mode="campaign" />);
+    timeOutCurrentLevel(level.id);
+
+    await screen.findByRole("button", { name: /Начать заново|Start Over/i });
+    expect(
+      screen.queryByRole("button", { name: /\+60|60 seconds|60 секунд/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("does not grant time when the rewarded extension is closed early", async () => {
+    const level = getChapterLevels("northern-route")[0];
+    mockPlatform.setRewardedGatewayOverride({
+      showRewarded: vi.fn(async () => "closed" as const),
+    });
+    useGameStore.getState().startLevel(level.id, "campaign");
+
+    render(<GameScreen levelId={level.id} mode="campaign" />);
+    timeOutCurrentLevel(level.id);
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: /\+60|60 seconds|60 секунд/i }),
+    );
+
+    await waitFor(() => {
+      expect(
+        useGameStore.getState().saveData.inProgress?.rewardedTimeExtensionUsed,
+      ).toBe(false);
+    });
+    expect(
+      useGameStore.getState().saveData.inProgress?.timeGrantedSeconds,
+    ).toBe(0);
   });
 
   it("prevents native context menus, text selection, and browser dragging during gameplay", () => {

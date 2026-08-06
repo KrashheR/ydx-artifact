@@ -35,11 +35,19 @@ Loading performance:
 - After bootstrap, an idle-scheduled background prefetch (`src/shared/lib/scenePrefetch.ts`) warms map backgrounds and level card previews of unlocked chapters plus the likely next levels' scene pairs, one image at a time; it is skipped under data-saver.
 - Secondary surfaces (`CollectionScreen`, `DailyScreen`, `SettingsModal`) are `React.lazy` chunks; the settings modal mounts on first open. Home, map and gameplay stay in the entry chunk.
 
-Platform calls are routed through service modules under `src/services`. The platform adapter keeps Yandex SDK access out of React components for review prompts, fullscreen interstitials, rewarded hint ads and cloud/local save storage.
+Platform calls are routed through service modules under `src/services`. The platform adapter keeps Yandex SDK access out of React components for review prompts, fullscreen interstitials, rewarded ads, in-app purchases and cloud/local save storage.
+
+Monetization seams:
+
+- `src/shared/lib/adPolicy.ts` is pure policy: the every-two-completions campaign cadence, the 90-second post-rewarded suppression window, the 60-second time-extension values, the placement list and `resolveInterstitialDecision`.
+- `src/services/platform/adService.ts` is the only module that calls the ad gateways. It tags every event with a `placement`, stamps `adRuntime.lastRewardedShownAt` when a rewarded video actually opens, and resolves the cadence ledger whether the ad ran, was suppressed or failed.
+- `src/services/platform/payments.ts` defines the typed `PaymentsGateway`, normalizes the Yandex catalog/purchase shapes and exposes `setPaymentsGatewayOverride` for tests and mock mode; `src/services/platform/mockPayments.ts` is the in-memory implementation.
+- `src/services/platform/purchaseService.ts` owns the purchase pipeline: grant and idempotency-ledger write land in one save, `consumePurchase` runs only after `persistSave` reports success, and `recoverPurchases()` reconciles entitlements at startup.
+- `src/features/shop/ShopModal.tsx` is presentation only; it reads the balance and entitlements from the store and calls the purchase service.
 
 Review prompt flow stays inside the same architecture seams:
 
 - `src/services/platform/mockPlatform.ts` owns the Yandex review gateway (`canReview` / `requestReview`) and caches SDK initialization.
-- The same adapter owns Yandex ad calls: `showRewarded()` powers zero-balance area hints through `ysdk.adv.showRewardedVideo()`, and `showInterstitial()` powers campaign-map break ads through `ysdk.adv.showFullscreenAdv()`.
+- The same adapter owns Yandex ad calls: `showRewarded(callbacks)` wraps `ysdk.adv.showRewardedVideo()` for area hints, Daily rewards and timeout extensions, and `showInterstitial(callbacks)` wraps `ysdk.adv.showFullscreenAdv()` for the post-victory campaign cadence and the Daily exit ad. Both are driven exclusively through `adService`.
 - `src/shared/store/gameStore.ts` persists review prompt schedule state in `saveData.reviewPrompt` and keeps transient request guards in `reviewPromptRuntime`.
 - `src/screens/MapScreen.tsx` now renders the campaign journal card layout for desktop/mobile, while still orchestrating the safe post-level review prompt check and opening `GameReviewPrePromptModal` only after `canReview()` succeeds.
